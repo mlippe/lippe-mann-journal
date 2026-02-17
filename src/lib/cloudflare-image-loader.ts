@@ -1,6 +1,8 @@
 const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || '';
 
-const normalizeSrc = (src: string) => src.replace(/^\/+/, '');
+const normalizeSrc = (src: string) => {
+  return src.startsWith('/') ? src.slice(1) : src;
+};
 
 export default function cloudflareLoader({
   src,
@@ -11,15 +13,17 @@ export default function cloudflareLoader({
   width: number;
   quality?: number;
 }) {
-  // Ensure src is relative to bucket
-  const relativeSrc = src.startsWith('http')
-    ? new URL(src).pathname
-    : normalizeSrc(src);
-
+  if (src.startsWith('/')) {
+    return src;
+  }
+  // if (process.env.NODE_ENV === "development") {
+  //   return src;
+  // }
   const params = [`width=${width}`];
-  if (quality) params.push(`quality=${quality}`);
+  if (quality) {
+    params.push(`quality=${quality}`);
+  }
   const paramsString = params.join(',');
 
-  // Return correct Cloudflare Image URL
-  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${relativeSrc}`;
+  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(src)}`;
 }
