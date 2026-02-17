@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { TExifData, TImageInfo } from "@/modules/photos/lib/utils";
+import { z } from 'zod';
+import { TExifData, TImageInfo } from '@/modules/photos/lib/utils';
 
 // ============================================================================
 // FORM SCHEMAS
@@ -8,15 +8,15 @@ import { TExifData, TImageInfo } from "@/modules/photos/lib/utils";
 export const firstStepSchema = z.object({
   url: z
     .string()
-    .min(1, { message: "Please upload a photo before proceeding" }),
+    .min(1, { message: 'Please upload a photo before proceeding' }),
 });
 
 export type FirstStepData = z.infer<typeof firstStepSchema>;
 
 export const secondStepSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
-  visibility: z.enum(["private", "public"]).default("private"),
+  title: z.string().min(1, { message: 'Title is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
+  visibility: z.enum(['private', 'public']).default('private'),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   gpsAltitude: z.number().optional(),
@@ -91,32 +91,27 @@ export interface MetadataStepProps extends StepProps {
 // ============================================================================
 
 export const INITIAL_FORM_VALUES: Partial<PhotoFormData> = {
-  url: "",
-  title: "",
-  description: "",
-  visibility: "private",
+  url: '',
+  title: '',
+  description: '',
+  visibility: 'private',
   isFavorite: false,
 };
 
 export const STEP_CONFIG = [
   {
-    id: "upload",
-    title: "Upload",
-    description: "Upload your photo",
+    id: 'upload',
+    title: 'Upload',
+    description: 'Upload your photo',
   },
   {
-    id: "metadata",
-    title: "Metadata",
-    description: "Add metadata to your photo",
+    id: 'metadata',
+    title: 'Metadata',
+    description: 'Add metadata to your photo',
   },
   {
-    id: "location",
-    title: "Location",
-    description: "Add location to your photo",
-  },
-  {
-    id: "preview",
-    title: "Preview",
-    description: "Preview your photo",
+    id: 'preview',
+    title: 'Preview',
+    description: 'Preview your photo',
   },
 ];
