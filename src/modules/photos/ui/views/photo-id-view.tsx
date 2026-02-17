@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import { useState } from 'react';
 import { FramedPhoto } from '@/components/framed-photo';
 import { photosUpdateSchema } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
@@ -22,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ApertureSelector } from '../components/aperture-selector';
 import { ShutterSpeedSelector } from '../components/shutter-speed-selector';
 import { ISOSelector } from '../components/iso-selector';
@@ -31,18 +29,6 @@ import { ExposureCompensationSelector } from '../components/exposure-compensatio
 interface PhotoIdViewProps {
   id: string;
 }
-
-const MapboxComponent = dynamic(
-  () => import('@/modules/mapbox/ui/components/map'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className='h-64 w-full rounded-md border flex items-center justify-center bg-muted'>
-        <Skeleton className='h-full w-full' />
-      </div>
-    ),
-  },
-);
 
 const formSchema = photosUpdateSchema.extend({
   make: z.string().optional(),
@@ -70,14 +56,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
       onError: () => {},
     }),
   );
-
-  const [currentLocation, setCurrentLocation] = useState<{
-    lat: number | null;
-    lng: number | null;
-  }>({
-    lat: data.latitude ?? null,
-    lng: data.longitude ?? null,
-  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -406,14 +384,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                               const numericValue =
                                 value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
-                              setCurrentLocation((prev) => ({
-                                lat:
-                                  numericValue ??
-                                  prev?.lat ??
-                                  data.latitude ??
-                                  null,
-                                lng: prev?.lng ?? data.longitude ?? null,
-                              }));
                             }}
                             placeholder='e.g. 37.7749'
                           />
@@ -439,14 +409,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                               const numericValue =
                                 value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
-                              setCurrentLocation((prev) => ({
-                                lat: prev?.lat ?? data.latitude ?? null,
-                                lng:
-                                  numericValue ??
-                                  prev?.lng ??
-                                  data.longitude ??
-                                  null,
-                              }));
                             }}
                             placeholder='e.g. -122.4194'
                           />
@@ -477,51 +439,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                 height={data.height}
                 className='max-h-[50vh]'
               />
-            </div>
-
-            <div className='bg-card border rounded-xl p-4 shadow-sm'>
-              <div className='mb-2 flex items-center justify-between'>
-                <h2 className='text-sm font-medium'>Location</h2>
-              </div>
-              <div className='h-64 w-full rounded-md overflow-hidden border'>
-                <Suspense
-                  fallback={
-                    <div className='h-full w-full flex items-center justify-center bg-muted'>
-                      <Skeleton className='h-full w-full' />
-                    </div>
-                  }
-                >
-                  <MapboxComponent
-                    draggableMarker
-                    markers={
-                      currentLocation?.lat != null &&
-                      currentLocation?.lng != null
-                        ? [
-                            {
-                              id: 'photo-location',
-                              longitude: currentLocation.lng,
-                              latitude: currentLocation.lat,
-                            },
-                          ]
-                        : []
-                    }
-                    initialViewState={{
-                      longitude: currentLocation?.lng ?? 0,
-                      latitude: currentLocation?.lat ?? 0,
-                      zoom:
-                        currentLocation?.lat != null &&
-                        currentLocation?.lng != null
-                          ? 10
-                          : 2,
-                    }}
-                    onMarkerDragEnd={(markerId, lngLat) => {
-                      setCurrentLocation({ lat: lngLat.lat, lng: lngLat.lng });
-                      form.setValue('latitude', lngLat.lat);
-                      form.setValue('longitude', lngLat.lng);
-                    }}
-                  />
-                </Suspense>
-              </div>
             </div>
           </div>
         </div>
