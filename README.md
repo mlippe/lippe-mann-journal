@@ -1,84 +1,43 @@
-# Photography Website
+# #myownplaceonlinelikeinstagrambutwithoutmeta
 
-A modern photography portfolio website built with Next.js 16, featuring interactive maps, photo management, and a comprehensive dashboard.
+I whished for something like instagram, where i can share my work online and get feedback from others. But I wanted to take control over each aspect of this, for example that I still own my content after posting it. Thats why I built this. I also plan to share some blog articles about side projects and other stuff that interests me and gets me writing. I tried [ghost.org](https://ghost.org/) earlier for this purpose, but it wasn't for me. I was looking for a media heavy blog with some text articles, not the other way around.
 
-## 📸 Screenshots
+**This is a fork of the beuatiful and extensive [photography-website by ECarry](https://github.com/ECarry/photography-website), I adjusted it based on my taste and needs. Please always refer to the [Readme](https://github.com/ECarry/photography-website#photography-website) from ECarry for further details.**
 
-![Home Page](screenshots/home.png)
-_Home Page_
-
-![Dashboard](screenshots/dashboard.png)
-_Dashboard_
+[My production version lives here.](https://journal.lippe-mann.de/)
 
 ## 🚀 Features
 
+- **Instagram like experience and feel** people visiting your site know their way around
 - **Next.js 16** with React 19 and React Compiler
 - **TanStack Query v5** for advanced data fetching and caching
 - **tRPC v11** for end-to-end type-safe APIs
-- **Interactive Maps** with Mapbox GL JS integration
-- **Photo Management** with EXIF data extraction and iPhone album integration
+- **Photo Management** with EXIF data extraction
 - **Real-time Dashboard** with analytics and statistics
 - **Modern UI** built with Tailwind CSS and shadcn/ui components
 - **Authentication** powered by Better Auth
 - **Database** using Drizzle ORM with PostgreSQL
 - **File Storage** via S3-compatible storage
 
-## 📋 Prerequisites
+## 🛠️ Deployment guide
 
-Before deploying, ensure you have:
+The setup of this was not as straightforward as I have guessed when first finding ECarrys repo. So I wrote this guide outlining exactly what I have done to get this up and running.
 
-- **Node.js 18+** or **Bun** runtime
-- **PostgreSQL database** (recommended: Neon, Supabase, or Vercel Postgres)
-- **S3-compatible storage** for image storage (AWS S3, Cloudflare R2, DigitalOcean Spaces, etc.)
-- **Mapbox** account for map features
-- **Vercel** account for deployment (or any Node.js hosting provider)
+My setup:
 
-## 🎨 Customization
-
-All personal branding is centralized in **one file**: `src/site.config.ts`. Edit it to make the site your own:
-
-| Field         | Description                                                             |
-| ------------- | ----------------------------------------------------------------------- |
-| `name`        | Your name (logo, profile cards, footer)                                 |
-| `tagline`     | Short tagline next to logo (e.g. "Photo")                               |
-| `role`        | Your title (e.g. "Photographer")                                        |
-| `bio`         | Short bio on the home page                                              |
-| `avatar`      | Avatar image path (place file in `/public/avatar.jpg`)                  |
-| `initials`    | Fallback text when avatar fails to load                                 |
-| `metadata`    | SEO title & description                                                 |
-| `socialLinks` | Social links with icons (Instagram, GitHub, X, Xiaohongshu, Contact me) |
-| `footer`      | Footer attribution credits                                              |
-| `mapbox`      | Custom Mapbox style URLs for light/dark themes                          |
-| `imageLoader` | Set to `"cloudflare"` or `"default"` based on your storage provider     |
-| `gear`        | Camera gear shown on the About page                                     |
-
-**Quick start:**
-
-```bash
-# 1. Edit the config
-vim src/site.config.ts
-
-# 2. Replace avatar
-cp your-photo.jpg public/avatar.jpg
-
-# 3. Replace about background
-cp your-bg.jpg public/bg.jpg
-```
-
-> **Note:** If you are NOT using Cloudflare R2, set `imageLoader` to `"default"` in `site.config.ts`. This replaces the old manual edit of `next.config.ts`.
-
-## 🛠️ Deployment Guide
+- **Bun** runtime for scripts
+- **npm** for futher development
+- **PostgreSQL database** from Neon
+- **S3-compatible storage** for image storage, I chose Cloudflare R2
+- **Vercel** account for deployment
 
 ### Step 1: Clone and Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/ECarry/photography-website.git
-cd photography-website
+git clone https://github.com/mlippe/lippe-mann-journal
+cd lippe-mann-journal
 
-# Install dependencies
-bun install
-# or
 npm install
 ```
 
@@ -86,11 +45,10 @@ npm install
 
 Create a `.env` file in the root directory:
 
-```bash
-cp .env.example .env
-```
-
 Configure the following environment variables:
+
+**!!! NEVER COMMIT ANY OF THE ENV CREDENTIALS YOU ARE ADDING BELOW !!!**
+They should stay secret and on your machine only. (or in Vercel for deployment)
 
 #### Database Configuration
 
@@ -99,118 +57,107 @@ Configure the following environment variables:
 DATABASE_URL=postgresql://username:password@host:port/database_name?sslmode=require
 ```
 
-**For Neon Database:**
+I am using Neon, because it offers a good free tier and my supabase account is busy with other projects in the free tier. You can choose any other database, but your miles may vary with this setup...
 
 1. Create account at [neon.tech](https://neon.tech)
 2. Create a new project
 3. Copy the connection string from dashboard
 
-**For Supabase:**
-
-1. Create project at [supabase.com](https://supabase.com)
-2. Go to Settings > Database
-3. Copy the connection string
+**If you use the same database for prod and dev, this stays the same for both environments.**
 
 #### Authentication Configuration
+
+This is for the accounts that can access the dashboard of your site a.k.a. allowing to post content to it. The project uses [Better-Auth](https://www.better-auth.com/), which is already set up except for the env credentials.
 
 ```env
 # Generate a random secret key (32+ characters)
 BETTER_AUTH_SECRET=your-super-secret-key-here
 
-# Your app's base URL
-BETTER_AUTH_URL=https://your-domain.com
-NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
+
+```env
+# Your app's base URL
+BETTER_AUTH_URL=https://your-domain.com (can be your own or just the vercel domain you get after deployment)
+NEXT_PUBLIC_APP_URL=https://your-domain.com (can be your own or just the vercel domain you get after deployment)
+
+```
+
+**For local development, always use `http://localhost:3000` for these variables. For production, use your domain.**
 
 #### S3-Compatible Storage Configuration
 
+This is where your photo files will live. I use Cloudflare R2, which allows you to save 10GB of photos in the free tier. You can also use other providers, have a look in the [original Readme](https://github.com/ECarry/photography-website#photography-website) for this.
+
 ```env
 # S3-compatible storage settings
-S3_ENDPOINT=https://your-s3-endpoint.com
-S3_BUCKET_NAME=your-bucket-name
-S3_PUBLIC_URL=https://your-custom-domain.com
-S3_ACCESS_KEY_ID=your-access-key
-S3_SECRET_ACCESS_KEY=your-secret-key
-NEXT_PUBLIC_S3_PUBLIC_URL=https://your-custom-domain.com
-```
-
-**Supported Storage Providers:**
-
-**Cloudflare R2:**
-
-```env
 S3_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
 S3_BUCKET_NAME=your-bucket-name
-NEXT_PUBLIC_S3_PUBLIC_URL=https://your-custom-domain.com
+S3_PUBLIC_URL=https://your-public-storage-domain.com
+S3_ACCESS_KEY_ID=your-access-key
+S3_SECRET_ACCESS_KEY=your-secret-key
+NEXT_PUBLIC_S3_PUBLIC_URL=https://your-public-storage-domain.com
 ```
 
-**AWS S3:**
+**Setup Instructions for Cloudflare:**
 
-```env
-S3_ENDPOINT=https://s3.amazonaws.com
-S3_BUCKET_NAME=your-aws-bucket
-NEXT_PUBLIC_S3_PUBLIC_URL=https://your-bucket.s3.amazonaws.com
+1. Go to [cloudflare.com](https://www.cloudflare.com/) and create a new account (or use your exisiting one)
+2. In the sidebar menu, go to "Storage and Databases" (Build) and then "R2 object storage"
+3. Create a new bucket here, choose a name for the bucket and specifiy the data location. Be careful, you cannot change the buckets name after creation. Add the name to the `S3_BUCKET_NAME` env var.
+4. Go back to "R2 object storage > Overview"
+5. On the right hand side it should show "Account Details". Copy the S3 API url and add it to the `S3_ENDPOINT` env var.
+6. While you're at it, create some API Tokens, which are needed for bucket access as well. Click "Manage" under "Account Details > API Token".
+7. Create a new "Account API token", with the permissions "Object Read & Write". Make sure it is valid for the bucket you created in step 3 (bucket specifity).
+8. Copy the "Access Key ID" to the env var `S3_ACCESS_KEY_ID` and the "Secret Access Key" to `S3_SECRET_ACCESS_KEY`. You can only view the page with these values once, so be sure to copy them directly.
+9. Go back to your bucket under "Storage & Databases > R2 object storage > Overview" and open the bucket. Go to its settings.
+10. Add a "Custom public domain" (see note below) or a "Public Development URL" (only good for testing). Add whichever you chose to `S3_PUBLIC_URL` and `NEXT_PUBLIC_S3_PUBLIC_URL`.
+11. Add a "CORS Policy" to allow access from your frontend client:
+
+```CORS
+# CORS
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "https://your-domain.com (same as in NEXT_PUBLIC_APP_URL)"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "PUT",
+      "POST",
+      "HEAD"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ]
+  }
+]
 ```
 
-**DigitalOcean Spaces:**
+12. We need to setup image transformation through cloudflare now. This is supported by the project and is cool as you can upload high res photos and dont worry about filesize and scaling to devices for delivery. So go "Media > Images > Transformations" in the sidebar. Add a zone / transformation. (I think this only works if you have added an own domain in step 10. Also read the note below.)
+13. Make sure to add your `https://your-public-storage-domain.com` (same as in `S3_PUBLIC_URL`) to the allowed origins.
+14. Phewww, you should be done with cloudflare for now.
 
-```env
-S3_ENDPOINT=https://nyc3.digitaloceanspaces.com
-S3_BUCKET_NAME=your-space-name
-NEXT_PUBLIC_S3_PUBLIC_URL=https://your-space.nyc3.digitaloceanspaces.com
-```
+**Note on the public S3 domain**
 
-**MinIO (Self-hosted):**
+If you use cloudflare, you need to add a domain to your account, which is then managed through cloudflare and its DNS. This is required to use that domain for the public bucket (media) access. I did not want to transfer my main domain to cloudflare, as I have some services and sites tied to it and I was to lazy to move all that stuff.
+My quick fix for this was to buy a new "storage domain" through cloudflare. You can do so in the "Domains" section of your account. It goes for some bucks a year, which I thought was worth it preventing the other hussle...
 
-```env
-S3_ENDPOINT=http://localhost:9000
-S3_BUCKET_NAME=your-minio-bucket
-NEXT_PUBLIC_S3_PUBLIC_URL=http://localhost:9000/your-bucket
-```
-
-**Wasabi:**
-
-```env
-S3_ENDPOINT=https://s3.wasabisys.com
-S3_BUCKET_NAME=your-wasabi-bucket
-NEXT_PUBLIC_S3_PUBLIC_URL=https://your-bucket.s3.wasabisys.com
-```
-
-#### ⚠️ Image loader note (when not using Cloudflare R2)
-
-If you are **not using Cloudflare R2**, set `imageLoader` to `"default"` in `src/site.config.ts`. This is handled automatically — no need to manually edit `next.config.ts`.
-
-**Setup Instructions:**
-
-1. Choose your preferred S3-compatible storage provider
-2. Create an account and set up a bucket
-3. Generate API credentials (Access Key ID and Secret Access Key)
-4. Configure the endpoint URL for your provider
-5. (Optional) Setup custom domain for public access
-
-#### Mapbox Configuration
-
-```env
-# Mapbox access token
-NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-token
-```
-
-**Get Mapbox Token:**
-
-1. Create account at [mapbox.com](https://mapbox.com)
-2. Go to Account > Access Tokens
-3. Create a new token with appropriate scopes
+After buying it, I had to wait for some time before being able to use it as public bucket access domain. Cloudflare keept saying "This domain is not managed through cloudflare", even though it was marked as active in the domain section. If you experience the same, just give it some time and try again.
 
 #### Admin User Configuration
 
+This is the account which can access the dashboard and post content. You can add whatever credentials here, just make sure they are safe.
+
 ```env
 # Default admin user for seeding
-SEED_USER_EMAIL=admin@yourdomain.com
+SEED_USER_EMAIL=your@email-address.com
 SEED_USER_PASSWORD=your-secure-password
-SEED_USER_NAME=Admin User
+SEED_USER_NAME=Admin User / Your Name
 ```
 
 ### Step 3: Database Setup
+
+If you do not yet have bun installed on your machine, [get it here.](https://bun.com/docs/installation)
 
 ```bash
 # Push database schema
@@ -223,36 +170,19 @@ bun run seed:user
 ### Step 4: Build and Test Locally
 
 ```bash
-# Build the application
-bun run build
-
-# Test the production build locally
-bun run start
+# start application locally
+npm run dev
 ```
 
 Visit `http://localhost:3000` to verify everything works correctly.
 
 ### Step 5: Deploy to Vercel
 
-#### Option A: Deploy via Vercel CLI
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel --prod
-```
-
-#### Option B: Deploy via Git Integration
-
-1. Push your code to GitHub/GitLab/Bitbucket
-2. Connect your repository to Vercel
-3. Configure environment variables in Vercel dashboard
-4. Deploy automatically on push
+1. Create a new repository on your GitHub/GitLab/Bitbucket
+2. Push your code to this repository
+3. Connect your repository to Vercel
+4. Configure environment variables in Vercel dashboard
+5. Deploy automatically on push
 
 #### Vercel Environment Variables Setup
 
@@ -260,121 +190,11 @@ In your Vercel dashboard, add all environment variables from your `.env` file:
 
 1. Go to Project Settings > Environment Variables
 2. Add each variable with appropriate values for production
-3. Make sure to update URLs to use your production domain
+3. Make sure to update URLs to use your production domain (you can leave them at `localhost` for the first deployment. just make sure to exchange them after you have deployed and vercel assigned you a \*.vercel.app domain)
 
-### Step 6: Post-Deployment Setup
+### Step 6: Done
 
-#### Database Migration (if needed)
-
-```bash
-# If you need to run migrations on production
-vercel env pull .env.local
-bun run db:push
-```
-
-#### Create Admin User (Production)
-
-```bash
-# Seed admin user in production
-vercel env pull .env.local
-bun run seed:user
-```
-
-#### Upgrade: Photo URL storage change (S3 Key)
-
-- **Change Summary**
-  - The database `url` field now stores the S3 object key (e.g., `photos/IMG_0001.jpg`) instead of a full public URL.
-  - **Benefit**: You can switch domains or CDNs freely by updating environment variables for the public base URL, without mass-updating the database.
-
-- **Migration Steps (run before production, recommended)**
-  1. **Backup your database** (strongly recommended).
-  2. Run the cleanup script to convert existing full URLs to S3 keys:
-     ```bash
-     bun run clean:photo-urls
-     ```
-  3. **Verify the result**: spot-check several records; `url` should look like a key such as `path/to/object.jpg`.
-  4. If you need to rollback, run:
-     ```bash
-     bun run rollback:photo-urls
-     ```
-
-- **Notes**
-  - Ensure your public access domain is configured via `S3_PUBLIC_URL` or `NEXT_PUBLIC_S3_PUBLIC_URL`. At runtime, the app combines this base URL with the key to form a full public URL.
-  - If you have custom prefixes or multiple buckets, validate the script behavior in a staging environment first.
-
-## 🐳 Docker Deployment
-
-This project supports two Docker deployment modes: **Standalone** (self-hosted) and **Cloud** (managed services).
-
-### 1. Standalone Mode (Default)
-
-Run the entire stack (App, PostgreSQL, RustFS) locally. Ideal for testing and self-hosting.
-
-```bash
-docker compose up -d
-# or explicitly:
-docker compose -f docker-compose.standalone.yml up -d
-```
-
-- **App**: http://localhost:3000
-- **Postgres**: localhost:5432
-- **RustFS (S3)**: localhost:9000
-- **RustFS Console**: http://localhost:9001
-
-### 2. Cloud Mode
-
-Run only the App container, connecting to external services (e.g., Neon Postgres, AWS S3, Cloudflare R2).
-
-1.  Create a `.env` file with your credentials:
-    ```bash
-    DATABASE_PROVIDER=cloud
-    DATABASE_URL="postgres://..."
-    BETTER_AUTH_SECRET="..."
-    S3_ACCESS_KEY_ID="..."
-    S3_SECRET_ACCESS_KEY="..."
-    S3_BUCKET_NAME="..."
-    S3_ENDPOINT="..." # Optional
-    S3_PUBLIC_URL="..."
-    ```
-2.  Start the service:
-    ```bash
-    docker compose -f docker-compose.cloud.yml up -d
-    ```
-
-### ⚠️ Important Note on Building
-
-The Dockerfile uses a **multi-stage build** with two deployment targets:
-
-| Target   | Used by                            | Strategy                                                                                                       |
-| -------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `dev`    | `docker-compose.yml` (Standalone)  | **Runtime build** — app is built inside the container at startup so SSG can access the local database          |
-| `runner` | `docker-compose.cloud.yml` (Cloud) | **Pre-built** — app is built during `docker build` using Next.js standalone output for a smaller, faster image |
-
-**Standalone mode:**
-
-- **First Start**: Will take 1-2 minutes to compile.
-- **Restarts**: Will be fast (cached via `next_cache` volume).
-
-**Cloud mode:**
-
-- Image is pre-built and optimized (~200MB vs ~1GB).
-- Starts instantly — no build step at runtime.
-- Environment variables for SSG are passed as build args.
-
-## 🛠 Tech Stack
-
-### Custom Domain Setup
-
-1. **Vercel Custom Domain:**
-   - Go to Project Settings > Domains
-   - Add your custom domain
-   - Configure DNS records as instructed
-
-2. **Update Environment Variables:**
-   ```env
-   BETTER_AUTH_URL=https://your-custom-domain.com
-   NEXT_PUBLIC_APP_URL=https://your-custom-domain.com
-   ```
+You should be able to see and use the site now.
 
 ### Performance Optimization
 
@@ -383,11 +203,6 @@ The Dockerfile uses a **multi-stage build** with two deployment targets:
    ```bash
    npm install @vercel/analytics
    ```
-
-2. **Configure Image Optimization:**
-   - Ensure S3-compatible storage is properly configured
-   - Set up custom domain for your storage bucket
-   - Configure CDN settings (CloudFlare, AWS CloudFront, etc.)
 
 ### Security Considerations
 
@@ -443,22 +258,13 @@ bun install
 - Ensure bucket permissions are correct
 - Verify endpoint URL is correct for your provider
 
-#### Map Not Loading
-
-- Verify Mapbox token is valid
-- Check token permissions and scopes
-- Ensure domain is authorized in Mapbox settings
-
 ## 📚 Additional Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Vercel Deployment Guide](https://vercel.com/docs)
 - [Drizzle ORM Documentation](https://orm.drizzle.team)
 - [Better Auth Documentation](https://better-auth.com)
-- [AWS S3 Documentation](https://docs.aws.amazon.com/s3/)
 - [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/)
-- [DigitalOcean Spaces Documentation](https://docs.digitalocean.com/products/spaces/)
-- [Mapbox Documentation](https://docs.mapbox.com)
 
 ## 🤝 Contributing
 
@@ -471,15 +277,3 @@ bun install
 ## 💖 Support
 
 If you find this project helpful, please give it a ⭐️ on GitHub!
-
-## ⭐️ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ECarry/photography-website&type=Date)](https://star-history.com/#ECarry/photography-website&Date)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-**Need help?** Check the troubleshooting section above or open an issue in the repository.
