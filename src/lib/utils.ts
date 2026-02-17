@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatGPSCoordinates(
   lat: number | null | undefined,
-  lng: number | null | undefined
+  lng: number | null | undefined,
 ): string {
   if (lat === null || lat === undefined || lng === null || lng === undefined) {
     return "No location data";
@@ -33,8 +33,8 @@ export function formatGPSCoordinates(
         ? "N"
         : "S"
       : decimal >= 0
-      ? "E"
-      : "W";
+        ? "E"
+        : "W";
 
     return `${degrees}°${minutes}'${seconds}"${direction}`;
   };
@@ -61,7 +61,7 @@ export const duplicateContent = (editor: Editor) => {
       selection.content().content.firstChild?.toJSON(),
       {
         updateSelection: true,
-      }
+      },
     )
     .focus(selection.to)
     .run();

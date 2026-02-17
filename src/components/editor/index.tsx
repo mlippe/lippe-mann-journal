@@ -50,7 +50,7 @@ interface TiptapEditorProps {
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const trpc = useTRPC();
   const createPresignedUrl = useMutation(
-    trpc.s3.createPresignedUrl.mutationOptions()
+    trpc.s3.createPresignedUrl.mutationOptions(),
   );
 
   const extensions = useMemo(
@@ -137,13 +137,13 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to upload image"
+                  : "Failed to upload image",
               );
             }
           },
         }),
       ] as Extension[],
-    [createPresignedUrl]
+    [createPresignedUrl],
   );
 
   const editor = useEditor({

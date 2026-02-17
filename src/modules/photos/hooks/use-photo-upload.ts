@@ -16,7 +16,7 @@ interface UsePhotoUploadProps {
   onUploadSuccess?: (
     url: string,
     exif: TExifData | null,
-    imageInfo: TImageInfo
+    imageInfo: TImageInfo,
   ) => void;
 }
 
@@ -32,7 +32,7 @@ export function usePhotoUpload({
 
   const trpc = useTRPC();
   const createPresignedUrl = useMutation(
-    trpc.s3.createPresignedUrl.mutationOptions()
+    trpc.s3.createPresignedUrl.mutationOptions(),
   );
 
   const handleUpload = async (file: File) => {
@@ -76,7 +76,7 @@ export function usePhotoUpload({
 
       console.error("Upload error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to upload photo"
+        error instanceof Error ? error.message : "Failed to upload photo",
       );
     } finally {
       setIsUploading(false);

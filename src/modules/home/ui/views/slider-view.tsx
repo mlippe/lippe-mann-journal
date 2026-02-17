@@ -15,7 +15,7 @@ import { ImageOff } from "lucide-react";
 export const SliderView = () => {
   const trpc = useTRPC();
   const { data: photos } = useSuspenseQuery(
-    trpc.home.getManyLikePhotos.queryOptions({ limit: 10 })
+    trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
   );
 
   if (photos.length === 0) {

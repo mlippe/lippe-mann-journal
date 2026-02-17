@@ -24,7 +24,7 @@ const FLIP_INTERVAL = 2000;
 export const ScreensaverView = () => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.discover.getManyPhotos.queryOptions({})
+    trpc.discover.getManyPhotos.queryOptions({}),
   );
 
   const [gridCells, setGridCells] = useState<GridCell[]>([]);
@@ -110,8 +110,8 @@ export const ScreensaverView = () => {
                 ...cell,
                 isAnimating: false,
               }
-            : cell
-        )
+            : cell,
+        ),
       );
     }, FLIP_DURATION);
 

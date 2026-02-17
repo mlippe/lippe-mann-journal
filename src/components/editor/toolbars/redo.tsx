@@ -48,7 +48,7 @@ const RedoToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 RedoToolbar.displayName = "RedoToolbar";

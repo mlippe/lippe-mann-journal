@@ -33,7 +33,7 @@ export const DashboardPhotosView = () => {
   const trpc = useTRPC();
   const [filters, setFilters] = usePhotosFilters();
   const { data } = useSuspenseQuery(
-    trpc.photos.getMany.queryOptions({ ...filters })
+    trpc.photos.getMany.queryOptions({ ...filters }),
   );
 
   return (

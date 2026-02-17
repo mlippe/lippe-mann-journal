@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const decodedSlug = decodeURIComponent(slug);
   const queryClient = getQueryClient();
   const data = await queryClient.fetchQuery(
-    trpc.blog.getOne.queryOptions({ slug: decodedSlug })
+    trpc.blog.getOne.queryOptions({ slug: decodedSlug }),
   );
 
   return {
@@ -32,7 +32,7 @@ export default async function page({ params }: Props) {
   const decodedSlug = decodeURIComponent(slug);
   const queryClient = getQueryClient();
   await queryClient.fetchQuery(
-    trpc.blog.getOne.queryOptions({ slug: decodedSlug })
+    trpc.blog.getOne.queryOptions({ slug: decodedSlug }),
   );
 
   return (

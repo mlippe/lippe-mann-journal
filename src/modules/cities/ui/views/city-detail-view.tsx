@@ -48,7 +48,7 @@ export function CityDetailView({ city }: CityDetailViewProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { data: cityData } = useSuspenseQuery(
-    trpc.city.getOne.queryOptions({ city })
+    trpc.city.getOne.queryOptions({ city }),
   );
 
   const form = useForm<CityDescriptionForm>({
@@ -59,28 +59,28 @@ export function CityDetailView({ city }: CityDetailViewProps) {
   });
 
   const updateCoverPhoto = useMutation(
-    trpc.city.updateCoverPhoto.mutationOptions()
+    trpc.city.updateCoverPhoto.mutationOptions(),
   );
 
   const updateDescription = useMutation(
     trpc.city.updateDescription.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries(
-          trpc.city.getOne.queryOptions({ city })
+          trpc.city.getOne.queryOptions({ city }),
         );
         await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
         await queryClient.invalidateQueries(
-          trpc.home.getCitySets.queryOptions({ limit: 12 })
+          trpc.home.getCitySets.queryOptions({ limit: 12 }),
         );
         await queryClient.invalidateQueries(
-          trpc.travel.getCitySets.queryOptions()
+          trpc.travel.getCitySets.queryOptions(),
         );
         toast.success("Description updated successfully");
       },
       onError: (error) => {
         toast.error(error.message || "Failed to update description");
       },
-    })
+    }),
   );
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export function CityDetailView({ city }: CityDetailViewProps) {
         onSuccess: async () => {
           // Invalidate both queries to refresh data
           await queryClient.invalidateQueries(
-            trpc.city.getOne.queryOptions({ city })
+            trpc.city.getOne.queryOptions({ city }),
           );
           await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
           toast.success("Cover photo updated successfully");
@@ -109,7 +109,7 @@ export function CityDetailView({ city }: CityDetailViewProps) {
         onError: (error) => {
           toast.error(error.message || "Failed to update cover photo");
         },
-      }
+      },
     );
   };
 

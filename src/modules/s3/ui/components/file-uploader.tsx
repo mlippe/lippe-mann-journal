@@ -41,7 +41,7 @@ const FileUploader = ({
 
   const trpc = useTRPC();
   const createPresignedUrl = useMutation(
-    trpc.s3.createPresignedUrl.mutationOptions()
+    trpc.s3.createPresignedUrl.mutationOptions(),
   );
 
   const deleteFile = useMutation(trpc.s3.deleteFile.mutationOptions());
@@ -49,7 +49,7 @@ const FileUploader = ({
   const uploadFile = useCallback(
     async (file: File, fileId: string) => {
       setFiles((prev) =>
-        prev.map((f) => (f.id === fileId ? { ...f, uploading: true } : f))
+        prev.map((f) => (f.id === fileId ? { ...f, uploading: true } : f)),
       );
 
       try {
@@ -58,7 +58,7 @@ const FileUploader = ({
           folder,
           onProgress: (progress) => {
             setFiles((prev) =>
-              prev.map((f) => (f.id === fileId ? { ...f, progress } : f))
+              prev.map((f) => (f.id === fileId ? { ...f, progress } : f)),
             );
           },
           getUploadUrl: async ({ filename, contentType, folder }) => {
@@ -86,8 +86,8 @@ const FileUploader = ({
                   error: false,
                   key: publicUrl,
                 }
-              : f
-          )
+              : f,
+          ),
         );
 
         toast.success("File uploaded successfully");
@@ -104,18 +104,18 @@ const FileUploader = ({
                   error: true,
                   progress: 0,
                 }
-              : f
-          )
+              : f,
+          ),
         );
 
         toast.error(
           `Failed to upload ${file.name}: ${
             error instanceof Error ? error.message : "Unknown error"
-          }`
+          }`,
         );
       }
     },
-    [createPresignedUrl, onUploadSuccess, folder]
+    [createPresignedUrl, onUploadSuccess, folder],
   );
 
   const onDrop = useCallback(
@@ -143,7 +143,7 @@ const FileUploader = ({
         });
       }
     },
-    [uploadFile]
+    [uploadFile],
   );
 
   useEffect(() => {
@@ -159,11 +159,11 @@ const FileUploader = ({
   const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
       const tooManyFiles = fileRejections.find(
-        (fileRejection) => fileRejection.errors[0].code === "too-many-files"
+        (fileRejection) => fileRejection.errors[0].code === "too-many-files",
       );
 
       const fileInvalidType = fileRejections.find(
-        (fileRejection) => fileRejection.errors[0].code === "file-invalid-type"
+        (fileRejection) => fileRejection.errors[0].code === "file-invalid-type",
       );
 
       if (tooManyFiles) {
@@ -200,7 +200,7 @@ const FileUploader = ({
 
       try {
         setFiles((prev) =>
-          prev.map((f) => (f.key === key ? { ...f, isDeleting: true } : f))
+          prev.map((f) => (f.key === key ? { ...f, isDeleting: true } : f)),
         );
 
         await deleteFile.mutateAsync({ key });
@@ -220,23 +220,23 @@ const FileUploader = ({
         toast.success("File deleted successfully");
       } catch (error) {
         setFiles((prev) =>
-          prev.map((f) => (f.key === key ? { ...f, isDeleting: false } : f))
+          prev.map((f) => (f.key === key ? { ...f, isDeleting: false } : f)),
         );
 
         toast.error(
-          error instanceof Error ? error.message : "Failed to delete file"
+          error instanceof Error ? error.message : "Failed to delete file",
         );
       }
     },
-    [deleteFile, files]
+    [deleteFile, files],
   );
 
   const currentFile = files[0];
   const displayImageUrl = currentFile?.objectUrl
     ? currentFile.objectUrl
     : value && value !== deletedKey
-    ? keyToUrl(value) || "/placeholder.svg"
-    : undefined;
+      ? keyToUrl(value) || "/placeholder.svg"
+      : undefined;
 
   const hasImage = !!displayImageUrl;
   const hasError = files.some((file) => file.error);
@@ -250,8 +250,8 @@ const FileUploader = ({
           isDragActive
             ? "border-dashed border-primary bg-primary/5"
             : hasImage
-            ? "border-border bg-background hover:border-primary/50"
-            : "border-dashed border-muted-foreground/25 bg-muted/30 hover:border-primary hover:bg-primary/5"
+              ? "border-border bg-background hover:border-primary/50"
+              : "border-dashed border-muted-foreground/25 bg-muted/30 hover:border-primary hover:bg-primary/5",
         )}
       >
         <input {...getInputProps()} className="sr-only" />
@@ -272,7 +272,7 @@ const FileUploader = ({
               alt="Preview"
               className={cn(
                 "h-full w-full object-cover transition-opacity duration-300",
-                imageLoading ? "opacity-0" : "opacity-100"
+                imageLoading ? "opacity-0" : "opacity-100",
               )}
               onLoad={() => setImageLoading(false)}
               onError={() => setImageLoading(false)}

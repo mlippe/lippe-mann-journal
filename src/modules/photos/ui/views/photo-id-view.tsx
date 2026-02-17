@@ -41,7 +41,7 @@ const MapboxComponent = dynamic(
         <Skeleton className="h-full w-full" />
       </div>
     ),
-  }
+  },
 );
 
 const formSchema = photosUpdateSchema.extend({
@@ -61,14 +61,14 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   const { data } = useSuspenseQuery(
     trpc.photos.getOne.queryOptions({
       id,
-    })
+    }),
   );
 
   const updateMutation = useMutation(
     trpc.photos.update.mutationOptions({
       onSuccess: () => {},
       onError: () => {},
-    })
+    }),
   );
 
   const [currentLocation, setCurrentLocation] = useState<{
@@ -284,7 +284,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                               onChange={(e) => {
                                 const value = e.target.value;
                                 field.onChange(
-                                  value === "" ? undefined : Number(value)
+                                  value === "" ? undefined : Number(value),
                                 );
                               }}
                               placeholder="50"
@@ -309,7 +309,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                               onChange={(e) => {
                                 const value = e.target.value;
                                 field.onChange(
-                                  value === "" ? undefined : Number(value)
+                                  value === "" ? undefined : Number(value),
                                 );
                               }}
                               placeholder="50"

@@ -76,7 +76,7 @@ export const HighlightToolbar = () => {
       .chain()
       .focus()
       .setHighlight(
-        color === editorState.currentHighlight ? { color: "" } : { color }
+        color === editorState.currentHighlight ? { color: "" } : { color },
       )
       .run();
   };

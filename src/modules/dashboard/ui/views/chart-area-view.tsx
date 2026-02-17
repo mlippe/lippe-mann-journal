@@ -65,7 +65,7 @@ export function ChartAreaView() {
   }, [timeRange]);
 
   const { data: photosCountByMonth } = useSuspenseQuery(
-    trpc.dashboard.getPhotosCountByMonth.queryOptions({ years })
+    trpc.dashboard.getPhotosCountByMonth.queryOptions({ years }),
   );
 
   // Transform data for chart
@@ -84,7 +84,7 @@ export function ChartAreaView() {
   const peakMonth = React.useMemo(() => {
     if (photosCountByMonth.length === 0) return null;
     const peak = photosCountByMonth.reduce((max, item) =>
-      item.count > max.count ? item : max
+      item.count > max.count ? item : max,
     );
     return {
       month: new Date(peak.month + "-01").toLocaleDateString("en-US", {

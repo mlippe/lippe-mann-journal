@@ -16,7 +16,7 @@ export const TravelView = () => {
 
   // Initialize with first city directly, no useEffect needed
   const [activeCity, setActiveCity] = useState<CitySetWithPhotos | null>(
-    () => data?.[0] ?? null
+    () => data?.[0] ?? null,
   );
 
   return (

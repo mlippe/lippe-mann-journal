@@ -34,7 +34,7 @@ export function UploadZone({
         {...getRootProps()}
         className={cn(
           "relative flex flex-col items-center justify-center rounded-full size-32 bg-muted cursor-pointer",
-          { "opacity-50": isUploading }
+          { "opacity-50": isUploading },
         )}
       >
         <input {...getInputProps()} disabled={isUploading} />

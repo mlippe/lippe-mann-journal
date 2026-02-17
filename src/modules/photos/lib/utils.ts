@@ -17,7 +17,7 @@ export const formatExposureTime = (exposureTime?: number): string => {
  * @example formatExposureCompensation(1) => "+1 EV"
  */
 export const formatExposureCompensation = (
-  exposureCompensation?: number
+  exposureCompensation?: number,
 ): string => {
   if (typeof exposureCompensation !== "number") return "";
   if (exposureCompensation === 0) return "0 EV";
@@ -38,7 +38,7 @@ export const formatFocalLength = (focalLength?: number | null): string => {
  * @example formatFocalLength35mm(50) => "50mm in 35mm"
  */
 export const formatFocalLength35mm = (
-  focalLength35mm?: number | null
+  focalLength35mm?: number | null,
 ): string => {
   if (!focalLength35mm) return "";
   return `${focalLength35mm}mm in 35mm`;
@@ -74,7 +74,7 @@ export const formatISO = (iso?: number): string => {
  */
 export const formatGPSCoordinates = (
   latitude?: number | null,
-  longitude?: number | null
+  longitude?: number | null,
 ): string => {
   if (!longitude || !latitude) return "- -";
 
@@ -277,7 +277,7 @@ export const getImageInfo = async (file: File): Promise<TImageInfo> => {
       imageData.width,
       imageData.height,
       5,
-      4
+      4,
     );
 
     if (!blurhash) {

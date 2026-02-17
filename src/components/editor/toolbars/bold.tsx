@@ -35,7 +35,7 @@ const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8",
               editorState.isBold && "bg-accent",
-              className
+              className,
             )}
             onClick={(e) => {
               editor.chain().focus().toggleBold().run();
@@ -54,7 +54,7 @@ const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 BoldToolbar.displayName = "BoldToolbar";

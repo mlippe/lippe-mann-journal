@@ -38,7 +38,7 @@ const HorizontalRuleToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 HorizontalRuleToolbar.displayName = "HorizontalRuleToolbar";

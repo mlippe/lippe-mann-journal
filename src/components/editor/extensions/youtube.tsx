@@ -56,7 +56,7 @@ function TiptapYoutube(props: NodeViewProps) {
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const [resizing, setResizing] = useState(false);
   const [resizingPosition, setResizingPosition] = useState<"left" | "right">(
-    "left"
+    "left",
   );
   const [resizeInitialWidth, setResizeInitialWidth] = useState(0);
   const [resizeInitialMouseX, setResizeInitialMouseX] = useState(0);
@@ -118,7 +118,7 @@ function TiptapYoutube(props: NodeViewProps) {
 
   function handleTouchStart(
     event: React.TouchEvent,
-    position: "left" | "right"
+    position: "left" | "right",
   ) {
     event.preventDefault();
 
@@ -188,7 +188,7 @@ function TiptapYoutube(props: NodeViewProps) {
         selected ? "border-blue-300" : "",
         node.attrs.align === "left" && "left-0 translate-x-0",
         node.attrs.align === "center" && "left-1/2 -translate-x-1/2",
-        node.attrs.align === "right" && "left-full -translate-x-full"
+        node.attrs.align === "right" && "left-full -translate-x-full",
       )}
       style={{ width: node.attrs.width, maxWidth: "100%" }}
     >
@@ -196,7 +196,7 @@ function TiptapYoutube(props: NodeViewProps) {
         ref={containerRef}
         className={cn(
           "group relative flex flex-col rounded-md overflow-hidden aspect-video bg-black",
-          resizing && ""
+          resizing && "",
         )}
       >
         <iframe
@@ -210,7 +210,7 @@ function TiptapYoutube(props: NodeViewProps) {
         <div
           className={cn(
             "absolute inset-0 z-10",
-            !editor?.isEditable && "hidden"
+            !editor?.isEditable && "hidden",
           )}
         />
 
@@ -244,7 +244,7 @@ function TiptapYoutube(props: NodeViewProps) {
               className={cn(
                 "absolute right-4 top-4 flex items-center gap-1 rounded-md border bg-background p-1 opacity-0 transition-opacity z-30",
                 !resizing && "group-hover:opacity-100",
-                openedMore && "opacity-100"
+                openedMore && "opacity-100",
               )}
             >
               <Button
@@ -252,7 +252,7 @@ function TiptapYoutube(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "left" && "bg-accent"
+                  node.attrs.align === "left" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {
@@ -268,7 +268,7 @@ function TiptapYoutube(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "center" && "bg-accent"
+                  node.attrs.align === "center" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {
@@ -284,7 +284,7 @@ function TiptapYoutube(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "right" && "bg-accent"
+                  node.attrs.align === "right" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {

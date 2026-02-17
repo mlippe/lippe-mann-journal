@@ -20,10 +20,10 @@ import {
 const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
-    trpc.home.getManyLikePhotos.queryOptions({ limit: 10 })
+    trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
   );
   void queryClient.prefetchQuery(
-    trpc.home.getCitySets.queryOptions({ limit: 12 })
+    trpc.home.getCitySets.queryOptions({ limit: 12 }),
   );
 
   return (

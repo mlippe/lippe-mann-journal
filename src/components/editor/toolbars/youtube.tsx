@@ -56,7 +56,7 @@ const YoutubeToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
               className={cn(
                 "h-8 w-8",
                 editorState.isYoutubeActive && "bg-accent",
-                className
+                className,
               )}
               onClick={(e) => {
                 setIsOpen(true);
@@ -114,7 +114,7 @@ const YoutubeToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </Dialog>
       </>
     );
-  }
+  },
 );
 
 YoutubeToolbar.displayName = "YoutubeToolbar";

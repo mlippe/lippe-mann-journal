@@ -25,7 +25,7 @@ const CityDetailPage = async ({ params }: Props) => {
   void queryClient.prefetchQuery(
     trpc.city.getOne.queryOptions({
       city: decodedCity,
-    })
+    }),
   );
 
   return (

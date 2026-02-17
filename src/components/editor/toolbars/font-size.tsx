@@ -75,7 +75,7 @@ export const FontSizeToolbar = () => {
             className={cn(
               "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
               editorState.currentFontSize === value &&
-                "bg-accent text-accent-foreground"
+                "bg-accent text-accent-foreground",
             )}
           >
             <span style={{ fontSize: value }}>{label}</span>

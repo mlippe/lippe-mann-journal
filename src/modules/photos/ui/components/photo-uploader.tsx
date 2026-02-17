@@ -8,7 +8,7 @@ interface PhotoUploaderProps {
   onUploadSuccess?: (
     url: string,
     exif: TExifData | null,
-    imageInfo: TImageInfo
+    imageInfo: TImageInfo,
   ) => void;
   folder?: string;
   onCreateSuccess?: () => void;

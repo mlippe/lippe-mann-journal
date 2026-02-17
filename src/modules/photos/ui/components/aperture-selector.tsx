@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 // Standard aperture values in photography
 const STANDARD_APERTURES = [
@@ -28,7 +28,7 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
   );
 
   const handleSelectChange = (val: string) => {
-    if (val === 'custom') {
+    if (val === "custom") {
       setIsCustom(true);
       onChange(undefined);
     } else {
@@ -43,41 +43,41 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
   };
 
   return (
-    <div className='space-y-2'>
+    <div className="space-y-2">
       <Select
-        value={isCustom ? 'custom' : value?.toString()}
+        value={isCustom ? "custom" : value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger className='w-full'>
-          <SelectValue placeholder='Select aperture'>
-            {isCustom ? 'Custom' : value ? `f/${value}` : 'Select aperture'}
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select aperture">
+            {isCustom ? "Custom" : value ? `f/${value}` : "Select aperture"}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className='max-h-[300px]'>
+        <SelectContent className="max-h-[300px]">
           {STANDARD_APERTURES.map((f) => (
             <SelectItem key={f} value={f.toString()}>
               f/{f}
             </SelectItem>
           ))}
-          <SelectItem value='custom'>Custom value...</SelectItem>
+          <SelectItem value="custom">Custom value...</SelectItem>
         </SelectContent>
       </Select>
 
       {isCustom && (
-        <div className='flex gap-2 items-center'>
-          <span className='text-sm text-muted-foreground'>f/</span>
+        <div className="flex gap-2 items-center">
+          <span className="text-sm text-muted-foreground">f/</span>
           <Input
-            type='number'
-            step='0.1'
-            placeholder='Enter custom value'
-            value={value ?? ''}
+            type="number"
+            step="0.1"
+            placeholder="Enter custom value"
+            value={value ?? ""}
             onChange={handleCustomChange}
-            className='flex-1'
+            className="flex-1"
           />
           <Button
-            type='button'
-            variant='outline'
-            size='sm'
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setIsCustom(false)}
           >
             Cancel

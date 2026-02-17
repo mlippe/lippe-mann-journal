@@ -43,7 +43,7 @@ export function createClusterIndex(photos: PhotoPoint[]) {
 export function getClustersFromIndex(
   index: Supercluster<PhotoPoint>,
   zoom: number,
-  bounds: [number, number, number, number]
+  bounds: [number, number, number, number],
 ) {
   const clusters: Cluster[] = [];
   const singlePhotos: PhotoPoint[] = [];
@@ -86,7 +86,7 @@ export function getClustersFromIndex(
 export function calculateBounds(
   latitude: number,
   longitude: number,
-  zoom: number
+  zoom: number,
 ): [number, number, number, number] {
   const latDelta = 180 / Math.pow(2, zoom);
   const lngDelta = 360 / Math.pow(2, zoom);

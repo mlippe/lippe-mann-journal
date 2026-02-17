@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const photo = await queryClient.fetchQuery(
     trpc.photos.getOne.queryOptions({
       id,
-    })
+    }),
   );
 
   return {
@@ -34,7 +34,7 @@ const Page = async ({ params }: Props) => {
   await queryClient.fetchQuery(
     trpc.photos.getOne.queryOptions({
       id,
-    })
+    }),
   );
 
   return (

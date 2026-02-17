@@ -36,7 +36,7 @@ const BulletListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8",
               editorState.isBulletList && "bg-accent",
-              className
+              className,
             )}
             onClick={(e) => {
               editor.chain().focus().toggleBulletList().run();
@@ -54,7 +54,7 @@ const BulletListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 BulletListToolbar.displayName = "BulletListToolbar";

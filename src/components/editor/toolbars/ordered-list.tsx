@@ -36,7 +36,7 @@ const OrderedListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8",
               editorState.isOrderedList && "bg-accent",
-              className
+              className,
             )}
             onClick={(e) => {
               editor.chain().focus().toggleOrderedList().run();
@@ -54,7 +54,7 @@ const OrderedListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 OrderedListToolbar.displayName = "OrderedListToolbar";

@@ -24,7 +24,7 @@ const MapboxComponent = dynamic(
         <Skeleton className="h-full w-full" />
       </div>
     ),
-  }
+  },
 );
 
 interface SearchResult {
@@ -100,8 +100,8 @@ export function ThirdStep({
     try {
       const response = await fetch(
         `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
-          searchQuery
-        )}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&limit=10`
+          searchQuery,
+        )}&access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&limit=10`,
       );
 
       if (!response.ok) {
@@ -257,7 +257,7 @@ export function ThirdStep({
                 {currentLocation.lat !== 0 && currentLocation.lng !== 0
                   ? formatGPSCoordinates(
                       currentLocation.lat,
-                      currentLocation.lng
+                      currentLocation.lng,
                     )
                   : "Drag the marker to set location"}
               </span>

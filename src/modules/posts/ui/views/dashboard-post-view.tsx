@@ -16,7 +16,7 @@ export const DashboardPostView = ({ slug }: { slug: string }) => {
 
   const [ConfirmationDialog, confirm] = useConfirm(
     "Delete post",
-    "Are you sure you want to delete this post?"
+    "Are you sure you want to delete this post?",
   );
 
   // const deleteFileMutation = useMutation(
@@ -33,14 +33,14 @@ export const DashboardPostView = ({ slug }: { slug: string }) => {
         //   deleteFileMutation.mutate({ key: data.coverImageKey });
         // }
         await queryClient.invalidateQueries(
-          trpc.posts.getMany.queryOptions({})
+          trpc.posts.getMany.queryOptions({}),
         );
         router.push("/dashboard/posts");
       },
       onError: (error) => {
         toast.error(error.message);
       },
-    })
+    }),
   );
 
   const handleRemove = async () => {

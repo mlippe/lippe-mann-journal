@@ -47,7 +47,7 @@ const UndoToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 UndoToolbar.displayName = "UndoToolbar";

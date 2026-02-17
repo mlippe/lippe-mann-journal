@@ -43,7 +43,7 @@ export const DiscoverLoading = () => {
 export const DiscoverView = () => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.discover.getManyPhotos.queryOptions({})
+    trpc.discover.getManyPhotos.queryOptions({}),
   );
 
   const isMobile = useIsMobile();
@@ -67,7 +67,7 @@ export const DiscoverView = () => {
 
       // Calculate center of selected photos
       const validPhotos = selectedPhotos.filter(
-        (p) => p.latitude != null && p.longitude != null
+        (p) => p.latitude != null && p.longitude != null,
       );
 
       if (validPhotos.length === 0) return;
@@ -104,7 +104,7 @@ export const DiscoverView = () => {
               padding: { top: 50, bottom: 50, left: 50, right: 50 },
               duration: 1000,
               maxZoom: 10,
-            }
+            },
           );
         }
       }
@@ -126,7 +126,7 @@ export const DiscoverView = () => {
         setIsDrawerOpen(true);
       }
     },
-    [isMobile]
+    [isMobile],
   );
 
   const clearSelection = () => {
@@ -222,7 +222,7 @@ export const DiscoverView = () => {
                 <div
                   className={cn(
                     "w-full grid grid-cols-2 gap-x-1 gap-y-8",
-                    selectedPhotos.length === 1 ? "grid-cols-1" : "grid-cols-2"
+                    selectedPhotos.length === 1 ? "grid-cols-1" : "grid-cols-2",
                   )}
                 >
                   {selectedPhotos.map((photo) => (

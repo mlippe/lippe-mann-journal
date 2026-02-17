@@ -78,7 +78,7 @@ const HeadingToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             onClick={() => setHeading(1)}
             className={cn(
               "flex items-center gap-2",
-              editorState.isH1 && "bg-accent"
+              editorState.isH1 && "bg-accent",
             )}
           >
             <Heading1Icon className="h-4 w-4" />
@@ -88,7 +88,7 @@ const HeadingToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             onClick={() => setHeading(2)}
             className={cn(
               "flex items-center gap-2",
-              editorState.isH2 && "bg-accent"
+              editorState.isH2 && "bg-accent",
             )}
           >
             <Heading2Icon className="h-4 w-4" />
@@ -98,7 +98,7 @@ const HeadingToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             onClick={() => setHeading(3)}
             className={cn(
               "flex items-center gap-2",
-              editorState.isH3 && "bg-accent"
+              editorState.isH3 && "bg-accent",
             )}
           >
             <Heading3Icon className="h-4 w-4" />
@@ -107,7 +107,7 @@ const HeadingToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </DropdownMenuContent>
       </DropdownMenu>
     );
-  }
+  },
 );
 
 HeadingToolbar.displayName = "HeadingToolbar";

@@ -24,7 +24,7 @@ export const TagsInput = ({ value, onChange }: TagsInputProps) => {
   };
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (
-    event
+    event,
   ) => {
     if (event.key === "Enter" || event.key === ",") {
       event.preventDefault();

@@ -35,7 +35,7 @@ const CodeBlockToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "h-8 w-8",
               editorState.isCodeBlock && "bg-accent",
-              className
+              className,
             )}
             onClick={(e) => {
               editor.chain().focus().toggleCodeBlock().run();
@@ -53,7 +53,7 @@ const CodeBlockToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 CodeBlockToolbar.displayName = "CodeBlockToolbar";
