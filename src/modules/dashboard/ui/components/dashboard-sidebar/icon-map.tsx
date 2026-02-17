@@ -4,7 +4,7 @@ import {
   IconUser,
   IconBuildingPavilion,
   IconNotebook,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
 interface IconMapProps {
   icon: string;
@@ -12,15 +12,13 @@ interface IconMapProps {
 
 const IconMap = ({ icon }: IconMapProps) => {
   switch (icon) {
-    case "dashboard":
+    case 'dashboard':
       return <IconLayoutDashboard />;
-    case "photo":
+    case 'photo':
       return <IconPhoto />;
-    case "user":
+    case 'user':
       return <IconUser />;
-    case "city":
-      return <IconBuildingPavilion />;
-    case "post":
+    case 'post':
       return <IconNotebook />;
     default:
       return <IconLayoutDashboard />;
