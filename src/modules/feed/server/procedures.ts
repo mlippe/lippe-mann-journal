@@ -1,10 +1,10 @@
-import { z } from "zod";
-import { createTRPCRouter, baseProcedure } from "@/trpc/init";
-import { desc, eq, and } from "drizzle-orm";
-import { citySets, photos } from "@/db/schema";
-import { TRPCError } from "@trpc/server";
+import { z } from 'zod';
+import { createTRPCRouter, baseProcedure } from '@/trpc/init';
+import { desc, eq, and } from 'drizzle-orm';
+import { citySets, photos } from '@/db/schema';
+import { TRPCError } from '@trpc/server';
 
-export const travelRouter = createTRPCRouter({
+export const feedRouter = createTRPCRouter({
   getCitySets: baseProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.query.citySets.findMany({
       with: {
@@ -33,8 +33,8 @@ export const travelRouter = createTRPCRouter({
 
       if (!citySet) {
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "City not found",
+          code: 'NOT_FOUND',
+          message: 'City not found',
         });
       }
 
@@ -42,7 +42,7 @@ export const travelRouter = createTRPCRouter({
       const cityPhotos = await ctx.db
         .select()
         .from(photos)
-        .where(and(eq(photos.city, city), eq(photos.visibility, "public")))
+        .where(and(eq(photos.city, city), eq(photos.visibility, 'public')))
         .orderBy(desc(photos.dateTimeOriginal), desc(photos.createdAt));
 
       return {

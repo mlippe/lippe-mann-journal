@@ -3,7 +3,7 @@ import { postsRouter } from '@/modules/posts/server/procedures';
 import { photosRouter } from '@/modules/photos/server/procedures';
 import { s3Router } from '@/modules/s3/server/procedures';
 import { homeRouter } from '@/modules/home/server/procedures';
-import { travelRouter } from '@/modules/travel/server/procedures';
+import { feedRouter } from '@/modules/feed/server/procedures';
 import { blogRouter } from '@/modules/blog/server/procedures';
 import { dashboardRouter } from '@/modules/dashboard/server/procedures';
 
@@ -12,7 +12,7 @@ export const appRouter = createTRPCRouter({
   photos: photosRouter,
   s3: s3Router,
   home: homeRouter,
-  travel: travelRouter,
+  feed: feedRouter,
   blog: blogRouter,
   dashboard: dashboardRouter,
 });
