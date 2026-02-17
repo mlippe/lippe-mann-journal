@@ -8,7 +8,7 @@ export interface ToolbarContextProps {
 }
 
 export const ToolbarContext = React.createContext<ToolbarContextProps | null>(
-  null
+  null,
 );
 
 interface ToolbarProviderProps {

@@ -17,8 +17,8 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
               i < currentStep
                 ? "bg-primary text-primary-foreground"
                 : i === currentStep
-                ? "bg-primary text-primary-foreground ring-primary/30 ring-2"
-                : "bg-secondary text-secondary-foreground"
+                  ? "bg-primary text-primary-foreground ring-primary/30 ring-2"
+                  : "bg-secondary text-secondary-foreground",
             )}
           >
             {i < currentStep ? <CheckCircle2 className="h-4 w-4" /> : i + 1}

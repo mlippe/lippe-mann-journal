@@ -27,7 +27,7 @@ export function usePhotoClustering({
         photo.latitude != null &&
         photo.longitude != null &&
         !isNaN(photo.latitude) &&
-        !isNaN(photo.longitude)
+        !isNaN(photo.longitude),
     );
   }, [photos]);
 
@@ -55,11 +55,11 @@ export function usePhotoClustering({
       const newBounds = calculateBounds(
         viewState.latitude,
         viewState.longitude,
-        viewState.zoom
+        viewState.zoom,
       );
       setBounds(newBounds);
     },
-    []
+    [],
   );
 
   return {

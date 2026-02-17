@@ -18,7 +18,7 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete Post",
-    `Are you sure you want to delete "${postTitle}"? This action cannot be undone. The post will be permanently deleted.`
+    `Are you sure you want to delete "${postTitle}"? This action cannot be undone. The post will be permanently deleted.`,
   );
 
   const deletePost = useMutation(trpc.posts.remove.mutationOptions());
@@ -34,14 +34,14 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
         onSuccess: async () => {
           // Invalidate queries to refetch posts list
           await queryClient.invalidateQueries(
-            trpc.posts.getMany.queryOptions({})
+            trpc.posts.getMany.queryOptions({}),
           );
           toast.success("Post deleted successfully");
         },
         onError: (error) => {
           toast.error(error.message || "Failed to delete post");
         },
-      }
+      },
     );
   };
 

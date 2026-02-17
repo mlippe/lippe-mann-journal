@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await queryClient.fetchQuery(
     trpc.posts.getOne.queryOptions({
       slug: decodedSlug,
-    })
+    }),
   );
 
   return {
@@ -39,7 +39,7 @@ const Page = async ({ params }: Props) => {
   await queryClient.fetchQuery(
     trpc.posts.getOne.queryOptions({
       slug: decodedSlug,
-    })
+    }),
   );
 
   return (

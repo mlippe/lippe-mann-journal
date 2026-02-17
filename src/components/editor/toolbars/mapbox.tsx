@@ -80,14 +80,12 @@ export const MapboxToolbar = React.forwardRef<HTMLButtonElement>((_, ref) => {
 
     // Validate all markers
     const validMarkers = markers.filter(
-      (m) => !isNaN(m.longitude) && !isNaN(m.latitude)
+      (m) => !isNaN(m.longitude) && !isNaN(m.latitude),
     );
 
     if (validMarkers.length === 0) {
       return;
     }
-
-
 
     editor
       .chain()
@@ -168,8 +166,8 @@ export const MapboxToolbar = React.forwardRef<HTMLButtonElement>((_, ref) => {
                   markers.map((m) =>
                     m.id === markerId
                       ? { ...m, longitude: lngLat.lng, latitude: lngLat.lat }
-                      : m
-                  )
+                      : m,
+                  ),
                 );
               }}
               onMove={(viewState) => {

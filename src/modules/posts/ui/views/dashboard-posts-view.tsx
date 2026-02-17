@@ -30,7 +30,7 @@ export const DashboardPostsView = () => {
   const [filters, setFilters] = usePostsFilters();
 
   const { data } = useSuspenseQuery(
-    trpc.posts.getMany.queryOptions({ ...filters })
+    trpc.posts.getMany.queryOptions({ ...filters }),
   );
 
   return (

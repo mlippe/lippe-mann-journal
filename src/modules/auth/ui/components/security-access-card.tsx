@@ -58,7 +58,7 @@ const SecurityAccessCard = (props: {
               const DeviceIcon = getDeviceIcon(parser, deviceType);
               const deviceDescription = getDeviceDescription(
                 parser,
-                deviceType
+                deviceType,
               );
               const browser = parser.getBrowser();
               const os = parser.getOS();
@@ -143,7 +143,7 @@ const SecurityAccessCard = (props: {
                             toast.success(
                               isCurrentSession
                                 ? "Signed out successfully"
-                                : "Session terminated successfully"
+                                : "Session terminated successfully",
                             );
                           }
                           router.refresh();

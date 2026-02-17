@@ -10,7 +10,10 @@ interface PhotoUploadModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const PhotoUploadModal = ({open, onOpenChange}: PhotoUploadModalProps) => {
+export const PhotoUploadModal = ({
+  open,
+  onOpenChange,
+}: PhotoUploadModalProps) => {
   const [isUploading, setIsUploading] = useState(false);
 
   return (

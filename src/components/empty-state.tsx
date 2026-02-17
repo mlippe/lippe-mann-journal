@@ -45,14 +45,16 @@ export function EmptyState({
       className={cn(
         "flex flex-col items-center justify-center gap-4 text-center",
         height,
-        className
+        className,
       )}
     >
       {icon && <div className="text-muted-foreground">{icon}</div>}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>
         {description && (
-          <p className="text-sm text-muted-foreground max-w-sm">{description}</p>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            {description}
+          </p>
         )}
       </div>
       {action && <div className="mt-2">{action}</div>}

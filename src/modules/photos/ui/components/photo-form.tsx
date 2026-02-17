@@ -41,7 +41,7 @@ const MapboxComponent = dynamic(
         <Skeleton className="h-full w-full" />
       </div>
     ),
-  }
+  },
 );
 
 interface PhotoFormProps {
@@ -78,13 +78,13 @@ export function PhotoForm({
       onSuccess: async () => {
         toast.success("Photo created");
         await queryClient.invalidateQueries(
-          trpc.photos.getMany.queryOptions({})
+          trpc.photos.getMany.queryOptions({}),
         );
         await queryClient.invalidateQueries(
-          trpc.home.getManyLikePhotos.queryOptions({})
+          trpc.home.getManyLikePhotos.queryOptions({}),
         );
         await queryClient.invalidateQueries(
-          trpc.home.getCitySets.queryOptions({})
+          trpc.home.getCitySets.queryOptions({}),
         );
 
         onCreateSuccess?.();
@@ -92,7 +92,7 @@ export function PhotoForm({
       onError: (error) => {
         toast.error(error.message);
       },
-    })
+    }),
   );
 
   const form = useForm<z.infer<typeof photosInsertSchema>>({

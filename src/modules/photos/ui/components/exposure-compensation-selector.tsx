@@ -27,12 +27,12 @@ interface ExposureCompensationSelectorProps {
 function formatEV(value: number): string {
   if (value === 0) return "0 EV";
   const sign = value > 0 ? "+" : "";
-  
+
   // Check if it's a whole number
   if (value % 1 === 0) {
     return `${sign}${value} EV`;
   }
-  
+
   // Format with up to 2 decimal places, removing trailing zeros
   return `${sign}${value.toFixed(2).replace(/\.?0+$/, "")} EV`;
 }
@@ -59,7 +59,7 @@ export function ExposureCompensationSelector({
 }: ExposureCompensationSelectorProps) {
   const closestEV = value !== undefined ? findClosestEV(value) : null;
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && closestEV === null
+    value !== undefined && closestEV === null,
   );
 
   const handleSelectChange = (val: string) => {
@@ -80,21 +80,17 @@ export function ExposureCompensationSelector({
   const displayValue = isCustom
     ? "Custom"
     : value !== undefined
-    ? formatEV(closestEV ?? value)
-    : "Select EV";
+      ? formatEV(closestEV ?? value)
+      : "Select EV";
 
   return (
     <div className="space-y-2">
       <Select
-        value={
-          isCustom ? "custom" : closestEV?.toString() || value?.toString()
-        }
+        value={isCustom ? "custom" : closestEV?.toString() || value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
-          <SelectValue placeholder="Select exposure compensation">
-            {displayValue}
-          </SelectValue>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select EV">{displayValue}</SelectValue>
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
           {STANDARD_EV_VALUES.map((ev) => (

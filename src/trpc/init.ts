@@ -35,5 +35,5 @@ export const protectedProcedure = t.procedure.use(
         auth: session.user,
       },
     });
-  })
+  }),
 );

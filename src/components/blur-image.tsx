@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState, memo } from "react";
 import Image, { ImageProps } from "next/image";
 import { Blurhash } from "react-blurhash";
 
-interface BlurImageProps
-  extends Omit<ImageProps, "onLoad" | "onLoadingComplete" | "priority"> {
+interface BlurImageProps extends Omit<
+  ImageProps,
+  "onLoad" | "onLoadingComplete" | "priority"
+> {
   blurhash: string;
 }
 

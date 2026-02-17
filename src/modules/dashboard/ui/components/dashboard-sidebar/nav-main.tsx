@@ -26,15 +26,18 @@ export function NavMain({
   const modal = useModal();
   const pathname = usePathname();
   const exactMatchItem = items.find((item) => item.url === pathname);
-  const bestMatchItem = items.reduce((best, item) => {
-    if (
-      pathname.startsWith(item.url) &&
-      (!best || item.url.length > best.url.length)
-    ) {
-      return item;
-    }
-    return best;
-  }, null as (typeof items)[0] | null);
+  const bestMatchItem = items.reduce(
+    (best, item) => {
+      if (
+        pathname.startsWith(item.url) &&
+        (!best || item.url.length > best.url.length)
+      ) {
+        return item;
+      }
+      return best;
+    },
+    null as (typeof items)[0] | null,
+  );
 
   return (
     <>

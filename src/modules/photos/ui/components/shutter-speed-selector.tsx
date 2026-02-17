@@ -84,7 +84,9 @@ function formatShutterSpeed(seconds: number): string {
   }
 }
 
-function findClosestShutterSpeed(value: number): typeof STANDARD_SHUTTER_SPEEDS[0] | null {
+function findClosestShutterSpeed(
+  value: number,
+): (typeof STANDARD_SHUTTER_SPEEDS)[0] | null {
   let closest = STANDARD_SHUTTER_SPEEDS[0];
   let minDiff = Math.abs(value - closest.value);
 
@@ -106,7 +108,7 @@ export function ShutterSpeedSelector({
 }: ShutterSpeedSelectorProps) {
   const closestSpeed = value ? findClosestShutterSpeed(value) : null;
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && closestSpeed === null
+    value !== undefined && closestSpeed === null,
   );
 
   const handleSelectChange = (val: string) => {
@@ -127,16 +129,20 @@ export function ShutterSpeedSelector({
   const displayValue = isCustom
     ? "Custom"
     : value
-    ? closestSpeed?.label || formatShutterSpeed(value)
-    : "Select shutter speed";
+      ? closestSpeed?.label || formatShutterSpeed(value)
+      : "Select shutter speed";
 
   return (
     <div className="space-y-2">
       <Select
-        value={isCustom ? "custom" : closestSpeed?.value.toString() || value?.toString()}
+        value={
+          isCustom
+            ? "custom"
+            : closestSpeed?.value.toString() || value?.toString()
+        }
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Select shutter speed">
             {displayValue}
           </SelectValue>

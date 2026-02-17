@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const id = (await params).id;
   const queryClient = getQueryClient();
   const data = await queryClient.fetchQuery(
-    trpc.home.getPhotoById.queryOptions({ id })
+    trpc.home.getPhotoById.queryOptions({ id }),
   );
 
   return {

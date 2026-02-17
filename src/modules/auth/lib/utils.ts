@@ -5,7 +5,7 @@ export const formatLastActive = (createdAt: Date) => {
   const date = new Date(createdAt);
   const now = new Date();
   const diffInMinutes = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60)
+    (now.getTime() - date.getTime()) / (1000 * 60),
   );
 
   if (diffInMinutes < 1) return "Active now";
@@ -16,7 +16,7 @@ export const formatLastActive = (createdAt: Date) => {
 
 export const getDeviceIcon = (
   parser: UAParser,
-  deviceType: string | undefined
+  deviceType: string | undefined,
 ) => {
   const os = parser.getOS().name?.toLowerCase();
 
@@ -32,7 +32,7 @@ export const getDeviceIcon = (
 
 export const getDeviceDescription = (
   parser: UAParser,
-  deviceType: string | undefined
+  deviceType: string | undefined,
 ) => {
   const browser = parser.getBrowser();
   const os = parser.getOS();

@@ -25,7 +25,7 @@ const LinkRotate = ({ link, label, className }: Props) => {
         href={link}
         className={cn(
           "relative inline-block group text-black font-light text-sm dark:text-white",
-          className
+          className,
         )}
       >
         {/* Default Text (visible initially, moves down on hover) */}

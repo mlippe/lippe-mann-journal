@@ -37,10 +37,10 @@ export function VisibilityToggle({
         onSuccess: async () => {
           // Invalidate queries to refetch posts list
           await queryClient.invalidateQueries(
-            trpc.posts.getMany.queryOptions({})
+            trpc.posts.getMany.queryOptions({}),
           );
           toast.success(
-            `Post is now ${newValue === "public" ? "public" : "private"}`
+            `Post is now ${newValue === "public" ? "public" : "private"}`,
           );
         },
         onError: (error) => {
@@ -48,7 +48,7 @@ export function VisibilityToggle({
           setVisibility(newValue === "public" ? "private" : "public");
           toast.error(error.message || "Failed to update visibility");
         },
-      }
+      },
     );
   };
 

@@ -108,7 +108,7 @@ export const ProfileForm = () => {
       if (res.error) {
         toast.error(
           res.error.message ||
-            "Couldn't change your password! Make sure it's correct"
+            "Couldn't change your password! Make sure it's correct",
         );
       } else {
         toast.success("Password changed successfully");

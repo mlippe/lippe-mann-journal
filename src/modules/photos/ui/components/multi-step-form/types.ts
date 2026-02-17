@@ -77,7 +77,7 @@ export interface UploadStepProps extends StepProps {
   onUploadSuccess: (
     url: string,
     exif: TExifData | null,
-    imageInfo: TImageInfo
+    imageInfo: TImageInfo,
   ) => void;
   onReupload: (url: string) => void;
 }

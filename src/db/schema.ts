@@ -134,7 +134,7 @@ export const photos = pgTable(
   (t) => [
     index("year_idx").on(sql`DATE_TRUNC('year', ${t.dateTimeOriginal})`),
     index("city_idx").on(t.city),
-  ]
+  ],
 );
 
 export const citySets = pgTable(
@@ -158,7 +158,7 @@ export const citySets = pgTable(
     // META DATA
     ...timestamps,
   },
-  (t) => [uniqueIndex("unique_city_set").on(t.country, t.city)]
+  (t) => [uniqueIndex("unique_city_set").on(t.country, t.city)],
 );
 
 // Soft relations
@@ -236,7 +236,7 @@ export const posts = pgTable(
     index("category_idx").on(t.categoryId),
     index("tags_idx").on(t.tags),
     index("slug_idx").on(t.slug),
-  ]
+  ],
 );
 
 // Types

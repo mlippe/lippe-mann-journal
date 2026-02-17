@@ -48,7 +48,7 @@ export const BrandsLogo = ({
   const normalizedBrand = brand.replace(/\s+/g, "").toLowerCase();
 
   const matchedBrand = Object.keys(brandConfigs).find((brandKey) =>
-    brandKey.startsWith(normalizedBrand)
+    brandKey.startsWith(normalizedBrand),
   );
 
   // If no brand matches, use placeholder

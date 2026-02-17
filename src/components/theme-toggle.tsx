@@ -12,7 +12,7 @@ const useIsMounted = () =>
   useSyncExternalStore(
     emptySubscribe,
     () => true,
-    () => false
+    () => false,
   );
 
 // Utility function to handle view transitions

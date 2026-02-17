@@ -35,14 +35,14 @@ const Carousel = ({
         delay: autoplayDelay,
         stopOnInteraction: false,
       }),
-    ]
+    ],
   );
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const scrollTo = useCallback(
     (index: number) => emblaApi && emblaApi.scrollTo(index),
-    [emblaApi]
+    [emblaApi],
   );
 
   const onSelect = useCallback(() => {

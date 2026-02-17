@@ -11,7 +11,6 @@ import { SecondStep } from "./steps/second-step";
 import { ThirdStep } from "./steps/third-step";
 import { FourthStep } from "./steps/fourth-step";
 import { ProgressBar } from "./components/progress-bar";
-import { StepIndicator } from "./components/step-indicator";
 import { SuccessScreen } from "./components/success-screen";
 import { toast } from "sonner";
 import { useTRPC } from "@/trpc/client";
@@ -68,7 +67,7 @@ export default function MultiStepForm({
   const handleUploadSuccess = (
     uploadedUrl: string,
     uploadedExif: TExifData | null,
-    uploadedImageInfo: TImageInfo
+    uploadedImageInfo: TImageInfo,
   ) => {
     setUrl(uploadedUrl);
     setExif(uploadedExif);
@@ -152,13 +151,13 @@ export default function MultiStepForm({
         onSuccess: async () => {
           // Invalidate queries to refetch photos list
           await queryClient.invalidateQueries(
-            trpc.photos.getMany.queryOptions({})
+            trpc.photos.getMany.queryOptions({}),
           );
           await queryClient.invalidateQueries(
-            trpc.home.getManyLikePhotos.queryOptions({ limit: 10 })
+            trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
           );
           await queryClient.invalidateQueries(
-            trpc.home.getCitySets.queryOptions({ limit: 9 })
+            trpc.home.getCitySets.queryOptions({ limit: 9 }),
           );
           await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
 
@@ -262,8 +261,6 @@ export default function MultiStepForm({
       {!isComplete ? (
         <>
           <ProgressBar currentStep={step} totalSteps={STEP_CONFIG.length} />
-          <StepIndicator steps={STEP_CONFIG} currentStep={step} />
-
           <AnimatePresence mode="wait">
             <motion.div
               key={step}

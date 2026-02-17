@@ -25,7 +25,7 @@ interface ISOSelectorProps {
 
 export function ISOSelector({ value, onChange }: ISOSelectorProps) {
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && !STANDARD_ISO_VALUES.includes(value)
+    value !== undefined && !STANDARD_ISO_VALUES.includes(value),
   );
 
   const handleSelectChange = (val: string) => {
@@ -49,7 +49,7 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
         value={isCustom ? "custom" : value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Select ISO">
             {isCustom ? "Custom" : value ? `ISO ${value}` : "Select ISO"}
           </SelectValue>

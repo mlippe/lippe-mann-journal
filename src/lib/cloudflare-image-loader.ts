@@ -1,7 +1,7 @@
-const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || '';
+const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || "";
 
 const normalizeSrc = (src: string) => {
-  return src.startsWith('/') ? src.slice(1) : src;
+  return src.startsWith("/") ? src.slice(1) : src;
 };
 
 export default function cloudflareLoader({
@@ -13,7 +13,7 @@ export default function cloudflareLoader({
   width: number;
   quality?: number;
 }) {
-  if (src.startsWith('/')) {
+  if (src.startsWith("/")) {
     return src;
   }
   // if (process.env.NODE_ENV === "development") {
@@ -23,7 +23,12 @@ export default function cloudflareLoader({
   if (quality) {
     params.push(`quality=${quality}`);
   }
-  const paramsString = params.join(',');
+  const paramsString = params.join(",");
 
-  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(src)}`;
+  // If src is a full URL, extract the pathname. Otherwise, use it as is.
+  const relativeSrc = src.startsWith("http") ? new URL(src).pathname : src;
+
+  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(
+    relativeSrc,
+  )}`;
 }

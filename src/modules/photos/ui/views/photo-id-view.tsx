@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, Suspense } from "react";
-import dynamic from "next/dynamic";
-import { FramedPhoto } from "@/components/framed-photo";
-import { photosUpdateSchema } from "@/db/schema";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { useState, Suspense } from 'react';
+import dynamic from 'next/dynamic';
+import { FramedPhoto } from '@/components/framed-photo';
+import { photosUpdateSchema } from '@/db/schema';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -17,31 +17,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ApertureSelector } from "../components/aperture-selector";
-import { ShutterSpeedSelector } from "../components/shutter-speed-selector";
-import { ISOSelector } from "../components/iso-selector";
-import { ExposureCompensationSelector } from "../components/exposure-compensation-selector";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ApertureSelector } from '../components/aperture-selector';
+import { ShutterSpeedSelector } from '../components/shutter-speed-selector';
+import { ISOSelector } from '../components/iso-selector';
+import { ExposureCompensationSelector } from '../components/exposure-compensation-selector';
 
 interface PhotoIdViewProps {
   id: string;
 }
 
 const MapboxComponent = dynamic(
-  () => import("@/modules/mapbox/ui/components/map"),
+  () => import('@/modules/mapbox/ui/components/map'),
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full rounded-md border flex items-center justify-center bg-muted">
-        <Skeleton className="h-full w-full" />
+      <div className='h-64 w-full rounded-md border flex items-center justify-center bg-muted'>
+        <Skeleton className='h-full w-full' />
       </div>
     ),
-  }
+  },
 );
 
 const formSchema = photosUpdateSchema.extend({
@@ -61,14 +61,14 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   const { data } = useSuspenseQuery(
     trpc.photos.getOne.queryOptions({
       id,
-    })
+    }),
   );
 
   const updateMutation = useMutation(
     trpc.photos.update.mutationOptions({
       onSuccess: () => {},
       onError: () => {},
-    })
+    }),
   );
 
   const [currentLocation, setCurrentLocation] = useState<{
@@ -83,9 +83,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: data.id,
-      title: data.title ?? "",
-      description: data.description ?? "",
-      visibility: data.visibility ?? "private",
+      title: data.title ?? '',
+      description: data.description ?? '',
+      visibility: data.visibility ?? 'private',
       isFavorite: data.isFavorite ?? false,
       latitude: data.latitude ?? undefined,
       longitude: data.longitude ?? undefined,
@@ -108,41 +108,41 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   }
 
   const takenAt = data.dateTimeOriginal
-    ? format(new Date(data.dateTimeOriginal), "d MMM yyyy")
+    ? format(new Date(data.dateTimeOriginal), 'd MMM yyyy')
     : null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex items-baseline justify-between gap-4">
+    <div className='min-h-screen bg-background'>
+      <div className='container mx-auto px-4 py-8'>
+        <div className='mb-6 flex items-baseline justify-between gap-4'>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {data.title || "Untitled photo"}
+            <h1 className='text-2xl font-semibold tracking-tight'>
+              {data.title || 'Untitled photo'}
             </h1>
             {takenAt && (
-              <p className="text-sm text-muted-foreground">
+              <p className='text-sm text-muted-foreground'>
                 Taken on {takenAt}
               </p>
             )}
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.6fr)] items-start">
+        <div className='grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.6fr)] items-start'>
           {/* Form on the left */}
-          <div className="bg-card border rounded-xl p-6 shadow-sm w-full">
+          <div className='bg-card border rounded-xl p-6 shadow-sm w-full'>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className='space-y-6'
               >
                 <FormField
                   control={form.control}
-                  name="title"
+                  name='title'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Photo title" />
+                        <Input {...field} placeholder='Photo title' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -151,7 +151,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                 <FormField
                   control={form.control}
-                  name="description"
+                  name='description'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description</FormLabel>
@@ -159,8 +159,8 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                         <Textarea
                           {...field}
                           rows={5}
-                          className="resize-none"
-                          placeholder="Photo description"
+                          className='resize-none'
+                          placeholder='Photo description'
                         />
                       </FormControl>
                       <FormMessage />
@@ -168,23 +168,23 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                   )}
                 />
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className='grid gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="visibility"
+                    name='visibility'
                     render={({ field }) => (
-                      <FormItem className="flex flex-col justify-between gap-2">
-                        <div className="flex items-center justify-between gap-4">
+                      <FormItem className='flex flex-col justify-between gap-2'>
+                        <div className='flex items-center justify-between gap-4'>
                           <FormLabel>Visibility</FormLabel>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                             <span>
-                              {field.value === "public" ? "Public" : "Private"}
+                              {field.value === 'public' ? 'Public' : 'Private'}
                             </span>
                             <FormControl>
                               <Switch
-                                checked={field.value === "public"}
+                                checked={field.value === 'public'}
                                 onCheckedChange={(checked) =>
-                                  field.onChange(checked ? "public" : "private")
+                                  field.onChange(checked ? 'public' : 'private')
                                 }
                               />
                             </FormControl>
@@ -197,9 +197,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                   <FormField
                     control={form.control}
-                    name="isFavorite"
+                    name='isFavorite'
                     render={({ field }) => (
-                      <FormItem className="flex items-center justify-between gap-4">
+                      <FormItem className='flex items-center justify-end gap-4'>
                         <FormLabel>Favorite</FormLabel>
                         <FormControl>
                           <Switch
@@ -213,24 +213,23 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                 </div>
 
                 {/* Camera parameters */}
-                <div className="space-y-4 border-t pt-4">
+                <div className='space-y-4 border-t pt-4'>
                   <div>
-                    <h3 className="text-sm font-semibold">Camera Parameters</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <h3 className='text-sm font-semibold'>Camera Parameters</h3>
+                    <p className='mt-1 text-xs text-muted-foreground'>
                       Auto-filled from EXIF when available. You can edit these
                       values.
                     </p>
                   </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className='grid gap-4 md:grid-cols-2'>
                     <FormField
                       control={form.control}
-                      name="make"
+                      name='make'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Camera Make</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="e.g., Canon" />
+                            <Input {...field} placeholder='e.g., Canon' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -239,55 +238,53 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                     <FormField
                       control={form.control}
-                      name="model"
+                      name='model'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Camera Model</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="e.g., EOS R5" />
+                            <Input {...field} placeholder='e.g., EOS R5' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-
                   <FormField
                     control={form.control}
-                    name="lensModel"
+                    name='lensModel'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Lens Model</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="e.g., RF 24-70mm f/2.8L"
+                            placeholder='e.g., RF 24-70mm f/2.8L'
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className='grid gap-4 md:grid-cols-2'>
                     <FormField
                       control={form.control}
-                      name="focalLength"
+                      name='focalLength'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Focal Length (mm)</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              step="0.1"
-                              value={field.value ?? ""}
+                              type='number'
+                              step={1}
+                              value={field.value ?? ''}
                               onChange={(e) => {
                                 const value = e.target.value;
                                 field.onChange(
-                                  value === "" ? undefined : Number(value)
+                                  value === '' ? undefined : Number(value),
                                 );
                               }}
-                              placeholder="50"
+                              placeholder='50'
                             />
                           </FormControl>
                           <FormMessage />
@@ -297,22 +294,22 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                     <FormField
                       control={form.control}
-                      name="focalLength35mm"
+                      name='focalLength35mm'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>35mm Equivalent (mm)</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              step="0.1"
-                              value={field.value ?? ""}
+                              type='number'
+                              step={1}
+                              value={field.value ?? ''}
                               onChange={(e) => {
                                 const value = e.target.value;
                                 field.onChange(
-                                  value === "" ? undefined : Number(value)
+                                  value === '' ? undefined : Number(value),
                                 );
                               }}
-                              placeholder="50"
+                              placeholder='50'
                             />
                           </FormControl>
                           <FormMessage />
@@ -320,11 +317,10 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       )}
                     />
                   </div>
-
-                  <div className="grid gap-4 md:grid-cols-4">
+                  <div className='grid gap-4 md:grid-cols-2'>
                     <FormField
                       control={form.control}
-                      name="fNumber"
+                      name='fNumber'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Aperture</FormLabel>
@@ -341,7 +337,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                     <FormField
                       control={form.control}
-                      name="exposureTime"
+                      name='exposureTime'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Shutter Speed</FormLabel>
@@ -355,10 +351,11 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                         </FormItem>
                       )}
                     />
-
+                  </div>
+                  <div className='grid gap-4 md:grid-cols-2'>
                     <FormField
                       control={form.control}
-                      name="iso"
+                      name='iso'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>ISO</FormLabel>
@@ -375,7 +372,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                     <FormField
                       control={form.control}
-                      name="exposureCompensation"
+                      name='exposureCompensation'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>EV</FormLabel>
@@ -392,22 +389,22 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className='grid gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="latitude"
+                    name='latitude'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Latitude</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            step="any"
-                            value={field.value ?? ""}
+                            type='number'
+                            step='any'
+                            value={field.value ?? ''}
                             onChange={(e) => {
                               const value = e.target.value;
                               const numericValue =
-                                value === "" ? undefined : Number(value);
+                                value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
                               setCurrentLocation((prev) => ({
                                 lat:
@@ -418,7 +415,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                                 lng: prev?.lng ?? data.longitude ?? null,
                               }));
                             }}
-                            placeholder="e.g. 37.7749"
+                            placeholder='e.g. 37.7749'
                           />
                         </FormControl>
                         <FormMessage />
@@ -428,19 +425,19 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                   <FormField
                     control={form.control}
-                    name="longitude"
+                    name='longitude'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Longitude</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            step="any"
-                            value={field.value ?? ""}
+                            type='number'
+                            step='any'
+                            value={field.value ?? ''}
                             onChange={(e) => {
                               const value = e.target.value;
                               const numericValue =
-                                value === "" ? undefined : Number(value);
+                                value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
                               setCurrentLocation((prev) => ({
                                 lat: prev?.lat ?? data.latitude ?? null,
@@ -451,7 +448,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                                   null,
                               }));
                             }}
-                            placeholder="e.g. -122.4194"
+                            placeholder='e.g. -122.4194'
                           />
                         </FormControl>
                         <FormMessage />
@@ -460,9 +457,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                   />
                 </div>
 
-                <div className="flex justify-end pt-2">
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Saving..." : "Save changes"}
+                <div className='flex justify-end pt-2'>
+                  <Button type='submit' disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Save changes'}
                   </Button>
                 </div>
               </form>
@@ -470,27 +467,27 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
           </div>
 
           {/* Photo + Map on the right */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-center bg-gray-50 dark:bg-muted rounded-xl p-6">
+          <div className='space-y-4'>
+            <div className='flex items-center justify-center bg-gray-50 dark:bg-muted rounded-xl p-6'>
               <FramedPhoto
                 src={data.url}
                 alt={data.title}
                 blurhash={data.blurData}
                 width={data.width}
                 height={data.height}
-                className="max-h-[50vh]"
+                className='max-h-[50vh]'
               />
             </div>
 
-            <div className="bg-card border rounded-xl p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-medium">Location</h2>
+            <div className='bg-card border rounded-xl p-4 shadow-sm'>
+              <div className='mb-2 flex items-center justify-between'>
+                <h2 className='text-sm font-medium'>Location</h2>
               </div>
-              <div className="h-64 w-full rounded-md overflow-hidden border">
+              <div className='h-64 w-full rounded-md overflow-hidden border'>
                 <Suspense
                   fallback={
-                    <div className="h-full w-full flex items-center justify-center bg-muted">
-                      <Skeleton className="h-full w-full" />
+                    <div className='h-full w-full flex items-center justify-center bg-muted'>
+                      <Skeleton className='h-full w-full' />
                     </div>
                   }
                 >
@@ -501,7 +498,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       currentLocation?.lng != null
                         ? [
                             {
-                              id: "photo-location",
+                              id: 'photo-location',
                               longitude: currentLocation.lng,
                               latitude: currentLocation.lat,
                             },
@@ -519,8 +516,8 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                     }}
                     onMarkerDragEnd={(markerId, lngLat) => {
                       setCurrentLocation({ lat: lngLat.lat, lng: lngLat.lng });
-                      form.setValue("latitude", lngLat.lat);
-                      form.setValue("longitude", lngLat.lng);
+                      form.setValue('latitude', lngLat.lat);
+                      form.setValue('longitude', lngLat.lng);
                     }}
                   />
                 </Suspense>

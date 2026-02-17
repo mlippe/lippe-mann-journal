@@ -21,7 +21,7 @@ export function DeletePhotoButton({
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete Photo",
-    `Are you sure you want to delete "${photoTitle}"? This action cannot be undone. The photo will be permanently deleted.`
+    `Are you sure you want to delete "${photoTitle}"? This action cannot be undone. The photo will be permanently deleted.`,
   );
 
   const deletePhoto = useMutation(trpc.photos.remove.mutationOptions());
@@ -37,14 +37,14 @@ export function DeletePhotoButton({
         onSuccess: async () => {
           // Invalidate queries to refetch photos list
           await queryClient.invalidateQueries(
-            trpc.photos.getMany.queryOptions({})
+            trpc.photos.getMany.queryOptions({}),
           );
           toast.success("Photo deleted successfully");
         },
         onError: (error) => {
           toast.error(error.message || "Failed to delete photo");
         },
-      }
+      },
     );
   };
 

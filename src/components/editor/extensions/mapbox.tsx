@@ -163,7 +163,6 @@ export const MapboxExtension = Node.create<MapboxOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-
     return [
       "div",
       mergeAttributes(HTMLAttributes, {
@@ -176,23 +175,23 @@ export const MapboxExtension = Node.create<MapboxOptions>({
     return {
       setMapbox:
         (options) =>
-          ({ commands }) => {
-            return commands.insertContent({
-              type: this.name,
-              attrs: {
-                markers: options.markers || [],
-                zoom: options.zoom || 12,
-                scrollZoom:
-                  options.scrollZoom !== undefined ? options.scrollZoom : true,
-                doubleClickZoom:
-                  options.doubleClickZoom !== undefined
-                    ? options.doubleClickZoom
-                    : true,
-                dragRotate:
-                  options.dragRotate !== undefined ? options.dragRotate : true,
-              },
-            });
-          },
+        ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            attrs: {
+              markers: options.markers || [],
+              zoom: options.zoom || 12,
+              scrollZoom:
+                options.scrollZoom !== undefined ? options.scrollZoom : true,
+              doubleClickZoom:
+                options.doubleClickZoom !== undefined
+                  ? options.doubleClickZoom
+                  : true,
+              dragRotate:
+                options.dragRotate !== undefined ? options.dragRotate : true,
+            },
+          });
+        },
     };
   },
 
@@ -207,7 +206,7 @@ function TiptapMapbox(props: NodeViewProps) {
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const [resizing, setResizing] = useState(false);
   const [resizingPosition, setResizingPosition] = useState<"left" | "right">(
-    "left"
+    "left",
   );
   const [resizeInitialWidth, setResizeInitialWidth] = useState(0);
   const [resizeInitialMouseX, setResizeInitialMouseX] = useState(0);
@@ -216,7 +215,6 @@ function TiptapMapbox(props: NodeViewProps) {
   // Calculate initial view state based on markers
   const initialViewState = useMemo(() => {
     const markers = Array.isArray(node.attrs.markers) ? node.attrs.markers : [];
-
 
     if (markers.length > 0) {
       return {
@@ -281,7 +279,7 @@ function TiptapMapbox(props: NodeViewProps) {
 
   function handleTouchStart(
     event: React.TouchEvent,
-    position: "left" | "right"
+    position: "left" | "right",
   ) {
     event.preventDefault();
     setResizing(true);
@@ -343,7 +341,7 @@ function TiptapMapbox(props: NodeViewProps) {
         selected ? "border-blue-300" : "",
         node.attrs.align === "left" && "left-0 translate-x-0",
         node.attrs.align === "center" && "left-1/2 -translate-x-1/2",
-        node.attrs.align === "right" && "left-full -translate-x-full"
+        node.attrs.align === "right" && "left-full -translate-x-full",
       )}
       style={{ width: node.attrs.width, maxWidth: "100%" }}
     >
@@ -351,7 +349,7 @@ function TiptapMapbox(props: NodeViewProps) {
         ref={containerRef}
         className={cn(
           "group relative flex flex-col rounded-md overflow-hidden bg-muted",
-          resizing && ""
+          resizing && "",
         )}
         style={{ height: node.attrs.height }}
       >
@@ -362,8 +360,8 @@ function TiptapMapbox(props: NodeViewProps) {
             editor?.isEditable
               ? false
               : node.attrs.scrollZoom ||
-              node.attrs.doubleClickZoom ||
-              node.attrs.dragRotate
+                node.attrs.doubleClickZoom ||
+                node.attrs.dragRotate
           }
           scrollZoom={editor?.isEditable ? false : node.attrs.scrollZoom}
           doubleClickZoom={
@@ -406,7 +404,7 @@ function TiptapMapbox(props: NodeViewProps) {
               className={cn(
                 "absolute right-4 top-4 flex items-center gap-1 rounded-md border bg-background p-1 opacity-0 transition-opacity z-30",
                 !resizing && "group-hover:opacity-100",
-                openedMore && "opacity-100"
+                openedMore && "opacity-100",
               )}
             >
               <Button
@@ -414,7 +412,7 @@ function TiptapMapbox(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "left" && "bg-accent"
+                  node.attrs.align === "left" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {
@@ -430,7 +428,7 @@ function TiptapMapbox(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "center" && "bg-accent"
+                  node.attrs.align === "center" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {
@@ -446,7 +444,7 @@ function TiptapMapbox(props: NodeViewProps) {
                 size="icon"
                 className={cn(
                   "size-7",
-                  node.attrs.align === "right" && "bg-accent"
+                  node.attrs.align === "right" && "bg-accent",
                 )}
                 variant="ghost"
                 onClick={() => {

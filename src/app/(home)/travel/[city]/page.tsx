@@ -30,7 +30,7 @@ const Page = async ({ params }: Props) => {
   void queryClient.prefetchQuery(
     trpc.travel.getOne.queryOptions({
       city: decodedCity,
-    })
+    }),
   );
 
   return (

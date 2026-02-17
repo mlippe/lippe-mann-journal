@@ -53,7 +53,7 @@ const TextScroll = ({
       className={cn(
         "group flex gap-4 overflow-hidden [--gap:1rem]",
         pauseOnHover && "[&:hover>*]:pause",
-        className
+        className,
       )}
     >
       <div

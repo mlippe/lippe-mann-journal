@@ -56,7 +56,7 @@ export function PhotoPreviewCard({
         // Set CSS variable for portrait mode responsiveness
         aspectRatio < 1 &&
           "[--width-constraint:90vw] md:[--width-constraint:50vw]",
-        className
+        className,
       )}
     >
       <div
@@ -81,7 +81,7 @@ export function PhotoPreviewCard({
             <h1
               className={cn(
                 "font-semibold text-xs sm:text-sm lg:text-lg",
-                aspectRatio < 1 ? "lg:text-sm" : "lg:text-lg"
+                aspectRatio < 1 ? "lg:text-sm" : "lg:text-lg",
               )}
             >
               <span className="flex items-center justify-center gap-1">

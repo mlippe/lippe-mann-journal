@@ -58,7 +58,7 @@ export function SecondStep({
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 @container">
         <div className="gap-6">
           <div className="space-y-6">
             <FormField
@@ -186,7 +186,7 @@ export function SecondStep({
                         <Input
                           {...field}
                           type="number"
-                          step="0.1"
+                          step={1}
                           placeholder="50"
                           value={field.value ?? ""}
                           onChange={(e) => {
@@ -212,7 +212,7 @@ export function SecondStep({
                         <Input
                           {...field}
                           type="number"
-                          step="0.1"
+                          step={1}
                           placeholder="50"
                           value={field.value ?? ""}
                           onChange={(e) => {
@@ -229,7 +229,7 @@ export function SecondStep({
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="fNumber"
@@ -263,7 +263,8 @@ export function SecondStep({
                     </FormItem>
                   )}
                 />
-
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="iso"

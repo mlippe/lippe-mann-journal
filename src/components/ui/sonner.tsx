@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   CircleCheckIcon,
   InfoIcon,
   Loader2Icon,
   OctagonXIcon,
   TriangleAlertIcon,
-} from "lucide-react"
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
+
+  const isMobile = useIsMobile();
 
   return (
     <Sonner
+      position={isMobile ? "top-center" : "bottom-center"}
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
@@ -34,7 +38,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };

@@ -38,7 +38,7 @@ const HardBreakToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     );
-  }
+  },
 );
 
 HardBreakToolbar.displayName = "HardBreakToolbar";

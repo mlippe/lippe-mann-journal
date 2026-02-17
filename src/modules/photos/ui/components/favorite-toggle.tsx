@@ -37,10 +37,10 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
         onSuccess: async () => {
           // Invalidate queries to refetch photos list
           await queryClient.invalidateQueries(
-            trpc.photos.getMany.queryOptions({})
+            trpc.photos.getMany.queryOptions({}),
           );
           toast.success(
-            newValue ? "Added to favorites" : "Removed from favorites"
+            newValue ? "Added to favorites" : "Removed from favorites",
           );
         },
         onError: (error) => {
@@ -48,7 +48,7 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
           setIsFavorite(!newValue);
           toast.error(error.message || "Failed to update favorite status");
         },
-      }
+      },
     );
   };
 
@@ -60,7 +60,7 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
       disabled={updatePhoto.isPending}
       className={cn(
         "h-8 w-8 transition-colors",
-        isFavorite && "text-red-500 hover:text-red-600"
+        isFavorite && "text-red-500 hover:text-red-600",
       )}
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >

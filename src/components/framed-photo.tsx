@@ -31,7 +31,7 @@ export function FramedPhoto({
             "before:pointer-events-none before:absolute before:content-['']",
             "before:inset-x-0 before:top-0 before:h-3 before:bg-linear-to-b before:from-black/25 before:via-black/25 before:to-transparent",
             "after:pointer-events-none after:absolute after:content-['']",
-            "after:inset-y-0 after:left-0 after:w-3 after:bg-linear-to-r after:from-black/25 after:via-black/25 after:to-transparent"
+            "after:inset-y-0 after:left-0 after:w-3 after:bg-linear-to-r after:from-black/25 after:via-black/25 after:to-transparent",
           )}
         >
           <BlurImage
@@ -40,7 +40,7 @@ export function FramedPhoto({
             blurhash={blurhash}
             className={cn(
               "block w-full h-auto max-h-[60vh] object-cover border border-neutral-200",
-              className
+              className,
             )}
             width={width}
             height={height}

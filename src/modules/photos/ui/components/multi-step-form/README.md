@@ -25,18 +25,22 @@ multi-step-form/
 ## 🎯 Design Principles
 
 ### 1. Separation of Concerns
+
 - **index.tsx**: Only responsible for state management and step flow control
 - **steps/**: Each step's form logic and UI are independent
 - **components/**: Reusable UI components
 - **types.ts**: Centralized type definitions and validation rules
 
 ### 2. Single Responsibility
+
 Each file handles one specific function:
+
 - Step components: Handle form validation and UI for that step
 - UI components: Pure presentation logic
 - Main component: Coordinate overall flow
 
 ### 3. Extensibility
+
 - Add new step: Create new component in `steps/`
 - Modify step: Only edit corresponding step file
 - Shared logic: Add to `types.ts`
@@ -44,11 +48,13 @@ Each file handles one specific function:
 ## 🔧 Usage
 
 ### Import Component
+
 ```typescript
 import MultiStepForm from "@/modules/photos/ui/components/multi-step-form";
 ```
 
 ### Basic Usage
+
 ```typescript
 <MultiStepForm
   onSubmit={(data) => {
@@ -60,6 +66,7 @@ import MultiStepForm from "@/modules/photos/ui/components/multi-step-form";
 ## 📝 Adding New Steps
 
 1. **Create Step Component** (`steps/new-step.tsx`)
+
 ```typescript
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,6 +78,7 @@ export function NewStep({ onNext, onBack, initialData }: StepProps) {
 ```
 
 2. **Add Schema** (`types.ts`)
+
 ```typescript
 export const newStepSchema = z.object({
   // Define field validation
@@ -78,6 +86,7 @@ export const newStepSchema = z.object({
 ```
 
 3. **Update Configuration** (`types.ts`)
+
 ```typescript
 export const STEP_CONFIG = [
   // ... existing steps
@@ -90,6 +99,7 @@ export const STEP_CONFIG = [
 ```
 
 4. **Integrate in Main Component** (`index.tsx`)
+
 ```typescript
 import { NewStep } from "./steps/new-step";
 
@@ -101,18 +111,21 @@ case 4:
 ## 🎨 Component Responsibilities
 
 ### index.tsx
+
 - ✅ Manage global state (step, formData, isSubmitting, etc.)
 - ✅ Handle step navigation
 - ✅ Coordinate data flow between steps
 - ✅ Final form submission
 
 ### Step Components (first-step.tsx, second-step.tsx, etc.)
+
 - ✅ Form fields and validation for that step
 - ✅ Step-specific UI layout
 - ✅ Step-specific interaction logic
 - ✅ Call `onNext()` to pass data
 
 ### UI Components (progress-bar.tsx, step-indicator.tsx, etc.)
+
 - ✅ Pure presentation logic
 - ✅ Reusable
 - ✅ Receive props, don't manage state
@@ -143,13 +156,13 @@ Pass to Next Step
 
 ## 📊 Comparison with Original Component
 
-| Feature | Original | Refactored |
-|---------|----------|------------|
-| Lines of Code | ~750 lines | Main file ~230 lines |
-| Maintainability | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Testability | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Extensibility | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Code Reuse | ⭐⭐ | ⭐⭐⭐⭐ |
+| Feature         | Original   | Refactored           |
+| --------------- | ---------- | -------------------- |
+| Lines of Code   | ~750 lines | Main file ~230 lines |
+| Maintainability | ⭐⭐       | ⭐⭐⭐⭐⭐           |
+| Testability     | ⭐⭐       | ⭐⭐⭐⭐⭐           |
+| Extensibility   | ⭐⭐       | ⭐⭐⭐⭐⭐           |
+| Code Reuse      | ⭐⭐       | ⭐⭐⭐⭐             |
 
 ## 🛠 Development Recommendations
 

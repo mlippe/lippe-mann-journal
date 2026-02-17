@@ -24,7 +24,7 @@ interface ApertureSelectorProps {
 
 export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && !STANDARD_APERTURES.includes(value)
+    value !== undefined && !STANDARD_APERTURES.includes(value),
   );
 
   const handleSelectChange = (val: string) => {
@@ -48,7 +48,7 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
         value={isCustom ? "custom" : value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Select aperture">
             {isCustom ? "Custom" : value ? `f/${value}` : "Select aperture"}
           </SelectValue>

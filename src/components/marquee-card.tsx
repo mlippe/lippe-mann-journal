@@ -22,7 +22,7 @@ export function MarqueeCard({
       className={cn(
         "group flex gap-16 overflow-hidden [--gap:4rem]",
         pauseOnHover && "[&:hover>*]:pause",
-        className
+        className,
       )}
     >
       {/* Duplicate the children to create the infinite scroll effect */}

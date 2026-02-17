@@ -3,8 +3,10 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -16,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "./ui/button";
 
 interface ResponsiveModalProps {
   children: React.ReactNode;
@@ -42,7 +45,7 @@ export const ResponsiveModal = ({
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription></DrawerDescription>
           </DrawerHeader>
-          {children}
+          <div className="no-scrollbar overflow-y-auto px-4">{children}</div>
         </DrawerContent>
       </Drawer>
     );
@@ -55,7 +58,9 @@ export const ResponsiveModal = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        {children}
+        <div className="no-scrollbar -mx-4 max-h-[70vh] overflow-y-auto px-4">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );

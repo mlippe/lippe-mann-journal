@@ -14,8 +14,12 @@ import { join } from "path";
 // Check environment variables
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL environment variable is not set");
-  console.log("💡 Please check your .env file and make sure DATABASE_URL is configured");
-  console.log("📝 Example: DATABASE_URL=postgresql://user:password@host:port/database");
+  console.log(
+    "💡 Please check your .env file and make sure DATABASE_URL is configured",
+  );
+  console.log(
+    "📝 Example: DATABASE_URL=postgresql://user:password@host:port/database",
+  );
   process.exit(1);
 }
 
@@ -30,15 +34,19 @@ interface PhotoBackup {
 
 async function rollbackPhotoUrls() {
   console.log("🔄 Starting photo URL rollback...");
-  
+
   if (!existsSync(BACKUP_FILE)) {
     console.error("❌ Backup file not found:", BACKUP_FILE);
-    console.log("💡 Make sure you have run the cleanup script first to create a backup");
+    console.log(
+      "💡 Make sure you have run the cleanup script first to create a backup",
+    );
     process.exit(1);
   }
 
   try {
-    const backup: PhotoBackup[] = JSON.parse(readFileSync(BACKUP_FILE, 'utf-8'));
+    const backup: PhotoBackup[] = JSON.parse(
+      readFileSync(BACKUP_FILE, "utf-8"),
+    );
     console.log(`📋 Found backup with ${backup.length} photos`);
 
     // Show some examples
@@ -49,11 +57,13 @@ async function rollbackPhotoUrls() {
       console.log(`   Restore: ${photo.originalUrl}`);
     });
 
-    console.log(`\n⚠️  This will restore ${backup.length} photo URLs to their original state`);
+    console.log(
+      `\n⚠️  This will restore ${backup.length} photo URLs to their original state`,
+    );
     console.log("Press Enter to continue or Ctrl+C to cancel...");
-    
-    await new Promise(resolve => {
-      process.stdin.once('data', resolve);
+
+    await new Promise((resolve) => {
+      process.stdin.once("data", resolve);
     });
 
     console.log("🔄 Restoring photo URLs...");
@@ -67,7 +77,7 @@ async function rollbackPhotoUrls() {
           SET url = ${photo.originalUrl},
               updated_at = NOW()
           WHERE id = ${photo.id}
-        `
+        `,
       );
       if (result.rowCount && result.rowCount > 0) {
         restored++;
@@ -86,8 +96,9 @@ async function rollbackPhotoUrls() {
       .from(photos)
       .where(sql`${photos.url} LIKE 'https://photograph.ecarry.uk/%'`);
 
-    console.log(`🔍 Verification: ${restoredPhotos.length} photos now have the original domain prefix`);
-
+    console.log(
+      `🔍 Verification: ${restoredPhotos.length} photos now have the original domain prefix`,
+    );
   } catch (error) {
     console.error("❌ Error during rollback:", error);
     process.exit(1);

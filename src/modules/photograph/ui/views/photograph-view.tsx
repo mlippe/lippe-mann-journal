@@ -14,7 +14,7 @@ interface PhotographViewProps {
 export const PhotographView = ({ id }: PhotographViewProps) => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.home.getPhotoById.queryOptions({ id })
+    trpc.home.getPhotoById.queryOptions({ id }),
   );
 
   const imageInfo = {

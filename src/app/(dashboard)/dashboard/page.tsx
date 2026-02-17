@@ -16,13 +16,13 @@ import {
 const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
-    trpc.dashboard.getPhotosCountByMonth.queryOptions({ years: 3 })
+    trpc.dashboard.getPhotosCountByMonth.queryOptions({ years: 3 }),
   );
   void queryClient.prefetchQuery(
-    trpc.dashboard.getVisitedCountriesWithGeoJson.queryOptions()
+    trpc.dashboard.getVisitedCountriesWithGeoJson.queryOptions(),
   );
   void queryClient.prefetchQuery(
-    trpc.dashboard.getDashboardStats.queryOptions()
+    trpc.dashboard.getDashboardStats.queryOptions(),
   );
 
   return (

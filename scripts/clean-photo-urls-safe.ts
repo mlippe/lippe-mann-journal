@@ -15,8 +15,12 @@ import { join } from "path";
 // Check environment variables
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL environment variable is not set");
-  console.log("💡 Please check your .env file and make sure DATABASE_URL is configured");
-  console.log("📝 Example: DATABASE_URL=postgresql://user:password@host:port/database");
+  console.log(
+    "💡 Please check your .env file and make sure DATABASE_URL is configured",
+  );
+  console.log(
+    "📝 Example: DATABASE_URL=postgresql://user:password@host:port/database",
+  );
   process.exit(1);
 }
 
@@ -32,7 +36,7 @@ interface PhotoBackup {
 
 async function createBackup(): Promise<PhotoBackup[]> {
   console.log("💾 Creating backup of current photo URLs...");
-  
+
   const photosWithDomain = await db
     .select({
       id: photos.id,
@@ -40,9 +44,9 @@ async function createBackup(): Promise<PhotoBackup[]> {
       title: photos.title,
     })
     .from(photos)
-    .where(sql`${photos.url} LIKE ${DOMAIN_TO_REMOVE + '%'}`);
+    .where(sql`${photos.url} LIKE ${DOMAIN_TO_REMOVE + "%"}`);
 
-  const backup: PhotoBackup[] = photosWithDomain.map(photo => ({
+  const backup: PhotoBackup[] = photosWithDomain.map((photo) => ({
     id: photo.id,
     originalUrl: photo.url,
     cleanedUrl: photo.url.replace(DOMAIN_TO_REMOVE, ""),
@@ -51,13 +55,13 @@ async function createBackup(): Promise<PhotoBackup[]> {
 
   writeFileSync(BACKUP_FILE, JSON.stringify(backup, null, 2));
   console.log(`✅ Backup created: ${BACKUP_FILE} (${backup.length} photos)`);
-  
+
   return backup;
 }
 
 async function cleanPhotoUrls() {
   console.log("🚀 Starting safe photo URL cleanup...");
-  
+
   try {
     // Create backup first
     const backup = await createBackup();
@@ -78,10 +82,10 @@ async function cleanPhotoUrls() {
     console.log(`\n⚠️  This will update ${backup.length} photo URLs`);
     console.log("✅ Backup created, changes can be rolled back");
     console.log("Press Enter to continue or Ctrl+C to cancel...");
-    
+
     // Wait for user confirmation
-    await new Promise(resolve => {
-      process.stdin.once('data', resolve);
+    await new Promise((resolve) => {
+      process.stdin.once("data", resolve);
     });
 
     // Perform the update
@@ -91,8 +95,8 @@ async function cleanPhotoUrls() {
         UPDATE photos 
         SET url = REPLACE(url, ${DOMAIN_TO_REMOVE}, ''),
             updated_at = NOW()
-        WHERE url LIKE ${DOMAIN_TO_REMOVE + '%'}
-      `
+        WHERE url LIKE ${DOMAIN_TO_REMOVE + "%"}
+      `,
     );
 
     console.log(`✅ Successfully updated ${result.rowCount} photo URLs`);
@@ -104,16 +108,19 @@ async function cleanPhotoUrls() {
         url: photos.url,
       })
       .from(photos)
-      .where(sql`${photos.url} LIKE ${DOMAIN_TO_REMOVE + '%'}`);
+      .where(sql`${photos.url} LIKE ${DOMAIN_TO_REMOVE + "%"}`);
 
     if (remainingPhotos.length === 0) {
       console.log("🎉 All photo URLs have been successfully cleaned!");
     } else {
-      console.log(`⚠️  ${remainingPhotos.length} photos still have domain prefix`);
+      console.log(
+        `⚠️  ${remainingPhotos.length} photos still have domain prefix`,
+      );
     }
 
-    console.log(`\n💡 To rollback changes, run: bun scripts/rollback-photo-urls.ts`);
-
+    console.log(
+      `\n💡 To rollback changes, run: bun scripts/rollback-photo-urls.ts`,
+    );
   } catch (error) {
     console.error("❌ Error cleaning photo URLs:", error);
     process.exit(1);
@@ -122,21 +129,23 @@ async function cleanPhotoUrls() {
 
 async function rollbackPhotoUrls() {
   console.log("🔄 Starting photo URL rollback...");
-  
+
   if (!existsSync(BACKUP_FILE)) {
     console.error("❌ Backup file not found:", BACKUP_FILE);
     process.exit(1);
   }
 
   try {
-    const backup: PhotoBackup[] = JSON.parse(readFileSync(BACKUP_FILE, 'utf-8'));
+    const backup: PhotoBackup[] = JSON.parse(
+      readFileSync(BACKUP_FILE, "utf-8"),
+    );
     console.log(`📋 Found backup with ${backup.length} photos`);
 
     console.log("\n⚠️  This will restore original URLs");
     console.log("Press Enter to continue or Ctrl+C to cancel...");
-    
-    await new Promise(resolve => {
-      process.stdin.once('data', resolve);
+
+    await new Promise((resolve) => {
+      process.stdin.once("data", resolve);
     });
 
     // Restore URLs one by one for safety
@@ -148,13 +157,12 @@ async function rollbackPhotoUrls() {
           SET url = ${photo.originalUrl},
               updated_at = NOW()
           WHERE id = ${photo.id}
-        `
+        `,
       );
       restored++;
     }
 
     console.log(`✅ Successfully restored ${restored} photo URLs`);
-
   } catch (error) {
     console.error("❌ Error during rollback:", error);
     process.exit(1);
@@ -164,7 +172,7 @@ async function rollbackPhotoUrls() {
 // Check command line arguments
 const command = process.argv[2];
 
-if (command === 'rollback') {
+if (command === "rollback") {
   rollbackPhotoUrls()
     .then(() => {
       console.log("\n🏁 Rollback completed successfully");
