@@ -2,7 +2,7 @@
 
 I whished for something like instagram, where i can share my work online and get feedback from others. But I wanted to take control over each aspect of this, for example that I still own my content after posting it. Thats why I built this. I also plan to share some blog articles about side projects and other stuff that interests me and gets me writing. I tried [ghost.org](https://ghost.org/) earlier for this purpose, but it wasn't for me. I was looking for a media heavy blog with some text articles, not the other way around.
 
-**This is a fork of the beuatiful and extensive [photography-website by ECarry](https://github.com/ECarry/photography-website), I adjusted it based on my taste and needs. Please always refer to the [Readme](https://github.com/ECarry/photography-website#photography-website) from ECarry for further details.**
+**This is a fork of the beautiful and extensive [photography-website by ECarry](https://github.com/ECarry/photography-website), I adjusted it based on my taste and needs. Please always refer to the [Readme](https://github.com/ECarry/photography-website#photography-website) from ECarry for further details.**
 
 [My production version lives here.](https://journal.lippe-mann.de/)
 
@@ -155,7 +155,7 @@ SEED_USER_PASSWORD=your-secure-password
 SEED_USER_NAME=Admin User / Your Name
 ```
 
-### Step 3: Database Setup
+### Step 3: Database Setup & Application start
 
 If you do not yet have bun installed on your machine, [get it here.](https://bun.com/docs/installation)
 
@@ -163,16 +163,14 @@ If you do not yet have bun installed on your machine, [get it here.](https://bun
 # Push database schema
 bun run db:push
 
-# Create admin user
+# start application locally
+npm run dev
+
+# In a new terminal, create admin user
 bun run seed:user
 ```
 
-### Step 4: Build and Test Locally
-
-```bash
-# start application locally
-npm run dev
-```
+### Step 4: Test Locally
 
 Visit `http://localhost:3000` to verify everything works correctly.
 
