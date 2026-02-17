@@ -25,5 +25,10 @@ export default function cloudflareLoader({
   }
   const paramsString = params.join(',');
 
-  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(src)}`;
+  // If src is a full URL, extract the pathname. Otherwise, use it as is.
+  const relativeSrc = src.startsWith('http') ? new URL(src).pathname : src;
+
+  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(
+    relativeSrc,
+  )}`;
 }
