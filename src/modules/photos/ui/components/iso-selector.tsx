@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Standard ISO values in photography
 const STANDARD_ISO_VALUES = [
@@ -25,11 +25,11 @@ interface ISOSelectorProps {
 
 export function ISOSelector({ value, onChange }: ISOSelectorProps) {
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && !STANDARD_ISO_VALUES.includes(value)
+    value !== undefined && !STANDARD_ISO_VALUES.includes(value),
   );
 
   const handleSelectChange = (val: string) => {
-    if (val === "custom") {
+    if (val === 'custom') {
       setIsCustom(true);
       onChange(undefined);
     } else {
@@ -44,40 +44,40 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className='space-y-2'>
       <Select
-        value={isCustom ? "custom" : value?.toString()}
+        value={isCustom ? 'custom' : value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
-          <SelectValue placeholder="Select ISO">
-            {isCustom ? "Custom" : value ? `ISO ${value}` : "Select ISO"}
+        <SelectTrigger className='w-full'>
+          <SelectValue placeholder='Select ISO'>
+            {isCustom ? 'Custom' : value ? `ISO ${value}` : 'Select ISO'}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="max-h-[300px]">
+        <SelectContent className='max-h-[300px]'>
           {STANDARD_ISO_VALUES.map((iso) => (
             <SelectItem key={iso} value={iso.toString()}>
               ISO {iso}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Custom value...</SelectItem>
+          <SelectItem value='custom'>Custom value...</SelectItem>
         </SelectContent>
       </Select>
 
       {isCustom && (
-        <div className="flex gap-2 items-center">
-          <span className="text-sm text-muted-foreground">ISO</span>
+        <div className='flex gap-2 items-center'>
+          <span className='text-sm text-muted-foreground'>ISO</span>
           <Input
-            type="number"
-            placeholder="Enter custom value"
-            value={value ?? ""}
+            type='number'
+            placeholder='Enter custom value'
+            value={value ?? ''}
             onChange={handleCustomChange}
-            className="flex-1"
+            className='flex-1'
           />
           <Button
-            type="button"
-            variant="outline"
-            size="sm"
+            type='button'
+            variant='outline'
+            size='sm'
             onClick={() => setIsCustom(false)}
           >
             Cancel

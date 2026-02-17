@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Standard exposure compensation values in EV (1/3 stop increments)
 // Range: -5 EV to +5 EV
@@ -25,16 +25,16 @@ interface ExposureCompensationSelectorProps {
 }
 
 function formatEV(value: number): string {
-  if (value === 0) return "0 EV";
-  const sign = value > 0 ? "+" : "";
-  
+  if (value === 0) return '0 EV';
+  const sign = value > 0 ? '+' : '';
+
   // Check if it's a whole number
   if (value % 1 === 0) {
     return `${sign}${value} EV`;
   }
-  
+
   // Format with up to 2 decimal places, removing trailing zeros
-  return `${sign}${value.toFixed(2).replace(/\.?0+$/, "")} EV`;
+  return `${sign}${value.toFixed(2).replace(/\.?0+$/, '')} EV`;
 }
 
 function findClosestEV(value: number): number | null {
@@ -59,11 +59,11 @@ export function ExposureCompensationSelector({
 }: ExposureCompensationSelectorProps) {
   const closestEV = value !== undefined ? findClosestEV(value) : null;
   const [isCustom, setIsCustom] = useState(
-    value !== undefined && closestEV === null
+    value !== undefined && closestEV === null,
   );
 
   const handleSelectChange = (val: string) => {
-    if (val === "custom") {
+    if (val === 'custom') {
       setIsCustom(true);
       onChange(undefined);
     } else {
@@ -78,51 +78,47 @@ export function ExposureCompensationSelector({
   };
 
   const displayValue = isCustom
-    ? "Custom"
+    ? 'Custom'
     : value !== undefined
-    ? formatEV(closestEV ?? value)
-    : "Select EV";
+      ? formatEV(closestEV ?? value)
+      : 'Select EV';
 
   return (
-    <div className="space-y-2">
+    <div className='space-y-2'>
       <Select
-        value={
-          isCustom ? "custom" : closestEV?.toString() || value?.toString()
-        }
+        value={isCustom ? 'custom' : closestEV?.toString() || value?.toString()}
         onValueChange={handleSelectChange}
       >
-        <SelectTrigger>
-          <SelectValue placeholder="Select exposure compensation">
-            {displayValue}
-          </SelectValue>
+        <SelectTrigger className='w-full'>
+          <SelectValue placeholder='Select EV'>{displayValue}</SelectValue>
         </SelectTrigger>
-        <SelectContent className="max-h-[300px]">
+        <SelectContent className='max-h-[300px]'>
           {STANDARD_EV_VALUES.map((ev) => (
             <SelectItem key={ev} value={ev.toString()}>
               {formatEV(ev)}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Custom value...</SelectItem>
+          <SelectItem value='custom'>Custom value...</SelectItem>
         </SelectContent>
       </Select>
 
       {isCustom && (
-        <div className="flex gap-2 items-center">
+        <div className='flex gap-2 items-center'>
           <Input
-            type="number"
-            step="0.33"
-            placeholder="Enter EV value (e.g., -1.5)"
-            value={value ?? ""}
+            type='number'
+            step='0.33'
+            placeholder='Enter EV value (e.g., -1.5)'
+            value={value ?? ''}
             onChange={handleCustomChange}
-            className="flex-1"
+            className='flex-1'
           />
-          <span className="text-sm text-muted-foreground whitespace-nowrap">
+          <span className='text-sm text-muted-foreground whitespace-nowrap'>
             EV
           </span>
           <Button
-            type="button"
-            variant="outline"
-            size="sm"
+            type='button'
+            variant='outline'
+            size='sm'
             onClick={() => setIsCustom(false)}
           >
             Cancel

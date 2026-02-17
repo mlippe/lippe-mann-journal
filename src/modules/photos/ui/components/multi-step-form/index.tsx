@@ -1,21 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { TExifData, TImageInfo } from "@/modules/photos/lib/utils";
-import { PhotoFormData, INITIAL_FORM_VALUES, STEP_CONFIG } from "./types";
-import type { AddressData } from "@/modules/mapbox/hooks/use-get-address";
-import { FirstStep } from "./steps/first-step";
-import { SecondStep } from "./steps/second-step";
-import { ThirdStep } from "./steps/third-step";
-import { FourthStep } from "./steps/fourth-step";
-import { ProgressBar } from "./components/progress-bar";
-import { StepIndicator } from "./components/step-indicator";
-import { SuccessScreen } from "./components/success-screen";
-import { toast } from "sonner";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { TExifData, TImageInfo } from '@/modules/photos/lib/utils';
+import { PhotoFormData, INITIAL_FORM_VALUES, STEP_CONFIG } from './types';
+import type { AddressData } from '@/modules/mapbox/hooks/use-get-address';
+import { FirstStep } from './steps/first-step';
+import { SecondStep } from './steps/second-step';
+import { ThirdStep } from './steps/third-step';
+import { FourthStep } from './steps/fourth-step';
+import { ProgressBar } from './components/progress-bar';
+import { SuccessScreen } from './components/success-screen';
+import { toast } from 'sonner';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // ============================================================================
 // TYPES
@@ -68,7 +67,7 @@ export default function MultiStepForm({
   const handleUploadSuccess = (
     uploadedUrl: string,
     uploadedExif: TExifData | null,
-    uploadedImageInfo: TImageInfo
+    uploadedImageInfo: TImageInfo,
   ) => {
     setUrl(uploadedUrl);
     setExif(uploadedExif);
@@ -91,7 +90,7 @@ export default function MultiStepForm({
     if (step === 0) {
       updatedData = {
         ...updatedData,
-        url: url || "",
+        url: url || '',
         exif,
         imageInfo,
         // Pre-fill camera parameters from EXIF
@@ -120,14 +119,14 @@ export default function MultiStepForm({
       // Final submission - integrate all data including address and image info
       const finalData = {
         ...updatedData,
-        url: url || "",
-        title: updatedData.title || "",
-        description: updatedData.description || "",
+        url: url || '',
+        title: updatedData.title || '',
+        description: updatedData.description || '',
         // Add image dimensions and blur data from imageInfo
         aspectRatio: imageInfo ? imageInfo.width / imageInfo.height : 1,
         width: imageInfo?.width || 0,
         height: imageInfo?.height || 0,
-        blurData: imageInfo?.blurhash || "",
+        blurData: imageInfo?.blurhash || '',
         // Add address data from geocoding if available
         country: address?.features?.[0]?.properties?.context?.country?.name,
         countryCode:
@@ -135,9 +134,9 @@ export default function MultiStepForm({
         region: address?.features?.[0]?.properties?.context?.region?.name,
         city:
           address?.features?.[0]?.properties?.context?.country?.country_code ===
-            "JP" ||
+            'JP' ||
           address?.features?.[0]?.properties?.context?.country?.country_code ===
-            "TW"
+            'TW'
             ? address?.features?.[0]?.properties?.context?.region?.name
             : address?.features?.[0]?.properties?.context?.place?.name,
         district: address?.features?.[0]?.properties?.context?.locality?.name,
@@ -152,17 +151,17 @@ export default function MultiStepForm({
         onSuccess: async () => {
           // Invalidate queries to refetch photos list
           await queryClient.invalidateQueries(
-            trpc.photos.getMany.queryOptions({})
+            trpc.photos.getMany.queryOptions({}),
           );
           await queryClient.invalidateQueries(
-            trpc.home.getManyLikePhotos.queryOptions({ limit: 10 })
+            trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
           );
           await queryClient.invalidateQueries(
-            trpc.home.getCitySets.queryOptions({ limit: 9 })
+            trpc.home.getCitySets.queryOptions({ limit: 9 }),
           );
           await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
 
-          toast.success("Photo uploaded successfully!");
+          toast.success('Photo uploaded successfully!');
           setIsComplete(true);
           setIsSubmitting(false);
 
@@ -258,24 +257,22 @@ export default function MultiStepForm({
   // ========================================
 
   return (
-    <div className={cn("mx-auto w-full", className)}>
+    <div className={cn('mx-auto w-full', className)}>
       {!isComplete ? (
         <>
           <ProgressBar currentStep={step} totalSteps={STEP_CONFIG.length} />
-          <StepIndicator steps={STEP_CONFIG} currentStep={step} />
-
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode='wait'>
             <motion.div
               key={step}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
+              initial='hidden'
+              animate='visible'
+              exit='exit'
               variants={variants}
               transition={{ duration: 0.3 }}
             >
-              <div className="mb-6">
-                <h2 className="text-xl font-bold">{STEP_CONFIG[step].title}</h2>
-                <p className="text-muted-foreground text-sm">
+              <div className='mb-6'>
+                <h2 className='text-xl font-bold'>{STEP_CONFIG[step].title}</h2>
+                <p className='text-muted-foreground text-sm'>
                   {STEP_CONFIG[step].description}
                 </p>
               </div>
