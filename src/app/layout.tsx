@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
-import { TRPCReactProvider } from "@/trpc/client";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/components/theme-provider";
-import { siteConfig } from "@/site.config";
+import { TRPCReactProvider } from '@/trpc/client';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from '@/components/theme-provider';
+import { siteConfig } from '@/site.config';
 // Vercel Analytics
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
-import { Readex_Pro } from "next/font/google";
+import { Readex_Pro } from 'next/font/google';
 
 const readexPro = Readex_Pro({
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
@@ -27,13 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body className={`${readexPro.className} antialiased`}>
         <NuqsAdapter>
           <TRPCReactProvider>
-            <ThemeProvider attribute="class">
-              <Toaster />
-              {children}
+            <ThemeProvider attribute='class'>
+              <div className='flex items-center justify-center min-h-screen'>
+                <span>Lippe & Mann Journal</span>
+              </div>
+              {/* <Toaster />
+              {children} */}
             </ThemeProvider>
           </TRPCReactProvider>
         </NuqsAdapter>
