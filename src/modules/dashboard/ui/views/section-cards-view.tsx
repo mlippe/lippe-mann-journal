@@ -1,14 +1,9 @@
 'use client';
 
-import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-
-import { Badge } from '@/components/ui/badge';
 import {
   Card,
-  CardAction,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -20,106 +15,42 @@ export function SectionCardsView() {
   const { data: stats } = useSuspenseQuery(
     trpc.dashboard.getDashboardStats.queryOptions(),
   );
+  
+  const cardData = [
+    { title: 'Total Photos', value: stats.totalPhotos },
+    { title: 'Total Posts', value: stats.totalPosts },
+    { title: 'Total Collections', value: stats.totalCollections },
+  ];
+
   return (
-    <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2'>
-      <Card className='@container/card'>
-        <CardHeader>
-          <CardDescription>Total Photos</CardDescription>
-          <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {stats.totalPhotos.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant='outline'>
-              {stats.thisYearPercentChange >= 0 ? (
-                <>
-                  <IconTrendingUp />+{stats.thisYearPercentChange}%
-                </>
-              ) : (
-                <>
-                  <IconTrendingDown />
-                  {stats.thisYearPercentChange}%
-                </>
-              )}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            {stats.thisYearPercentChange >= 0
-              ? 'Growth this year'
-              : 'Decline this year'}{' '}
-            <IconTrendingUp className='size-4' />
-          </div>
-          <div className='text-muted-foreground'>
-            {Math.abs(stats.thisYearPercentChange)}%{' '}
-            {stats.thisYearPercentChange >= 0 ? 'increase' : 'decrease'} vs last
-            year
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className='@container/card'>
-        <CardHeader>
-          <CardDescription>This Year Photos</CardDescription>
-          <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {stats.thisYearPhotos.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant='outline'>
-              {stats.thisYearPercentChange >= 0 ? (
-                <>
-                  <IconTrendingUp />+{stats.thisYearPercentChange}%
-                </>
-              ) : (
-                <>
-                  <IconTrendingDown />
-                  {stats.thisYearPercentChange}%
-                </>
-              )}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            {stats.thisYearPercentChange >= 0
-              ? 'Year-over-year growth'
-              : 'Year-over-year decline'}{' '}
-            <IconTrendingUp className='size-4' />
-          </div>
-          <div className='text-muted-foreground'>
-            {Math.abs(stats.thisYearPercentChange)}%{' '}
-            {stats.thisYearPercentChange >= 0 ? 'increase' : 'decrease'} vs last
-            year
-          </div>
-        </CardFooter>
-      </Card>
+    <div className='grid grid-cols-1 gap-4 @xl/main:grid-cols-3'>
+      {cardData.map((card) => (
+        <Card key={card.title} className='@container/card'>
+          <CardHeader>
+            <CardDescription>{card.title}</CardDescription>
+            <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+              {card.value.toLocaleString()}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      ))}
     </div>
   );
 }
 
 export const SectionCardsLoading = () => {
   return (
-    <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-      {[1, 2, 3, 4].map((i) => (
+    <div className='grid grid-cols-1 gap-4 @xl/main:grid-cols-3'>
+      {[1, 2, 3].map((i) => (
         <Card key={i} className='@container/card'>
           <CardHeader>
             <CardDescription>
               <Skeleton className='h-4 w-20' />
             </CardDescription>
             <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              <Skeleton className='h-8 w-32 mt-2' />
+              <Skeleton className='h-8 w-16 mt-2' />
             </CardTitle>
-            <CardAction>
-              <Skeleton className='h-8 w-24' />
-            </CardAction>
           </CardHeader>
-          <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-            <div className='line-clamp-1 flex gap-2 font-medium'>
-              <Skeleton className='h-4 w-24' />
-            </div>
-            <div className='text-muted-foreground'>
-              <Skeleton className='h-4 w-32' />
-            </div>
-          </CardFooter>
         </Card>
       ))}
     </div>

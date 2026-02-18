@@ -1,4 +1,4 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm";
+import { InferSelectModel, relations, sql } from 'drizzle-orm';
 import {
   boolean,
   timestamp,
@@ -8,21 +8,21 @@ import {
   varchar,
   integer,
   uuid,
-  uniqueIndex,
   index,
   pgEnum,
-} from "drizzle-orm/pg-core";
+  primaryKey,
+} from 'drizzle-orm/pg-core';
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
-} from "drizzle-zod";
-import { z } from "zod";
+} from 'drizzle-zod';
+import { z } from 'zod';
 
 // ⌚️ Reusable timestamps - Define once, use everywhere!
 export const timestamps = {
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 };
 
 /***************
@@ -31,54 +31,54 @@ export const timestamps = {
  ****************
  ***************/
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").notNull(),
-  image: text("image"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').notNull(),
+  image: text('image'),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
 });
 
-export const session = pgTable("session", {
-  id: text("id").primaryKey(),
-  expiresAt: timestamp("expires_at").notNull(),
-  token: text("token").notNull().unique(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  userId: text("user_id")
+export const session = pgTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id')
     .notNull()
     .references(() => user.id),
 });
 
-export const account = pgTable("account", {
-  id: text("id").primaryKey(),
-  accountId: text("account_id").notNull(),
-  providerId: text("provider_id").notNull(),
-  userId: text("user_id")
+export const account = pgTable('account', {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  userId: text('user_id')
     .notNull()
     .references(() => user.id),
-  accessToken: text("access_token"),
-  refreshToken: text("refresh_token"),
-  idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-  scope: text("scope"),
-  password: text("password"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
 });
 
-export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+export const verification = pgTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at'),
+  updatedAt: timestamp('updated_at'),
 });
 
 /***************
@@ -87,100 +87,48 @@ export const verification = pgTable("verification", {
  ****************
  ***************/
 
-export const photoVisibility = pgEnum("photo_visibility", [
-  "public",
-  "private",
+export const photoVisibility = pgEnum('photo_visibility', [
+  'public',
+  'private',
 ]);
 
 export const photos = pgTable(
-  "photos",
+  'photos',
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    url: text("url").notNull(),
-    title: text("title").notNull(),
-    description: text("description").notNull(),
-    isFavorite: boolean("is_favorite").default(false).notNull(),
-    visibility: photoVisibility("visibility").default("private").notNull(),
-    aspectRatio: real("aspect_ratio").notNull(),
-    width: real("width").notNull(),
-    height: real("height").notNull(),
-    blurData: text("blur_data").notNull(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    url: text('url').notNull(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    isFavorite: boolean('is_favorite').default(false).notNull(),
+    visibility: photoVisibility('visibility').default('private').notNull(),
+    aspectRatio: real('aspect_ratio').notNull(),
+    width: real('width').notNull(),
+    height: real('height').notNull(),
+    blurData: text('blur_data').notNull(),
 
-    country: text("country"),
-    countryCode: text("country_code"),
-    region: text("region"),
-    city: text("city"),
-    district: text("district"),
-
-    fullAddress: text("full_address"),
-    placeFormatted: text("place_formatted"),
-
-    make: varchar("make", { length: 255 }),
-    model: varchar("model", { length: 255 }),
-    lensModel: varchar("lens_model", { length: 255 }),
-    focalLength: real("focal_length"),
-    focalLength35mm: real("focal_length_35mm"),
-    fNumber: real("f_number"),
-    iso: integer("iso"),
-    exposureTime: real("exposure_time"),
-    exposureCompensation: real("exposure_compensation"),
-    latitude: real("latitude"),
-    longitude: real("longitude"),
-    gpsAltitude: real("gps_altitude"),
-    dateTimeOriginal: timestamp("datetime_original"),
+    make: varchar('make', { length: 255 }),
+    model: varchar('model', { length: 255 }),
+    lensModel: varchar('lens_model', { length: 255 }),
+    focalLength: real('focal_length'),
+    focalLength35mm: real('focal_length_35mm'),
+    fNumber: real('f_number'),
+    iso: integer('iso'),
+    exposureTime: real('exposure_time'),
+    exposureCompensation: real('exposure_compensation'),
+    latitude: real('latitude'),
+    longitude: real('longitude'),
+    gpsAltitude: real('gps_altitude'),
+    dateTimeOriginal: timestamp('datetime_original'),
 
     ...timestamps,
   },
-  (t) => [
-    index("year_idx").on(sql`DATE_TRUNC('year', ${t.dateTimeOriginal})`),
-    index("city_idx").on(t.city),
-  ],
+  (t) => [index('year_idx').on(sql`DATE_TRUNC('year', ${t.dateTimeOriginal})`)],
 );
-
-export const citySets = pgTable(
-  "city_sets",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    description: text("description"),
-
-    // GEO DATA
-    country: text("country").notNull(),
-    countryCode: text("country_code").notNull(),
-    city: text("city").notNull(),
-
-    // COVER PHOTO
-    coverPhotoId: uuid("cover_photo_id")
-      .references(() => photos.id)
-      .notNull(),
-
-    photoCount: integer("photo_count").default(0).notNull(),
-
-    // META DATA
-    ...timestamps,
-  },
-  (t) => [uniqueIndex("unique_city_set").on(t.country, t.city)],
-);
-
-// Soft relations
-export const citySetsRelations = relations(citySets, ({ one, many }) => ({
-  coverPhoto: one(photos, {
-    fields: [citySets.coverPhotoId],
-    references: [photos.id],
-  }),
-  photos: many(photos),
-}));
-
-export const photosRelations = relations(photos, ({ one }) => ({
-  citySet: one(citySets, {
-    fields: [photos.country, photos.city],
-    references: [citySets.country, citySets.city],
-  }),
-}));
 
 // Schema
 export const photosInsertSchema = createInsertSchema(photos).extend({
-  title: z.string().min(1, { message: "Title is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
+  title: z.string().min(1, { message: 'Title is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
 });
 export const photosSelectSchema = createSelectSchema(photos);
 export const photosUpdateSchema = createUpdateSchema(photos)
@@ -197,11 +145,27 @@ export const photosUpdateSchema = createUpdateSchema(photos)
 
 // Types
 export type Photo = InferSelectModel<typeof photos>;
-export type CitySet = InferSelectModel<typeof citySets>;
-// with photos & cover photo
-export type CitySetWithPhotos = CitySet & { photos: Photo[] } & {
-  coverPhoto: Photo;
-};
+
+/*********************
+ *********************
+ * Collections Table *
+ *********************
+ *********************/
+
+export const collections = pgTable('collections', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  coverImageUrl: text('cover_image_url'),
+  isFeatured: boolean('is_featured').default(false).notNull(),
+  ...timestamps,
+});
+
+export type Collection = InferSelectModel<typeof collections>;
+export const collectionsInsertSchema = createInsertSchema(collections);
+export const collectionsSelectSchema = createSelectSchema(collections);
+export const collectionsUpdateSchema = createUpdateSchema(collections);
 
 /***************
  ****************
@@ -209,40 +173,124 @@ export type CitySetWithPhotos = CitySet & { photos: Photo[] } & {
  ****************
  ***************/
 
-export const categories = pgTable("categories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-});
-
-export const postVisibility = pgEnum("post_visibility", ["public", "private"]);
+export const postVisibility = pgEnum('post_visibility', ['public', 'private']);
+export const postType = pgEnum('post_type', ['ARTICLE', 'PHOTO', 'ALBUM']);
 
 export const posts = pgTable(
-  "posts",
+  'posts',
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    title: text("title").notNull(),
-    slug: text("slug").notNull().unique(),
-    categoryId: uuid("category_id").references(() => categories.id),
-    visibility: postVisibility("visibility").default("private").notNull(),
-    tags: text("tags").array(),
-    coverImage: text("cover_image"),
-    description: text("description"),
-    content: text("content"),
-    readingTimeMinutes: integer("reading_time_minutes"),
-
+    id: uuid('id').primaryKey().defaultRandom(),
+    title: text('title').notNull(),
+    slug: text('slug').notNull().unique(),
+    visibility: postVisibility('visibility').default('private').notNull(),
+    type: postType('type').notNull(),
+    tags: text('tags').array(),
+    coverImage: text('cover_image'),
+    description: text('description'),
+    content: text('content'), // For BLOG posts
     ...timestamps,
   },
-  (t) => [
-    index("category_idx").on(t.categoryId),
-    index("tags_idx").on(t.tags),
-    index("slug_idx").on(t.slug),
-  ],
+  (t) => [index('tags_idx').on(t.tags), index('slug_idx').on(t.slug)],
 );
 
 // Types
 export type Post = InferSelectModel<typeof posts>;
 
 // Schema
-export const postsInsertSchema = createInsertSchema(posts);
+export const postsInsertSchema = createInsertSchema(posts).extend({
+  tags: z.array(z.string()).default([]),
+});
 export const postsSelectSchema = createSelectSchema(posts);
 export const postsUpdateSchema = createUpdateSchema(posts);
+
+export const postsWithPhotos = createSelectSchema(posts).extend({
+  postsToPhotos: z
+    .array(
+      z.object({
+        photo: createSelectSchema(photos),
+      }),
+    )
+    .optional(),
+});
+export type PostWithPhotos = z.infer<typeof postsWithPhotos>;
+
+/*******************
+ *******************
+ * Join Tables *
+ *******************
+ *******************/
+
+export const postsToCollections = pgTable(
+  'posts_to_collections',
+  {
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => posts.id, { onDelete: 'cascade' }),
+    collectionId: uuid('collection_id')
+      .notNull()
+      .references(() => collections.id, { onDelete: 'cascade' }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.postId, t.collectionId] }),
+  }),
+);
+
+export const postsToPhotos = pgTable(
+  'posts_to_photos',
+  {
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => posts.id, { onDelete: 'cascade' }),
+    photoId: uuid('photo_id')
+      .notNull()
+      .references(() => photos.id, { onDelete: 'cascade' }),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.postId, t.photoId] }),
+  }),
+);
+
+/*******************
+ *******************
+ *    Relations    *
+ *******************
+ *******************/
+
+export const postsRelations = relations(posts, ({ many }) => ({
+  postsToCollections: many(postsToCollections),
+  postsToPhotos: many(postsToPhotos),
+}));
+
+export const collectionsRelations = relations(collections, ({ many }) => ({
+  postsToCollections: many(postsToCollections),
+}));
+
+export const photosRelations = relations(photos, ({ many }) => ({
+  postsToPhotos: many(postsToPhotos),
+}));
+
+export const postsToCollectionsRelations = relations(
+  postsToCollections,
+  ({ one }) => ({
+    collection: one(collections, {
+      fields: [postsToCollections.collectionId],
+      references: [collections.id],
+    }),
+    post: one(posts, {
+      fields: [postsToCollections.postId],
+      references: [posts.id],
+    }),
+  }),
+);
+
+export const postsToPhotosRelations = relations(postsToPhotos, ({ one }) => ({
+  photo: one(photos, {
+    fields: [postsToPhotos.photoId],
+    references: [photos.id],
+  }),
+  post: one(posts, {
+    fields: [postsToPhotos.postId],
+    references: [posts.id],
+  }),
+}));

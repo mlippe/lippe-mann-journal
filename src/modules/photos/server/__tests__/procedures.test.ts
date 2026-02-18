@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createAuthedCaller, buildPhotoInput } from "@/test/helpers";
 import { db } from "@/db";
-import { photos, citySets } from "@/db/schema";
+import { photos } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { getSession } from "@/modules/auth/lib/get-session";
 
 // Clean up test data before each test
 beforeEach(async () => {
-  await db.delete(citySets);
   await db.delete(photos);
 });
 
@@ -22,82 +21,6 @@ describe("photos.create", () => {
     expect(result.title).toBe("Test Photo");
     expect(result.url).toBe("photos/test-photo.jpg");
     expect(result.id).toBeDefined();
-  });
-
-  it("should create a city set when photo has location data", async () => {
-    const caller = createAuthedCaller();
-    const input = buildPhotoInput({
-      country: "United States",
-      countryCode: "US",
-      city: "New York",
-      region: "New York",
-    });
-
-    await caller.photos.create(input);
-
-    // Verify city set was created
-    const [citySet] = await db
-      .select()
-      .from(citySets)
-      .where(eq(citySets.city, "New York"));
-
-    expect(citySet).toBeDefined();
-    expect(citySet.country).toBe("United States");
-    expect(citySet.photoCount).toBe(1);
-  });
-
-  it("should increment city set photo count for same city", async () => {
-    const caller = createAuthedCaller();
-    const baseInput = {
-      country: "United States",
-      countryCode: "US",
-      city: "New York",
-      region: "New York",
-    };
-
-    await caller.photos.create(
-      buildPhotoInput({ ...baseInput, title: "Photo 1" }),
-    );
-    await caller.photos.create(
-      buildPhotoInput({ ...baseInput, title: "Photo 2" }),
-    );
-
-    const [citySet] = await db
-      .select()
-      .from(citySets)
-      .where(eq(citySets.city, "New York"));
-
-    expect(citySet.photoCount).toBe(2);
-  });
-
-  it("should use region as city name for JP country code", async () => {
-    const caller = createAuthedCaller();
-    const input = buildPhotoInput({
-      country: "Japan",
-      countryCode: "JP",
-      city: "Shibuya",
-      region: "Tokyo",
-    });
-
-    await caller.photos.create(input);
-
-    const [citySet] = await db
-      .select()
-      .from(citySets)
-      .where(eq(citySets.city, "Tokyo"));
-
-    expect(citySet).toBeDefined();
-    expect(citySet.city).toBe("Tokyo");
-  });
-
-  it("should not create city set when no location data", async () => {
-    const caller = createAuthedCaller();
-    const input = buildPhotoInput();
-
-    await caller.photos.create(input);
-
-    const allCitySets = await db.select().from(citySets);
-    expect(allCitySets).toHaveLength(0);
   });
 
   it("should reject unauthenticated requests", async () => {
@@ -207,62 +130,6 @@ describe("photos.remove", () => {
     // Verify it's gone
     const found = await caller.photos.getOne({ id: photo.id });
     expect(found).toBeUndefined();
-  });
-
-  it("should delete city set when last photo is removed", async () => {
-    const caller = createAuthedCaller();
-    const photo = await caller.photos.create(
-      buildPhotoInput({
-        country: "France",
-        countryCode: "FR",
-        city: "Paris",
-        region: "Île-de-France",
-      }),
-    );
-
-    await caller.photos.remove({ id: photo.id });
-
-    const allCitySets = await db
-      .select()
-      .from(citySets)
-      .where(eq(citySets.city, "Paris"));
-
-    expect(allCitySets).toHaveLength(0);
-  });
-
-  it("should decrement city set count when non-cover photo removed", async () => {
-    const caller = createAuthedCaller();
-
-    const photo1 = await caller.photos.create(
-      buildPhotoInput({
-        title: "Photo 1",
-        country: "France",
-        countryCode: "FR",
-        city: "Paris",
-        region: "Île-de-France",
-      }),
-    );
-
-    const photo2 = await caller.photos.create(
-      buildPhotoInput({
-        title: "Photo 2",
-        country: "France",
-        countryCode: "FR",
-        city: "Paris",
-        region: "Île-de-France",
-      }),
-    );
-
-    // Remove the second photo (not the cover)
-    await caller.photos.remove({ id: photo2.id });
-
-    const [citySet] = await db
-      .select()
-      .from(citySets)
-      .where(eq(citySets.city, "Paris"));
-
-    expect(citySet.photoCount).toBe(1);
-    expect(citySet.coverPhotoId).toBe(photo1.id);
   });
 
   it("should return NOT_FOUND for non-existent photo", async () => {

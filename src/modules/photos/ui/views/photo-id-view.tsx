@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { FramedPhoto } from '@/components/framed-photo';
 import { photosUpdateSchema } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';

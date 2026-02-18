@@ -1,17 +1,16 @@
-"use client";
+'use client';
 
-import "./editor.css";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import TextAlign from "@tiptap/extension-text-align";
-import { TextStyle } from "@tiptap/extension-text-style";
-import Underline from "@tiptap/extension-underline";
-import { Color } from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
-import { ImageExtension } from "./extensions/image";
-import { YoutubeExtension } from "./extensions/youtube";
-import { MapboxExtension } from "./extensions/mapbox";
-import { FontSize } from "./extensions/font-size";
+import './editor.css';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import { Color } from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+import { ImageExtension } from './extensions/image';
+import { YoutubeExtension } from './extensions/youtube';
+import { FontSize } from './extensions/font-size';
 
 interface RichTextProps {
   content: string | Record<string, unknown>;
@@ -27,33 +26,33 @@ export default function RichTextViewer({ content }: RichTextProps) {
       StarterKit.configure({
         orderedList: {
           HTMLAttributes: {
-            class: "list-decimal",
+            class: 'list-decimal',
           },
         },
         bulletList: {
           HTMLAttributes: {
-            class: "list-disc",
+            class: 'list-disc',
           },
         },
         heading: {
           levels: [1, 2, 3],
           HTMLAttributes: {
-            class: "tiptap-heading",
+            class: 'tiptap-heading',
           },
         },
         codeBlock: {
           HTMLAttributes: {
-            class: "bg-muted rounded-md p-4 font-mono text-sm",
+            class: 'bg-muted rounded-md p-4 font-mono text-sm',
           },
         },
         blockquote: {
           HTMLAttributes: {
-            class: "border-l-4 border-primary pl-4 italic",
+            class: 'border-l-4 border-primary pl-4 italic',
           },
         },
       }),
       TextAlign.configure({
-        types: ["heading", "paragraph"],
+        types: ['heading', 'paragraph'],
       }),
       TextStyle,
       FontSize,
@@ -62,7 +61,6 @@ export default function RichTextViewer({ content }: RichTextProps) {
       Highlight.configure({
         multicolor: true,
       }),
-      MapboxExtension,
       ImageExtension,
     ],
     content: content,

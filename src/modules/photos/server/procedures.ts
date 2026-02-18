@@ -1,24 +1,26 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { and, eq, desc, asc, sql, ilike, count } from "drizzle-orm";
+import { z } from 'zod';
+import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
+import { and, eq, desc, asc, sql, ilike, count } from 'drizzle-orm';
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
   MIN_PAGE_SIZE,
-} from "@/constants";
+} from '@/constants';
 import {
-  citySets,
   photos,
   photosUpdateSchema,
   photosInsertSchema,
-} from "@/db/schema";
-import { TRPCError } from "@trpc/server";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { s3Client } from "@/modules/s3/lib/server-client";
+  posts,
+  postsToPhotos,
+} from '@/db/schema';
+import { TRPCError } from '@trpc/server';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { s3Client } from '@/modules/s3/lib/server-client';
+import { generateSlug } from '@/modules/articles/lib/utils';
 
 function escapeLike(str: string): string {
-  return str.replace(/[%_\\]/g, "\\$&");
+  return str.replace(/[%_\\]/g, '\\$&');
 }
 
 export const photosRouter = createTRPCRouter({
@@ -28,43 +30,47 @@ export const photosRouter = createTRPCRouter({
       const values = input;
 
       try {
-        const [insertedPhoto] = await ctx.db
-          .insert(photos)
-          .values(values)
-          .returning();
+        const [insertedPhoto] = await ctx.db.transaction(async (tx) => {
+          const [photo] = await tx.insert(photos).values(values).returning();
 
-        const cityName =
-          values.countryCode === "JP" || values.countryCode === "TW"
-            ? values.region
-            : values.city;
+          if (!photo) {
+            throw new Error('Failed to insert photo');
+          }
 
-        if (insertedPhoto.country && cityName && insertedPhoto.countryCode) {
-          await ctx.db
-            .insert(citySets)
+          const baseSlug = generateSlug(photo.title);
+          const uniqueSlug = `${baseSlug}-${photo.id.slice(0, 8)}`;
+
+          const [post] = await tx
+            .insert(posts)
             .values({
-              country: insertedPhoto.country,
-              countryCode: insertedPhoto.countryCode,
-              city: cityName,
-              photoCount: 1,
-              coverPhotoId: insertedPhoto.id,
+              title: photo.title,
+              slug: uniqueSlug,
+              type: 'PHOTO',
+              visibility: photo.visibility,
+              coverImage: photo.url,
+              description: photo.description,
             })
-            .onConflictDoUpdate({
-              target: [citySets.country, citySets.city],
-              set: {
-                countryCode: insertedPhoto.countryCode,
-                photoCount: sql`${citySets.photoCount} + 1`,
-                coverPhotoId: sql`COALESCE(${citySets.coverPhotoId}, ${insertedPhoto.id})`,
-                updatedAt: new Date(),
-              },
-            });
-        }
+            .returning();
+
+          if (!post) {
+            throw new Error('Failed to insert post');
+          }
+
+          await tx.insert(postsToPhotos).values({
+            postId: post.id,
+            photoId: photo.id,
+            sortOrder: 0,
+          });
+
+          return [photo];
+        });
 
         return insertedPhoto;
       } catch (error) {
-        console.error("Photo creation error:", error);
+        console.error('Photo creation error:', error);
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create photo",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create photo',
         });
       }
     }),
@@ -78,7 +84,7 @@ export const photosRouter = createTRPCRouter({
       const { id } = input;
 
       if (!id) {
-        throw new TRPCError({ code: "BAD_REQUEST" });
+        throw new TRPCError({ code: 'BAD_REQUEST' });
       }
 
       try {
@@ -89,65 +95,32 @@ export const photosRouter = createTRPCRouter({
 
         if (!photo) {
           throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Photo not found",
+            code: 'NOT_FOUND',
+            message: 'Photo not found',
           });
         }
 
-        // city set related
-        if (photo.country && photo.city) {
-          const [citySet] = await ctx.db
-            .select()
-            .from(citySets)
-            .where(
-              and(
-                eq(citySets.country, photo.country),
-                eq(citySets.city, photo.city),
-              ),
+        await ctx.db.transaction(async (tx) => {
+          // Find and delete posts associated with this photo that are of type 'PHOTO'
+          // Other posts (like ALBUMs) might still need to exist even if one photo is deleted.
+          const linkedPosts = await tx
+            .select({ id: posts.id })
+            .from(posts)
+            .innerJoin(postsToPhotos, eq(posts.id, postsToPhotos.postId))
+            .where(and(eq(postsToPhotos.photoId, id), eq(posts.type, 'PHOTO')));
+
+          if (linkedPosts.length > 0) {
+            await tx.delete(posts).where(
+              sql`${posts.id} IN (${sql.join(
+                linkedPosts.map((p) => p.id),
+                sql`, `,
+              )})`,
             );
-
-          if (citySet) {
-            if (citySet.photoCount === 1) {
-              // last photo in city — delete the city set
-              await ctx.db.delete(citySets).where(eq(citySets.id, citySet.id));
-            } else {
-              // find new cover photo if current cover is being deleted
-              const newCoverPhotoId =
-                citySet.coverPhotoId === photo.id
-                  ? (
-                      await ctx.db
-                        .select({ id: photos.id })
-                        .from(photos)
-                        .where(
-                          and(
-                            eq(photos.country, photo.country),
-                            eq(photos.city, photo.city),
-                            sql`${photos.id} != ${photo.id}`,
-                          ),
-                        )
-                        .limit(1)
-                    )[0]?.id
-                  : undefined;
-
-              await ctx.db
-                .update(citySets)
-                .set({
-                  photoCount: sql`${citySets.photoCount} - 1`,
-                  ...(newCoverPhotoId ? { coverPhotoId: newCoverPhotoId } : {}),
-                  updatedAt: new Date(),
-                })
-                .where(
-                  and(
-                    eq(citySets.country, photo.country),
-                    eq(citySets.city, photo.city),
-                  ),
-                );
-            }
           }
-        }
 
-        // delete photo record first, then S3
-        await ctx.db.delete(photos).where(eq(photos.id, id));
+          // Delete photo record (join table records are deleted by DB cascade)
+          await tx.delete(photos).where(eq(photos.id, id));
+        });
 
         // S3 delete after DB — orphan file is acceptable, inconsistent DB is not
         try {
@@ -157,16 +130,16 @@ export const photosRouter = createTRPCRouter({
           });
           await s3Client.send(command);
         } catch (error) {
-          console.error("S3 delete failed (orphan file):", error);
+          console.error('S3 delete failed (orphan file):', error);
         }
 
         return photo;
       } catch (error) {
         if (error instanceof TRPCError) throw error;
-        console.error("Photo deletion error:", error);
+        console.error('Photo deletion error:', error);
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete photo",
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to delete photo',
         });
       }
     }),
@@ -176,23 +149,55 @@ export const photosRouter = createTRPCRouter({
       const { id } = input;
 
       if (!id) {
-        throw new TRPCError({ code: "BAD_REQUEST" });
+        throw new TRPCError({ code: 'BAD_REQUEST' });
       }
 
-      const [updatedPhoto] = await ctx.db
-        .update(photos)
-        .set({
-          ...input,
-          updatedAt: new Date(),
-        })
-        .where(eq(photos.id, id))
-        .returning();
+      try {
+        const [updatedPhoto] = await ctx.db.transaction(async (tx) => {
+          const [photo] = await tx
+            .update(photos)
+            .set({
+              ...input,
+              updatedAt: new Date(),
+            })
+            .where(eq(photos.id, id))
+            .returning();
 
-      if (!updatedPhoto) {
-        throw new TRPCError({ code: "NOT_FOUND" });
+          if (!photo) {
+            throw new TRPCError({ code: 'NOT_FOUND' });
+          }
+
+          // Sync changes to the linked post if it's a PHOTO type post
+          // Note: we only sync fields that exist in both schemas
+          await tx
+            .update(posts)
+            .set({
+              title: photo.title,
+              description: photo.description,
+              visibility: photo.visibility,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(posts.type, 'PHOTO'),
+                sql`${posts.id} IN (
+                  SELECT post_id FROM posts_to_photos WHERE photo_id = ${id}
+                )`,
+              ),
+            );
+
+          return [photo];
+        });
+
+        return updatedPhoto;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error('Photo update error:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update photo',
+        });
       }
-
-      return updatedPhoto;
     }),
   getOne: protectedProcedure
     .input(
@@ -214,7 +219,7 @@ export const photosRouter = createTRPCRouter({
     .input(
       z.object({
         page: z.number().default(DEFAULT_PAGE),
-        orderBy: z.enum(["asc", "desc"] as const).default("desc"),
+        orderBy: z.enum(['asc', 'desc'] as const).default('desc'),
         pageSize: z
           .number()
           .min(MIN_PAGE_SIZE)
@@ -233,7 +238,7 @@ export const photosRouter = createTRPCRouter({
           search ? ilike(photos.title, `%${escapeLike(search)}%`) : undefined,
         )
         .orderBy(
-          orderBy === "asc"
+          orderBy === 'asc'
             ? asc(photos.dateTimeOriginal)
             : desc(photos.dateTimeOriginal),
         )

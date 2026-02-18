@@ -69,11 +69,6 @@ export const BlogSlugView = ({ slug }: { slug: string }) => {
           </div>
 
           <div className="bg-muted rounded-xl p-5 w-full flex justify-between">
-            <p className="text-text-muted">Reading Time</p>
-            <p>{data.readingTimeMinutes} Min</p>
-          </div>
-
-          <div className="bg-muted rounded-xl p-5 w-full flex justify-between">
             <p className="text-text-muted">Date</p>
             <p>March 2024</p>
           </div>

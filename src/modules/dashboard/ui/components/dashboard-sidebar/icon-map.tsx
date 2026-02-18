@@ -2,7 +2,6 @@ import {
   IconLayoutDashboard,
   IconPhoto,
   IconUser,
-  IconBuildingPavilion,
   IconNotebook,
 } from '@tabler/icons-react';
 

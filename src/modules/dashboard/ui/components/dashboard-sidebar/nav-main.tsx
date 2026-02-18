@@ -1,18 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import type { Route } from "next";
-import { usePathname } from "next/navigation";
-import { IconPhotoUp } from "@tabler/icons-react";
+import Link from 'next/link';
+import type { Route } from 'next';
+import { usePathname } from 'next/navigation';
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import IconMap from "./icon-map";
-import { useModal } from "@/hooks/use-modal";
+} from '@/components/ui/sidebar';
+import IconMap from './icon-map';
 
 export function NavMain({
   items,
@@ -23,7 +21,6 @@ export function NavMain({
     icon: string;
   }[];
 }) {
-  const modal = useModal();
   const pathname = usePathname();
   const exactMatchItem = items.find((item) => item.url === pathname);
   const bestMatchItem = items.reduce(
@@ -42,16 +39,21 @@ export function NavMain({
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupContent className="flex flex-col gap-2">
+        <SidebarGroupContent className='flex flex-col gap-2'>
           <SidebarMenu>
-            <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuItem className='flex items-center gap-2'>
               <SidebarMenuButton
-                onClick={() => modal.onOpen()}
-                tooltip="Add Photo"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+                tooltip='Add Photo'
+                className='bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear pl-3'
+                isActive={pathname.startsWith('/dashboard/new')}
+                asChild
               >
-                <IconPhotoUp />
-                <span>Add Photo</span>
+                <Link
+                  href='/dashboard/new'
+                  className='flex w-full cursor-pointer '
+                >
+                  <span>+ New Post</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

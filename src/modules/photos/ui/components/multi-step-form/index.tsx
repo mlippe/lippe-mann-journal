@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TExifData, TImageInfo } from '@/modules/photos/lib/utils';
 import { PhotoFormData, INITIAL_FORM_VALUES, STEP_CONFIG } from './types';
-import type { AddressData } from '@/modules/mapbox/hooks/use-get-address';
 import { FirstStep } from './steps/first-step';
 import { SecondStep } from './steps/second-step';
 import { FourthStep } from './steps/fourth-step';
@@ -54,9 +53,6 @@ export default function MultiStepForm({
   const [url, setUrl] = useState<string | null>(null);
   const [exif, setExif] = useState<TExifData | null>(null);
   const [imageInfo, setImageInfo] = useState<TImageInfo>();
-
-  // Address state for geocoding
-  const [address, setAddress] = useState<AddressData>(null);
 
   // ========================================
   // Handlers
@@ -126,21 +122,6 @@ export default function MultiStepForm({
         width: imageInfo?.width || 0,
         height: imageInfo?.height || 0,
         blurData: imageInfo?.blurhash || '',
-        // Add address data from geocoding if available
-        country: address?.features?.[0]?.properties?.context?.country?.name,
-        countryCode:
-          address?.features?.[0]?.properties?.context?.country?.country_code,
-        region: address?.features?.[0]?.properties?.context?.region?.name,
-        city:
-          address?.features?.[0]?.properties?.context?.country?.country_code ===
-            'JP' ||
-          address?.features?.[0]?.properties?.context?.country?.country_code ===
-            'TW'
-            ? address?.features?.[0]?.properties?.context?.region?.name
-            : address?.features?.[0]?.properties?.context?.place?.name,
-        district: address?.features?.[0]?.properties?.context?.locality?.name,
-        fullAddress: address?.features?.[0]?.properties?.full_address,
-        placeFormatted: address?.features?.[0]?.properties?.place_formatted,
       };
 
       setIsSubmitting(true);
@@ -152,13 +133,13 @@ export default function MultiStepForm({
           await queryClient.invalidateQueries(
             trpc.photos.getMany.queryOptions({}),
           );
-          await queryClient.invalidateQueries(
-            trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
-          );
-          await queryClient.invalidateQueries(
-            trpc.home.getCitySets.queryOptions({ limit: 9 }),
-          );
-          await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
+          // await queryClient.invalidateQueries(
+          //   trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
+          // );
+          // await queryClient.invalidateQueries(
+          //   trpc.home.getCitySets.queryOptions({ limit: 9 }),
+          // );
+          // await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
 
           toast.success('Photo uploaded successfully!');
           setIsComplete(true);
@@ -192,7 +173,6 @@ export default function MultiStepForm({
     setUrl(null);
     setExif(null);
     setImageInfo(undefined);
-    setAddress(null);
   };
 
   // ========================================

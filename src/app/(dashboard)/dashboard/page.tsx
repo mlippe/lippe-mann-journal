@@ -3,7 +3,6 @@ import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { MapView } from '@/modules/dashboard/ui/views/map-view';
 import {
   ChartAreaView,
   ChartAreaLoading,
@@ -17,9 +16,6 @@ const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
     trpc.dashboard.getPhotosCountByMonth.queryOptions({ years: 3 }),
-  );
-  void queryClient.prefetchQuery(
-    trpc.dashboard.getVisitedCountriesWithGeoJson.queryOptions(),
   );
   void queryClient.prefetchQuery(
     trpc.dashboard.getDashboardStats.queryOptions(),

@@ -11,6 +11,7 @@
     "seed:user": "bun tsx scripts/seed-user.ts",
     "clean:photo-urls": "bun tsx scripts/clean-photo-urls-safe.ts",
     "rollback:photo-urls": "bun tsx scripts/rollback-photo-urls.ts",
+    "db:migrate": "bun tsx scripts/migrate.ts",
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run"

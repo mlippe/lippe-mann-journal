@@ -28,8 +28,8 @@ const data = {
       icon: 'photo',
     },
     {
-      title: 'Posts',
-      url: '/dashboard/posts',
+      title: 'Articles',
+      url: '/dashboard/articles',
       icon: 'post',
     },
     {
@@ -70,7 +70,9 @@ export const DashboardSidebar = async ({
             >
               <Link href='/'>
                 <IconLivePhoto />
-                <span className='text-base font-semibold'>Photography</span>
+                <span className='text-base font-semibold'>
+                  LippeMann Journal CMS
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
