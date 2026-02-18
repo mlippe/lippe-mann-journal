@@ -13,13 +13,13 @@ export const metadata = {
 };
 
 const AllCollectionsView = async () => {
-  const collections = await trpc.collections.getAllCollections();
+  // const collections = await trpc.collections.getAllCollections();
 
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 p-3">
-      {collections.map((collection: Collection) => (
+    <div className='w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 p-3'>
+      {/* {collections.map((collection: Collection) => (
         <CityCard key={collection.id} collection={collection} />
-      ))}
+      ))} */}
     </div>
   );
 };
@@ -27,13 +27,15 @@ const AllCollectionsView = async () => {
 const page = async () => {
   const queryClient = getQueryClient();
   // Prefetch all collections
-  void queryClient.prefetchQuery(trpc.collections.getAllCollections.queryOptions({}));
+  void queryClient.prefetchQuery(
+    trpc.collections.getAllCollections.queryOptions({}),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col min-h-screen w-full">
-        <div className="py-4 px-4 md:px-8">
-          <h1 className="text-3xl font-bold mb-4">All Collections</h1>
+      <div className='flex flex-col min-h-screen w-full'>
+        <div className='py-4 px-4 md:px-8'>
+          <h1 className='text-3xl font-bold mb-4'>All Collections</h1>
           <Suspense fallback={<p>Loading collections...</p>}>
             <ErrorBoundary fallback={<p>Error loading collections.</p>}>
               <AllCollectionsView />

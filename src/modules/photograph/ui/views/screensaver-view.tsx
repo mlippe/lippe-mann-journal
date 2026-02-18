@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState, useEffect, useCallback } from "react";
-import BlurImage from "@/components/blur-image";
-import { keyToUrl } from "@/modules/s3/lib/key-to-url";
-import { ScreensaverSettingsModal } from "@/modules/photograph/ui/components/screensaver-settings-modal";
-import { Button } from "@/components/ui/button";
-import { Settings, Maximize, Minimize } from "lucide-react";
+import { useTRPC } from '@/trpc/client';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import BlurImage from '@/components/blur-image';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { ScreensaverSettingsModal } from '@/modules/photograph/ui/components/screensaver-settings-modal';
+import { Button } from '@/components/ui/button';
+import { Settings, Maximize, Minimize } from 'lucide-react';
 
 interface GridCell {
   index: number;
@@ -38,7 +38,8 @@ export const ScreensaverView = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
-    if (!data || data.length === 0 || typeof window === "undefined") return;
+    if (!data || data.items.length === 0 || typeof window === 'undefined')
+      return;
 
     const initializeGrid = () => {
       // Fixed rows, calculate cell size based on screen height
@@ -51,8 +52,8 @@ export const ScreensaverView = () => {
 
       const cells: GridCell[] = Array.from({ length: totalCells }, (_, i) => ({
         index: i,
-        currentPhotoIndex: Math.floor(Math.random() * data.length),
-        nextPhotoIndex: Math.floor(Math.random() * data.length),
+        currentPhotoIndex: Math.floor(Math.random() * data.items.length),
+        nextPhotoIndex: Math.floor(Math.random() * data.items.length),
         rotationDegree: 0,
         isAnimating: false,
       }));
@@ -68,8 +69,8 @@ export const ScreensaverView = () => {
       initializeGrid();
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [data, rows]);
 
   // Random flip animation
@@ -94,9 +95,9 @@ export const ScreensaverView = () => {
           rotationDegree: cell.rotationDegree + 180,
           currentPhotoIndex: isBackFaceHidden
             ? cell.currentPhotoIndex
-            : Math.floor(Math.random() * data.length),
+            : Math.floor(Math.random() * data.items.length),
           nextPhotoIndex: isBackFaceHidden
-            ? Math.floor(Math.random() * data.length)
+            ? Math.floor(Math.random() * data.items.length)
             : cell.nextPhotoIndex,
         };
       });
@@ -149,10 +150,10 @@ export const ScreensaverView = () => {
       setMouseTimeout(timeout);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMove);
       if (mouseTimeout) {
         clearTimeout(mouseTimeout);
       }
@@ -180,30 +181,30 @@ export const ScreensaverView = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   if (!data || gridCells.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden flex items-center justify-center">
+    <div className='fixed inset-0 bg-black overflow-hidden flex items-center justify-center'>
       {showControls && (
-        <div className="fixed top-8 right-8 z-50 flex gap-2">
+        <div className='fixed top-8 right-8 z-50 flex gap-2'>
           <Button
-            variant="outline"
-            size="icon"
+            variant='outline'
+            size='icon'
             onClick={toggleFullscreen}
-            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
             {isFullscreen ? <Minimize /> : <Maximize />}
           </Button>
           <Button
-            variant="outline"
-            size="icon"
+            variant='outline'
+            size='icon'
             onClick={() => setShowModal(true)}
-            title="Settings"
+            title='Settings'
           >
             <Settings />
           </Button>
@@ -219,40 +220,40 @@ export const ScreensaverView = () => {
       />
 
       <div
-        className="relative"
+        className='relative'
         style={{
-          display: "grid",
+          display: 'grid',
           gridTemplateColumns: `repeat(${gridSize.cols}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${gridSize.rows}, ${cellSize}px)`,
-          height: "100vh",
+          height: '100vh',
         }}
       >
         {gridCells.map((cell) => {
-          const currentPhoto = data[cell.currentPhotoIndex];
-          const nextPhoto = data[cell.nextPhotoIndex];
+          const currentPhoto = data.items[cell.currentPhotoIndex];
+          const nextPhoto = data.items[cell.nextPhotoIndex];
 
           return (
             <div
               key={cell.index}
-              className="relative"
+              className='relative'
               style={{
                 width: `${cellSize}px`,
                 height: `${cellSize}px`,
-                perspective: "1000px",
+                perspective: '1000px',
               }}
             >
               <div
-                className="relative w-full h-full transition-transform ease-in-out"
+                className='relative w-full h-full transition-transform ease-in-out'
                 style={{
-                  transformStyle: "preserve-3d",
+                  transformStyle: 'preserve-3d',
                   transform: `rotateY(${cell.rotationDegree}deg)`,
                   transitionDuration: `${FLIP_DURATION}ms`,
                 }}
               >
                 <div
-                  className="absolute inset-0"
+                  className='absolute inset-0'
                   style={{
-                    backfaceVisibility: "hidden",
+                    backfaceVisibility: 'hidden',
                   }}
                 >
                   <BlurImage
@@ -261,14 +262,14 @@ export const ScreensaverView = () => {
                     width={cellSize}
                     height={cellSize}
                     blurhash={currentPhoto.blurData}
-                    className="w-full h-full object-cover"
+                    className='w-full h-full object-cover'
                   />
                 </div>
                 <div
-                  className="absolute inset-0"
+                  className='absolute inset-0'
                   style={{
-                    backfaceVisibility: "hidden",
-                    transform: "rotateY(180deg)",
+                    backfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
                   }}
                 >
                   <BlurImage
@@ -277,7 +278,7 @@ export const ScreensaverView = () => {
                     width={cellSize}
                     height={cellSize}
                     blurhash={nextPhoto.blurData}
-                    className="w-full h-full object-cover"
+                    className='w-full h-full object-cover'
                   />
                 </div>
               </div>
