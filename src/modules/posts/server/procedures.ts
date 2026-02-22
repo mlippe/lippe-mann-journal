@@ -19,6 +19,8 @@ import {
   postsWithPhotos,
 } from '@/db/schema';
 
+import { postsInCollectionOutputSchema } from '@/modules/collections/server/procedures';
+
 export const postsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(postsInsertSchema)
@@ -170,6 +172,52 @@ export const postsRouter = createTRPCRouter({
 
       return {
         items: data,
+        total: total.count,
+        totalPages,
+      };
+    }),
+  getPublished: baseProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
+        cursor: z.number().nullish(),
+      }),
+    )
+    .output(postsInCollectionOutputSchema)
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit;
+      const cursor = input.cursor ?? 1;
+
+      const data = await ctx.db.query.posts.findMany({
+        where: eq(posts.visibility, 'public'),
+        orderBy: [desc(posts.createdAt)],
+        limit: limit,
+        offset: (cursor - 1) * limit,
+        with: {
+          postsToPhotos: {
+            with: {
+              photo: true,
+            },
+            orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
+          },
+        },
+      });
+
+      const hasMore = data.length === limit;
+      const nextCursor = hasMore ? cursor + 1 : undefined;
+
+      const [total] = await ctx.db
+        .select({
+          count: count(),
+        })
+        .from(posts)
+        .where(eq(posts.visibility, 'public'));
+
+      const totalPages = Math.ceil(total.count / limit);
+
+      return {
+        items: data,
+        nextCursor,
         total: total.count,
         totalPages,
       };

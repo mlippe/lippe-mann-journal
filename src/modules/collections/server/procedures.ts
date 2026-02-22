@@ -9,7 +9,7 @@ import {
 } from "@/constants";
 
 // Zod schema for the output of getPostsInCollection
-const postsInCollectionOutputSchema = z.object({
+export const postsInCollectionOutputSchema = z.object({
   items: z.array(postsWithPhotos),
   nextCursor: z.number().optional(),
   total: z.number(),
@@ -47,6 +47,24 @@ export const collectionsRouter = createTRPCRouter({
         });
       }
       return collection;
+    }),
+
+  getFeaturedCollections: baseProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { limit } = input;
+
+      const data = await ctx.db.query.collections.findMany({
+        where: (collections, { eq }) => eq(collections.isFeatured, true),
+        orderBy: [desc(collections.updatedAt)],
+        limit: limit,
+      });
+
+      return data;
     }),
 
   getPostsInCollection: baseProcedure

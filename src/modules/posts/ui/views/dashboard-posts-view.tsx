@@ -3,10 +3,15 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PostsList, LoadingStatus, ErrorStatus } from '../components/posts-list';
+import {
+  PostsList,
+  LoadingStatus,
+  ErrorStatus,
+} from '../components/posts-list';
 import { usePostsFilters } from '../../hooks/use-posts-filters';
 import { Input } from '@/components/ui/input';
 import { IconSearch } from '@tabler/icons-react';
+import { Post } from '@/db/schema';
 
 export const DashboardPostsView = () => {
   const [filters, setFilters] = usePostsFilters();
@@ -25,9 +30,11 @@ export const DashboardPostsView = () => {
         </div>
       </div>
 
-      <Tabs 
-        value={filters.type} 
-        onValueChange={(value) => setFilters({ type: value as any, page: 1 })}
+      <Tabs
+        value={filters.type}
+        onValueChange={(value) =>
+          setFilters({ type: value as Post['type'], page: 1 })
+        }
         className='w-full'
       >
         <TabsList>
@@ -35,13 +42,13 @@ export const DashboardPostsView = () => {
           <TabsTrigger value='ALBUM'>Albums</TabsTrigger>
           <TabsTrigger value='ARTICLE'>Articles</TabsTrigger>
         </TabsList>
-        
+
         <div className='mt-4'>
-            <ErrorBoundary fallback={<ErrorStatus />}>
-                <Suspense fallback={<LoadingStatus />}>
-                    <PostsList type={filters.type} />
-                </Suspense>
-            </ErrorBoundary>
+          <ErrorBoundary fallback={<ErrorStatus />}>
+            <Suspense fallback={<LoadingStatus />}>
+              <PostsList type={filters.type} />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </Tabs>
     </div>

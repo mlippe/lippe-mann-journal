@@ -19,11 +19,11 @@ import {
 const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
-    trpc.home.getFeaturedCollections.queryOptions({ limit: 12 }),
+    trpc.collections.getFeaturedCollections.queryOptions({ limit: 12 }),
   );
-  // void queryClient.prefetchQuery(
-  //   trpc.feed.getPublicFeed.queryOptions({ page: 1, limit: 5 }), // Prefetch for infinite feed
-  // );
+  void queryClient.prefetchInfiniteQuery(
+    trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

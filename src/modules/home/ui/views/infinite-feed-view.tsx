@@ -2,7 +2,6 @@
 
 import { useRef, useCallback } from 'react';
 import Footer from '@/components/footer';
-// import { Introduction } from '@/modules/feed/ui/components/introduction'; // Removed Introduction import
 import type { Post, Photo } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,9 +16,9 @@ const PostCard = ({
   return (
     <div className='p-4 border rounded-lg shadow-sm bg-card'>
       <h2 className='text-xl font-bold mb-2'>{post.title}</h2>
-      {post.description && (
+      {/* {post.description && (
         <p className='text-muted-foreground mb-4'>{post.description}</p>
-      )}
+      )} */}
 
       {post.type === 'ARTICLE' && post.content && (
         <div className='prose prose-sm dark:prose-invert max-h-24 overflow-hidden'>
@@ -68,76 +67,71 @@ interface InfiniteFeedViewProps {
 export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   const trpc = useTRPC();
 
-  return <div>Infinte feed</div>;
+  // Using the trpc hooks directly to avoid queryOptions union issues
+  const feedQuery = trpc.posts.getPublished.useInfiniteQuery(
+    { limit: 5 },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      initialPageParam: 1,
+      enabled: !collectionSlug,
+    },
+  );
 
-  // const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-  //   collectionSlug
-  //     ? trpc.collections.getPostsInCollection.useInfiniteQuery(
-  //         {
-  //           collectionSlug,
-  //           limit: 5,
-  //         },
-  //         {
-  //           getNextPageParam: (lastPage) => lastPage.nextCursor,
-  //           initialPageParam: 1,
-  //         },
-  //       )
-  //     : trpc.home.getPublicFeed.useInfiniteQuery(
-  //         {
-  //           limit: 5, // Changed from pageSize
-  //         },
-  //         {
-  //           getNextPageParam: (lastPage) => lastPage.nextCursor,
-  //           initialPageParam: 1,
-  //         },
-  //       );
+  const collectionQuery =
+    trpc.collections.getPostsInCollection.useInfiniteQuery(
+      { collectionSlug: collectionSlug || '', limit: 5 },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialPageParam: 1,
+        enabled: !!collectionSlug,
+      },
+    );
 
-  // const observer = useRef<IntersectionObserver>();
-  // const lastPostRef = useCallback(
-  //   (node: HTMLDivElement) => {
-  //     if (isFetchingNextPage) return;
-  //     if (observer.current) observer.current.disconnect();
-  //     observer.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasNextPage) {
-  //         fetchNextPage();
-  //       }
-  //     });
-  //     if (node) observer.current.observe(node);
-  //   },
-  //   [isFetchingNextPage, fetchNextPage, hasNextPage],
-  // );
+  const activeQuery = collectionSlug ? collectionQuery : feedQuery;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = activeQuery;
 
-  // const posts = data?.pages.flatMap((page) => page.items);
+  const observer = useRef<IntersectionObserver>(null);
+  const lastPostRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (isFetchingNextPage) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [isFetchingNextPage, fetchNextPage, hasNextPage],
+  );
 
-  // return (
-  //   <div className='w-full max-w-3xl mx-auto space-y-8 py-8 px-4'>
-  //     {/* <Introduction /> Removed Introduction component */}
-  //     <div className='space-y-8'>
-  //       {posts?.map((post, i) => (
-  //         <div key={post.id} ref={i === posts.length - 1 ? lastPostRef : null}>
-  //           {/* The type assertion is needed because drizzle's relational queries are not fully typed yet */}
-  //           <PostCard
-  //             post={post as Post & { postsToPhotos: { photo: Photo }[] }}
-  //           />
-  //         </div>
-  //       ))}
-  //     </div>
-  //     {isFetchingNextPage && (
-  //       <div className='space-y-8'>
-  //         <Skeleton className='w-full h-64 rounded-lg' />
-  //         <Skeleton className='w-full h-64 rounded-lg' />
-  //       </div>
-  //     )}
-  //     {!hasNextPage && !isFetchingNextPage && <Footer />}
-  //   </div>
-  // );
+  const posts = data?.pages.flatMap((page) => page.items) || [];
+
+  return (
+    <div className='w-full max-w-3xl mx-auto space-y-8 py-8'>
+      <div className='space-y-8'>
+        {posts.map((post, i) => (
+          <div key={post.id} ref={i === posts.length - 1 ? lastPostRef : null}>
+            <PostCard
+              post={post as Post & { postsToPhotos: { photo: Photo }[] }}
+            />
+          </div>
+        ))}
+      </div>
+      {isFetchingNextPage && (
+        <div className='space-y-8'>
+          <Skeleton className='w-full h-64 rounded-lg' />
+          <Skeleton className='w-full h-64 rounded-lg' />
+        </div>
+      )}
+      {!hasNextPage && posts.length > 0 && !isFetchingNextPage && <Footer />}
+    </div>
+  );
 };
 
 export const InfiniteFeedViewLoadingStatus = () => {
-  // Renamed LoadingStatus to InfiniteFeedViewLoadingStatus
   return (
     <div className='w-full max-w-3xl mx-auto space-y-8 py-8 px-4'>
-      {/* <Introduction /> Removed Introduction component */}
       <div className='space-y-8'>
         <Skeleton className='w-full h-64 rounded-lg' />
         <Skeleton className='w-full h-64 rounded-lg' />
