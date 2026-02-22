@@ -5,8 +5,6 @@ import { photoGetMany } from '../../types';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import BlurImage from '@/components/blur-image';
 import { format } from 'date-fns';
-import { FavoriteToggle } from './favorite-toggle';
-import { VisibilityToggle } from './visibility-toggle';
 import { DeletePhotoButton } from './delete-photo-button';
 import Link from 'next/link';
 import { PenBoxIcon } from 'lucide-react';
@@ -49,30 +47,6 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
       const formatted = format(new Date(takenAt), 'MMM d, yyyy HH:mm');
 
       return <span suppressHydrationWarning>{formatted}</span>;
-    },
-  },
-  {
-    accessorKey: 'isFavorite',
-    header: 'Favorite',
-    cell: ({ row }) => {
-      return (
-        <FavoriteToggle
-          photoId={row.original.id}
-          initialValue={row.original.isFavorite}
-        />
-      );
-    },
-  },
-  {
-    accessorKey: 'visibility',
-    header: 'Visibility',
-    cell: ({ row }) => {
-      return (
-        <VisibilityToggle
-          photoId={row.original.id}
-          initialValue={row.original.visibility}
-        />
-      );
     },
   },
   {

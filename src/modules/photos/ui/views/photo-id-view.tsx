@@ -61,9 +61,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
     defaultValues: {
       id: data.id,
       title: data.title ?? '',
-      description: data.description ?? '',
-      visibility: data.visibility ?? 'private',
-      isFavorite: data.isFavorite ?? false,
       latitude: data.latitude ?? undefined,
       longitude: data.longitude ?? undefined,
       make: data.make ?? undefined,
@@ -125,69 +122,6 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name='description'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          rows={5}
-                          className='resize-none'
-                          placeholder='Photo description'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <FormField
-                    control={form.control}
-                    name='visibility'
-                    render={({ field }) => (
-                      <FormItem className='flex flex-col justify-between gap-2'>
-                        <div className='flex items-center justify-between gap-4'>
-                          <FormLabel>Visibility</FormLabel>
-                          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <span>
-                              {field.value === 'public' ? 'Public' : 'Private'}
-                            </span>
-                            <FormControl>
-                              <Switch
-                                checked={field.value === 'public'}
-                                onCheckedChange={(checked) =>
-                                  field.onChange(checked ? 'public' : 'private')
-                                }
-                              />
-                            </FormControl>
-                          </div>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='isFavorite'
-                    render={({ field }) => (
-                      <FormItem className='flex items-center justify-end gap-4'>
-                        <FormLabel>Favorite</FormLabel>
-                        <FormControl>
-                          <Switch
-                            checked={field.value ?? false}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
                 {/* Camera parameters */}
                 <div className='space-y-4 border-t pt-4'>

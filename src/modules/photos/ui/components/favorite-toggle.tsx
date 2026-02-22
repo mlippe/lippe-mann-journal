@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface FavoriteToggleProps {
   photoId: string;
@@ -31,7 +31,6 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
     updatePhoto.mutate(
       {
         id: photoId,
-        isFavorite: newValue,
       },
       {
         onSuccess: async () => {
@@ -40,13 +39,13 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
             trpc.photos.getMany.queryOptions({}),
           );
           toast.success(
-            newValue ? "Added to favorites" : "Removed from favorites",
+            newValue ? 'Added to favorites' : 'Removed from favorites',
           );
         },
         onError: (error) => {
           // Revert on error
           setIsFavorite(!newValue);
-          toast.error(error.message || "Failed to update favorite status");
+          toast.error(error.message || 'Failed to update favorite status');
         },
       },
     );
@@ -54,18 +53,18 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
 
   return (
     <Button
-      variant="ghost"
-      size="icon"
+      variant='ghost'
+      size='icon'
       onClick={handleToggle}
       disabled={updatePhoto.isPending}
       className={cn(
-        "h-8 w-8 transition-colors",
-        isFavorite && "text-red-500 hover:text-red-600",
+        'h-8 w-8 transition-colors',
+        isFavorite && 'text-red-500 hover:text-red-600',
       )}
-      title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
     >
       <Heart
-        className={cn("size-6 transition-all", isFavorite && "fill-current")}
+        className={cn('size-6 transition-all', isFavorite && 'fill-current')}
       />
     </Button>
   );
