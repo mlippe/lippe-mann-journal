@@ -8,24 +8,25 @@ interface UploadZoneProps {
   isUploading: boolean;
   onUpload: (file: File) => Promise<void>;
   uploadProgress: number;
+  multiple?: boolean;
 }
 
 export function UploadZone({
   isUploading,
   onUpload,
   uploadProgress,
+  multiple = false,
 }: UploadZoneProps) {
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop: async (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
+      for (const file of acceptedFiles) {
         await onUpload(file);
       }
     },
     accept: {
       "image/*": [".png", ".jpg", ".jpeg", ".gif"],
     },
-    multiple: false,
+    multiple,
   });
 
   return (

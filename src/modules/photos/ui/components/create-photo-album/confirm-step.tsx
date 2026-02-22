@@ -8,10 +8,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { TExifData, TImageInfo } from '../../../lib/utils';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,210 +22,175 @@ import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
 import { ExifPreview } from './exif-preview';
-import { ConfirmStepData, confirmStepSchema } from './types';
+import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  ChevronUp,
+  Trash2,
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { TExifData } from '@/modules/photos/lib/utils';
 
 const ConfirmStep = ({
-  url,
-  exif,
-  imageInfo,
+  photos: initialPhotos,
   isSubmitting,
-  setExif,
-  createImage,
+  onSubmit,
 }: {
-  url: string | null;
-  exif: TExifData | null;
-  imageInfo: TImageInfo | undefined;
+  photos: AlbumPhoto[];
+  setPhotos: Dispatch<SetStateAction<AlbumPhoto[]>>;
   isSubmitting: boolean;
-  setExif: Dispatch<SetStateAction<TExifData | null>>;
-  createImage: (data: ConfirmStepData) => void;
+  onSubmit: (data: ConfirmStepData) => void;
 }) => {
-  const [isEditExif, setIsEditExif] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log('imageInfo', imageInfo);
-  }, [imageInfo]);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
   const form = useForm<ConfirmStepData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(confirmStepSchema) as any,
+    resolver: zodResolver(confirmStepSchema),
     defaultValues: {
       postTitle: '',
       postVisibility: 'public',
-      title: imageInfo?.fileName || 'Untitled.jpg',
-      make: exif?.make,
-      model: exif?.model,
-      lensModel: exif?.lensModel,
-      focalLength: exif?.focalLength,
-      focalLength35mm: exif?.focalLength35mm,
-      fNumber: exif?.fNumber,
-      iso: exif?.iso,
-      exposureTime: exif?.exposureTime,
-      exposureCompensation: exif?.exposureCompensation,
-      latitude: exif?.latitude,
-      longitude: exif?.longitude,
-      gpsAltitude: exif?.gpsAltitude,
-      dateTimeOriginal: exif?.dateTimeOriginal,
+      photos: initialPhotos,
     },
     mode: 'onChange',
   });
-  const { handleSubmit } = form;
 
-  const onSubmit = (data: ConfirmStepData) => {
-    if (isEditExif) {
-      setExif((prev) => ({
-        ...prev,
-        make: data.make,
-        model: data.model,
-        lensModel: data.lensModel,
-        focalLength: data.focalLength,
-        focalLength35mm: data.focalLength35mm,
-        fNumber: data.fNumber,
-        iso: data.iso,
-        exposureTime: data.exposureTime,
-        exposureCompensation: data.exposureCompensation,
-        latitude: data.latitude,
-        longitude: data.longitude,
-        gpsAltitude: data.gpsAltitude,
-        dateTimeOriginal: data.dateTimeOriginal,
-      }));
-      setIsEditExif(false);
-      return;
-    }
-
-    createImage(data);
-  };
+  const { control, handleSubmit } = form;
+  const { fields, move, remove } = useFieldArray({
+    control,
+    name: 'photos',
+  });
 
   return (
-    <>
-      <Form {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className='space-y-4 @container'
-        >
-          {url && imageInfo && (
-            <div className='relative h-40 lg:h-72 w-full overflow-hidden rounded-lg border bg-muted'>
-              <BlurImage
-                blurhash={imageInfo.blurhash}
-                src={keyToUrl(url)}
-                alt='Uploaded photo'
-                fill
-                className='object-contain w-full h-full'
-                unoptimized
-              />
-            </div>
-          )}
-          <FormField
-            control={form.control}
-            name='title'
-            render={({ field }) => (
-              <FormItem className='mb-10'>
-                <FormControl>
-                  <Input {...field} placeholder='Photo title' />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className='gap-6'>
-            <div className='space-y-6'>
-              <div className='border-t gap-6 pt-6 flex items-end flex-col'>
-                <FormField
-                  control={form.control}
-                  name='postVisibility'
-                  render={({ field }) => (
-                    <FormItem className='-mb-10'>
-                      <div className='flex items-center gap-4'>
-                        <div className='flex items-center gap-2'>
-                          <span className='text-sm text-muted-foreground'>
-                            {field.value === 'public' ? 'Public' : 'Private'}
-                          </span>
-                          <FormControl>
-                            <Switch
-                              checked={field.value === 'public'}
-                              onCheckedChange={(checked) =>
-                                field.onChange(checked ? 'public' : 'private')
-                              }
-                            />
-                          </FormControl>
-                        </div>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+        {/* Album Global Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Album Settings</CardTitle>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <FormField
+              control={form.control}
+              name='postTitle'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Album Title</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} placeholder='Enter album title' />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormField
-                  control={form.control}
-                  name='postTitle'
-                  render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel className='mb-3'>Post Title</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder='Post title'
-                        ></Textarea>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Camera Parameters Section */}
-
-              <div className='space-y-4 border-t pt-4'>
-                <div>
-                  <h3 className='text-sm font-semibold'>EXIF Data</h3>
-
-                  {!isEditExif && (
-                    <div className='mt-4 border border-border/80 rounded-sm p-4 w-fit'>
-                      <ExifPreview exif={exif} showLogo={false} />
+            <FormField
+              control={form.control}
+              name='postVisibility'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      Visibility:{' '}
+                      {field.value === 'public' ? 'Public' : 'Private'}
+                    </FormLabel>
+                    <div className='text-sm text-muted-foreground'>
+                      {field.value === 'public'
+                        ? 'Anyone can view this album.'
+                        : 'Only you can view this album.'}
                     </div>
-                  )}
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value === 'public'}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked ? 'public' : 'private')
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Photos List */}
+        <div className='space-y-4'>
+          <h3 className='text-xl font-semibold'>Photos</h3>
+          {fields.map((field, index) => (
+            <Card
+              key={field.id}
+              className={cn(
+                'relative overflow-hidden transition-all',
+                index === 0 && 'border-primary shadow-sm',
+              )}
+            >
+              {index === 0 && (
+                <div className='absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold z-10'>
+                  Cover Photo
                 </div>
-                {isEditExif && (
-                  <>
-                    <div className='grid grid-cols-2 gap-4'>
-                      <FormField
-                        control={form.control}
-                        name='make'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Camera Make</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder='e.g., Canon' />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='model'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Camera Model</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder='e.g., EOS R5' />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+              )}
+              <CardContent className='p-4'>
+                <div className='flex gap-4 items-start'>
+                  {/* Sorting & Basic Controls */}
+                  <div className='flex flex-col gap-2'>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      disabled={index === 0}
+                      onClick={() => move(index, index - 1)}
+                    >
+                      <ArrowUp className='h-4 w-4' />
+                    </Button>
+                    <div className='text-center text-xs font-mono font-bold text-muted-foreground'>
+                      {index + 1}
                     </div>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      disabled={index === fields.length - 1}
+                      onClick={() => move(index, index + 1)}
+                    >
+                      <ArrowDown className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon'
+                      className='text-destructive'
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className='h-4 w-4' />
+                    </Button>
+                  </div>
 
+                  {/* Photo Preview */}
+                  <div className='relative h-32 w-48 shrink-0 overflow-hidden rounded-md border bg-muted'>
+                    <BlurImage
+                      blurhash={field.blurData}
+                      src={keyToUrl(field.url)}
+                      alt={`Photo ${index + 1}`}
+                      fill
+                      className='object-contain'
+                      unoptimized
+                    />
+                  </div>
+
+                  {/* Photo Details */}
+                  <div className='flex-1 space-y-4'>
                     <FormField
                       control={form.control}
-                      name='lensModel'
-                      render={({ field }) => (
+                      name={`photos.${index}.title`}
+                      render={({ field: inputField }) => (
                         <FormItem>
-                          <FormLabel>Lens Model</FormLabel>
                           <FormControl>
                             <Input
-                              {...field}
-                              placeholder='e.g., RF 24-70mm f/2.8L'
+                              {...inputField}
+                              placeholder='Photo title'
+                              className='font-semibold text-lg border-transparent hover:border-input focus:border-input px-1'
                             />
                           </FormControl>
                           <FormMessage />
@@ -234,163 +198,220 @@ const ConfirmStep = ({
                       )}
                     />
 
-                    <div className='grid grid-cols-2 gap-4'>
-                      <FormField
-                        control={form.control}
-                        name='focalLength'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Focal Length (mm)</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type='number'
-                                step={1}
-                                placeholder='50'
-                                value={field.value ?? ''}
-                                onChange={(e) => {
-                                  const val = e.target.value
+                    <div className='flex items-center gap-4'>
+                      <div className='flex-1'>
+                        <ExifPreview
+                          exif={form.getValues(`photos.${index}`) as TExifData}
+                          showLogo={false}
+                        />
+                      </div>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() =>
+                          setExpandedIndex(
+                            expandedIndex === index ? null : index,
+                          )
+                        }
+                      >
+                        {expandedIndex === index ? (
+                          <>
+                            <ChevronUp className='mr-2 h-4 w-4' /> Hide EXIF
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className='mr-2 h-4 w-4' /> Edit EXIF
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded EXIF Editing */}
+                {expandedIndex === index && (
+                  <div className='mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 border-t pt-6 animate-in slide-in-from-top-2 duration-200'>
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.make`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Camera Make</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder='e.g., Canon'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.model`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Camera Model</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder='e.g., EOS R5'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.lensModel`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Lens Model</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder='e.g., RF 24-70mm f/2.8L'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.focalLength`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Focal Length (mm)</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type='number'
+                              value={field.value ?? ''}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value
                                     ? parseFloat(e.target.value)
-                                    : undefined;
-                                  field.onChange(val);
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='focalLength35mm'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>35mm Equivalent (mm)</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type='number'
-                                step={1}
-                                placeholder='50'
-                                value={field.value ?? ''}
-                                onChange={(e) => {
-                                  const val = e.target.value
-                                    ? parseFloat(e.target.value)
-                                    : undefined;
-                                  field.onChange(val);
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className='grid grid-cols-2 gap-4'>
-                      <FormField
-                        control={form.control}
-                        name='fNumber'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Aperture</FormLabel>
-                            <FormControl>
-                              <ApertureSelector
-                                value={field.value}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='exposureTime'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Shutter Speed</FormLabel>
-                            <FormControl>
-                              <ShutterSpeedSelector
-                                value={field.value}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className='grid grid-cols-2 gap-4'>
-                      <FormField
-                        control={form.control}
-                        name='iso'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>ISO</FormLabel>
-                            <FormControl>
-                              <ISOSelector
-                                value={field.value}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name='exposureCompensation'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>EV</FormLabel>
-                            <FormControl>
-                              <ExposureCompensationSelector
-                                value={field.value}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </>
-                )}
-                {!isEditExif ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={() => setIsEditExif(true)}
-                  >
-                    Edit EXIF Data
-                  </Button>
-                ) : (
-                  <div className='flex gap-2'>
-                    <Button type='submit'>Save EXIF Data</Button>
-                    <Button
-                      type='button'
-                      variant='secondary'
-                      onClick={() => setIsEditExif(false)}
-                    >
-                      Cancel
-                    </Button>
+                                    : null,
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.fNumber`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Aperture</FormLabel>
+                          <FormControl>
+                            <ApertureSelector
+                              value={field.value ?? undefined}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.exposureTime`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Shutter Speed</FormLabel>
+                          <FormControl>
+                            <ShutterSpeedSelector
+                              value={field.value ?? undefined}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.iso`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ISO</FormLabel>
+                          <FormControl>
+                            <ISOSelector
+                              value={field.value ?? undefined}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.exposureCompensation`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Exposure Comp.</FormLabel>
+                          <FormControl>
+                            <ExposureCompensationSelector
+                              value={field.value ?? undefined}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`photos.${index}.dateTimeOriginal`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date Taken</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='datetime-local'
+                              value={
+                                field.value
+                                  ? new Date(field.value)
+                                      .toISOString()
+                                      .slice(0, 16)
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value
+                                    ? new Date(e.target.value)
+                                    : null,
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-          <div className='border-t pt-4'>
-            <Button type='submit' disabled={isEditExif || isSubmitting}>
-              {!isSubmitting ? 'Save image' : 'Creating image... '}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className='sticky  bottom-2 flex justify-end gap-4 p-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg'>
+          <Button
+            type='submit'
+            size='lg'
+            disabled={isSubmitting || fields.length === 0}
+          >
+            {isSubmitting ? 'Creating Album...' : 'Create Album'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
