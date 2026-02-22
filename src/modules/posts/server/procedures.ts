@@ -180,23 +180,74 @@ export const postsRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
-        cursor: z.number().nullish(),
+        cursor: z.number().optional(),
       }),
     )
-    .output(postsInCollectionOutputSchema)
+    .output(
+      z.object({
+        items: z.array(postsWithPhotos),
+        nextCursor: z.number().optional(),
+        total: z.number(),
+        totalPages: z.number(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const limit = input.limit;
       const cursor = input.cursor ?? 1;
+
+      const offset = (cursor - 1) * limit;
 
       const data = await ctx.db.query.posts.findMany({
         where: eq(posts.visibility, 'public'),
         orderBy: [desc(posts.createdAt)],
         limit: limit,
-        offset: (cursor - 1) * limit,
+        offset: offset,
+        columns: {
+          id: true,
+          title: true,
+          slug: true,
+          visibility: true,
+          type: true,
+          tags: true,
+          coverImage: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+        },
         with: {
           postsToPhotos: {
+            columns: {
+              postId: true,
+              photoId: true,
+              sortOrder: true,
+            },
             with: {
-              photo: true,
+              photo: {
+                columns: {
+                  id: true,
+                  url: true,
+                  title: true,
+                  aspectRatio: true,
+                  width: true,
+                  height: true,
+                  blurData: true,
+                  make: true,
+                  model: true,
+                  lensModel: true,
+                  focalLength: true,
+                  focalLength35mm: true,
+                  fNumber: true,
+                  iso: true,
+                  exposureTime: true,
+                  exposureCompensation: true,
+                  latitude: true,
+                  longitude: true,
+                  gpsAltitude: true,
+                  dateTimeOriginal: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
             },
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },

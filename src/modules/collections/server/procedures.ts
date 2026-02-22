@@ -72,7 +72,7 @@ export const collectionsRouter = createTRPCRouter({
       z.object({
         collectionSlug: z.string(),
         limit: z.number().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
-        cursor: z.number().nullish(), // Page number for offset-based pagination
+        cursor: z.number().optional(), // Page number for offset-based pagination
       }),
     )
     .output(postsInCollectionOutputSchema)

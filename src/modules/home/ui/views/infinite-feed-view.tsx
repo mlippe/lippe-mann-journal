@@ -2,23 +2,19 @@
 
 import { useRef, useCallback } from 'react';
 import Footer from '@/components/footer';
-import type { Post, Photo } from '@/db/schema';
+import { type PostWithPhotos } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { type PostGetPublished } from '@/modules/posts/types';
+import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
 
 // A placeholder PostCard component to display different post types.
-const PostCard = ({
-  post,
-}: {
-  post: Post & { postsToPhotos: { photo: Photo }[] };
-}) => {
+const PostCard = ({ post }: { post: PostWithPhotos }) => {
   return (
     <div className='p-4 border rounded-lg shadow-sm bg-card'>
       <h2 className='text-xl font-bold mb-2'>{post.title}</h2>
-      {/* {post.description && (
-        <p className='text-muted-foreground mb-4'>{post.description}</p>
-      )} */}
 
       {post.type === 'ARTICLE' && post.content && (
         <div className='prose prose-sm dark:prose-invert max-h-24 overflow-hidden'>
@@ -26,7 +22,7 @@ const PostCard = ({
         </div>
       )}
 
-      {post.type === 'PHOTO' && post.postsToPhotos[0] && (
+      {post.type === 'PHOTO' && post.postsToPhotos && post.postsToPhotos[0] && (
         <div className='rounded-md overflow-hidden'>
           <Image
             src={post.postsToPhotos[0].photo.url}
@@ -38,24 +34,26 @@ const PostCard = ({
         </div>
       )}
 
-      {post.type === 'ALBUM' && post.postsToPhotos.length > 0 && (
-        <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-          {post.postsToPhotos.map(({ photo }) => (
-            <div
-              key={photo.id}
-              className='rounded-md overflow-hidden aspect-square'
-            >
-              <Image
-                src={photo.url}
-                alt={photo.title}
-                width={photo.width}
-                height={photo.height}
-                className='w-full h-full object-cover'
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {post.type === 'ALBUM' &&
+        post.postsToPhotos &&
+        post.postsToPhotos.length > 0 && (
+          <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+            {post.postsToPhotos.map(({ photo }) => (
+              <div
+                key={photo.id}
+                className='rounded-md overflow-hidden aspect-square'
+              >
+                <Image
+                  src={photo.url}
+                  alt={photo.title}
+                  width={photo.width}
+                  height={photo.height}
+                  className='w-full h-full object-cover'
+                />
+              </div>
+            ))}
+          </div>
+        )}
     </div>
   );
 };
@@ -67,28 +65,26 @@ interface InfiniteFeedViewProps {
 export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   const trpc = useTRPC();
 
-  // Using the trpc hooks directly to avoid queryOptions union issues
-  const feedQuery = trpc.posts.getPublished.useInfiniteQuery(
-    { limit: 5 },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
+  // Move pagination parameters from infiniteQueryOptions (which in this tRPC version might not expect them)
+  // to the useInfiniteQuery hook directly to resolve the TS error and ensure consistent behavior.
+  const feedQueryOptions = trpc.posts.getPublished.infiniteQueryOptions({
+    limit: 5,
+  });
+  const collectionQueryOptions =
+    trpc.collections.getPostsInCollection.infiniteQueryOptions({
+      collectionSlug: collectionSlug || '',
+      limit: 5,
+    });
+
+  // Use the correctly inferred type for the output of both procedures
+  type FeedPage = PostGetPublished | CollectionGetPostsInCollection;
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      ...(collectionSlug ? collectionQueryOptions : feedQueryOptions),
+      getNextPageParam: (lastPage: FeedPage) => lastPage.nextCursor,
       initialPageParam: 1,
-      enabled: !collectionSlug,
-    },
-  );
-
-  const collectionQuery =
-    trpc.collections.getPostsInCollection.useInfiniteQuery(
-      { collectionSlug: collectionSlug || '', limit: 5 },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        initialPageParam: 1,
-        enabled: !!collectionSlug,
-      },
-    );
-
-  const activeQuery = collectionSlug ? collectionQuery : feedQuery;
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = activeQuery;
+    });
 
   const observer = useRef<IntersectionObserver>(null);
   const lastPostRef = useCallback(
@@ -105,16 +101,16 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
     [isFetchingNextPage, fetchNextPage, hasNextPage],
   );
 
-  const posts = data?.pages.flatMap((page) => page.items) || [];
+  const posts =
+    data?.pages.flatMap((page: FeedPage) => page.items as PostWithPhotos[]) ||
+    [];
 
   return (
     <div className='w-full max-w-3xl mx-auto space-y-8 py-8'>
       <div className='space-y-8'>
-        {posts.map((post, i) => (
+        {posts.map((post, i: number) => (
           <div key={post.id} ref={i === posts.length - 1 ? lastPostRef : null}>
-            <PostCard
-              post={post as Post & { postsToPhotos: { photo: Photo }[] }}
-            />
+            <PostCard post={post} />
           </div>
         ))}
       </div>
@@ -124,7 +120,6 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
           <Skeleton className='w-full h-64 rounded-lg' />
         </div>
       )}
-      {!hasNextPage && posts.length > 0 && !isFetchingNextPage && <Footer />}
     </div>
   );
 };

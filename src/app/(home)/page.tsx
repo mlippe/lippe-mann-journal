@@ -18,11 +18,16 @@ import {
 
 const page = async () => {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(
+  await queryClient.prefetchQuery(
     trpc.collections.getFeaturedCollections.queryOptions({ limit: 12 }),
   );
-  void queryClient.prefetchInfiniteQuery(
-    trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+  await queryClient.prefetchInfiniteQuery(
+    trpc.posts.getPublished.infiniteQueryOptions(
+      { limit: 5 },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    ),
   );
 
   return (
