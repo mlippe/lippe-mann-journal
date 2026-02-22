@@ -22,7 +22,7 @@ import { ApertureSelector } from '../aperture-selector';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
-import { ExifPreview } from './exif-preview';
+import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema } from './types';
 
 const ConfirmStep = ({

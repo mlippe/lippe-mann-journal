@@ -21,7 +21,7 @@ import { ApertureSelector } from '../aperture-selector';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
-import { ExifPreview } from './exif-preview';
+import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
 import {
   ArrowDown,
@@ -131,56 +131,58 @@ const ConfirmStep = ({
                   Cover Photo
                 </div>
               )}
-              <CardContent className='p-4'>
-                <div className='flex gap-4 items-start'>
+              <CardContent className='px-4'>
+                <div className='flex gap-4 items-start lg:flex-row flex-col'>
                   {/* Sorting & Basic Controls */}
-                  <div className='flex flex-col gap-2'>
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      disabled={index === 0}
-                      onClick={() => move(index, index - 1)}
-                    >
-                      <ArrowUp className='h-4 w-4' />
-                    </Button>
-                    <div className='text-center text-xs font-mono font-bold text-muted-foreground'>
-                      {index + 1}
+                  <div className='flex gap-4 items-center'>
+                    <div className='flex flex-col gap-2 '>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        disabled={index === 0}
+                        onClick={() => move(index, index - 1)}
+                      >
+                        <ArrowUp className='h-4 w-4' />
+                      </Button>
+                      <div className='text-center text-xs font-mono font-bold text-muted-foreground'>
+                        {index + 1}
+                      </div>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        disabled={index === fields.length - 1}
+                        onClick={() => move(index, index + 1)}
+                      >
+                        <ArrowDown className='h-4 w-4' />
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='text-destructive'
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
                     </div>
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      disabled={index === fields.length - 1}
-                      onClick={() => move(index, index + 1)}
-                    >
-                      <ArrowDown className='h-4 w-4' />
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      className='text-destructive'
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className='h-4 w-4' />
-                    </Button>
-                  </div>
 
-                  {/* Photo Preview */}
-                  <div className='relative h-32 w-48 shrink-0 overflow-hidden rounded-md border bg-muted'>
-                    <BlurImage
-                      blurhash={field.blurData}
-                      src={keyToUrl(field.url)}
-                      alt={`Photo ${index + 1}`}
-                      fill
-                      className='object-contain'
-                      unoptimized
-                    />
+                    {/* Photo Preview */}
+                    <div className='relative min-h-32 min-w-48 w-full md:w-fit shrink-0 overflow-hidden rounded-md border bg-muted'>
+                      <BlurImage
+                        blurhash={field.blurData}
+                        src={keyToUrl(field.url)}
+                        alt={`Photo ${index + 1}`}
+                        fill
+                        className='object-contain'
+                        unoptimized
+                      />
+                    </div>
                   </div>
 
                   {/* Photo Details */}
-                  <div className='flex-1 space-y-4'>
+                  <div className='flex-1 space-y-4 w-full'>
                     <FormField
                       control={form.control}
                       name={`photos.${index}.title`}
@@ -198,7 +200,7 @@ const ConfirmStep = ({
                       )}
                     />
 
-                    <div className='flex items-center gap-4'>
+                    <div className='flex items-center gap-4 '>
                       <div className='flex-1'>
                         <ExifPreview
                           exif={form.getValues(`photos.${index}`) as TExifData}
@@ -215,15 +217,7 @@ const ConfirmStep = ({
                           )
                         }
                       >
-                        {expandedIndex === index ? (
-                          <>
-                            <ChevronUp className='mr-2 h-4 w-4' /> Hide EXIF
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className='mr-2 h-4 w-4' /> Edit EXIF
-                          </>
-                        )}
+                        {expandedIndex === index ? 'Hide EXIF' : 'Edit EXIF'}
                       </Button>
                     </div>
                   </div>
