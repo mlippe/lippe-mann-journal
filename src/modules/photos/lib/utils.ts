@@ -1,12 +1,12 @@
-import { ExifParserFactory } from "ts-exif-parser";
-import { encode } from "blurhash";
+import { ExifParserFactory } from 'ts-exif-parser';
+import { encode } from 'blurhash';
 
 /**
  * Format exposure time to string (e.g., "1/1000")
  * @example formatExposureTime(1) => "1/1000"
  */
 export const formatExposureTime = (exposureTime?: number): string => {
-  if (!exposureTime) return "";
+  if (!exposureTime) return '';
   return exposureTime < 1
     ? `1/${Math.round(1 / exposureTime)}`
     : exposureTime.toString();
@@ -19,9 +19,9 @@ export const formatExposureTime = (exposureTime?: number): string => {
 export const formatExposureCompensation = (
   exposureCompensation?: number,
 ): string => {
-  if (typeof exposureCompensation !== "number") return "";
-  if (exposureCompensation === 0) return "0 EV";
-  return `${exposureCompensation > 0 ? "+" : ""}${exposureCompensation} EV`;
+  if (typeof exposureCompensation !== 'number') return '';
+  if (exposureCompensation === 0) return '0 EV';
+  return `${exposureCompensation > 0 ? '+' : ''}${exposureCompensation} EV`;
 };
 
 /**
@@ -29,7 +29,7 @@ export const formatExposureCompensation = (
  * @example formatFocalLength(50) => "50mm"
  */
 export const formatFocalLength = (focalLength?: number | null): string => {
-  if (!focalLength) return "";
+  if (!focalLength) return '';
   return `${focalLength}mm`;
 };
 
@@ -40,7 +40,7 @@ export const formatFocalLength = (focalLength?: number | null): string => {
 export const formatFocalLength35mm = (
   focalLength35mm?: number | null,
 ): string => {
-  if (!focalLength35mm) return "";
+  if (!focalLength35mm) return '';
   return `${focalLength35mm}mm in 35mm`;
 };
 
@@ -50,7 +50,7 @@ export const formatFocalLength35mm = (
  * @example formatFNumber(2.0) => "f/2"
  */
 export const formatFNumber = (fNumber?: number): string => {
-  if (!fNumber) return "";
+  if (!fNumber) return '';
 
   if (Number.isInteger(fNumber) || fNumber % 1 === 0) {
     return `f/${Math.round(fNumber)}`;
@@ -64,7 +64,7 @@ export const formatFNumber = (fNumber?: number): string => {
  * @example formatISO(100) => "ISO 100"
  */
 export const formatISO = (iso?: number): string => {
-  if (!iso) return "";
+  if (!iso) return '';
   return `ISO ${iso}`;
 };
 
@@ -76,10 +76,10 @@ export const formatGPSCoordinates = (
   latitude?: number | null,
   longitude?: number | null,
 ): string => {
-  if (!longitude || !latitude) return "- -";
+  if (!longitude || !latitude) return '- -';
 
-  const eastWest = longitude >= 0 ? "E" : "W";
-  const northSouth = latitude >= 0 ? "N" : "S";
+  const eastWest = longitude >= 0 ? 'E' : 'W';
+  const northSouth = latitude >= 0 ? 'N' : 'S';
 
   const eastWestCoord = `${Math.abs(longitude).toFixed(4)} ${eastWest}`;
   const northSouthCoord = `${Math.abs(latitude).toFixed(4)} ${northSouth}`;
@@ -92,7 +92,7 @@ export const formatGPSCoordinates = (
  * @example formatGPSAltitude(100.5) => "100.5m"
  */
 export const formatGPSAltitude = (altitude?: number) => {
-  if (!altitude) return "";
+  if (!altitude) return '';
   return `${altitude.toFixed(1)}m`;
 };
 
@@ -105,14 +105,14 @@ export const formatGPSAltitude = (altitude?: number) => {
  * @example formatDateTime(new Date()) => "2024-01-01 12:00:00"
  */
 export const formatDateTime = (date?: Date) => {
-  if (!date) return "";
+  if (!date) return '';
 
   const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
@@ -122,7 +122,7 @@ export const formatDateTime = (date?: Date) => {
  * @example snakeCaseToTitle("hello_world") => "Hello World"
  */
 export function snakeCaseToTitle(str: string) {
-  return str.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 export interface TExifData {
@@ -216,21 +216,21 @@ export const getPhotoExif = async (file: File): Promise<TExifData | null> => {
       make: Make as string | undefined,
       model: Model as string | undefined,
       lensModel: LensModel as string | undefined,
-      focalLength: typeof FocalLength === "number" ? FocalLength : undefined,
+      focalLength: typeof FocalLength === 'number' ? FocalLength : undefined,
       focalLength35mm:
-        typeof FocalLengthIn35mmFormat === "number"
+        typeof FocalLengthIn35mmFormat === 'number'
           ? FocalLengthIn35mmFormat
           : undefined,
-      fNumber: typeof FNumber === "number" ? FNumber : undefined,
-      iso: typeof ISO === "number" ? ISO : undefined,
-      exposureTime: typeof ExposureTime === "number" ? ExposureTime : undefined,
+      fNumber: typeof FNumber === 'number' ? FNumber : undefined,
+      iso: typeof ISO === 'number' ? ISO : undefined,
+      exposureTime: typeof ExposureTime === 'number' ? ExposureTime : undefined,
       exposureCompensation:
-        typeof ExposureCompensation === "number"
+        typeof ExposureCompensation === 'number'
           ? ExposureCompensation
           : undefined,
-      latitude: typeof GPSLatitude === "number" ? GPSLatitude : undefined,
-      longitude: typeof GPSLongitude === "number" ? GPSLongitude : undefined,
-      gpsAltitude: typeof GPSAltitude === "number" ? GPSAltitude : undefined,
+      latitude: typeof GPSLatitude === 'number' ? GPSLatitude : undefined,
+      longitude: typeof GPSLongitude === 'number' ? GPSLongitude : undefined,
+      gpsAltitude: typeof GPSAltitude === 'number' ? GPSAltitude : undefined,
       dateTimeOriginal: DateTimeOriginal
         ? new Date(DateTimeOriginal * 1000)
         : undefined,
@@ -238,7 +238,7 @@ export const getPhotoExif = async (file: File): Promise<TExifData | null> => {
 
     return exifData;
   } catch (error) {
-    console.error("Error reading EXIF data:", error);
+    console.error('Error reading EXIF data:', error);
     return null;
   }
 };
@@ -250,23 +250,23 @@ export const getPhotoExif = async (file: File): Promise<TExifData | null> => {
  */
 export const getImageInfo = async (file: File): Promise<TImageInfo> => {
   if (!file) {
-    throw new Error("No file provided");
+    throw new Error('No file provided');
   }
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Invalid file type. Only images are allowed");
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Invalid file type. Only images are allowed');
   }
 
   try {
     const img = await loadImage(file);
     // generate blurhash
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
-      throw new Error("Failed to get canvas context");
+      throw new Error('Failed to get canvas context');
     }
 
     ctx.drawImage(img, 0, 0, 32, 32);
@@ -281,7 +281,7 @@ export const getImageInfo = async (file: File): Promise<TImageInfo> => {
     );
 
     if (!blurhash) {
-      throw new Error("Failed to generate blurhash");
+      throw new Error('Failed to generate blurhash');
     }
 
     const imageInfo: TImageInfo = {
@@ -289,6 +289,9 @@ export const getImageInfo = async (file: File): Promise<TImageInfo> => {
       height: img.height,
       aspectRatio: Number((img.width / img.height).toFixed(2)),
       blurhash,
+      fileName: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
     };
 
     // cleanup
@@ -299,6 +302,6 @@ export const getImageInfo = async (file: File): Promise<TImageInfo> => {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Failed to process image: " + String(error));
+    throw new Error('Failed to process image: ' + String(error));
   }
 };

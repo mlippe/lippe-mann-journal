@@ -25,30 +25,35 @@ function escapeLike(str: string): string {
 
 export const photosRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(photosInsertSchema)
+    .input(
+      z.object({
+        ...photosInsertSchema.shape,
+        postTitle: z.string(),
+        postVisibility: z.enum(['public', 'private']).default('private'),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const values = input;
+      const { postTitle, postVisibility, ...photoData } = input;
 
       try {
-        const [insertedPhoto] = await ctx.db.transaction(async (tx) => {
-          const [photo] = await tx.insert(photos).values(values).returning();
+        const [result] = await ctx.db.transaction(async (tx) => {
+          const [photo] = await tx.insert(photos).values(photoData).returning();
 
           if (!photo) {
             throw new Error('Failed to insert photo');
           }
 
-          const baseSlug = generateSlug(photo.title);
-          const uniqueSlug = `${baseSlug}-${photo.id.slice(0, 8)}`;
+          const baseSlug = generateSlug(postTitle);
+          const uniqueSlug = `${baseSlug}-${photo.id.slice(0, 4)}`;
 
           const [post] = await tx
             .insert(posts)
             .values({
-              title: photo.title,
+              title: postTitle,
               slug: uniqueSlug,
               type: 'PHOTO',
-              visibility: photo.visibility,
+              visibility: postVisibility,
               coverImage: photo.url,
-              description: photo.description,
             })
             .returning();
 
@@ -65,12 +70,74 @@ export const photosRouter = createTRPCRouter({
           return [photo];
         });
 
-        return insertedPhoto;
+        return result;
       } catch (error) {
         console.error('Photo creation error:', error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to create photo',
+        });
+      }
+    }),
+
+  createAlbum: protectedProcedure
+    .input(
+      z.object({
+        postTitle: z.string(),
+        postVisibility: z.enum(['public', 'private']).default('private'),
+        photos: z.array(photosInsertSchema),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const [albumPost] = await ctx.db.transaction(async (tx) => {
+          // 1. Insert all photos
+          const insertedPhotos = await tx
+            .insert(photos)
+            .values(input.photos)
+            .returning();
+
+          if (insertedPhotos.length === 0) {
+            throw new Error('Failed to insert photos for album');
+          }
+
+          // 2. Create the album post
+          const baseSlug = generateSlug(input.postTitle);
+          const uniqueSlug = `album-${baseSlug}-${insertedPhotos[0].id.slice(0, 4)}`;
+
+          const [post] = await tx
+            .insert(posts)
+            .values({
+              title: input.postTitle,
+              slug: uniqueSlug,
+              type: 'ALBUM',
+              visibility: input.postVisibility,
+              coverImage: insertedPhotos[0].url,
+            })
+            .returning();
+
+          if (!post) {
+            throw new Error('Failed to create album post');
+          }
+
+          // 3. Link photos to album post
+          const links = insertedPhotos.map((photo, index) => ({
+            postId: post.id,
+            photoId: photo.id,
+            sortOrder: index,
+          }));
+
+          await tx.insert(postsToPhotos).values(links);
+
+          return [post];
+        });
+
+        return albumPost;
+      } catch (error) {
+        console.error('Album creation error:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create album',
         });
       }
     }),
@@ -166,25 +233,6 @@ export const photosRouter = createTRPCRouter({
           if (!photo) {
             throw new TRPCError({ code: 'NOT_FOUND' });
           }
-
-          // Sync changes to the linked post if it's a PHOTO type post
-          // Note: we only sync fields that exist in both schemas
-          await tx
-            .update(posts)
-            .set({
-              title: photo.title,
-              description: photo.description,
-              visibility: photo.visibility,
-              updatedAt: new Date(),
-            })
-            .where(
-              and(
-                eq(posts.type, 'PHOTO'),
-                sql`${posts.id} IN (
-                  SELECT post_id FROM posts_to_photos WHERE photo_id = ${id}
-                )`,
-              ),
-            );
 
           return [photo];
         });

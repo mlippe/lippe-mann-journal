@@ -87,20 +87,12 @@ export const verification = pgTable('verification', {
  ****************
  ***************/
 
-export const photoVisibility = pgEnum('photo_visibility', [
-  'public',
-  'private',
-]);
-
 export const photos = pgTable(
   'photos',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     url: text('url').notNull(),
     title: text('title').notNull(),
-    description: text('description').notNull(),
-    isFavorite: boolean('is_favorite').default(false).notNull(),
-    visibility: photoVisibility('visibility').default('private').notNull(),
     aspectRatio: real('aspect_ratio').notNull(),
     width: real('width').notNull(),
     height: real('height').notNull(),
@@ -128,18 +120,14 @@ export const photos = pgTable(
 // Schema
 export const photosInsertSchema = createInsertSchema(photos).extend({
   title: z.string().min(1, { message: 'Title is required' }),
-  description: z.string().min(1, { message: 'Description is required' }),
 });
 export const photosSelectSchema = createSelectSchema(photos);
 export const photosUpdateSchema = createUpdateSchema(photos)
   .pick({
     id: true,
     title: true,
-    description: true,
-    isFavorite: true,
     latitude: true,
     longitude: true,
-    visibility: true,
   })
   .partial();
 
@@ -186,7 +174,6 @@ export const posts = pgTable(
     type: postType('type').notNull(),
     tags: text('tags').array(),
     coverImage: text('cover_image'),
-    description: text('description'),
     content: text('content'), // For BLOG posts
     ...timestamps,
   },
