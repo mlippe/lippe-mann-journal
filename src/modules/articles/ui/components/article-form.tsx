@@ -53,7 +53,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
-        router.push(`/dashboard/articles/${data.slug}`);
+        router.push(`/dashboard/posts/${data.slug}`);
       },
       onError: (e) => {
         toast.error('Failed to create article', {
@@ -75,7 +75,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
-        router.push(`/dashboard/articles/${data.slug}`);
+        router.push(`/dashboard/posts/${data.slug}`);
       },
       onError: (e) => {
         toast.error('Failed to update article', {

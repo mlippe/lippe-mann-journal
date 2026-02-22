@@ -3,19 +3,19 @@ import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import type { SearchParams } from 'nuqs/server';
 import { ErrorBoundary } from 'react-error-boundary';
-import { loadSearchParams } from '@/modules/articles/params';
+import { loadSearchParams } from '@/modules/posts/params';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 import {
-  DashboardArticlesView,
   ErrorStatus,
   LoadingStatus,
-} from '@/modules/articles/ui/views/dashboard-articles-view';
-import { ArticlesListHeader } from '@/modules/articles/ui/components/articles-list-header';
+} from '@/modules/posts/ui/components/posts-list';
+import { DashboardPostsView } from '@/modules/posts/ui/views/dashboard-posts-view';
+import { PostsListHeader } from '@/modules/posts/ui/components/posts-list-header';
 
 export const metadata = {
-  title: 'Articles',
-  description: 'Articles',
+  title: 'Posts',
+  description: 'Manage all your posts',
 };
 
 type Props = {
@@ -32,11 +32,11 @@ const page = async ({ searchParams }: Props) => {
 
   return (
     <>
-      <ArticlesListHeader />
+      <PostsListHeader />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<LoadingStatus />}>
           <ErrorBoundary fallback={<ErrorStatus />}>
-            <DashboardArticlesView />
+            <DashboardPostsView />
           </ErrorBoundary>
         </Suspense>
       </HydrationBoundary>

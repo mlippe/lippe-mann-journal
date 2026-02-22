@@ -23,13 +23,7 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
 import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  ChevronUp,
-  Trash2,
-} from 'lucide-react';
+import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { TExifData } from '@/modules/photos/lib/utils';

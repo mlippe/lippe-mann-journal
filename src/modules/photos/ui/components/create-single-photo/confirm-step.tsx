@@ -180,7 +180,7 @@ const ConfirmStep = ({
                   <h3 className='text-sm font-semibold'>EXIF Data</h3>
 
                   {!isEditExif && (
-                    <div className='mt-4 border border-border/80 rounded-sm p-4 w-fit'>
+                    <div className='mt-4 border border-border/80 rounded-sm p-4 w-full'>
                       <ExifPreview exif={exif} showLogo={false} />
                     </div>
                   )}
