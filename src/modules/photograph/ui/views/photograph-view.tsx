@@ -9,11 +9,16 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { IconArrowsMaximize, IconX } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconArrowsMaximize,
+  IconX,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 
 import { PostGetOne } from '@/modules/posts/types';
@@ -23,7 +28,11 @@ import { ExifPreview } from '@/modules/photos/ui/components/exif-preview';
 import { TExifData } from '@/modules/photos/lib/utils';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Keyboard } from 'swiper/modules';
 import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/keyboard';
 
 export const PhotographView = ({
   post,
@@ -33,6 +42,35 @@ export const PhotographView = ({
   isModal?: boolean;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
+
+  const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
+
+  const [exif, setExif] = useState<TExifData>(
+    post.postsToPhotos && post.postsToPhotos.at(0)
+      ? {
+          make: post.postsToPhotos.at(0)!.photo.make!,
+          model: post.postsToPhotos.at(0)!.photo.model!,
+          lensModel: post.postsToPhotos.at(0)!.photo.lensModel!,
+          focalLength: post.postsToPhotos.at(0)!.photo.focalLength!,
+          focalLength35mm: post.postsToPhotos.at(0)!.photo.focalLength35mm!,
+          fNumber: post.postsToPhotos.at(0)!.photo.fNumber!,
+          iso: post.postsToPhotos.at(0)!.photo.iso!,
+          exposureTime: post.postsToPhotos.at(0)!.photo.exposureTime!,
+          exposureCompensation:
+            post.postsToPhotos.at(0)!.photo.exposureCompensation!,
+          dateTimeOriginal: post.postsToPhotos.at(0)!.photo.dateTimeOriginal!,
+        }
+      : {},
+  );
+
+  const hasAnyExifValue = useMemo(
+    () =>
+      Object.values(exif).some(
+        (value) => value !== undefined && value !== null,
+      ),
+    [exif],
+  );
+
   const router = useRouter();
 
   const handleOpenChange = (openState: boolean) => {
@@ -45,74 +83,109 @@ export const PhotographView = ({
 
   console.log('post data 2', post);
 
+  useEffect(() => {
+    setExif({
+      make: post.postsToPhotos.at(swiperActiveIndex)!.photo.make!,
+      model: post.postsToPhotos.at(swiperActiveIndex)!.photo.model!,
+      lensModel: post.postsToPhotos.at(swiperActiveIndex)!.photo.lensModel!,
+      focalLength: post.postsToPhotos.at(swiperActiveIndex)!.photo.focalLength!,
+      focalLength35mm:
+        post.postsToPhotos.at(swiperActiveIndex)!.photo.focalLength35mm!,
+      fNumber: post.postsToPhotos.at(swiperActiveIndex)!.photo.fNumber!,
+      iso: post.postsToPhotos.at(swiperActiveIndex)!.photo.iso!,
+      exposureTime:
+        post.postsToPhotos.at(swiperActiveIndex)!.photo.exposureTime!,
+      exposureCompensation:
+        post.postsToPhotos.at(swiperActiveIndex)!.photo.exposureCompensation!,
+      dateTimeOriginal:
+        post.postsToPhotos.at(swiperActiveIndex)!.photo.dateTimeOriginal!,
+    });
+  }, [swiperActiveIndex]);
+
   if (!post.postsToPhotos?.at(0)) {
     return null;
   }
-
-  const exif: TExifData = {
-    make: post.postsToPhotos.at(0)!.photo.make!,
-    model: post.postsToPhotos.at(0)!.photo.model!,
-    lensModel: post.postsToPhotos.at(0)!.photo.lensModel!,
-    focalLength: post.postsToPhotos.at(0)!.photo.focalLength!,
-    focalLength35mm: post.postsToPhotos.at(0)!.photo.focalLength35mm!,
-    fNumber: post.postsToPhotos.at(0)!.photo.fNumber!,
-    iso: post.postsToPhotos.at(0)!.photo.iso!,
-    exposureTime: post.postsToPhotos.at(0)!.photo.exposureTime!,
-    exposureCompensation: post.postsToPhotos.at(0)!.photo.exposureCompensation!,
-    dateTimeOriginal: post.postsToPhotos.at(0)!.photo.dateTimeOriginal!,
-  };
-
-  const hasAnyExifValue = Object.values(exif).some(
-    (value) => value !== undefined && value !== null,
-  );
 
   return isModal ? (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className='bg-transparent border-none max-w-[calc(100%-2rem)]! w-full shadow-none max-h-[calc(100%-2rem)]!'
+        className='bg-transparent border-none max-w-[calc(100%-2rem)]! w-full shadow-none h-full max-h-[calc(100%-2rem)]!'
       >
-        <div className='flex rounded-sm overflow-hidden  w-full h-full min-h-0 min-w-0'>
-          <div className='bg-background p-3 w-13/16 relative group'>
+        <div className='flex rounded-sm overflow-hidden w-full h-full min-h-0 min-w-0'>
+          <div className='bg-background p-3 w-13/16 relative group flex items-center justify-center h-full'>
             {post.postsToPhotos && post.postsToPhotos.length > 1 ? (
               <>
                 <Swiper
+                  id='album-swiper'
+                  modules={[Navigation, Pagination, Keyboard]}
                   slidesPerView={1}
                   onSlideChange={(active) =>
-                    console.log('slide change', active)
+                    setSwiperActiveIndex(active.realIndex)
                   }
-                  onSwiper={(swiper) => console.log(swiper)}
                   autoHeight={false}
+                  loop
                   className='min-h-0 w-full h-full'
+                  keyboard={{ enabled: true }}
+                  navigation={{
+                    prevEl: '#album-swiper-prev',
+                    nextEl: '#album-swiper-next',
+                  }}
+                  pagination={{
+                    el: '#album-swiper-pagination',
+                    clickable: true,
+                  }}
                 >
+                  <Button
+                    id='album-swiper-prev'
+                    size='icon-sm'
+                    className='absolute top-1/2 left-0 -translate-y-1/2  z-10 cursor-pointer'
+                    variant='outline'
+                  >
+                    <IconArrowLeft />
+                  </Button>
+                  <Button
+                    id='album-swiper-next'
+                    size='icon-sm'
+                    className='absolute top-1/2 right-0 -translate-y-1/2  z-10 cursor-pointer'
+                    variant='outline'
+                  >
+                    <IconArrowRight />
+                  </Button>
+                  <div id='album-swiper-pagination' />
                   {post.postsToPhotos.map((photo, i) => (
                     <SwiperSlide
                       key={`slide-${i}`}
-                      className='h-full flex items-center justify-center'
+                      className='h-full flex items-center justify-center cursor-ew-resize'
                     >
                       <Image
                         src={keyToUrl(photo.photo.url)}
                         alt={post.title}
                         width={photo.photo.width}
                         height={photo.photo.height}
-                        className='max-w-full max-h-full object-contain'
+                        className='max-w-full max-h-full w-full h-full object-contain'
                       />
                     </SwiperSlide>
                   ))}
                 </Swiper>
                 <Button
-                  size='icon-lg'
+                  size='icon-sm'
                   asChild
-                  className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
+                  className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10'
                   variant='outline'
                 >
-                  <Link target='_blank' href={'asd'}>
+                  <Link
+                    target='_blank'
+                    href={keyToUrl(
+                      post.postsToPhotos?.at(swiperActiveIndex)!.photo.url,
+                    )}
+                  >
                     <IconArrowsMaximize />
                   </Link>
                 </Button>
               </>
             ) : (
-              <>
+              <div className='flex items-center justify-center w-full h-full'>
                 <Image
                   src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
                   alt={post.title}
@@ -121,9 +194,9 @@ export const PhotographView = ({
                   className='max-w-full max-h-full object-contain'
                 />
                 <Button
-                  size='icon-lg'
+                  size='icon-sm'
                   asChild
-                  className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
+                  className='absolute top-3 right-3 opacity-0 group-hover:opacity-100'
                   variant='outline'
                 >
                   <Link
@@ -133,7 +206,7 @@ export const PhotographView = ({
                     <IconArrowsMaximize />
                   </Link>
                 </Button>
-              </>
+              </div>
             )}
           </div>
           <div className='h-full bg-background/95  backdrop-blur-xl w-3/16 flex flex-col justify-between'>
