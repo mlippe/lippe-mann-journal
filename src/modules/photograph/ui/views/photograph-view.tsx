@@ -9,7 +9,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -119,7 +119,7 @@ export const PhotographView = ({
                   <Button
                     id='album-swiper-prev'
                     size='icon-sm'
-                    className='absolute top-1/2 left-0 -translate-y-1/2  z-10 cursor-pointer'
+                    className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                     variant='outline'
                   >
                     <IconArrowLeft />
@@ -127,7 +127,7 @@ export const PhotographView = ({
                   <Button
                     id='album-swiper-next'
                     size='icon-sm'
-                    className='absolute top-1/2 right-0 -translate-y-1/2  z-10 cursor-pointer'
+                    className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                     variant='outline'
                   >
                     <IconArrowRight />
