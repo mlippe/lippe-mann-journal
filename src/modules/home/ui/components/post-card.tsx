@@ -227,6 +227,7 @@ const MediaContent = ({
                     priority={priority && i === 0}
                     sizes={sizes}
                     blurhash={ptp.photo.blurData}
+                    aspectRatio={ptp.photo.aspectRatio ?? undefined}
                     className='object-contain p-3'
                   />
                 </SwiperSlide>
@@ -258,6 +259,7 @@ const MediaContent = ({
                 priority={priority}
                 sizes={sizes}
                 blurhash={firstPhoto.blurData}
+                aspectRatio={firstPhoto.aspectRatio ?? undefined}
                 className='object-contain p-3'
               />
             </div>
@@ -275,6 +277,7 @@ const MediaContent = ({
           priority={priority}
           sizes={sizes}
           blurhash={firstPhoto.blurData}
+          aspectRatio={firstPhoto.aspectRatio ?? undefined}
           className='object-contain p-3'
         />
       </div>
@@ -291,6 +294,7 @@ const MediaContent = ({
         priority={priority}
         sizes={sizes}
         blurhash={firstPhoto.blurData}
+        aspectRatio={firstPhoto.aspectRatio ?? undefined}
         className='object-contain p-3 transition-opacity duration-300'
       />
     </Link>
