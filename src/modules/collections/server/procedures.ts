@@ -94,7 +94,7 @@ export const collectionsRouter = createTRPCRouter({
 
       // Query posts linked to this collection
       const data = await ctx.db.query.posts.findMany({
-        where: and(
+        where: (posts, { and, eq, exists }) => and(
           eq(posts.visibility, 'public'),
           exists(
             ctx.db.select().from(postsToCollections).where(

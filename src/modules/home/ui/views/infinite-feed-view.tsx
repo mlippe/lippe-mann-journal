@@ -102,8 +102,9 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   );
 
   const posts =
-    data?.pages.flatMap((page: FeedPage) => page.items as PostWithPhotos[]) ||
-    [];
+    data?.pages
+      .flatMap((page: FeedPage) => (page.items as PostWithPhotos[]) || [])
+      .filter((post) => post.visibility === 'public') || [];
 
   return (
     <div className='w-full max-w-3xl mx-auto space-y-8 py-8'>

@@ -19,8 +19,6 @@ import {
   postsWithPhotos,
 } from '@/db/schema';
 
-import { postsInCollectionOutputSchema } from '@/modules/collections/server/procedures';
-
 export const postsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(postsInsertSchema)
@@ -198,7 +196,7 @@ export const postsRouter = createTRPCRouter({
       const offset = (cursor - 1) * limit;
 
       const data = await ctx.db.query.posts.findMany({
-        where: eq(posts.visibility, 'public'),
+        where: (posts, { eq }) => eq(posts.visibility, 'public'),
         orderBy: [desc(posts.createdAt)],
         limit: limit,
         offset: offset,
