@@ -1,6 +1,8 @@
-import { Editor } from "@tiptap/core";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { Editor } from '@tiptap/core';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { formatRelative } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,7 +19,7 @@ export function formatGPSCoordinates(
   lng: number | null | undefined,
 ): string {
   if (lat === null || lat === undefined || lng === null || lng === undefined) {
-    return "No location data";
+    return 'No location data';
   }
 
   // Convert decimal degrees to degrees, minutes, seconds
@@ -30,11 +32,11 @@ export function formatGPSCoordinates(
 
     const direction = isLatitude
       ? decimal >= 0
-        ? "N"
-        : "S"
+        ? 'N'
+        : 'S'
       : decimal >= 0
-        ? "E"
-        : "W";
+        ? 'E'
+        : 'W';
 
     return `${degrees}°${minutes}'${seconds}"${direction}`;
   };
@@ -43,7 +45,7 @@ export function formatGPSCoordinates(
 }
 
 export const NODE_HANDLES_SELECTED_STYLE_CLASSNAME =
-  "node-handles-selected-style";
+  'node-handles-selected-style';
 
 export function isValidUrl(url: string) {
   return /^https?:\/\/\S+$/.test(url);
@@ -72,10 +74,44 @@ export function getUrlFromString(str: string) {
     return str;
   }
   try {
-    if (str.includes(".") && !str.includes(" ")) {
+    if (str.includes('.') && !str.includes(' ')) {
       return new URL(`https://${str}`).toString();
     }
   } catch {
     return null;
   }
+}
+
+type RelativeToken =
+  | 'lastWeek'
+  | 'yesterday'
+  | 'today'
+  | 'tomorrow'
+  | 'nextWeek'
+  | 'other';
+
+type CustomStrings = Partial<Record<RelativeToken, string>>;
+
+export function formatRelativeCustom(
+  date: Date,
+  baseDate: Date = new Date(),
+  customStrings: CustomStrings = {},
+) {
+  const defaultFormatMap: Record<RelativeToken, string> = {
+    lastWeek: "'Last' eeee',' p",
+    yesterday: "'Yesterday,' p",
+    today: "'Today,' p",
+    tomorrow: "'Tomorrow,' p",
+    nextWeek: "eeee 'at' p",
+    other: 'P',
+  };
+
+  const locale = {
+    ...enUS,
+    formatRelative: (token: RelativeToken) => {
+      return customStrings[token] ?? defaultFormatMap[token];
+    },
+  };
+
+  return formatRelative(date, baseDate, { locale });
 }

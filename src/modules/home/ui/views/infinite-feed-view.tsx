@@ -10,14 +10,20 @@ import { type PostGetPublished } from '@/modules/posts/types';
 import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
 import BlurImage from '@/components/blur-image';
 import Link from 'next/link';
+import Author from '@/components/author';
+import { formatRelative } from 'date-fns';
+import { formatRelativeCustom } from '@/lib/utils';
 
 // A placeholder PostCard component to display different post types.
 const PostCard = ({ post }: { post: PostWithPhotos }) => {
   if (post.type === 'ARTICLE') {
     console.log(post);
   }
+
+  const dateNow = new Date().getTime();
+
   return (
-    <div className='bg-background aspect-[0.8] '>
+    <div className='bg-background aspect-[0.8] hover:bg-muted-foreground/5 transition-colors duration-700'>
       {post.type === 'ARTICLE' &&
         post.coverImage &&
         post.coverImage?.length > 0 && (
@@ -42,6 +48,13 @@ const PostCard = ({ post }: { post: PostWithPhotos }) => {
 
       {post.type === 'PHOTO' && post.postsToPhotos && post.postsToPhotos[0] && (
         <>
+          <div className='p-3 md:hidden flex gap-2 items-center justify-between '>
+            <Author size='sm' />
+
+            <p className='text-xs uppercase text-muted-foreground'>
+              {formatRelativeCustom(post.createdAt)}
+            </p>
+          </div>
           <Link className='block h-full p-3' href={`/photo/${post.slug}`}>
             <BlurImage
               src={post.postsToPhotos[0].photo.url}
@@ -49,11 +62,11 @@ const PostCard = ({ post }: { post: PostWithPhotos }) => {
               width={post.postsToPhotos[0].photo.width / 4}
               height={post.postsToPhotos[0].photo.height / 4}
               blurhash={post.postsToPhotos[0].photo.blurData}
-              className='object-contain w-full h-full'
+              className='object-contain w-full h-full '
             />
           </Link>
           <div className='p-3 md:hidden'>
-            <span>{post.title}</span>
+            <span className='text-sm line-clamp-3'>{post.title}</span>
           </div>
         </>
       )}
@@ -61,23 +74,38 @@ const PostCard = ({ post }: { post: PostWithPhotos }) => {
       {post.type === 'ALBUM' &&
         post.postsToPhotos &&
         post.postsToPhotos.length > 0 && (
-          <div className='h-full p-3 relative group'>
-            <BlurImage
-              src={post.postsToPhotos[0].photo.url}
-              alt={post.postsToPhotos[0].photo.title}
-              width={post.postsToPhotos[0].photo.width / 4}
-              height={post.postsToPhotos[0].photo.height / 4}
-              blurhash={post.postsToPhotos[0].photo.blurData}
-              className='object-contain w-full h-full'
-            />
-            <Image
-              src={post.postsToPhotos[1].photo.url}
-              alt={post.postsToPhotos[1].photo.title}
-              width={post.postsToPhotos[1].photo.width / 4}
-              height={post.postsToPhotos[1].photo.height / 4}
-              className='absolute z-1 object-contain w-full h-full top-0 left-0 p-3 hidden group-hover:block'
-            />
-          </div>
+          <>
+            <div className='p-3 md:hidden flex gap-2 items-center justify-between '>
+              <Author size='sm' />
+
+              <p className='text-xs uppercase text-muted-foreground'>
+                {formatRelativeCustom(post.createdAt)}
+              </p>
+            </div>
+            <Link
+              className='block h-full p-3 relative group'
+              href={`/album/${post.slug}`}
+            >
+              <BlurImage
+                src={post.postsToPhotos[0].photo.url}
+                alt={post.postsToPhotos[0].photo.title}
+                width={post.postsToPhotos[0].photo.width / 4}
+                height={post.postsToPhotos[0].photo.height / 4}
+                blurhash={post.postsToPhotos[0].photo.blurData}
+                className='object-contain w-full h-full'
+              />
+              <Image
+                src={post.postsToPhotos[1].photo.url}
+                alt={post.postsToPhotos[1].photo.title}
+                width={post.postsToPhotos[1].photo.width / 4}
+                height={post.postsToPhotos[1].photo.height / 4}
+                className='absolute z-1 object-contain w-full h-full top-0 left-0 p-3 hidden group-hover:block'
+              />
+            </Link>
+            <div className='p-3 md:hidden'>
+              <span className='text-sm line-clamp-3'>{post.title}</span>
+            </div>
+          </>
         )}
     </div>
   );

@@ -9,16 +9,17 @@ import {
   LoadingState,
   PhotographView,
 } from '@/modules/photograph/ui/views/photograph-view';
+import { InfiniteFeedView } from '@/modules/home/ui/views/infinite-feed-view';
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = (await params).id;
+  const slug = (await params).slug;
   const queryClient = getQueryClient();
   const data = await queryClient.fetchQuery(
-    trpc.photos.getOne.queryOptions({ id }),
+    trpc.posts.getOne.queryOptions({ slug }),
   );
 
   return {
@@ -27,16 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const page = async ({ params }: Props) => {
-  const id = (await params).id;
+  const slug = (await params).slug;
   const queryClient = getQueryClient();
-  await queryClient.fetchQuery(trpc.photos.getOne.queryOptions({ id }));
+  const post = await queryClient.fetchQuery(
+    trpc.posts.getOne.queryOptions({ slug }),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<LoadingState />}>
         <ErrorBoundary fallback={<p>Error</p>}>
-          <div className='m-20'>other route</div>
-          <PhotographView id={id} />
+          <PhotographView post={post} isModal={false} />
+          <InfiniteFeedView />
         </ErrorBoundary>
       </Suspense>
     </HydrationBoundary>

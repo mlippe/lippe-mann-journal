@@ -22,7 +22,16 @@ import { format } from 'date-fns';
 import { ExifPreview } from '@/modules/photos/ui/components/exif-preview';
 import { TExifData } from '@/modules/photos/lib/utils';
 
-export const PhotographView = ({ post }: { post: PostGetOne }) => {
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+
+export const PhotographView = ({
+  post,
+  isModal = true,
+}: {
+  post: PostGetOne;
+  isModal?: boolean;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const router = useRouter();
 
@@ -57,7 +66,7 @@ export const PhotographView = ({ post }: { post: PostGetOne }) => {
     (value) => value !== undefined && value !== null,
   );
 
-  return (
+  return isModal ? (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
@@ -65,26 +74,67 @@ export const PhotographView = ({ post }: { post: PostGetOne }) => {
       >
         <div className='flex rounded-sm overflow-hidden  w-full h-full min-h-0 min-w-0'>
           <div className='bg-background p-3 w-13/16 relative group'>
-            <Image
-              src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-              alt={post.title}
-              width={post.postsToPhotos?.at(0)!.photo.width}
-              height={post.postsToPhotos?.at(0)!.photo.height}
-              className='max-w-full max-h-full object-contain'
-            />
-            <Button
-              size='icon-lg'
-              asChild
-              className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
-              variant='outline'
-            >
-              <Link
-                target='_blank'
-                href={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-              >
-                <IconArrowsMaximize />
-              </Link>
-            </Button>
+            {post.postsToPhotos && post.postsToPhotos.length > 1 ? (
+              <>
+                <Swiper
+                  slidesPerView={1}
+                  onSlideChange={(active) =>
+                    console.log('slide change', active)
+                  }
+                  onSwiper={(swiper) => console.log(swiper)}
+                  autoHeight={false}
+                  className='min-h-0 w-full h-full'
+                >
+                  {post.postsToPhotos.map((photo, i) => (
+                    <SwiperSlide
+                      key={`slide-${i}`}
+                      className='h-full flex items-center justify-center'
+                    >
+                      <Image
+                        src={keyToUrl(photo.photo.url)}
+                        alt={post.title}
+                        width={photo.photo.width}
+                        height={photo.photo.height}
+                        className='max-w-full max-h-full object-contain'
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <Button
+                  size='icon-lg'
+                  asChild
+                  className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
+                  variant='outline'
+                >
+                  <Link target='_blank' href={'asd'}>
+                    <IconArrowsMaximize />
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Image
+                  src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
+                  alt={post.title}
+                  width={post.postsToPhotos?.at(0)!.photo.width}
+                  height={post.postsToPhotos?.at(0)!.photo.height}
+                  className='max-w-full max-h-full object-contain'
+                />
+                <Button
+                  size='icon-lg'
+                  asChild
+                  className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
+                  variant='outline'
+                >
+                  <Link
+                    target='_blank'
+                    href={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
+                  >
+                    <IconArrowsMaximize />
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
           <div className='h-full bg-background/95  backdrop-blur-xl w-3/16 flex flex-col justify-between'>
             <div>
@@ -118,6 +168,51 @@ export const PhotographView = ({ post }: { post: PostGetOne }) => {
         <DialogTitle className='hidden'>{post.title}</DialogTitle>
       </DialogContent>
     </Dialog>
+  ) : (
+    <div className='w-full mt-12 border border-border/50 max-h-screen '>
+      <div className='flex  w-full min-h-0 min-w-0 max-h-screen md:flex-row flex-col '>
+        <div className='bg-background p-3 md:w-13/16 relative group'>
+          <Image
+            src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
+            alt={post.title}
+            width={post.postsToPhotos?.at(0)!.photo.width}
+            height={post.postsToPhotos?.at(0)!.photo.height}
+            className='max-w-full max-h-full object-contain'
+          />
+          <Button
+            size='icon-lg'
+            asChild
+            className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
+            variant='outline'
+          >
+            <Link
+              target='_blank'
+              href={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
+            >
+              <IconArrowsMaximize />
+            </Link>
+          </Button>
+        </div>
+        <div className='bg-muted/50  backdrop-blur-xl md:w-3/16 flex flex-col justify-between'>
+          <div>
+            <div className='flex items-center justify-between border-b p-3 gap-1'>
+              <Author size='sm' />
+            </div>
+            <div className='p-3'>
+              <p>{post.title}</p>
+              <p className='text-xs text-muted-foreground'>
+                {format(post.createdAt, 'dd.MM.yyyy')}
+              </p>
+            </div>
+          </div>
+          {hasAnyExifValue && (
+            <div className='p-3 border-t max-w-sm'>
+              <ExifPreview exif={exif} showLogo={false} size='sm' />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
