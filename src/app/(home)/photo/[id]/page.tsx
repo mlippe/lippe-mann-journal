@@ -35,6 +35,7 @@ const page = async ({ params }: Props) => {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<LoadingState />}>
         <ErrorBoundary fallback={<p>Error</p>}>
+          <div className='m-20'>other route</div>
           <PhotographView id={id} />
         </ErrorBoundary>
       </Suspense>

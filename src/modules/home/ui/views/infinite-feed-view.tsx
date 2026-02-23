@@ -9,6 +9,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { type PostGetPublished } from '@/modules/posts/types';
 import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
 import BlurImage from '@/components/blur-image';
+import Link from 'next/link';
 
 // A placeholder PostCard component to display different post types.
 const PostCard = ({ post }: { post: PostWithPhotos }) => {
@@ -40,16 +41,21 @@ const PostCard = ({ post }: { post: PostWithPhotos }) => {
       )}
 
       {post.type === 'PHOTO' && post.postsToPhotos && post.postsToPhotos[0] && (
-        <div className='h-full p-3'>
-          <BlurImage
-            src={post.postsToPhotos[0].photo.url}
-            alt={post.postsToPhotos[0].photo.title}
-            width={post.postsToPhotos[0].photo.width / 4}
-            height={post.postsToPhotos[0].photo.height / 4}
-            blurhash={post.postsToPhotos[0].photo.blurData}
-            className='object-contain w-full h-full'
-          />
-        </div>
+        <>
+          <Link className='block h-full p-3' href={`/photo/${post.slug}`}>
+            <BlurImage
+              src={post.postsToPhotos[0].photo.url}
+              alt={post.postsToPhotos[0].photo.title}
+              width={post.postsToPhotos[0].photo.width / 4}
+              height={post.postsToPhotos[0].photo.height / 4}
+              blurhash={post.postsToPhotos[0].photo.blurData}
+              className='object-contain w-full h-full'
+            />
+          </Link>
+          <div className='p-3 md:hidden'>
+            <span>{post.title}</span>
+          </div>
+        </>
       )}
 
       {post.type === 'ALBUM' &&

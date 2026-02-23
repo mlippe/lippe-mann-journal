@@ -1,16 +1,18 @@
 import { BrandsLogo } from '@/components/brands-logo';
 import { Separator } from '@/components/ui/separator';
 import { formatExposureTime, TExifData } from '@/modules/photos/lib/utils';
+import clsx from 'clsx';
+import { format } from 'date-fns';
 
 export const ExifPreview = ({
   exif,
   showLogo = true,
+  size = 'md',
 }: {
   exif: TExifData | null;
   showLogo?: boolean;
+  size?: 'sm' | 'md';
 }) => {
-  console.log('exif', exif);
-
   const hasAnyExifValue =
     exif &&
     Object.values(exif).some((value) => value !== undefined && value !== null);
@@ -27,43 +29,71 @@ export const ExifPreview = ({
 
   return (
     <div className='@container'>
-      <div className='flex flex-col gap-2 @sm:gap-4 @sm:flex-row'>
-        <div>
-          <h1 className='font-semibold text-sm  lg:text-lg'>
-            <span className='flex items-center  gap-1'>
+      <div
+        className={clsx(
+          'flex flex-col gap-2 @sm:gap-4 @sm:flex-row',
+          size === 'sm' && 'gap-1!',
+        )}
+      >
+        <div
+          className={clsx(size === 'sm' && 'flex gap-1 items-center flex-wrap')}
+        >
+          <p
+            className={clsx(
+              'font-semibold text-sm  lg:text-lg',
+              size === 'sm' && 'text-sm! font-medium!',
+            )}
+          >
+            <span className='flex items-center gap-1'>
               {exif.make} {exif.model}
             </span>
-          </h1>
-          <p className='text-sm text-gray-800'>{exif.lensModel}</p>
+          </p>
+          {size === 'sm' && <span className='text-gray-400'>·</span>}
+          <p
+            className={clsx(
+              'text-sm text-gray-800',
+              size === 'sm' && 'text-xs!',
+            )}
+          >
+            {exif.lensModel}
+          </p>
         </div>
         <div className='flex flex-col @sm:flex-row @sm:items-center gap-2 @sm:gap-4'>
           {showLogo && <BrandsLogo brand={exif.make || ''} />}
 
-          <Separator
-            orientation='horizontal'
-            className=' bg-gray-300 @sm:hidden'
-          />
-          <Separator
-            orientation='vertical'
-            className=' bg-gray-300 @sm:block hidden'
-          />
+          {size !== 'sm' && (
+            <>
+              <Separator
+                orientation='horizontal'
+                className=' bg-gray-200 @sm:hidden'
+              />
+              <Separator
+                orientation='vertical'
+                className=' bg-gray-200 @sm:block hidden'
+              />
+            </>
+          )}
           <div className='flex flex-col gap-0.5'>
-            <div className='space-x-1.5 text-sm lg:text-sm font-mono text-gray-800'>
-              <span>{exif.focalLength35mm && exif.focalLength35mm + 'mm'}</span>
+            <div
+              className={clsx(
+                'space-x-2 text-sm font-mono text-gray-800',
+                size === 'sm' && 'text-xs! flex-wrap flex',
+              )}
+            >
+              <span>{exif.focalLength && exif.focalLength + 'mm'}</span>
+              <span className='text-gray-400'>·</span>
               <span>{exif.fNumber && 'ƒ/' + exif.fNumber}</span>
+              <span className='text-gray-400'>·</span>
               <span>
                 {exif.exposureTime && formatExposureTime(exif.exposureTime)}
               </span>
+              <span className='text-gray-400'>·</span>
               <span>{exif.iso && 'ISO' + exif.iso}</span>
             </div>
-            <div className='flex items-center text-xs text-gray-600'>
+            <div className='flex items-center text-xs text-gray-500'>
               <p>
                 {exif.dateTimeOriginal &&
-                  new Date(exif.dateTimeOriginal).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  format(exif.dateTimeOriginal, 'dd.MM.yyyy')}
               </p>
             </div>
           </div>

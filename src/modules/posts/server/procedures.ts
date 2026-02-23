@@ -83,20 +83,28 @@ export const postsRouter = createTRPCRouter({
     }),
   getOne: protectedProcedure
     .input(z.object({ slug: z.string() }))
+    .output(postsWithPhotos)
     .query(async ({ ctx, input }) => {
-      const [data] = await ctx.db
-        .select()
-        .from(posts)
-        .where(eq(posts.slug, input.slug));
+      const post = await ctx.db.query.posts.findFirst({
+        where: eq(posts.slug, input.slug),
+        with: {
+          postsToPhotos: {
+            with: {
+              photo: true,
+            },
+            orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
+          },
+        },
+      });
 
-      if (!data) {
+      if (!post) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Post not found',
         });
       }
 
-      return data;
+      return post;
     }),
   getPostById: baseProcedure
     .input(z.object({ postId: z.string().uuid() }))

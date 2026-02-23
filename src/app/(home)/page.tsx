@@ -4,8 +4,6 @@ import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
-import ProfileCard from '@/modules/home/ui/components/profile-card';
-
 import Footer from '@/components/footer';
 import {
   FeaturedCollectionsView,
