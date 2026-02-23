@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import Footer from '@/components/footer';
 import { type PostWithPhotos } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,27 +8,46 @@ import Image from 'next/image';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { type PostGetPublished } from '@/modules/posts/types';
 import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
+import BlurImage from '@/components/blur-image';
 
 // A placeholder PostCard component to display different post types.
 const PostCard = ({ post }: { post: PostWithPhotos }) => {
+  if (post.type === 'ARTICLE') {
+    console.log(post);
+  }
   return (
-    <div className='p-4 border rounded-lg shadow-sm bg-card'>
-      <h2 className='text-xl font-bold mb-2'>{post.title}</h2>
+    <div className='bg-background aspect-[0.8] '>
+      {post.type === 'ARTICLE' &&
+        post.coverImage &&
+        post.coverImage?.length > 0 && (
+          <div className='h-full p-3'>
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              width={750}
+              height={750}
+              className='object-contain w-full h-full'
+            />
+          </div>
+        )}
 
-      {post.type === 'ARTICLE' && post.content && (
-        <div className='prose prose-sm dark:prose-invert max-h-24 overflow-hidden'>
-          {post.content}
+      {post.type === 'ARTICLE' && post.title && !post.coverImage && (
+        <div className='h-full p-3'>
+          <div className='bg-muted h-full flex items-center justify-center p-8'>
+            {post.title}
+          </div>
         </div>
       )}
 
       {post.type === 'PHOTO' && post.postsToPhotos && post.postsToPhotos[0] && (
-        <div className='rounded-md overflow-hidden'>
-          <Image
+        <div className='h-full p-3'>
+          <BlurImage
             src={post.postsToPhotos[0].photo.url}
             alt={post.postsToPhotos[0].photo.title}
-            width={post.postsToPhotos[0].photo.width}
-            height={post.postsToPhotos[0].photo.height}
-            className='w-full h-auto'
+            width={post.postsToPhotos[0].photo.width / 4}
+            height={post.postsToPhotos[0].photo.height / 4}
+            blurhash={post.postsToPhotos[0].photo.blurData}
+            className='object-contain w-full h-full'
           />
         </div>
       )}
@@ -37,21 +55,22 @@ const PostCard = ({ post }: { post: PostWithPhotos }) => {
       {post.type === 'ALBUM' &&
         post.postsToPhotos &&
         post.postsToPhotos.length > 0 && (
-          <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-            {post.postsToPhotos.map(({ photo }) => (
-              <div
-                key={photo.id}
-                className='rounded-md overflow-hidden aspect-square'
-              >
-                <Image
-                  src={photo.url}
-                  alt={photo.title}
-                  width={photo.width}
-                  height={photo.height}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            ))}
+          <div className='h-full p-3 relative group'>
+            <BlurImage
+              src={post.postsToPhotos[0].photo.url}
+              alt={post.postsToPhotos[0].photo.title}
+              width={post.postsToPhotos[0].photo.width / 4}
+              height={post.postsToPhotos[0].photo.height / 4}
+              blurhash={post.postsToPhotos[0].photo.blurData}
+              className='object-contain w-full h-full'
+            />
+            <Image
+              src={post.postsToPhotos[1].photo.url}
+              alt={post.postsToPhotos[1].photo.title}
+              width={post.postsToPhotos[1].photo.width / 4}
+              height={post.postsToPhotos[1].photo.height / 4}
+              className='absolute z-1 object-contain w-full h-full top-0 left-0 p-3 hidden group-hover:block'
+            />
           </div>
         )}
     </div>
@@ -107,8 +126,8 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
       .filter((post) => post.visibility === 'public') || [];
 
   return (
-    <div className='w-full max-w-3xl mx-auto space-y-8 py-8'>
-      <div className='space-y-8'>
+    <div className='w-full space-y-8 py-8'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-[0.06rem] border-y border-muted -mx-3 md:mx-0'>
         {posts.map((post, i: number) => (
           <div key={post.id} ref={i === posts.length - 1 ? lastPostRef : null}>
             <PostCard post={post} />

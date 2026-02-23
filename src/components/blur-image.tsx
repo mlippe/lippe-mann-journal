@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState, memo } from "react";
-import Image, { ImageProps } from "next/image";
-import { Blurhash } from "react-blurhash";
+import { useEffect, useMemo, useState, memo } from 'react';
+import Image, { ImageProps } from 'next/image';
+import { Blurhash } from 'react-blurhash';
 
 interface BlurImageProps extends Omit<
   ImageProps,
-  "onLoad" | "onLoadingComplete" | "priority"
+  'onLoad' | 'onLoadingComplete' | 'priority'
 > {
   blurhash: string;
 }
@@ -36,7 +36,7 @@ const BlurImageInner = function BlurImageInner({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-  const containerStyle = fill ? "absolute inset-0" : "relative w-full h-full";
+  const containerStyle = fill ? 'absolute inset-0' : 'relative w-full h-full';
 
   useEffect(() => {
     if (!imageLoaded) return;
@@ -55,16 +55,16 @@ const BlurImageInner = function BlurImageInner({
       {showBlurhash && (
         <div
           className={`absolute inset-0 ${
-            className ?? ""
+            className ?? ''
           } transition-opacity duration-500 ease-in-out ${
-            imageLoaded ? "opacity-0" : "opacity-100"
+            imageLoaded ? 'opacity-0' : 'opacity-100'
           }`}
-          style={{ pointerEvents: "none" }}
+          style={{ pointerEvents: 'none' }}
         >
           <Blurhash
             hash={blurhash}
-            width="100%"
-            height="100%"
+            width='100%'
+            height='100%'
             resolutionX={16}
             resolutionY={16}
             punch={1}
@@ -78,9 +78,9 @@ const BlurImageInner = function BlurImageInner({
         height={height}
         fill={fill}
         className={`${
-          className ?? ""
+          className ?? ''
         } transition-opacity duration-500 ease-in-out ${
-          imageLoaded ? "opacity-100" : "opacity-0"
+          imageLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         onLoad={() => {
           window.requestAnimationFrame(() => {
@@ -100,13 +100,13 @@ const BlurImageInner = function BlurImageInner({
 const BlurImage = memo(function BlurImage(props: BlurImageProps) {
   const srcKey = useMemo(() => {
     const src = props.src;
-    if (typeof src === "string") return src;
+    if (typeof src === 'string') return src;
 
-    if ("src" in src && typeof src.src === "string") {
+    if ('src' in src && typeof src.src === 'string') {
       return src.src;
     }
 
-    if ("default" in src && src.default && "src" in src.default) {
+    if ('default' in src && src.default && 'src' in src.default) {
       return src.default.src;
     }
 
