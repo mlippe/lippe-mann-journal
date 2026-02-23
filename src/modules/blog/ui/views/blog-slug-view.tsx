@@ -12,7 +12,7 @@ import RichTextViewer from '@/components/editor/rich-text-viewer';
 
 export const BlogSlugView = ({ slug }: { slug: string }) => {
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.blog.getOne.queryOptions({ slug }));
+  const { data } = useSuspenseQuery(trpc.posts.getOne.queryOptions({ slug }));
 
   return (
     <div className='flex flex-col gap-3 lg:gap-0 lg:flex-row w-full'>

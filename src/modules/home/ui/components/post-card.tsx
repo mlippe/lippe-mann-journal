@@ -22,10 +22,12 @@ import {
   IconPhotoStar,
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 interface PostCardProps {
   post: PostWithPhotos;
   className?: string;
+  index?: number;
 }
 
 const TYPE_CONFIG = {
@@ -43,7 +45,7 @@ const TYPE_CONFIG = {
   },
 } as const;
 
-export const PostCard = ({ post, className }: PostCardProps) => {
+export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   const isMobile = useIsMobile();
   const isArticle = post.type === 'ARTICLE';
 
@@ -59,6 +61,7 @@ export const PostCard = ({ post, className }: PostCardProps) => {
       : `/album/${post.slug}`;
 
   const ContentWrapper = shouldNavigate ? Link : 'div';
+  const isPriority = index < 3;
 
   return (
     <div
@@ -89,10 +92,15 @@ export const PostCard = ({ post, className }: PostCardProps) => {
 
         {isArticle ? (
           <ContentWrapper href={href} className='block h-full'>
-            <ArticleContent post={post} />
+            <ArticleContent post={post} priority={isPriority} />
           </ContentWrapper>
         ) : (
-          <MediaContent post={post} href={href} isMobile={isMobile} />
+          <MediaContent
+            post={post}
+            href={href}
+            isMobile={isMobile}
+            priority={isPriority}
+          />
         )}
       </div>
 
@@ -115,16 +123,23 @@ export const PostCard = ({ post, className }: PostCardProps) => {
   );
 };
 
-const ArticleContent = ({ post }: { post: PostWithPhotos }) => {
+const ArticleContent = ({
+  post,
+  priority,
+}: {
+  post: PostWithPhotos;
+  priority: boolean;
+}) => {
   if (post.coverImage && post.coverImage.length > 0) {
     return (
-      <div className='h-full p-3'>
+      <div className='h-full p-3 relative'>
         <Image
-          src={post.coverImage}
+          src={keyToUrl(post.coverImage)}
           alt={post.title}
-          width={750}
-          height={750}
-          className='object-contain w-full h-full'
+          fill
+          priority={priority}
+          sizes='(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)'
+          className='object-contain p-3'
         />
       </div>
     );
@@ -143,10 +158,12 @@ const MediaContent = ({
   post,
   href,
   isMobile,
+  priority,
 }: {
   post: PostWithPhotos;
   href: string;
   isMobile: boolean;
+  priority: boolean;
 }) => {
   const photos = post.postsToPhotos || [];
   const firstPhoto = photos[0]?.photo;
@@ -176,6 +193,9 @@ const MediaContent = ({
 
   if (!firstPhoto) return null;
 
+  const sizes =
+    '(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)';
+
   if (isMobile) {
     if (post.type === 'ALBUM' && photos.length > 1) {
       return (
@@ -199,14 +219,15 @@ const MediaContent = ({
               className='h-full w-full'
             >
               {photos.map((ptp, i) => (
-                <SwiperSlide key={ptp.photo.id} className='p-3 h-full'>
+                <SwiperSlide key={ptp.photo.id} className='p-3 h-full relative'>
                   <BlurImage
-                    src={ptp.photo.url}
+                    src={keyToUrl(ptp.photo.url)}
                     alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
-                    width={ptp.photo.width / 4}
-                    height={ptp.photo.height / 4}
+                    fill
+                    priority={priority && i === 0}
+                    sizes={sizes}
                     blurhash={ptp.photo.blurData}
-                    className='object-contain w-full h-full'
+                    className='object-contain p-3'
                   />
                 </SwiperSlide>
               ))}
@@ -229,14 +250,15 @@ const MediaContent = ({
               <div id='album-swiper-pagination' />
             </Swiper>
           ) : (
-            <div className='h-full w-full p-3'>
+            <div className='h-full w-full p-3 relative'>
               <BlurImage
-                src={firstPhoto.url}
+                src={keyToUrl(firstPhoto.url)}
                 alt={firstPhoto.title ?? post.title}
-                width={firstPhoto.width / 4}
-                height={firstPhoto.height / 4}
+                fill
+                priority={priority}
+                sizes={sizes}
                 blurhash={firstPhoto.blurData}
-                className='object-contain w-full h-full'
+                className='object-contain p-3'
               />
             </div>
           )}
@@ -245,14 +267,15 @@ const MediaContent = ({
     }
 
     return (
-      <div className='h-full w-full p-3'>
+      <div className='h-full w-full p-3 relative'>
         <BlurImage
-          src={firstPhoto.url}
+          src={keyToUrl(firstPhoto.url)}
           alt={firstPhoto.title ?? post.title}
-          width={firstPhoto.width / 4}
-          height={firstPhoto.height / 4}
+          fill
+          priority={priority}
+          sizes={sizes}
           blurhash={firstPhoto.blurData}
-          className='object-contain w-full h-full'
+          className='object-contain p-3'
         />
       </div>
     );
@@ -262,12 +285,13 @@ const MediaContent = ({
   return (
     <Link className='block h-full p-3 relative group' href={href}>
       <BlurImage
-        src={firstPhoto.url}
+        src={keyToUrl(firstPhoto.url)}
         alt={firstPhoto.title ?? post.title}
-        width={firstPhoto.width / 4}
-        height={firstPhoto.height / 4}
+        fill
+        priority={priority}
+        sizes={sizes}
         blurhash={firstPhoto.blurData}
-        className='object-contain w-full h-full transition-opacity duration-300'
+        className='object-contain p-3 transition-opacity duration-300'
       />
     </Link>
   );

@@ -6,7 +6,7 @@ import { Blurhash } from 'react-blurhash';
 
 interface BlurImageProps extends Omit<
   ImageProps,
-  'onLoad' | 'onLoadingComplete' | 'priority'
+  'onLoad' | 'onLoadingComplete'
 > {
   blurhash: string;
 }
@@ -21,6 +21,7 @@ interface BlurImageProps extends Omit<
  * @param {string} fill - The fill of the image.
  * @param {string} className - Optional className for the component.
  * @param {string} blurhash - The blurhash of the image.
+ * @param {boolean} priority - Whether the image should be prioritized for loading.
  * @returns {JSX.Element} - The BlurImage component.
  */
 const BlurImageInner = function BlurImageInner({
@@ -31,6 +32,7 @@ const BlurImageInner = function BlurImageInner({
   fill,
   className,
   blurhash,
+  priority,
   ...props
 }: BlurImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -74,9 +76,10 @@ const BlurImageInner = function BlurImageInner({
       <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
         fill={fill}
+        width={!fill ? width : undefined}
+        height={!fill ? height : undefined}
+        priority={priority}
         className={`${
           className ?? ''
         } transition-opacity duration-500 ease-in-out ${

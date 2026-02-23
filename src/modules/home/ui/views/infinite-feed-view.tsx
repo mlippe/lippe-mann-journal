@@ -55,7 +55,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
             key={post.id} 
             ref={i === posts.length - 1 ? lastElementRef : null}
           >
-            <PostCard post={post} />
+            <PostCard post={post} index={i} />
           </div>
         ))}
       </div>
