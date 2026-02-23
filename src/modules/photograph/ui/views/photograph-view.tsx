@@ -45,23 +45,22 @@ export const PhotographView = ({
 
   const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
 
-  const [exif, setExif] = useState<TExifData>(
-    post.postsToPhotos && post.postsToPhotos.at(0)
-      ? {
-          make: post.postsToPhotos.at(0)!.photo.make!,
-          model: post.postsToPhotos.at(0)!.photo.model!,
-          lensModel: post.postsToPhotos.at(0)!.photo.lensModel!,
-          focalLength: post.postsToPhotos.at(0)!.photo.focalLength!,
-          focalLength35mm: post.postsToPhotos.at(0)!.photo.focalLength35mm!,
-          fNumber: post.postsToPhotos.at(0)!.photo.fNumber!,
-          iso: post.postsToPhotos.at(0)!.photo.iso!,
-          exposureTime: post.postsToPhotos.at(0)!.photo.exposureTime!,
-          exposureCompensation:
-            post.postsToPhotos.at(0)!.photo.exposureCompensation!,
-          dateTimeOriginal: post.postsToPhotos.at(0)!.photo.dateTimeOriginal!,
-        }
-      : {},
-  );
+  const exif: TExifData = useMemo(() => {
+    const photo = post.postsToPhotos?.at(swiperActiveIndex)?.photo;
+    if (!photo) return {};
+    return {
+      make: photo.make ?? undefined,
+      model: photo.model ?? undefined,
+      lensModel: photo.lensModel ?? undefined,
+      focalLength: photo.focalLength ?? undefined,
+      focalLength35mm: photo.focalLength35mm ?? undefined,
+      fNumber: photo.fNumber ?? undefined,
+      iso: photo.iso ?? undefined,
+      exposureTime: photo.exposureTime ?? undefined,
+      exposureCompensation: photo.exposureCompensation ?? undefined,
+      dateTimeOriginal: photo.dateTimeOriginal ?? undefined,
+    };
+  }, [post.postsToPhotos, swiperActiveIndex]);
 
   const hasAnyExifValue = useMemo(
     () =>
@@ -82,25 +81,6 @@ export const PhotographView = ({
   };
 
   console.log('post data 2', post);
-
-  useEffect(() => {
-    setExif({
-      make: post.postsToPhotos.at(swiperActiveIndex)!.photo.make!,
-      model: post.postsToPhotos.at(swiperActiveIndex)!.photo.model!,
-      lensModel: post.postsToPhotos.at(swiperActiveIndex)!.photo.lensModel!,
-      focalLength: post.postsToPhotos.at(swiperActiveIndex)!.photo.focalLength!,
-      focalLength35mm:
-        post.postsToPhotos.at(swiperActiveIndex)!.photo.focalLength35mm!,
-      fNumber: post.postsToPhotos.at(swiperActiveIndex)!.photo.fNumber!,
-      iso: post.postsToPhotos.at(swiperActiveIndex)!.photo.iso!,
-      exposureTime:
-        post.postsToPhotos.at(swiperActiveIndex)!.photo.exposureTime!,
-      exposureCompensation:
-        post.postsToPhotos.at(swiperActiveIndex)!.photo.exposureCompensation!,
-      dateTimeOriginal:
-        post.postsToPhotos.at(swiperActiveIndex)!.photo.dateTimeOriginal!,
-    });
-  }, [swiperActiveIndex]);
 
   if (!post.postsToPhotos?.at(0)) {
     return null;
