@@ -14,22 +14,46 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/keyboard';
 import { Button } from '@/components/ui/button';
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconBook,
+  IconPhoto,
+  IconPhotoStar,
+} from '@tabler/icons-react';
+import { Badge } from '@/components/ui/badge';
 
 interface PostCardProps {
   post: PostWithPhotos;
   className?: string;
 }
 
+const TYPE_CONFIG = {
+  PHOTO: {
+    label: 'Photo',
+    icon: IconPhoto,
+  },
+  ALBUM: {
+    label: 'Album',
+    icon: IconPhotoStar,
+  },
+  ARTICLE: {
+    label: 'Article',
+    icon: IconBook,
+  },
+} as const;
+
 export const PostCard = ({ post, className }: PostCardProps) => {
   const isMobile = useIsMobile();
-  const isMediaPost = post.type === 'PHOTO' || post.type === 'ALBUM';
   const isArticle = post.type === 'ARTICLE';
+
+  const typeConfig = TYPE_CONFIG[post.type];
+  const TypeIcon = typeConfig.icon;
 
   // Only articles navigate on mobile. Everything navigates on desktop.
   const shouldNavigate = !isMobile || isArticle;
   const href = isArticle
-    ? `/post/${post.slug}`
+    ? `/article/${post.slug}`
     : post.type === 'PHOTO'
       ? `/photo/${post.slug}`
       : `/album/${post.slug}`;
@@ -39,13 +63,13 @@ export const PostCard = ({ post, className }: PostCardProps) => {
   return (
     <div
       className={cn(
-        'bg-background aspect-[0.8] md:hover:bg-muted-foreground/5 transition-colors duration-700 flex flex-col',
+        'bg-background aspect-[0.8] md:hover:bg-muted-foreground/5 transition-colors duration-500 flex flex-col group/card',
         className,
       )}
     >
-      {/* Mobile Header for Media Posts */}
-      {isMediaPost && (
-        <div className='p-3 md:hidden flex gap-2 items-center justify-between'>
+      {/* Mobile Header */}
+      {isMobile && (
+        <div className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'>
           <Author size='sm' />
           <p className='text-xs uppercase text-muted-foreground font-mono'>
             {formatRelativeCustom(post.createdAt)}
@@ -54,6 +78,15 @@ export const PostCard = ({ post, className }: PostCardProps) => {
       )}
 
       <div className='flex-1 min-h-0 relative'>
+        {/* Type Badge */}
+        <Badge
+          variant='default'
+          className='hidden md:flex absolute top-4 left-4 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[10px] uppercase tracking-widest gap-1.5 px-2 py-1 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
+        >
+          <TypeIcon size={12} className='text-background' />
+          {typeConfig.label}
+        </Badge>
+
         {isArticle ? (
           <ContentWrapper href={href} className='block h-full'>
             <ArticleContent post={post} />
@@ -63,10 +96,19 @@ export const PostCard = ({ post, className }: PostCardProps) => {
         )}
       </div>
 
-      {/* Mobile Footer for Media Posts */}
-      {isMediaPost && isMobile && (
-        <div className='p-3 md:hidden'>
-          <span className='text-sm line-clamp-3 font-medium'>{post.title}</span>
+      {/* Mobile Footer */}
+      {isMobile && (
+        <div className='p-3 pb-6 md:hidden flex gap-3 items-start'>
+          <Badge
+            variant='secondary'
+            className='text-[10px] uppercase tracking-widest gap-1.5 px-2 py-1 bg-background/80 backdrop-blur-sm border-none shadow-sm'
+          >
+            <TypeIcon size={12} className='text-muted-foreground' />
+            {typeConfig.label}
+          </Badge>
+          <span className='text-sm line-clamp-3 font-medium mt-0.5'>
+            {post.title}
+          </span>
         </div>
       )}
     </div>
@@ -108,7 +150,6 @@ const MediaContent = ({
 }) => {
   const photos = post.postsToPhotos || [];
   const firstPhoto = photos[0]?.photo;
-  const secondPhoto = photos[1]?.photo;
 
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -226,19 +267,8 @@ const MediaContent = ({
         width={firstPhoto.width / 4}
         height={firstPhoto.height / 4}
         blurhash={firstPhoto.blurData}
-        className='object-contain w-full h-full transition-opacity duration-300 group-hover:opacity-0'
+        className='object-contain w-full h-full transition-opacity duration-300'
       />
-      {post.type === 'ALBUM' && secondPhoto && (
-        <div className='absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-          <Image
-            src={secondPhoto.url}
-            alt={secondPhoto.title ?? post.title}
-            width={secondPhoto.width / 4}
-            height={secondPhoto.height / 4}
-            className='object-contain w-full h-full'
-          />
-        </div>
-      )}
     </Link>
   );
 };
