@@ -7,6 +7,7 @@ import Footer from '@/components/footer';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import RichTextViewer from '@/components/editor/rich-text-viewer';
 import { format } from 'date-fns';
+import { FeedPreview } from '@/modules/home/ui/components/feed-preview';
 
 export const ArticleSlugView = ({ slug }: { slug: string }) => {
   const trpc = useTRPC();
@@ -37,6 +38,7 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
         {/* POST PREVIEW */}
         <RichTextViewer content={data.content || ''} />
       </div>
+      <FeedPreview />
       <div className='mt-10 w-full'>
         <Footer />
       </div>
