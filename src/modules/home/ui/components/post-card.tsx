@@ -17,13 +17,30 @@ import { Button } from '@/components/ui/button';
 import {
   IconArrowLeft,
   IconArrowRight,
+  IconArrowUpRight,
   IconFileText,
   IconLibraryPhoto,
+  IconPhoto,
   IconTextSize,
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import clsx from 'clsx';
+
+const POST_TYPE_INFO = {
+  PHOTO: {
+    icon: IconPhoto,
+    displayString: 'Photo',
+  },
+  ALBUM: {
+    icon: IconLibraryPhoto,
+    displayString: 'Album',
+  },
+  ARTICLE: {
+    icon: IconTextSize,
+    displayString: 'Article',
+  },
+} as const;
 
 interface PostCardProps {
   post: PostWithPhotos;
@@ -34,16 +51,16 @@ interface PostCardProps {
 export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   const isMobile = useIsMobile();
   const isArticle = post.type === 'ARTICLE';
+  const PostTypeIcon = POST_TYPE_INFO[post.type].icon;
+  const postTypeString = POST_TYPE_INFO[post.type].displayString;
 
-  // Only articles navigate on mobile. Everything navigates on desktop.
-  const shouldNavigate = !isMobile || isArticle;
   const href = isArticle
     ? `/article/${post.slug}`
     : post.type === 'PHOTO'
       ? `/photo/${post.slug}`
       : `/album/${post.slug}`;
 
-  const ContentWrapper = shouldNavigate ? Link : 'div';
+  const ContentWrapper = !isMobile ? Link : 'div';
   const isPriority = index < 3;
 
   return (
@@ -56,7 +73,15 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       {/* Mobile Header */}
       {isMobile && (
         <div className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'>
-          <Author size='sm' />
+          <div className='flex items-center gap-2'>
+            <div className='size-9 bg-muted rounded-full flex justify-center items-center'>
+              <PostTypeIcon className='size-4.5!' />
+            </div>
+            <span className='block text-sm font-medium whitespace-nowrap'>
+              {postTypeString}
+            </span>
+          </div>
+          {/* <Author size='sm' /> */}
           <p className='text-xs uppercase text-muted-foreground font-mono'>
             {formatRelativeCustom(post.createdAt)}
           </p>
@@ -69,9 +94,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           variant='default'
           className='hidden md:flex absolute bottom-10 left-1/2 -translate-x-1/2 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
         >
-          View {post.type === 'PHOTO' && 'Photo'}
-          {post.type === 'ALBUM' && 'Album'}
-          {post.type === 'ARTICLE' && 'Article'}
+          View {postTypeString}
         </Badge>
 
         {/* Type Badge */}
@@ -80,13 +103,10 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             variant='secondary'
             className={clsx(
               'hidden md:flex absolute top-4 right-4 z-20 pointer-events-none  px-2.5 py-1.5 bg-background/80 backdrop-blur-sm  shadow-sm ',
-              post.type === 'ARTICLE' && 'flex!',
+              isArticle && 'bg-foreground/80 text-background',
             )}
           >
-            {post.type === 'ALBUM' && (
-              <IconLibraryPhoto className='size-4.5!' />
-            )}
-            {post.type === 'ARTICLE' && <IconTextSize className='size-4.5!' />}
+            <PostTypeIcon className='size-4.5!' />
           </Badge>
         )}
 
@@ -110,15 +130,17 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <span className='text-sm line-clamp-3 font-medium block mt-2'>
             {post.title}
           </span>
-          {post.type === 'ARTICLE' && (
-            <Button
-              variant='default'
-              className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
-              asChild
-            >
-              <Link href={href}>Open Article</Link>
-            </Button>
-          )}
+
+          <Button
+            variant='secondary'
+            className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
+            asChild
+          >
+            <Link href={href}>
+              <IconArrowUpRight />
+              {isArticle && 'read article'}
+            </Link>
+          </Button>
         </div>
       )}
     </div>
