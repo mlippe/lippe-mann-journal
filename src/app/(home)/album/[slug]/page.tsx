@@ -21,8 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const AlbumPage = async ({ params }: Props) => {
   const { slug } = await params;
-  return <PhotographDetailPage slug={slug} isModal={false} showFeed={true} />;
+  return <PhotographDetailPage slug={slug} isModal={false} />;
 };
 
 export default AlbumPage;
-

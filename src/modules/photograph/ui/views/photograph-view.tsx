@@ -34,6 +34,9 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/keyboard';
 
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+
 export const PhotographView = ({
   post,
   isModal = true,
@@ -42,8 +45,16 @@ export const PhotographView = ({
   isModal?: boolean;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
-
   const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
+  const router = useRouter();
+  const isMobile = useIsMobile();
+
+  const handleOpenChange = (openState: boolean) => {
+    if (openState === false) {
+      router.back();
+    }
+    setIsModalOpen(openState);
+  };
 
   const exif: TExifData = useMemo(() => {
     const photo = post.postsToPhotos?.at(swiperActiveIndex)?.photo;
@@ -63,209 +74,275 @@ export const PhotographView = ({
   }, [post.postsToPhotos, swiperActiveIndex]);
 
   const hasAnyExifValue = useMemo(
-    () =>
-      Object.values(exif).some(
-        (value) => value !== undefined && value !== null,
-      ),
+    () => Object.values(exif).some((v) => v !== undefined && v !== null),
     [exif],
   );
 
-  const router = useRouter();
+  if (!post.postsToPhotos?.at(0)) return null;
 
-  const handleOpenChange = (openState: boolean) => {
-    console.log(openState);
-    if (openState === false) {
-      router.back();
-    }
-    setIsModalOpen(openState);
-  };
+  const photos = post.postsToPhotos;
+  const isAlbum = photos.length > 1;
 
-  console.log('post data 2', post);
+  const MediaSection = (
+    <div
+      className={cn(
+        'bg-background p-3 relative group flex items-center justify-center',
+        isModal ? 'w-13/16 h-full' : 'w-full md:w-13/16 min-h-[50vh]',
+      )}
+    >
+      {isAlbum ? (
+        <>
+          <Swiper
+            id='album-swiper'
+            modules={[Navigation, Pagination, Keyboard]}
+            slidesPerView={1}
+            onSlideChange={(s) => setSwiperActiveIndex(s.realIndex)}
+            loop
+            className='w-full h-full'
+            keyboard={{ enabled: true }}
+            navigation={{
+              prevEl: '#album-swiper-prev',
+              nextEl: '#album-swiper-next',
+            }}
+            pagination={{ el: '#album-swiper-pagination', clickable: true }}
+          >
+            {photos.map((ptp, i) => (
+              <SwiperSlide
+                key={ptp.photo.id}
+                className='h-full flex items-center justify-center cursor-ew-resize'
+              >
+                <Image
+                  src={keyToUrl(ptp.photo.url)}
+                  alt={post.title}
+                  width={ptp.photo.width}
+                  height={ptp.photo.height}
+                  className='max-w-full max-h-full w-full h-full object-contain'
+                  priority={i === 0}
+                />
+              </SwiperSlide>
+            ))}
+            <Button
+              id='album-swiper-prev'
+              size='icon-sm'
+              className='absolute top-1/2 left-1 -translate-y-1/2 z-10 bg-background/50 backdrop-blur-sm border-none'
+              variant='outline'
+            >
+              <IconArrowLeft />
+            </Button>
+            <Button
+              id='album-swiper-next'
+              size='icon-sm'
+              className='absolute top-1/2 right-1 -translate-y-1/2 z-10 bg-background/50 backdrop-blur-sm border-none'
+              variant='outline'
+            >
+              <IconArrowRight />
+            </Button>
+            <div id='album-swiper-pagination' />
+          </Swiper>
+          <Button
+            size='icon-sm'
+            asChild
+            className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10'
+            variant='outline'
+          >
+            <Link
+              target='_blank'
+              href={keyToUrl(photos[swiperActiveIndex].photo.url)}
+            >
+              <IconArrowsMaximize />
+            </Link>
+          </Button>
+        </>
+      ) : (
+        <div className='flex items-center justify-center w-full h-full relative'>
+          <Image
+            src={keyToUrl(photos[0].photo.url)}
+            alt={post.title}
+            width={photos[0].photo.width}
+            height={photos[0].photo.height}
+            className='max-w-full max-h-full object-contain'
+            priority
+          />
+          <Button
+            size='icon-sm'
+            asChild
+            className='absolute top-3 right-3 opacity-0 group-hover:opacity-100'
+            variant='outline'
+          >
+            <Link target='_blank' href={keyToUrl(photos[0].photo.url)}>
+              <IconArrowsMaximize />
+            </Link>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 
-  if (!post.postsToPhotos?.at(0)) {
-    return null;
+  const MediaSectionMobile = (
+    <div className='bg-background p-3 relative group flex flex-col w-full'>
+      {isAlbum ? (
+        <>
+          {photos.map((ptp, i) => (
+            <div key={ptp.photo.id} className='mt-6 relative'>
+              <Image
+                src={keyToUrl(ptp.photo.url)}
+                alt={post.title}
+                width={ptp.photo.width}
+                height={ptp.photo.height}
+                className='max-w-full  w-full h-full object-contain max-h-screen'
+                priority={i === 0}
+              />
+              {ptp.photo.make && (
+                <div className='p-3 bg-muted/50'>
+                  <ExifPreview
+                    exif={{
+                      make: ptp.photo.make ?? undefined,
+                      model: ptp.photo.model ?? undefined,
+                      lensModel: ptp.photo.lensModel ?? undefined,
+                      focalLength: ptp.photo.focalLength ?? undefined,
+                      focalLength35mm: ptp.photo.focalLength35mm ?? undefined,
+                      fNumber: ptp.photo.fNumber ?? undefined,
+                      iso: ptp.photo.iso ?? undefined,
+                      exposureTime: ptp.photo.exposureTime ?? undefined,
+                      exposureCompensation:
+                        ptp.photo.exposureCompensation ?? undefined,
+                      dateTimeOriginal: ptp.photo.dateTimeOriginal ?? undefined,
+                    }}
+                    showLogo={false}
+                    size='sm'
+                  />
+                </div>
+              )}
+              <Button
+                size='icon-sm'
+                asChild
+                className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
+                variant='outline'
+              >
+                <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
+                  <IconArrowsMaximize className='size-3.5!' />
+                </Link>
+              </Button>
+            </div>
+          ))}
+        </>
+      ) : (
+        <div className='mt-6 relative'>
+          <Image
+            src={keyToUrl(photos[0].photo.url)}
+            alt={post.title}
+            width={photos[0].photo.width}
+            height={photos[0].photo.height}
+            className='max-w-full  w-full h-full object-contain max-h-screen'
+            priority
+          />
+          {photos[0].photo.make && (
+            <div className='p-3 bg-muted/50'>
+              <ExifPreview
+                exif={{
+                  make: photos[0].photo.make ?? undefined,
+                  model: photos[0].photo.model ?? undefined,
+                  lensModel: photos[0].photo.lensModel ?? undefined,
+                  focalLength: photos[0].photo.focalLength ?? undefined,
+                  focalLength35mm: photos[0].photo.focalLength35mm ?? undefined,
+                  fNumber: photos[0].photo.fNumber ?? undefined,
+                  iso: photos[0].photo.iso ?? undefined,
+                  exposureTime: photos[0].photo.exposureTime ?? undefined,
+                  exposureCompensation:
+                    photos[0].photo.exposureCompensation ?? undefined,
+                  dateTimeOriginal:
+                    photos[0].photo.dateTimeOriginal ?? undefined,
+                }}
+                showLogo={false}
+                size='sm'
+              />
+            </div>
+          )}
+          <Button
+            size='icon-sm'
+            asChild
+            className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
+            variant='outline'
+          >
+            <Link target='_blank' href={keyToUrl(photos[0].photo.url)}>
+              <IconArrowsMaximize className='size-3.5!' />
+            </Link>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
+  const InfoSection = (
+    <div
+      className={cn(
+        'flex flex-col justify-between backdrop-blur-xl',
+        isModal
+          ? 'h-full bg-background/95 w-3/16'
+          : 'bg-muted/50 w-full md:w-3/16',
+      )}
+    >
+      <div>
+        <div className='flex items-center justify-between border-b p-3 gap-1'>
+          <Author size='sm' />
+          {isModal && (
+            <DialogClose asChild>
+              <Button variant='ghost' size='icon-sm'>
+                <IconX />
+              </Button>
+            </DialogClose>
+          )}
+        </div>
+        <div className='p-3'>
+          <p className='font-medium'>{post.title}</p>
+          <p className='text-xs text-muted-foreground'>
+            {format(post.createdAt, 'dd.MM.yyyy')}
+          </p>
+        </div>
+      </div>
+      {hasAnyExifValue && !isMobile && (
+        <div className='p-3 border-t'>
+          <ExifPreview exif={exif} showLogo={false} size='sm' />
+        </div>
+      )}
+    </div>
+  );
+
+  const MainContent = (
+    <div
+      className={cn(
+        'flex overflow-hidden min-h-0 min-w-0',
+        isModal
+          ? 'rounded-sm w-full h-full'
+          : 'flex-col md:flex-row w-full border border-border/50 max-h-[calc(100vh-5rem)] mt-12',
+      )}
+    >
+      {MediaSection}
+      {InfoSection}
+    </div>
+  );
+
+  const MainContentMobile = (
+    <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3'>
+      {InfoSection}
+      {MediaSectionMobile}
+    </div>
+  );
+
+  if (!isModal) {
+    return isMobile ? MainContentMobile : MainContent;
   }
 
-  return isModal ? (
+  return (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
         className='bg-transparent border-none max-w-[calc(100%-2rem)]! w-full shadow-none h-full max-h-[calc(100%-2rem)]!'
       >
-        <div className='flex rounded-sm overflow-hidden w-full h-full min-h-0 min-w-0'>
-          <div className='bg-background p-3 w-13/16 relative group flex items-center justify-center h-full'>
-            {post.postsToPhotos && post.postsToPhotos.length > 1 ? (
-              <>
-                <Swiper
-                  id='album-swiper'
-                  modules={[Navigation, Pagination, Keyboard]}
-                  slidesPerView={1}
-                  onSlideChange={(active) =>
-                    setSwiperActiveIndex(active.realIndex)
-                  }
-                  autoHeight={false}
-                  loop
-                  className='min-h-0 w-full h-full'
-                  keyboard={{ enabled: true }}
-                  navigation={{
-                    prevEl: '#album-swiper-prev',
-                    nextEl: '#album-swiper-next',
-                  }}
-                  pagination={{
-                    el: '#album-swiper-pagination',
-                    clickable: true,
-                  }}
-                >
-                  <Button
-                    id='album-swiper-prev'
-                    size='icon-sm'
-                    className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
-                    variant='outline'
-                  >
-                    <IconArrowLeft />
-                  </Button>
-                  <Button
-                    id='album-swiper-next'
-                    size='icon-sm'
-                    className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
-                    variant='outline'
-                  >
-                    <IconArrowRight />
-                  </Button>
-                  <div id='album-swiper-pagination' />
-                  {post.postsToPhotos.map((photo, i) => (
-                    <SwiperSlide
-                      key={`slide-${i}`}
-                      className='h-full flex items-center justify-center cursor-ew-resize'
-                    >
-                      <Image
-                        src={keyToUrl(photo.photo.url)}
-                        alt={post.title}
-                        width={photo.photo.width}
-                        height={photo.photo.height}
-                        className='max-w-full max-h-full w-full h-full object-contain'
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-                <Button
-                  size='icon-sm'
-                  asChild
-                  className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10'
-                  variant='outline'
-                >
-                  <Link
-                    target='_blank'
-                    href={keyToUrl(
-                      post.postsToPhotos?.at(swiperActiveIndex)!.photo.url,
-                    )}
-                  >
-                    <IconArrowsMaximize />
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <div className='flex items-center justify-center w-full h-full'>
-                <Image
-                  src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-                  alt={post.title}
-                  width={post.postsToPhotos?.at(0)!.photo.width}
-                  height={post.postsToPhotos?.at(0)!.photo.height}
-                  className='max-w-full max-h-full object-contain'
-                />
-                <Button
-                  size='icon-sm'
-                  asChild
-                  className='absolute top-3 right-3 opacity-0 group-hover:opacity-100'
-                  variant='outline'
-                >
-                  <Link
-                    target='_blank'
-                    href={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-                  >
-                    <IconArrowsMaximize />
-                  </Link>
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className='h-full bg-background/95  backdrop-blur-xl w-3/16 flex flex-col justify-between'>
-            <div>
-              <div className='flex items-center justify-between border-b p-3 gap-1'>
-                <Author size='sm' />
-                <DialogClose asChild>
-                  <Button
-                    variant='ghost'
-                    className='cursor-pointer'
-                    size='icon-sm'
-                  >
-                    <IconX />
-                  </Button>
-                </DialogClose>
-              </div>
-              <div className='p-3'>
-                <p>{post.title}</p>
-                <p className='text-xs text-muted-foreground'>
-                  {format(post.createdAt, 'dd.MM.yyyy')}
-                </p>
-              </div>
-            </div>
-            {hasAnyExifValue && (
-              <div className='p-3 border-t'>
-                <ExifPreview exif={exif} showLogo={false} size='sm' />
-              </div>
-            )}
-          </div>
-        </div>
-
+        {MainContent}
         <DialogTitle className='hidden'>{post.title}</DialogTitle>
       </DialogContent>
     </Dialog>
-  ) : (
-    <div className='w-full mt-12 border border-border/50 max-h-screen '>
-      <div className='flex  w-full min-h-0 min-w-0 max-h-screen md:flex-row flex-col '>
-        <div className='bg-background p-3 md:w-13/16 relative group'>
-          <Image
-            src={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-            alt={post.title}
-            width={post.postsToPhotos?.at(0)!.photo.width}
-            height={post.postsToPhotos?.at(0)!.photo.height}
-            className='max-w-full max-h-full object-contain'
-          />
-          <Button
-            size='icon-lg'
-            asChild
-            className='absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100'
-            variant='outline'
-          >
-            <Link
-              target='_blank'
-              href={keyToUrl(post.postsToPhotos?.at(0)!.photo.url)}
-            >
-              <IconArrowsMaximize />
-            </Link>
-          </Button>
-        </div>
-        <div className='bg-muted/50  backdrop-blur-xl md:w-3/16 flex flex-col justify-between'>
-          <div>
-            <div className='flex items-center justify-between border-b p-3 gap-1'>
-              <Author size='sm' />
-            </div>
-            <div className='p-3'>
-              <p>{post.title}</p>
-              <p className='text-xs text-muted-foreground'>
-                {format(post.createdAt, 'dd.MM.yyyy')}
-              </p>
-            </div>
-          </div>
-          {hasAnyExifValue && (
-            <div className='p-3 border-t max-w-sm'>
-              <ExifPreview exif={exif} showLogo={false} size='sm' />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
   );
 };
 
