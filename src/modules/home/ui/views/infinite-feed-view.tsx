@@ -42,24 +42,26 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   });
 
   const posts = useMemo(() => {
-    return data?.pages
-      .flatMap((page) => (page.items as PostWithPhotos[]) || [])
-      .filter((post) => post.visibility === 'public') || [];
+    return (
+      data?.pages
+        .flatMap((page) => (page.items as PostWithPhotos[]) || [])
+        .filter((post) => post.visibility === 'public') || []
+    );
   }, [data?.pages]);
 
   return (
-    <div className='w-full space-y-8 py-8'>
+    <div className='w-full space-y-8 py-8 max-w-528 mx-auto'>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-[0.06rem] border-y border-muted -mx-3 md:mx-0'>
         {posts.map((post, i) => (
-          <div 
-            key={post.id} 
+          <div
+            key={post.id}
             ref={i === posts.length - 1 ? lastElementRef : null}
           >
             <PostCard post={post} index={i} />
           </div>
         ))}
       </div>
-      
+
       {isFetchingNextPage && <LoadingSkeletons count={2} />}
     </div>
   );

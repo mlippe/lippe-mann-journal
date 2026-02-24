@@ -17,12 +17,13 @@ import { Button } from '@/components/ui/button';
 import {
   IconArrowLeft,
   IconArrowRight,
-  IconBook,
-  IconPhoto,
-  IconPhotoStar,
+  IconFileText,
+  IconLibraryPhoto,
+  IconTextSize,
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import clsx from 'clsx';
 
 interface PostCardProps {
   post: PostWithPhotos;
@@ -30,27 +31,9 @@ interface PostCardProps {
   index?: number;
 }
 
-const TYPE_CONFIG = {
-  PHOTO: {
-    label: 'Photo',
-    icon: IconPhoto,
-  },
-  ALBUM: {
-    label: 'Album',
-    icon: IconPhotoStar,
-  },
-  ARTICLE: {
-    label: 'Article',
-    icon: IconBook,
-  },
-} as const;
-
 export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   const isMobile = useIsMobile();
   const isArticle = post.type === 'ARTICLE';
-
-  const typeConfig = TYPE_CONFIG[post.type];
-  const TypeIcon = typeConfig.icon;
 
   // Only articles navigate on mobile. Everything navigates on desktop.
   const shouldNavigate = !isMobile || isArticle;
@@ -81,14 +64,31 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       )}
 
       <div className='flex-1 min-h-0 relative'>
-        {/* Type Badge */}
+        {/* Open Badge */}
         <Badge
           variant='default'
-          className='hidden md:flex absolute top-4 left-4 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[10px] uppercase tracking-widest gap-1.5 px-2 py-1 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
+          className='hidden md:flex absolute bottom-10 left-1/2 -translate-x-1/2 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
         >
-          <TypeIcon size={12} className='text-background' />
-          {typeConfig.label}
+          View {post.type === 'PHOTO' && 'Photo'}
+          {post.type === 'ALBUM' && 'Album'}
+          {post.type === 'ARTICLE' && 'Article'}
         </Badge>
+
+        {/* Type Badge */}
+        {(post.type === 'ALBUM' || post.type === 'ARTICLE') && (
+          <Badge
+            variant='secondary'
+            className={clsx(
+              'hidden md:flex absolute top-4 right-4 z-20 pointer-events-none  px-2.5 py-1.5 bg-background/80 backdrop-blur-sm  shadow-sm ',
+              post.type === 'ARTICLE' && 'flex!',
+            )}
+          >
+            {post.type === 'ALBUM' && (
+              <IconLibraryPhoto className='size-4.5!' />
+            )}
+            {post.type === 'ARTICLE' && <IconTextSize className='size-4.5!' />}
+          </Badge>
+        )}
 
         {isArticle ? (
           <ContentWrapper href={href} className='block h-full'>
@@ -106,17 +106,19 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
 
       {/* Mobile Footer */}
       {isMobile && (
-        <div className='p-3 pb-6 md:hidden flex gap-3 items-start'>
-          <Badge
-            variant='secondary'
-            className='text-[10px] uppercase tracking-widest gap-1.5 px-2 py-1 bg-background/80 backdrop-blur-sm border-none shadow-sm'
-          >
-            <TypeIcon size={12} className='text-muted-foreground' />
-            {typeConfig.label}
-          </Badge>
-          <span className='text-sm line-clamp-3 font-medium mt-0.5'>
+        <div className='p-3 pb-6 md:hidden flex gap-2 justify-between w-full '>
+          <span className='text-sm line-clamp-3 font-medium block mt-2'>
             {post.title}
           </span>
+          {post.type === 'ARTICLE' && (
+            <Button
+              variant='default'
+              className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
+              asChild
+            >
+              <Link href={href}>Open Article</Link>
+            </Button>
+          )}
         </div>
       )}
     </div>
