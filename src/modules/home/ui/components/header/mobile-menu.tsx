@@ -14,8 +14,8 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
+  { label: 'Feed', href: '/' },
+  { label: 'Über dieses Journal', href: '/about' },
 ];
 
 interface Props {
@@ -60,7 +60,7 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
                 className='fixed top-3 right-3 z-50 bg-background rounded-bl-[18px] cursor-pointer select-none'
               >
                 <div className='relative pb-3 pl-4 pr-1'>
-                  <h1 className='text-sm font-light'>Close</h1>
+                  <h1 className='text-sm font-light'>Schließen</h1>
                   <Graphic className='absolute -bottom-4 right-0 rotate-90' />
                   <Graphic className='absolute -left-4 top-0 rotate-90' />
                 </div>
@@ -68,7 +68,7 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
 
               <div className='flex gap-4 items-center'>
                 {/* AVATAR  */}
-                <Avatar className='size-[60px]'>
+                <Avatar className='size-15'>
                   <AvatarImage src={siteConfig.avatar} alt='Avatar' />
                   <AvatarFallback>{siteConfig.initials}</AvatarFallback>
                 </Avatar>

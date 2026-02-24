@@ -1,7 +1,6 @@
 import { type PostWithPhotos } from '@/db/schema';
 import Image from 'next/image';
 import Link from 'next/link';
-import Author from '@/components/author';
 import BlurImage from '@/components/blur-image';
 import { formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
@@ -18,7 +17,6 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconArrowUpRight,
-  IconFileText,
   IconLibraryPhoto,
   IconPhoto,
   IconTextSize,
@@ -30,15 +28,18 @@ import clsx from 'clsx';
 const POST_TYPE_INFO = {
   PHOTO: {
     icon: IconPhoto,
-    displayString: 'Photo',
+    displayString: 'Foto',
+    actionString: 'Foto ansehen',
   },
   ALBUM: {
     icon: IconLibraryPhoto,
     displayString: 'Album',
+    actionString: 'Album ansehen',
   },
   ARTICLE: {
     icon: IconTextSize,
-    displayString: 'Article',
+    displayString: 'Artikel',
+    actionString: 'Artikel lesen',
   },
 } as const;
 
@@ -52,7 +53,8 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   const isMobile = useIsMobile();
   const isArticle = post.type === 'ARTICLE';
   const PostTypeIcon = POST_TYPE_INFO[post.type].icon;
-  const postTypeString = POST_TYPE_INFO[post.type].displayString;
+  const postTypeDisplayString = POST_TYPE_INFO[post.type].displayString;
+  const postTypeActionString = POST_TYPE_INFO[post.type].actionString;
 
   const href = isArticle
     ? `/article/${post.slug}`
@@ -78,7 +80,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
               <PostTypeIcon className='size-4.5!' />
             </div>
             <span className='block text-sm font-medium whitespace-nowrap'>
-              {postTypeString}
+              {postTypeDisplayString}
             </span>
           </div>
           {/* <Author size='sm' /> */}
@@ -94,7 +96,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           variant='default'
           className='hidden md:flex absolute bottom-10 left-1/2 -translate-x-1/2 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
         >
-          View {postTypeString}
+          {postTypeActionString}
         </Badge>
 
         {/* Type Badge */}
@@ -143,7 +145,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             ) : (
               <Link href={href}>
                 <IconArrowUpRight />
-                {isArticle && 'read article'}
+                {isArticle && 'Artikel lesen'}
               </Link>
             )}
           </Button>

@@ -29,7 +29,7 @@ const IntroCard = () => {
           </div>
         </div>
 
-        <div className='lg:mt-4 xl:mt-0'>
+        <div className='xl:mt-0'>
           <p className='text-center text-foreground text-lg'>
             {siteConfig.bio}
           </p>

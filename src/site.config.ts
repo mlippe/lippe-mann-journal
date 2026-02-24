@@ -18,13 +18,13 @@ export const siteConfig = {
   name: 'Manuel Lippmann',
 
   /** Tagline shown alongside name (e.g. "Photo", "Photography") */
-  tagline: 'Back to Feed',
+  tagline: 'Zum Feed',
 
   /** Your role/title shown in profile cards and footer */
-  role: 'Digital product engineer, Content creator',
+  role: 'Digital Product Engineer',
 
   /** Short bio shown on the home page profile card */
-  bio: 'Welcome to my journal. I capture moments of everyday life, share current projects and thoughts.',
+  bio: 'In diesem Journal teile ich Bilder aus dem täglichen Leben, Einblicke in aktuelle Projekte und Gedankenfetzen.',
 
   /** Avatar image path (place your avatar in /public/avatar.jpg) */
   avatar: '/avatar.jpg',

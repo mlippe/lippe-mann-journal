@@ -2,7 +2,7 @@ import { Editor } from '@tiptap/core';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { formatRelative } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { de } from 'date-fns/locale';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -98,16 +98,16 @@ export function formatRelativeCustom(
   customStrings: CustomStrings = {},
 ) {
   const defaultFormatMap: Record<RelativeToken, string> = {
-    lastWeek: "'Last' eeee',' p",
-    yesterday: "'Yesterday,' p",
-    today: "'Today,' p",
-    tomorrow: "'Tomorrow,' p",
-    nextWeek: "eeee 'at' p",
+    lastWeek: "eeee',' p",
+    yesterday: "'Gestern,' p",
+    today: "'Heute,' p",
+    tomorrow: "'Morgen,' p",
+    nextWeek: "eeee 'um' p",
     other: 'P',
   };
 
   const locale = {
-    ...enUS,
+    ...de,
     formatRelative: (token: RelativeToken) => {
       return customStrings[token] ?? defaultFormatMap[token];
     },

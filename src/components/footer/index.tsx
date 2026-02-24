@@ -20,10 +20,10 @@ const Footer = () => {
       </div>
       <div className='grid lg:w-full grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-14'>
         <FooterNav
-          title='Pages'
+          title='Seiten'
           links={[
-            { title: 'Home', href: '/' },
-            { title: 'About', href: '/about' },
+            { title: 'Feed', href: '/' },
+            { title: 'Über das Journal', href: '/about' },
           ]}
         />
       </div>
