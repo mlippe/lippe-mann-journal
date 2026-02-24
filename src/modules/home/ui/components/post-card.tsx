@@ -68,7 +68,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   return (
     <div
       className={cn(
-        'bg-background aspect-[0.8] md:hover:bg-muted-foreground/5 transition-colors duration-500 flex flex-col group/card',
+        'bg-background lg:aspect-[0.8] md:hover:bg-muted-foreground/5 transition-colors duration-500 flex flex-col group/card',
         className,
       )}
     >
@@ -90,7 +90,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         </div>
       )}
 
-      <div className='flex-1 min-h-0 relative'>
+      <div className='flex-1 min-h-0 relative aspect-[0.8]'>
         {/* Open Badge */}
         <Badge
           variant='default'
@@ -231,57 +231,65 @@ const MediaContent = ({
   if (isMobile) {
     if (post.type === 'ALBUM' && photos.length > 1) {
       return (
-        <div ref={containerRef} className='h-full w-full'>
+        <div
+          id='album-swiper'
+          ref={containerRef}
+          className='h-full w-full relative'
+        >
           {shouldRenderSwiper ? (
-            <Swiper
-              id='album-swiper'
-              modules={[Navigation, Pagination, Keyboard]}
-              slidesPerView={1}
-              autoHeight={false}
-              loop
-              keyboard={{ enabled: true }}
-              navigation={{
-                prevEl: '#album-swiper-prev',
-                nextEl: '#album-swiper-next',
-              }}
-              pagination={{
-                el: '#album-swiper-pagination',
-                clickable: true,
-              }}
-              className='h-full w-full'
-            >
-              {photos.map((ptp, i) => (
-                <SwiperSlide key={ptp.photo.id} className='p-3 h-full relative'>
-                  <BlurImage
-                    src={keyToUrl(ptp.photo.url)}
-                    alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
-                    fill
-                    priority={priority && i === 0}
-                    sizes={sizes}
-                    blurhash={ptp.photo.blurData}
-                    aspectRatio={ptp.photo.aspectRatio ?? undefined}
-                    className='object-contain p-3'
-                  />
-                </SwiperSlide>
-              ))}
-              <Button
-                id='album-swiper-prev'
-                size='icon-sm'
-                className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
-                variant='outline'
+            <>
+              <Swiper
+                modules={[Navigation, Pagination, Keyboard]}
+                slidesPerView={1}
+                autoHeight={false}
+                loop
+                keyboard={{ enabled: true }}
+                navigation={{
+                  prevEl: '#album-swiper-prev',
+                  nextEl: '#album-swiper-next',
+                }}
+                pagination={{
+                  el: '#album-swiper-pagination',
+                  clickable: true,
+                }}
+                className='h-full w-full'
               >
-                <IconArrowLeft />
-              </Button>
-              <Button
-                id='album-swiper-next'
-                size='icon-sm'
-                className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
-                variant='outline'
-              >
-                <IconArrowRight />
-              </Button>
+                {photos.map((ptp, i) => (
+                  <SwiperSlide
+                    key={ptp.photo.id}
+                    className='p-3 h-full relative'
+                  >
+                    <BlurImage
+                      src={keyToUrl(ptp.photo.url)}
+                      alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
+                      fill
+                      priority={priority && i === 0}
+                      sizes={sizes}
+                      blurhash={ptp.photo.blurData}
+                      aspectRatio={ptp.photo.aspectRatio ?? undefined}
+                      className='object-contain p-3'
+                    />
+                  </SwiperSlide>
+                ))}
+                <Button
+                  id='album-swiper-prev'
+                  size='icon-sm'
+                  className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
+                  variant='outline'
+                >
+                  <IconArrowLeft />
+                </Button>
+                <Button
+                  id='album-swiper-next'
+                  size='icon-sm'
+                  className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
+                  variant='outline'
+                >
+                  <IconArrowRight />
+                </Button>
+              </Swiper>
               <div id='album-swiper-pagination' />
-            </Swiper>
+            </>
           ) : (
             <div className='h-full w-full p-3 relative'>
               <BlurImage
