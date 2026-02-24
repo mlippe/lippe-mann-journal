@@ -23,13 +23,7 @@ const CreateSinglePhoto = () => {
 
   const createPhoto = useMutation(trpc.photos.create.mutationOptions());
 
-  useEffect(() => {
-    console.log('exif data updated', exif);
-  }, [exif]);
-
   const createImage = (data: ConfirmStepData) => {
-    console.log('data', data);
-
     const finalData = {
       ...data,
       ...exif,

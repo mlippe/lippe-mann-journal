@@ -42,10 +42,6 @@ const ConfirmStep = ({
 }) => {
   const [isEditExif, setIsEditExif] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log('imageInfo', imageInfo);
-  }, [imageInfo]);
-
   const form = useForm<ConfirmStepData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(confirmStepSchema) as any,

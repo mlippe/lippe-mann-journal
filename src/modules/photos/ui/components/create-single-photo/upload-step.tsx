@@ -26,16 +26,11 @@ const UploadStep = ({
     },
     mode: 'onChange',
   });
-  const { handleSubmit } = form;
-
-  const onSubmit = (data: UploadStepData) => {
-    console.log(data);
-  };
 
   return (
     <div className='space-y-6'>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+        <form className='space-y-4'>
           <div className='space-y-2'>
             <PhotoUploader
               folder={DEFAULT_PHOTOS_UPLOAD_FOLDER}

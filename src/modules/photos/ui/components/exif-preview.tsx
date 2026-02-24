@@ -17,8 +17,6 @@ export const ExifPreview = ({
     exif &&
     Object.values(exif).some((value) => value !== undefined && value !== null);
 
-  console.log(exif, hasAnyExifValue);
-
   if (!hasAnyExifValue || !exif) {
     return (
       <p className='text-xs text-muted-foreground mt-1'>
