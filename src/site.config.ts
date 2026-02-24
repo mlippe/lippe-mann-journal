@@ -24,7 +24,7 @@ export const siteConfig = {
   role: 'Digital product engineer, Content creator',
 
   /** Short bio shown on the home page profile card */
-  bio: 'This is my online journal: moments of everyday life, current projects, thoughts ...',
+  bio: 'Welcome to my journal. I capture moments of everyday life, share current projects and thoughts.',
 
   /** Avatar image path (place your avatar in /public/avatar.jpg) */
   avatar: '/avatar.jpg',

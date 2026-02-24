@@ -83,7 +83,7 @@ const PhotoInfo = ({
         'flex flex-col justify-between backdrop-blur-xl',
         isModal
           ? 'h-full bg-background/95 w-3/16'
-          : 'bg-muted/50 w-full md:w-3/16',
+          : 'bg-muted/50 w-full md:w-5/16 lg:w-3/16',
       )}
     >
       <div>
@@ -132,7 +132,9 @@ const DesktopMedia = ({
     <div
       className={cn(
         'bg-background p-3 relative group flex items-center justify-center',
-        isModal ? 'w-13/16 h-full' : 'w-full md:w-13/16 min-h-[50vh]',
+        isModal
+          ? 'w-13/16 h-full'
+          : 'w-full md:w-11/16 lg:w-13/16 min-h-[50vh]',
       )}
     >
       {isAlbum ? (

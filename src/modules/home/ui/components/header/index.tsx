@@ -4,13 +4,13 @@ import Navbar from './navbar';
 
 const Header = () => {
   return (
-    <header className='fixed top-3 lg:top-0 lg:pt-3 left-3 z-50 bg-background rounded-br-[18px]'>
+    <header className='fixed top-3 lg:top-0 lg:pt-3 lg:left-3 left-0 z-50 bg-background rounded-br-[18px]'>
       <div className='relative'>
         <Navbar />
         {/* MOBILE TOP BAR  */}
         <div className='border-t-12 fixed top-0 left-0 w-full border-background block lg:hidden'></div>
 
-        <div className='absolute left-0 -bottom-4.5 size-4.5'>
+        <div className='absolute lg:left-0 -bottom-4.5 size-4.5'>
           <Graphic />
         </div>
 

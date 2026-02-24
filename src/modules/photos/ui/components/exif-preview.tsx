@@ -32,15 +32,17 @@ export const ExifPreview = ({
       <div
         className={clsx(
           'flex flex-col gap-2 @sm:gap-4 @sm:flex-row',
-          size === 'sm' && 'gap-1!',
+          size === 'sm' && 'gap-y-1! gap-x-4',
         )}
       >
         <div
-          className={clsx(size === 'sm' && 'flex gap-1 items-center flex-wrap')}
+          className={clsx(
+            size === 'sm' && 'flex gap-x-1 gap-y-0 items-center flex-wrap',
+          )}
         >
           <p
             className={clsx(
-              'font-semibold text-sm  lg:text-lg',
+              'font-semibold text-sm  lg:text-lg text-foreground',
               size === 'sm' && 'text-sm! font-medium!',
             )}
           >
@@ -48,10 +50,10 @@ export const ExifPreview = ({
               {exif.make} {exif.model}
             </span>
           </p>
-          {size === 'sm' && <span className='text-gray-400'>·</span>}
+          {size === 'sm' && <span className='text-foreground/40'>·</span>}
           <p
             className={clsx(
-              'text-sm text-gray-800',
+              'text-sm text-foreground/80',
               size === 'sm' && 'text-xs!',
             )}
           >
@@ -73,24 +75,24 @@ export const ExifPreview = ({
               />
             </>
           )}
-          <div className='flex flex-col gap-0.5'>
+          <div className='flex flex-wrap gap-y-0.5 gap-x-2'>
             <div
               className={clsx(
-                'space-x-2 text-sm font-mono text-gray-800',
-                size === 'sm' && 'text-xs! flex-wrap flex',
+                'space-x-2 text-sm font-mono text-foreground',
+                size === 'sm' && 'text-xs! flex-wrap flex gap-x-1 space-x-0!',
               )}
             >
               <span>{exif.focalLength && exif.focalLength + 'mm'}</span>
-              <span className='text-gray-400'>·</span>
+              <span className='text-foreground/40'>·</span>
               <span>{exif.fNumber && 'ƒ/' + exif.fNumber}</span>
-              <span className='text-gray-400'>·</span>
+              <span className='text-foreground/40'>·</span>
               <span>
                 {exif.exposureTime && formatExposureTime(exif.exposureTime)}
               </span>
-              <span className='text-gray-400'>·</span>
+              <span className='text-foreground/40'>·</span>
               <span>{exif.iso && 'ISO' + exif.iso}</span>
             </div>
-            <div className='flex items-center text-xs text-gray-500'>
+            <div className='flex items-center text-xs text-foreground/60'>
               <p>
                 {exif.dateTimeOriginal &&
                   format(exif.dateTimeOriginal, 'dd.MM.yyyy')}

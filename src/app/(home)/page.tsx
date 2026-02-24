@@ -32,7 +32,7 @@ const page = async () => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className='flex flex-col w-full'>
-        <div className='w-full lg:mt-16  mt-10 space-y-3 pb-3'>
+        <div className='w-full lg:mt-16  mt-10 pb-3'>
           {/* INTRO CARD  */}
           <IntroCard />
 
