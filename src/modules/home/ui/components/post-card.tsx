@@ -176,9 +176,9 @@ const ArticleContent = ({
   }
 
   return (
-    <div className='h-full p-3'>
-      <div className='bg-muted h-full flex items-center justify-center p-8 text-center font-medium'>
-        {post.title}
+    <div className='h-full p-3 flex justify-center items-center'>
+      <div className='from-muted from-25% to-foreground/30 bg-linear-to-br  h-full flex items-center justify-center p-8 text-center font-medium aspect-[0.66667]'>
+        <span className=''>{post.title}</span>
       </div>
     </div>
   );
