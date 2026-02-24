@@ -36,54 +36,99 @@ import 'swiper/css/keyboard';
 
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Photo } from '@/db/schema';
 
-export const PhotographView = ({
-  post,
-  isModal = true,
-}: {
+// --- Types ---
+
+interface PhotographViewProps {
   post: PostGetOne;
   isModal?: boolean;
+}
+
+// --- Helper Functions ---
+
+const getExifFromPhoto = (photo: Photo): TExifData => ({
+  make: photo?.make ?? undefined,
+  model: photo?.model ?? undefined,
+  lensModel: photo?.lensModel ?? undefined,
+  focalLength: photo?.focalLength ?? undefined,
+  focalLength35mm: photo?.focalLength35mm ?? undefined,
+  fNumber: photo?.fNumber ?? undefined,
+  iso: photo?.iso ?? undefined,
+  exposureTime: photo?.exposureTime ?? undefined,
+  exposureCompensation: photo?.exposureCompensation ?? undefined,
+  dateTimeOriginal: photo?.dateTimeOriginal ?? undefined,
+});
+
+// --- Sub-components ---
+
+const PhotoInfo = ({
+  post,
+  exif,
+  isModal,
+  showExif,
+}: {
+  post: PostGetOne;
+  exif: TExifData;
+  isModal: boolean;
+  showExif: boolean;
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
-  const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
-  const router = useRouter();
-  const isMobile = useIsMobile();
-
-  const handleOpenChange = (openState: boolean) => {
-    if (openState === false) {
-      router.back();
-    }
-    setIsModalOpen(openState);
-  };
-
-  const exif: TExifData = useMemo(() => {
-    const photo = post.postsToPhotos?.at(swiperActiveIndex)?.photo;
-    if (!photo) return {};
-    return {
-      make: photo.make ?? undefined,
-      model: photo.model ?? undefined,
-      lensModel: photo.lensModel ?? undefined,
-      focalLength: photo.focalLength ?? undefined,
-      focalLength35mm: photo.focalLength35mm ?? undefined,
-      fNumber: photo.fNumber ?? undefined,
-      iso: photo.iso ?? undefined,
-      exposureTime: photo.exposureTime ?? undefined,
-      exposureCompensation: photo.exposureCompensation ?? undefined,
-      dateTimeOriginal: photo.dateTimeOriginal ?? undefined,
-    };
-  }, [post.postsToPhotos, swiperActiveIndex]);
-
-  const hasAnyExifValue = useMemo(
-    () => Object.values(exif).some((v) => v !== undefined && v !== null),
-    [exif],
+  const hasExif = Object.values(exif).some(
+    (v) => v !== undefined && v !== null,
   );
 
-  if (!post.postsToPhotos?.at(0)) return null;
+  return (
+    <div
+      className={cn(
+        'flex flex-col justify-between backdrop-blur-xl',
+        isModal
+          ? 'h-full bg-background/95 w-3/16'
+          : 'bg-muted/50 w-full md:w-3/16',
+      )}
+    >
+      <div>
+        <div className='flex items-center justify-between border-b p-3 gap-1'>
+          <Author size='sm' />
+          {isModal && (
+            <DialogClose asChild>
+              <Button variant='ghost' size='icon-sm'>
+                <IconX />
+              </Button>
+            </DialogClose>
+          )}
+        </div>
+        <div className='p-3'>
+          <p className='font-medium'>{post.title}</p>
+          <p className='text-xs text-muted-foreground'>
+            {format(post.createdAt, 'dd.MM.yyyy')}
+          </p>
+        </div>
+      </div>
+      {showExif && hasExif && (
+        <div className='p-3 border-t'>
+          <ExifPreview exif={exif} showLogo={false} size='sm' />
+        </div>
+      )}
+    </div>
+  );
+};
 
-  const photos = post.postsToPhotos;
+const DesktopMedia = ({
+  photos,
+  title,
+  isModal,
+  onSlideChange,
+  activeIndex,
+}: {
+  photos: { photo: Photo }[];
+  title: string;
+  isModal: boolean;
+  onSlideChange: (index: number) => void;
+  activeIndex: number;
+}) => {
   const isAlbum = photos.length > 1;
 
-  const MediaSection = (
+  return (
     <div
       className={cn(
         'bg-background p-3 relative group flex items-center justify-center',
@@ -96,7 +141,7 @@ export const PhotographView = ({
             id='album-swiper'
             modules={[Navigation, Pagination, Keyboard]}
             slidesPerView={1}
-            onSlideChange={(s) => setSwiperActiveIndex(s.realIndex)}
+            onSlideChange={(s) => onSlideChange(s.realIndex)}
             loop
             className='w-full h-full'
             keyboard={{ enabled: true }}
@@ -113,7 +158,7 @@ export const PhotographView = ({
               >
                 <Image
                   src={keyToUrl(ptp.photo.url)}
-                  alt={post.title}
+                  alt={title}
                   width={ptp.photo.width}
                   height={ptp.photo.height}
                   className='max-w-full max-h-full w-full h-full object-contain'
@@ -147,7 +192,7 @@ export const PhotographView = ({
           >
             <Link
               target='_blank'
-              href={keyToUrl(photos[swiperActiveIndex].photo.url)}
+              href={keyToUrl(photos[activeIndex].photo.url)}
             >
               <IconArrowsMaximize />
             </Link>
@@ -157,7 +202,7 @@ export const PhotographView = ({
         <div className='flex items-center justify-center w-full h-full relative'>
           <Image
             src={keyToUrl(photos[0].photo.url)}
-            alt={post.title}
+            alt={title}
             width={photos[0].photo.width}
             height={photos[0].photo.height}
             className='max-w-full max-h-full object-contain'
@@ -177,161 +222,115 @@ export const PhotographView = ({
       )}
     </div>
   );
+};
 
-  const MediaSectionMobile = (
-    <div className='bg-background p-3 relative group flex flex-col w-full'>
-      {isAlbum ? (
-        <>
-          {photos.map((ptp, i) => (
-            <div key={ptp.photo.id} className='mt-6 relative'>
-              <Image
-                src={keyToUrl(ptp.photo.url)}
-                alt={post.title}
-                width={ptp.photo.width}
-                height={ptp.photo.height}
-                className='max-w-full  w-full h-full object-contain max-h-screen'
-                priority={i === 0}
-              />
-              {ptp.photo.make && (
-                <div className='p-3 bg-muted/50'>
-                  <ExifPreview
-                    exif={{
-                      make: ptp.photo.make ?? undefined,
-                      model: ptp.photo.model ?? undefined,
-                      lensModel: ptp.photo.lensModel ?? undefined,
-                      focalLength: ptp.photo.focalLength ?? undefined,
-                      focalLength35mm: ptp.photo.focalLength35mm ?? undefined,
-                      fNumber: ptp.photo.fNumber ?? undefined,
-                      iso: ptp.photo.iso ?? undefined,
-                      exposureTime: ptp.photo.exposureTime ?? undefined,
-                      exposureCompensation:
-                        ptp.photo.exposureCompensation ?? undefined,
-                      dateTimeOriginal: ptp.photo.dateTimeOriginal ?? undefined,
-                    }}
-                    showLogo={false}
-                    size='sm'
-                  />
-                </div>
-              )}
-              <Button
-                size='icon-sm'
-                asChild
-                className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
-                variant='outline'
-              >
-                <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
-                  <IconArrowsMaximize className='size-3.5!' />
-                </Link>
-              </Button>
-            </div>
-          ))}
-        </>
-      ) : (
-        <div className='mt-6 relative'>
-          <Image
-            src={keyToUrl(photos[0].photo.url)}
-            alt={post.title}
-            width={photos[0].photo.width}
-            height={photos[0].photo.height}
-            className='max-w-full  w-full h-full object-contain max-h-screen'
-            priority
-          />
-          {photos[0].photo.make && (
-            <div className='p-3 bg-muted/50'>
-              <ExifPreview
-                exif={{
-                  make: photos[0].photo.make ?? undefined,
-                  model: photos[0].photo.model ?? undefined,
-                  lensModel: photos[0].photo.lensModel ?? undefined,
-                  focalLength: photos[0].photo.focalLength ?? undefined,
-                  focalLength35mm: photos[0].photo.focalLength35mm ?? undefined,
-                  fNumber: photos[0].photo.fNumber ?? undefined,
-                  iso: photos[0].photo.iso ?? undefined,
-                  exposureTime: photos[0].photo.exposureTime ?? undefined,
-                  exposureCompensation:
-                    photos[0].photo.exposureCompensation ?? undefined,
-                  dateTimeOriginal:
-                    photos[0].photo.dateTimeOriginal ?? undefined,
-                }}
-                showLogo={false}
-                size='sm'
-              />
-            </div>
-          )}
-          <Button
-            size='icon-sm'
-            asChild
-            className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
-            variant='outline'
-          >
-            <Link target='_blank' href={keyToUrl(photos[0].photo.url)}>
-              <IconArrowsMaximize className='size-3.5!' />
-            </Link>
-          </Button>
-        </div>
-      )}
-    </div>
+const MobileMediaList = ({
+  photos,
+  title,
+}: {
+  photos: { photo: Photo }[];
+  title: string;
+}) => (
+  <div className='bg-background p-3 relative group flex flex-col w-full'>
+    {photos.map(
+      (ptp, i) =>
+        ptp && (
+          <div key={ptp.photo.id} className='mt-6 relative'>
+            <Image
+              src={keyToUrl(ptp.photo.url)}
+              alt={title}
+              width={ptp.photo.width}
+              height={ptp.photo.height}
+              className='max-w-full w-full h-full object-contain max-h-screen'
+              priority={i === 0}
+            />
+            {ptp.photo.make && (
+              <div className='p-3 bg-muted/50'>
+                <ExifPreview
+                  exif={getExifFromPhoto(ptp.photo)}
+                  showLogo={false}
+                  size='sm'
+                />
+              </div>
+            )}
+            <Button
+              size='icon-sm'
+              asChild
+              className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
+              variant='outline'
+            >
+              <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
+                <IconArrowsMaximize className='size-3.5!' />
+              </Link>
+            </Button>
+          </div>
+        ),
+    )}
+  </div>
+);
+
+// --- Main Component ---
+
+export const PhotographView = ({
+  post,
+  isModal = true,
+}: PhotographViewProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
+  const router = useRouter();
+  const isMobile = useIsMobile();
+
+  const handleOpenChange = (openState: boolean) => {
+    if (openState === false) router.back();
+    setIsModalOpen(openState);
+  };
+
+  const currentExif = useMemo(
+    () => getExifFromPhoto(post.postsToPhotos!.at(swiperActiveIndex)!.photo!),
+    [post.postsToPhotos, swiperActiveIndex],
   );
 
-  const InfoSection = (
-    <div
-      className={cn(
-        'flex flex-col justify-between backdrop-blur-xl',
-        isModal
-          ? 'h-full bg-background/95 w-3/16'
-          : 'bg-muted/50 w-full md:w-3/16',
-      )}
-    >
-      <div>
-        <div className='flex items-center justify-between border-b p-3 gap-1'>
-          <Author size='sm' />
-          {isModal && (
-            <DialogClose asChild>
-              <Button variant='ghost' size='icon-sm'>
-                <IconX />
-              </Button>
-            </DialogClose>
-          )}
-        </div>
-        <div className='p-3'>
-          <p className='font-medium'>{post.title}</p>
-          <p className='text-xs text-muted-foreground'>
-            {format(post.createdAt, 'dd.MM.yyyy')}
-          </p>
-        </div>
+  if (!post.postsToPhotos?.at(0)) return null;
+
+  const photos = post.postsToPhotos;
+
+  const content =
+    isMobile && !isModal ? (
+      <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3'>
+        <PhotoInfo
+          post={post}
+          exif={currentExif}
+          isModal={false}
+          showExif={false}
+        />
+        <MobileMediaList photos={photos} title={post.title} />
       </div>
-      {hasAnyExifValue && !isMobile && (
-        <div className='p-3 border-t'>
-          <ExifPreview exif={exif} showLogo={false} size='sm' />
-        </div>
-      )}
-    </div>
-  );
+    ) : (
+      <div
+        className={cn(
+          'flex overflow-hidden min-h-0 min-w-0',
+          isModal
+            ? 'rounded-sm w-full h-full'
+            : 'flex-col md:flex-row w-full border border-border/50 max-h-[calc(100vh-5rem)] mt-12',
+        )}
+      >
+        <DesktopMedia
+          photos={photos}
+          title={post.title}
+          isModal={isModal}
+          activeIndex={swiperActiveIndex}
+          onSlideChange={setSwiperActiveIndex}
+        />
+        <PhotoInfo
+          post={post}
+          exif={currentExif}
+          isModal={isModal}
+          showExif={!isMobile}
+        />
+      </div>
+    );
 
-  const MainContent = (
-    <div
-      className={cn(
-        'flex overflow-hidden min-h-0 min-w-0',
-        isModal
-          ? 'rounded-sm w-full h-full'
-          : 'flex-col md:flex-row w-full border border-border/50 max-h-[calc(100vh-5rem)] mt-12',
-      )}
-    >
-      {MediaSection}
-      {InfoSection}
-    </div>
-  );
-
-  const MainContentMobile = (
-    <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3'>
-      {InfoSection}
-      {MediaSectionMobile}
-    </div>
-  );
-
-  if (!isModal) {
-    return isMobile ? MainContentMobile : MainContent;
-  }
+  if (!isModal) return content;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
@@ -339,7 +338,7 @@ export const PhotographView = ({
         showCloseButton={false}
         className='bg-transparent border-none max-w-[calc(100%-2rem)]! w-full shadow-none h-full max-h-[calc(100%-2rem)]!'
       >
-        {MainContent}
+        {content}
         <DialogTitle className='hidden'>{post.title}</DialogTitle>
       </DialogContent>
     </Dialog>
