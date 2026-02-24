@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import {
   Form,
   FormControl,
@@ -13,18 +13,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertTitle } from "@/components/ui/alert";
-import { OctagonAlert } from "lucide-react";
-import { useState } from "react";
-import { authClient } from "../../lib/auth-client";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertTitle } from '@/components/ui/alert';
+import { OctagonAlert } from 'lucide-react';
+import { useState } from 'react';
+import { authClient } from '../../lib/auth-client';
 
 const signInSchema = z.object({
   email: z.email(),
   password: z.string().min(1, {
-    message: "Password is required",
+    message: 'Password is required',
   }),
 });
 
@@ -35,8 +35,8 @@ export const SignInView = () => {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -48,7 +48,7 @@ export const SignInView = () => {
       {
         email: values.email,
         password: values.password,
-        callbackURL: "/dashboard",
+        callbackURL: '/dashboard',
       },
       {
         onSuccess: () => {
@@ -63,32 +63,32 @@ export const SignInView = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-3">
+    <div className='flex flex-col gap-6 items-center'>
+      <Card className='overflow-hidden p-0 max-w-md w-full'>
+        <CardContent className='grid p-0'>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="p-6 md:p-8 flex flex-col justify-center min-h-full"
+              className='p-6 md:p-8 flex flex-col justify-center min-h-full'
             >
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">Welcome back</h1>
-                  <p className="text-muted-foreground text-balance">
+              <div className='flex flex-col gap-6'>
+                <div className='flex flex-col items-center text-center'>
+                  <h1 className='text-2xl font-bold'>Welcome back</h1>
+                  <p className='text-muted-foreground text-balance'>
                     Sign in to your account
                   </p>
                 </div>
 
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   <FormField
                     control={form.control}
-                    name="email"
+                    name='email'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="your.email@example.com"
+                            placeholder='your.email@example.com'
                             {...field}
                           />
                         </FormControl>
@@ -98,17 +98,17 @@ export const SignInView = () => {
                   />
                 </div>
 
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   <FormField
                     control={form.control}
-                    name="password"
+                    name='password'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="* * * * * * * *"
-                            type="password"
+                            placeholder='* * * * * * * *'
+                            type='password'
                             {...field}
                           />
                         </FormControl>
@@ -118,27 +118,18 @@ export const SignInView = () => {
                   />
                 </div>
                 {!!error && (
-                  <Alert className="bg-destructive/10 border-none">
-                    <OctagonAlert className="h-4 w-4 text-destructive!" />
+                  <Alert className='bg-destructive/10 border-none'>
+                    <OctagonAlert className='h-4 w-4 text-destructive!' />
                     <AlertTitle>{error}</AlertTitle>
                   </Alert>
                 )}
-                <Button type="submit" className="w-full" disabled={pending}>
+                <Button type='submit' className='w-full' disabled={pending}>
                   {pending && <Spinner />}
                   Sign In
                 </Button>
               </div>
             </form>
           </Form>
-          <div className="col-span-2 bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col gap-y-4 items-center justify-center">
-            <Image
-              src="/bg.jpg"
-              alt="Better nextjs"
-              width={1920}
-              height={1080}
-              className="size-full object-cover"
-            />
-          </div>
         </CardContent>
       </Card>
     </div>
