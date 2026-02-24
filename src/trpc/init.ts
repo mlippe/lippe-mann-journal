@@ -19,6 +19,18 @@ const t = initTRPC.context<Context>().create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+export const authedProcedure = t.procedure.use(
+  t.middleware(async ({ ctx, next }) => {
+    const session = await getSession();
+
+    return next({
+      ctx: {
+        ...ctx,
+        auth: session?.user,
+      },
+    });
+  }),
+);
 export const protectedProcedure = t.procedure.use(
   t.middleware(async ({ ctx, next }) => {
     const session = await getSession();

@@ -3,6 +3,7 @@ import {
   baseProcedure,
   createTRPCRouter,
   protectedProcedure,
+  authedProcedure,
 } from '@/trpc/init';
 import { count, desc, eq, ilike, and } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
@@ -82,12 +83,17 @@ export const postsRouter = createTRPCRouter({
 
       return updatedPost;
     }),
-  getOne: protectedProcedure
+  getOne: authedProcedure
     .input(z.object({ slug: z.string() }))
     .output(postsWithPhotos)
     .query(async ({ ctx, input }) => {
+      const filters = [eq(posts.slug, input.slug)];
+      if (!ctx.auth) {
+        filters.push(eq(posts.visibility, 'public'));
+      }
+
       const post = await ctx.db.query.posts.findFirst({
-        where: eq(posts.slug, input.slug),
+        where: and(...filters),
         with: {
           postsToPhotos: {
             with: {
@@ -107,14 +113,19 @@ export const postsRouter = createTRPCRouter({
 
       return post;
     }),
-  getPostById: baseProcedure
+  getPostById: authedProcedure
     .input(z.object({ postId: z.string().uuid() }))
     .output(postsWithPhotos)
     .query(async ({ ctx, input }) => {
       const { postId } = input;
 
+      const filters = [eq(posts.id, postId)];
+      if (!ctx.auth) {
+        filters.push(eq(posts.visibility, 'public'));
+      }
+
       const post = await ctx.db.query.posts.findFirst({
-        where: eq(posts.id, postId),
+        where: and(...filters),
         with: {
           postsToPhotos: {
             with: {
