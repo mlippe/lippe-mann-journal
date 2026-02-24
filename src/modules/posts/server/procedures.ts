@@ -17,6 +17,7 @@ import {
   postsInsertSchema,
   postsUpdateSchema,
   postsWithPhotos,
+  postsToPhotos,
 } from '@/db/schema';
 
 export const postsRouter = createTRPCRouter({
@@ -278,5 +279,32 @@ export const postsRouter = createTRPCRouter({
         total: total.count,
         totalPages,
       };
+    }),
+  updateAlbumPhotos: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().uuid(),
+        photoIds: z.array(z.string().uuid()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { postId, photoIds } = input;
+
+      await ctx.db.transaction(async (tx) => {
+        // Remove existing links
+        await tx.delete(postsToPhotos).where(eq(postsToPhotos.postId, postId));
+
+        // Insert new links with correct sort order
+        if (photoIds.length > 0) {
+          const newLinks = photoIds.map((photoId, index) => ({
+            postId,
+            photoId,
+            sortOrder: index,
+          }));
+          await tx.insert(postsToPhotos).values(newLinks);
+        }
+      });
+
+      return { success: true };
     }),
 });

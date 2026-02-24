@@ -123,13 +123,11 @@ export const photosInsertSchema = createInsertSchema(photos).extend({
 });
 export const photosSelectSchema = createSelectSchema(photos);
 export const photosUpdateSchema = createUpdateSchema(photos)
-  .pick({
-    id: true,
-    title: true,
-    latitude: true,
-    longitude: true,
+  .extend({
+    id: z.string().uuid(),
   })
-  .partial();
+  .partial()
+  .required({ id: true });
 
 // Types
 export type Photo = InferSelectModel<typeof photos>;

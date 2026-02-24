@@ -4,7 +4,7 @@ import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { ArticleView } from '@/modules/articles/ui/views/article-view';
+import { PostEditView } from '@/modules/posts/ui/views/post-edit-view';
 
 type Props = {
   params: Promise<{
@@ -46,7 +46,7 @@ const Page = async ({ params }: Props) => {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ErrorBoundary fallback={<p>Something went wrong</p>}>
         <Suspense fallback={<p>Loading...</p>}>
-          <ArticleView slug={decodedSlug} />
+          <PostEditView slug={decodedSlug} />
         </Suspense>
       </ErrorBoundary>
     </HydrationBoundary>
