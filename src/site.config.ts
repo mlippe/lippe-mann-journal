@@ -12,17 +12,19 @@
 import type { ContactCardTitle } from '@/components/contact-card';
 
 export const siteConfig = {
+  title: 'Lippe & Mann Journal',
+
   /** Site name used in metadata, logo, and branding */
-  name: 'Manue Lippe',
+  name: 'Manuel Lippmann',
 
   /** Tagline shown alongside name (e.g. "Photo", "Photography") */
-  tagline: 'Journal',
+  tagline: 'Zum Feed',
 
   /** Your role/title shown in profile cards and footer */
-  role: 'Digital Creative',
+  role: 'Digital Product Engineer',
 
   /** Short bio shown on the home page profile card */
-  bio: 'I am a digital product engineer and content creator living in munich. I am capturing moments of everyday life and posting them here.',
+  bio: 'In diesem Journal teile ich Bilder aus dem täglichen Leben, Einblicke in aktuelle Projekte und Gedankenfetzen.',
 
   /** Avatar image path (place your avatar in /public/avatar.jpg) */
   avatar: '/avatar.jpg',
@@ -88,7 +90,7 @@ export const siteConfig = {
    * Set to "cloudflare" to use the Cloudflare custom image loader,
    * or "default" to use Next.js built-in image optimization.
    */
-  imageLoader: 'cloudflare' as 'cloudflare' | 'default',
+  imageLoader: 'default' as 'cloudflare' | 'default',
 
   /**
    * Gear / equipment shown on the About page.

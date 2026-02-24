@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState, memo } from "react";
-import Image, { ImageProps } from "next/image";
-import { Blurhash } from "react-blurhash";
+import { useEffect, useMemo, useState, memo } from 'react';
+import Image, { ImageProps } from 'next/image';
+import { Blurhash } from 'react-blurhash';
 
 interface BlurImageProps extends Omit<
   ImageProps,
-  "onLoad" | "onLoadingComplete" | "priority"
+  'onLoad' | 'onLoadingComplete'
 > {
   blurhash: string;
+  aspectRatio?: number;
 }
 
 /**
@@ -21,6 +22,8 @@ interface BlurImageProps extends Omit<
  * @param {string} fill - The fill of the image.
  * @param {string} className - Optional className for the component.
  * @param {string} blurhash - The blurhash of the image.
+ * @param {boolean} priority - Whether the image should be prioritized for loading.
+ * @param {number} aspectRatio - Optional aspect ratio of the image (width / height).
  * @returns {JSX.Element} - The BlurImage component.
  */
 const BlurImageInner = function BlurImageInner({
@@ -31,12 +34,14 @@ const BlurImageInner = function BlurImageInner({
   fill,
   className,
   blurhash,
+  priority,
+  aspectRatio,
   ...props
 }: BlurImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-  const containerStyle = fill ? "absolute inset-0" : "relative w-full h-full";
+  const containerStyle = fill ? 'absolute inset-0 flex items-center justify-center' : 'relative w-full h-full';
 
   useEffect(() => {
     if (!imageLoaded) return;
@@ -54,33 +59,42 @@ const BlurImageInner = function BlurImageInner({
     <div className={containerStyle}>
       {showBlurhash && (
         <div
-          className={`absolute inset-0 ${
-            className ?? ""
-          } transition-opacity duration-500 ease-in-out ${
-            imageLoaded ? "opacity-0" : "opacity-100"
+          className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-500 ease-in-out ${
+            imageLoaded ? 'opacity-0' : 'opacity-100'
           }`}
-          style={{ pointerEvents: "none" }}
         >
-          <Blurhash
-            hash={blurhash}
-            width="100%"
-            height="100%"
-            resolutionX={16}
-            resolutionY={16}
-            punch={1}
-          />
+          <div 
+            className={className ?? ''}
+            style={{ 
+              aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
+              width: aspectRatio ? (aspectRatio > 0.8 ? '100%' : 'auto') : '100%',
+              height: aspectRatio ? (aspectRatio > 0.8 ? 'auto' : '100%') : '100%',
+              maxHeight: '100%',
+              maxWidth: '100%',
+            }}
+          >
+            <Blurhash
+              hash={blurhash}
+              width='100%'
+              height='100%'
+              resolutionX={16}
+              resolutionY={16}
+              punch={1}
+            />
+          </div>
         </div>
       )}
       <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
         fill={fill}
+        width={!fill ? width : undefined}
+        height={!fill ? height : undefined}
+        priority={priority}
         className={`${
-          className ?? ""
+          className ?? ''
         } transition-opacity duration-500 ease-in-out ${
-          imageLoaded ? "opacity-100" : "opacity-0"
+          imageLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         onLoad={() => {
           window.requestAnimationFrame(() => {
@@ -100,13 +114,13 @@ const BlurImageInner = function BlurImageInner({
 const BlurImage = memo(function BlurImage(props: BlurImageProps) {
   const srcKey = useMemo(() => {
     const src = props.src;
-    if (typeof src === "string") return src;
+    if (typeof src === 'string') return src;
 
-    if ("src" in src && typeof src.src === "string") {
+    if ('src' in src && typeof src.src === 'string') {
       return src.src;
     }
 
-    if ("default" in src && src.default && "src" in src.default) {
+    if ('default' in src && src.default && 'src' in src.default) {
       return src.default.src;
     }
 

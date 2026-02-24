@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 type BrandConfigType = {
   src: string;
@@ -20,32 +20,35 @@ export const BrandsLogo = ({
   brand,
   width,
   height,
-  className = "",
+  className = '',
 }: {
   brand: string;
   width?: number;
   height?: number;
   className?: string;
 }) => {
+  if (brand === '') {
+    return null;
+  }
+
   // Define default configurations for each brand
   const brandConfigs: Record<string, BrandConfigType> = {
-    sony: { src: "/Sony_logo.svg", width: 80, height: 20 },
-    nikon: { src: "/Nikon_Logo.svg", width: 40, height: 40 },
-    canon: { src: "/Canon_logo.svg", width: 80, height: 20 },
-    fujifilm: { src: "/Fujifilm_logo.svg", width: 90, height: 25 },
-    hasselblad: { src: "/Hasselblad_logo.svg", width: 120, height: 30 },
-    leica: { src: "/Leica_logo.svg", width: 40, height: 40 },
-    lumix: { src: "/Lumix_logo.svg", width: 90, height: 30 },
-    olympus: { src: "/Olympus_logo.svg", width: 100, height: 30 },
-    pentax: { src: "/Pentax_Logo.svg", width: 90, height: 30 },
-    ricoh: { src: "/Ricoh_logo.svg", width: 90, height: 30 },
-    sigma: { src: "/Sigma_logo.svg", width: 80, height: 30 },
-    apple: { src: "/Apple_logo.svg", width: 30, height: 35 },
-    dji: { src: "/DJI_logo.svg", width: 50, height: 30 },
+    sony: { src: '/Sony_logo.svg', width: 80, height: 20 },
+    nikon: { src: '/Nikon_Logo.svg', width: 40, height: 40 },
+    canon: { src: '/Canon_logo.svg', width: 80, height: 20 },
+    fujifilm: { src: '/Fujifilm_logo.svg', width: 90, height: 25 },
+    hasselblad: { src: '/Hasselblad_logo.svg', width: 120, height: 30 },
+    leica: { src: '/Leica_logo.svg', width: 40, height: 40 },
+    lumix: { src: '/Lumix_logo.svg', width: 90, height: 30 },
+    olympus: { src: '/Olympus_logo.svg', width: 100, height: 30 },
+    pentax: { src: '/Pentax_Logo.svg', width: 90, height: 30 },
+    ricoh: { src: '/Ricoh_logo.svg', width: 90, height: 30 },
+    sigma: { src: '/Sigma_logo.svg', width: 80, height: 30 },
+    apple: { src: '/Apple_logo.svg', width: 30, height: 35 },
+    dji: { src: '/DJI_logo.svg', width: 50, height: 30 },
   };
-
   // Case-insensitive search for brand that starts with the provided string
-  const normalizedBrand = brand.replace(/\s+/g, "").toLowerCase();
+  const normalizedBrand = brand.replace(/\s+/g, '').toLowerCase();
 
   const matchedBrand = Object.keys(brandConfigs).find((brandKey) =>
     brandKey.startsWith(normalizedBrand),
@@ -54,7 +57,7 @@ export const BrandsLogo = ({
   // If no brand matches, use placeholder
   const config = matchedBrand
     ? brandConfigs[matchedBrand]
-    : { src: "/placeholder.svg", width: 40, height: 40 };
+    : { src: '/placeholder.svg', width: 40, height: 40 };
 
   return (
     <Image

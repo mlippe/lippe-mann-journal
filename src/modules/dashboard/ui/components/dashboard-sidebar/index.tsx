@@ -28,8 +28,8 @@ const data = {
       icon: 'photo',
     },
     {
-      title: 'Articles',
-      url: '/dashboard/articles',
+      title: 'Posts',
+      url: '/dashboard/posts',
       icon: 'post',
     },
     {

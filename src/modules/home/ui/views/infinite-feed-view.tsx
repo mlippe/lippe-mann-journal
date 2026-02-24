@@ -1,148 +1,84 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
-import Footer from '@/components/footer';
-// import { Introduction } from '@/modules/feed/ui/components/introduction'; // Removed Introduction import
-import type { Post, Photo } from '@/db/schema';
+import { useMemo } from 'react';
+import { type PostWithPhotos } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
-
-// A placeholder PostCard component to display different post types.
-const PostCard = ({
-  post,
-}: {
-  post: Post & { postsToPhotos: { photo: Photo }[] };
-}) => {
-  return (
-    <div className='p-4 border rounded-lg shadow-sm bg-card'>
-      <h2 className='text-xl font-bold mb-2'>{post.title}</h2>
-      {post.description && (
-        <p className='text-muted-foreground mb-4'>{post.description}</p>
-      )}
-
-      {post.type === 'ARTICLE' && post.content && (
-        <div className='prose prose-sm dark:prose-invert max-h-24 overflow-hidden'>
-          {post.content}
-        </div>
-      )}
-
-      {post.type === 'PHOTO' && post.postsToPhotos[0] && (
-        <div className='rounded-md overflow-hidden'>
-          <Image
-            src={post.postsToPhotos[0].photo.url}
-            alt={post.postsToPhotos[0].photo.title}
-            width={post.postsToPhotos[0].photo.width}
-            height={post.postsToPhotos[0].photo.height}
-            className='w-full h-auto'
-          />
-        </div>
-      )}
-
-      {post.type === 'ALBUM' && post.postsToPhotos.length > 0 && (
-        <div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-          {post.postsToPhotos.map(({ photo }) => (
-            <div
-              key={photo.id}
-              className='rounded-md overflow-hidden aspect-square'
-            >
-              <Image
-                src={photo.url}
-                alt={photo.title}
-                width={photo.width}
-                height={photo.height}
-                className='w-full h-full object-cover'
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { type PostGetPublished } from '@/modules/posts/types';
+import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
+import { PostCard } from '../components/post-card';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 interface InfiniteFeedViewProps {
   collectionSlug?: string;
 }
 
+type FeedPage = PostGetPublished | CollectionGetPostsInCollection;
+
 export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   const trpc = useTRPC();
 
-  return <div>Infinte feed</div>;
+  const queryOptions = collectionSlug
+    ? trpc.collections.getPostsInCollection.infiniteQueryOptions({
+        collectionSlug,
+        limit: 5,
+      })
+    : trpc.posts.getPublished.infiniteQueryOptions({
+        limit: 5,
+      });
 
-  // const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-  //   collectionSlug
-  //     ? trpc.collections.getPostsInCollection.useInfiniteQuery(
-  //         {
-  //           collectionSlug,
-  //           limit: 5,
-  //         },
-  //         {
-  //           getNextPageParam: (lastPage) => lastPage.nextCursor,
-  //           initialPageParam: 1,
-  //         },
-  //       )
-  //     : trpc.home.getPublicFeed.useInfiniteQuery(
-  //         {
-  //           limit: 5, // Changed from pageSize
-  //         },
-  //         {
-  //           getNextPageParam: (lastPage) => lastPage.nextCursor,
-  //           initialPageParam: 1,
-  //         },
-  //       );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      ...queryOptions,
+      getNextPageParam: (lastPage: FeedPage) => lastPage.nextCursor,
+      initialPageParam: 1,
+    });
 
-  // const observer = useRef<IntersectionObserver>();
-  // const lastPostRef = useCallback(
-  //   (node: HTMLDivElement) => {
-  //     if (isFetchingNextPage) return;
-  //     if (observer.current) observer.current.disconnect();
-  //     observer.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasNextPage) {
-  //         fetchNextPage();
-  //       }
-  //     });
-  //     if (node) observer.current.observe(node);
-  //   },
-  //   [isFetchingNextPage, fetchNextPage, hasNextPage],
-  // );
+  const { lastElementRef } = useIntersectionObserver({
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  });
 
-  // const posts = data?.pages.flatMap((page) => page.items);
+  const posts = useMemo(() => {
+    return (
+      data?.pages
+        .flatMap((page) => (page.items as PostWithPhotos[]) || [])
+        .filter((post) => post.visibility === 'public') || []
+    );
+  }, [data?.pages]);
 
-  // return (
-  //   <div className='w-full max-w-3xl mx-auto space-y-8 py-8 px-4'>
-  //     {/* <Introduction /> Removed Introduction component */}
-  //     <div className='space-y-8'>
-  //       {posts?.map((post, i) => (
-  //         <div key={post.id} ref={i === posts.length - 1 ? lastPostRef : null}>
-  //           {/* The type assertion is needed because drizzle's relational queries are not fully typed yet */}
-  //           <PostCard
-  //             post={post as Post & { postsToPhotos: { photo: Photo }[] }}
-  //           />
-  //         </div>
-  //       ))}
-  //     </div>
-  //     {isFetchingNextPage && (
-  //       <div className='space-y-8'>
-  //         <Skeleton className='w-full h-64 rounded-lg' />
-  //         <Skeleton className='w-full h-64 rounded-lg' />
-  //       </div>
-  //     )}
-  //     {!hasNextPage && !isFetchingNextPage && <Footer />}
-  //   </div>
-  // );
+  return (
+    <div className='w-full space-y-8 py-8 max-w-420 mx-auto'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-[0.06rem] border-y border-muted -mx-3 md:mx-0'>
+        {posts.map((post, i) => (
+          <div
+            key={post.id}
+            ref={i === posts.length - 1 ? lastElementRef : null}
+          >
+            <PostCard post={post} index={i} />
+          </div>
+        ))}
+      </div>
+
+      {isFetchingNextPage && <LoadingSkeletons count={2} />}
+    </div>
+  );
 };
 
+const LoadingSkeletons = ({ count = 3 }: { count?: number }) => (
+  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+    {Array.from({ length: count }).map((_, i) => (
+      <Skeleton key={i} className='w-full aspect-[0.8] rounded-none' />
+    ))}
+  </div>
+);
+
 export const InfiniteFeedViewLoadingStatus = () => {
-  // Renamed LoadingStatus to InfiniteFeedViewLoadingStatus
   return (
-    <div className='w-full max-w-3xl mx-auto space-y-8 py-8 px-4'>
-      {/* <Introduction /> Removed Introduction component */}
-      <div className='space-y-8'>
-        <Skeleton className='w-full h-64 rounded-lg' />
-        <Skeleton className='w-full h-64 rounded-lg' />
-        <Skeleton className='w-full h-64 rounded-lg' />
-      </div>
+    <div className='w-full py-8'>
+      <LoadingSkeletons count={3} />
     </div>
   );
 };

@@ -11,7 +11,7 @@ import { Collection } from '@/db/schema';
 export const FeaturedCollectionsView = () => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.home.getFeaturedCollections.queryOptions({ limit: 12 }),
+    trpc.collections.getFeaturedCollections.queryOptions({ limit: 12 }),
   );
 
   if (data.length === 0) {

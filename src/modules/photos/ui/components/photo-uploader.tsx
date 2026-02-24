@@ -12,9 +12,14 @@ interface PhotoUploaderProps {
   ) => void;
   folder?: string;
   onCreateSuccess?: () => void;
+  multiple?: boolean;
 }
 
-export function PhotoUploader({ onUploadSuccess, folder }: PhotoUploaderProps) {
+export function PhotoUploader({
+  onUploadSuccess,
+  folder,
+  multiple = false,
+}: PhotoUploaderProps) {
   const { isUploading, handleUpload, uploadProgress } = usePhotoUpload({
     folder,
     onUploadSuccess,
@@ -25,6 +30,7 @@ export function PhotoUploader({ onUploadSuccess, folder }: PhotoUploaderProps) {
       isUploading={isUploading}
       onUpload={handleUpload}
       uploadProgress={uploadProgress}
+      multiple={multiple}
     />
   );
 }

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { useState } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface VisibilityToggleProps {
   photoId: string;
-  initialValue: "public" | "private";
+  initialValue: 'public' | 'private';
 }
 
 export function VisibilityToggle({
@@ -23,7 +23,7 @@ export function VisibilityToggle({
   const updatePhoto = useMutation(trpc.photos.update.mutationOptions());
 
   const handleToggle = async (checked: boolean) => {
-    const newValue = checked ? "public" : "private";
+    const newValue = checked ? 'public' : 'private';
 
     // Optimistic update
     setVisibility(newValue);
@@ -31,7 +31,6 @@ export function VisibilityToggle({
     updatePhoto.mutate(
       {
         id: photoId,
-        visibility: newValue,
       },
       {
         onSuccess: async () => {
@@ -40,13 +39,13 @@ export function VisibilityToggle({
             trpc.photos.getMany.queryOptions({}),
           );
           toast.success(
-            `Photo is now ${newValue === "public" ? "public" : "private"}`,
+            `Photo is now ${newValue === 'public' ? 'public' : 'private'}`,
           );
         },
         onError: (error) => {
           // Revert on error
-          setVisibility(newValue === "public" ? "private" : "public");
-          toast.error(error.message || "Failed to update visibility");
+          setVisibility(newValue === 'public' ? 'private' : 'public');
+          toast.error(error.message || 'Failed to update visibility');
         },
       },
     );
@@ -54,22 +53,22 @@ export function VisibilityToggle({
 
   return (
     <div
-      className="flex items-center gap-2"
+      className='flex items-center gap-2'
       onClick={(e) => e.stopPropagation()}
     >
-      {visibility === "public" ? (
-        <Eye className="h-4 w-4 text-green-600" />
+      {visibility === 'public' ? (
+        <Eye className='h-4 w-4 text-green-600' />
       ) : (
-        <EyeOff className="h-4 w-4 text-muted-foreground" />
+        <EyeOff className='h-4 w-4 text-muted-foreground' />
       )}
       <Switch
-        checked={visibility === "public"}
+        checked={visibility === 'public'}
         onCheckedChange={handleToggle}
         disabled={updatePhoto.isPending}
-        aria-label="Toggle visibility"
+        aria-label='Toggle visibility'
       />
-      <span className="text-sm text-muted-foreground min-w-[50px]">
-        {visibility === "public" ? "Public" : "Private"}
+      <span className='text-sm text-muted-foreground min-w-[50px]'>
+        {visibility === 'public' ? 'Public' : 'Private'}
       </span>
     </div>
   );

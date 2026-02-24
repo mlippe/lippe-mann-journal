@@ -1,7 +1,5 @@
-import { Suspense } from 'react';
 import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
-import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Footer from '@/components/footer';
 import Image from 'next/image';
@@ -20,7 +18,6 @@ export const generateMetadata = async ({
 
   return {
     title: post?.title || 'Post',
-    description: post?.description || 'Post details.',
   };
 };
 
@@ -57,9 +54,6 @@ const SinglePostView = async ({ params }: { params: { postId: string } }) => {
           <div className='absolute inset-0 bg-black/50 -z-10' />
           <div>
             <h1 className='text-5xl font-bold'>{postWithPhotos.title}</h1>
-            {postWithPhotos.description && (
-              <p className='text-xl mt-2'>{postWithPhotos.description}</p>
-            )}
           </div>
         </div>
 

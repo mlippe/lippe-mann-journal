@@ -9,7 +9,7 @@ import {
 } from "@/constants";
 
 // Zod schema for the output of getPostsInCollection
-const postsInCollectionOutputSchema = z.object({
+export const postsInCollectionOutputSchema = z.object({
   items: z.array(postsWithPhotos),
   nextCursor: z.number().optional(),
   total: z.number(),
@@ -49,12 +49,30 @@ export const collectionsRouter = createTRPCRouter({
       return collection;
     }),
 
+  getFeaturedCollections: baseProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { limit } = input;
+
+      const data = await ctx.db.query.collections.findMany({
+        where: (collections, { eq }) => eq(collections.isFeatured, true),
+        orderBy: [desc(collections.updatedAt)],
+        limit: limit,
+      });
+
+      return data;
+    }),
+
   getPostsInCollection: baseProcedure
     .input(
       z.object({
         collectionSlug: z.string(),
         limit: z.number().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
-        cursor: z.number().nullish(), // Page number for offset-based pagination
+        cursor: z.number().optional(), // Page number for offset-based pagination
       }),
     )
     .output(postsInCollectionOutputSchema)
@@ -76,7 +94,7 @@ export const collectionsRouter = createTRPCRouter({
 
       // Query posts linked to this collection
       const data = await ctx.db.query.posts.findMany({
-        where: and(
+        where: (posts, { and, eq, exists }) => and(
           eq(posts.visibility, 'public'),
           exists(
             ctx.db.select().from(postsToCollections).where(

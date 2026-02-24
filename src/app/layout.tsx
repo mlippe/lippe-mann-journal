@@ -32,11 +32,8 @@ export default function RootLayout({
         <NuqsAdapter>
           <TRPCReactProvider>
             <ThemeProvider attribute='class'>
-              <div className='flex items-center justify-center min-h-screen'>
-                <span>Lippe & Mann Journal</span>
-              </div>
-              {/* <Toaster />
-              {children} */}
+              <Toaster />
+              {children}
             </ThemeProvider>
           </TRPCReactProvider>
         </NuqsAdapter>

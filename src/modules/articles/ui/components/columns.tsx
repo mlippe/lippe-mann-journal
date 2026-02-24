@@ -37,7 +37,7 @@ export const columns: ColumnDef<PostGetMany[number]>[] = [
           />
 
           <Button variant='ghost' size='icon' asChild>
-            <Link href={`/dashboard/articles/${row.original.slug}`}>
+            <Link href={`/dashboard/posts/${row.original.slug}`}>
               <PenBoxIcon className='h-4 w-4' />
             </Link>
           </Button>
