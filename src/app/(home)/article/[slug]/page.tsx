@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
-import { BlogSlugView } from '@/modules/blog/ui/views/blog-slug-view';
+import { ArticleSlugView } from '@/modules/blog/ui/views/blog-slug-view';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -19,9 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const PhotoPage = async ({ params }: Props) => {
+const ArticlePage = async ({ params }: Props) => {
   const { slug } = await params;
-  return <BlogSlugView slug={slug} />;
+  return <ArticleSlugView slug={slug} />;
 };
 
-export default PhotoPage;
+export default ArticlePage;
