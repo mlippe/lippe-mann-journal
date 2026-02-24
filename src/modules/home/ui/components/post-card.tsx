@@ -136,10 +136,16 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
             asChild
           >
-            <Link href={href}>
-              <IconArrowUpRight />
-              {isArticle && 'read article'}
-            </Link>
+            {isMobile && !isArticle ? (
+              <a href={href}>
+                <IconArrowUpRight />
+              </a>
+            ) : (
+              <Link href={href}>
+                <IconArrowUpRight />
+                {isArticle && 'read article'}
+              </Link>
+            )}
           </Button>
         </div>
       )}
@@ -293,7 +299,7 @@ const MediaContent = ({
     }
 
     return (
-      <div className='h-full w-full p-3 relative'>
+      <a href={href} className='h-full w-full p-3 relative block'>
         <BlurImage
           src={keyToUrl(firstPhoto.url)}
           alt={firstPhoto.title ?? post.title}
@@ -304,7 +310,7 @@ const MediaContent = ({
           aspectRatio={firstPhoto.aspectRatio ?? undefined}
           className='object-contain p-3'
         />
-      </div>
+      </a>
     );
   }
 
