@@ -38,7 +38,7 @@ const ConfirmStep = ({
   isSubmitting: boolean;
   onSubmit: (data: ConfirmStepData) => void;
 }) => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const form = useForm<ConfirmStepData>({
     resolver: zodResolver(confirmStepSchema),
