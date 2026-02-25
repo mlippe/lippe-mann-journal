@@ -50,6 +50,12 @@ export default function RichTextViewer({ content }: RichTextProps) {
             class: 'border-l-4 border-primary pl-4 italic',
           },
         },
+        link: {
+          HTMLAttributes: {
+            class:
+              'underline hover:no-underline hover:bg-background bg-muted/50',
+          },
+        },
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],

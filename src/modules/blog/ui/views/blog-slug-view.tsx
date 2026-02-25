@@ -29,16 +29,19 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
 
         {/* CONTENT  */}
         <div className='px-3'>
-          <span className=' text-xs text-foreground/80 font-light'>
+          <span className='text-base text-foreground/80 mb-2 block'>
             {format(data.createdAt, 'dd.MM.yyyy')}
           </span>
-          <h1 className='text-3xl mb-10'>{data.title}</h1>
+          <h1 className='text-4xl tracking-tight lg:text-5xl mb-10 font-bold'>
+            {data.title}
+          </h1>
         </div>
 
         {/* POST PREVIEW */}
+
         <RichTextViewer content={data.content || ''} />
       </div>
-      <FeedPreview />
+      <FeedPreview excludeSlug={slug} />
       <div className='mt-10 w-full'>
         <Footer />
       </div>
