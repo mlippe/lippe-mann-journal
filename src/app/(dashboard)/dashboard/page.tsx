@@ -11,6 +11,7 @@ import {
   SectionCardsView,
   SectionCardsLoading,
 } from '@/modules/dashboard/ui/views/section-cards-view';
+import { NewPostView } from '@/modules/dashboard/ui/views/new-post-view';
 
 const page = async () => {
   const queryClient = getQueryClient();
@@ -32,6 +33,7 @@ const page = async () => {
       <div className='@container/main flex flex-1 flex-col'>
         <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
           <HydrationBoundary state={dehydrate(queryClient)}>
+            <NewPostView />
             <Suspense fallback={<SectionCardsLoading />}>
               <SectionCardsView />
             </Suspense>

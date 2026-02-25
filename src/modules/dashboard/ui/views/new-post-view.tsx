@@ -11,10 +11,10 @@ import Link from 'next/link';
 
 export const NewPostView = () => {
   return (
-    <div className='px-4 md:px-8 py-4 md:py-6'>
-      <div className='flex flex-wrap gap-5'>
+    <div>
+      <div className='flex flex-col md:flex-row md:flex-wrap gap-5'>
         <Link href='/dashboard/new/photo'>
-          <Card className='w-fit cursor-pointer hover:bg-white'>
+          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
             <CardContent className='flex gap-2 items-center'>
               <IconPhotoPlus />
               <CardTitle className='text-lg'>New Photo</CardTitle>
@@ -23,7 +23,7 @@ export const NewPostView = () => {
         </Link>
 
         <Link href='/dashboard/new/album'>
-          <Card className='w-fit cursor-pointer hover:bg-white'>
+          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
             <CardContent className='flex gap-2 items-center'>
               <IconPhotoVideo />
               <CardTitle className='text-lg'>New Photo Album</CardTitle>
@@ -32,7 +32,7 @@ export const NewPostView = () => {
         </Link>
 
         <Link href='/dashboard/new/article'>
-          <Card className='w-fit cursor-pointer hover:bg-white'>
+          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
             <CardContent className='flex gap-2 items-center'>
               <IconNotebook />
               <CardTitle className='text-lg'>New Article</CardTitle>
