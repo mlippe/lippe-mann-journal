@@ -115,3 +115,31 @@ export function formatRelativeCustom(
 
   return formatRelative(date, baseDate, { locale });
 }
+
+export function createPreview(html: string | null | undefined, length: number = 200) {
+  if (!html) return '';
+
+  const text = html
+    .replace(/<[^>]*>/g, ' ') // Replace all tags with a space
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/'/g, "'");
+
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+
+  if (cleaned.length <= length) return cleaned;
+
+  // Try to find a space near the end to avoid cutting words
+  const truncated = cleaned.substring(0, length);
+  const lastSpace = truncated.lastIndexOf(' ');
+
+  if (lastSpace > length * 0.8) {
+    return truncated.substring(0, lastSpace).trim() + '...';
+  }
+
+  return truncated.trim() + '...';
+}

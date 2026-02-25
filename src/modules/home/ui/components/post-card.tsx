@@ -2,7 +2,7 @@ import { type PostWithPhotos } from '@/db/schema';
 import Image from 'next/image';
 import Link from 'next/link';
 import BlurImage from '@/components/blur-image';
-import { formatRelativeCustom } from '@/lib/utils';
+import { createPreview, formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useRef, useState } from 'react';
@@ -94,7 +94,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         {/* Open Badge */}
         <Badge
           variant='default'
-          className='hidden md:flex absolute bottom-10 left-1/2 -translate-x-1/2 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-sm duration-500'
+          className='hidden md:flex absolute bottom-1/2 translate-y-full left-1/2 -translate-x-1/2 z-20 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity pointer-events-none text-[0.85rem]! uppercase tracking-widest gap-1.5 px-3 py-2 bg-foreground/90 backdrop-blur-sm border-foreground  shadow-2xl duration-500'
         >
           {postTypeActionString}
         </Badge>
@@ -104,7 +104,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <Badge
             variant='secondary'
             className={clsx(
-              'hidden md:flex absolute top-4 right-4 z-20 pointer-events-none  px-2.5 py-1.5 bg-background/80 backdrop-blur-sm  shadow-sm ',
+              'hidden md:flex absolute top-4 right-4 z-20 pointer-events-none  px-2.5 py-1.5 bg-background/80 backdrop-blur-sm  shadow-sm border border-foreground/40',
               isArticle && 'bg-foreground/80 text-background',
             )}
           >
@@ -127,27 +127,41 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       </div>
 
       {/* Mobile Footer */}
-      {isMobile && (
-        <div className='p-3 pb-6 md:hidden flex gap-2 justify-between w-full '>
-          <span className='text-sm line-clamp-3 font-medium block mt-2'>
+      {isMobile && !isArticle && (
+        <div className='p-3 pb-6 md:hidden flex gap-2 justify-between w-full'>
+          <p className='text-sm line-clamp-3 font-medium block mt-2'>
             {post.title}
-          </span>
+          </p>
 
           <Button
             variant='secondary'
             className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
             asChild
           >
-            {isMobile && !isArticle ? (
-              <a href={href}>
-                <IconArrowUpRight />
-              </a>
-            ) : (
-              <Link href={href}>
-                <IconArrowUpRight />
-                {isArticle && 'Artikel lesen'}
-              </Link>
-            )}
+            <a href={href}>
+              <IconArrowUpRight />
+            </a>
+          </Button>
+        </div>
+      )}
+      {isMobile && isArticle && (
+        <div className='p-3 pb-6 md:hidden flex gap-2 flex-col w-full'>
+          <p className='text-lg tracking-tight leading-snug font-medium block'>
+            {post.title}
+          </p>
+          <p className='text-sm line-clamp-3 text-foreground/70 -mt-0.5'>
+            {createPreview(post.content)}
+          </p>
+
+          <Button
+            variant='secondary'
+            className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 mt-2'
+            asChild
+          >
+            <Link href={href}>
+              Artikel lesen
+              <IconArrowUpRight />
+            </Link>
           </Button>
         </div>
       )}

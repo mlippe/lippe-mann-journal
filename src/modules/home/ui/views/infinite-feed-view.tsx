@@ -49,6 +49,8 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
     );
   }, [data?.pages]);
 
+  console.log(posts);
+
   return (
     <div className='w-full space-y-8 py-8 max-w-420 mx-auto'>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-[0.06rem] border-y border-muted -mx-3 md:mx-0'>
