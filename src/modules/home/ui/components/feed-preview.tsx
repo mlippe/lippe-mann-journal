@@ -52,7 +52,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
       </div>
       <div className='absolute bottom-0 -left-3 w-[calc(100%+1.5rem)] h-[75vh] md:h-1/2  z-50 flex flex-col gap-4 justify-center items-center pb-10 bg-linear-to-b from-background/0 via-background/90 to-background via-40% to-80%  '>
         <p className='text-foreground font-medium text-xl'>Du willst mehr?</p>
-        <Button asChild className='rounded-full px-8'>
+        <Button asChild className='rounded-full px-8 uppercase tracking-widest'>
           <Link href='/'>Alle Einträge ansehen</Link>
         </Button>
       </div>

@@ -113,8 +113,18 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         )}
 
         {isArticle ? (
-          <ContentWrapper href={href} className='block h-full'>
+          <ContentWrapper href={href} className='block h-full relative'>
             <ArticleContent post={post} priority={isPriority} />
+            <div className='hidden md:flex md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-500 absolute inset-0 bg-linear-to-b from-background/0 to-background/95 to-60% xl:to-80% from-40% flex-col justify-end'>
+              <div className='xl:p-12 p-8'>
+                <p className='text-xl xl:text-2xl tracking-tight leading-snug font-medium block max-w-xl mb-2 line-clamp-2'>
+                  {post.title}
+                </p>
+                <p className='text-base line-clamp-3 text-foreground/70  max-w-lg'>
+                  {createPreview(post.content)}
+                </p>
+              </div>
+            </div>
           </ContentWrapper>
         ) : (
           <MediaContent
