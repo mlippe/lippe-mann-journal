@@ -41,7 +41,9 @@ const BlurImageInner = function BlurImageInner({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-  const containerStyle = fill ? 'absolute inset-0 flex items-center justify-center' : 'relative w-full h-full';
+  const containerStyle = fill
+    ? 'absolute inset-0 flex items-center justify-center'
+    : 'relative w-full h-full flex justify-center items-center';
 
   useEffect(() => {
     if (!imageLoaded) return;
@@ -63,12 +65,20 @@ const BlurImageInner = function BlurImageInner({
             imageLoaded ? 'opacity-0' : 'opacity-100'
           }`}
         >
-          <div 
+          <div
             className={className ?? ''}
-            style={{ 
+            style={{
               aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
-              width: aspectRatio ? (aspectRatio > 0.8 ? '100%' : 'auto') : '100%',
-              height: aspectRatio ? (aspectRatio > 0.8 ? 'auto' : '100%') : '100%',
+              width: aspectRatio
+                ? aspectRatio > 0.8
+                  ? '100%'
+                  : 'auto'
+                : '100%',
+              height: aspectRatio
+                ? aspectRatio > 0.8
+                  ? 'auto'
+                  : '100%'
+                : '100%',
               maxHeight: '100%',
               maxWidth: '100%',
             }}

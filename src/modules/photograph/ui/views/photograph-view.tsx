@@ -11,7 +11,6 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   IconArrowLeft,
@@ -84,7 +83,7 @@ const PhotoInfo = ({
       className={cn(
         'flex flex-col justify-between backdrop-blur-xl',
         isModal
-          ? 'h-full bg-background/95 w-3/16'
+          ? 'h-full bg-background/95 w-5/16 lg:w-4/16 xl:w-3/16'
           : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16',
       )}
     >
@@ -137,7 +136,7 @@ const DesktopMedia = ({
       className={cn(
         'bg-background p-3 relative group flex items-center justify-center',
         isModal
-          ? 'w-13/16 h-full'
+          ? 'w-11/16 lg:w-12/16 xl:w-13/16 h-full'
           : 'w-full md:w-11/16 lg:w-12/16 xl:w-13/16 min-h-[50vh]',
       )}
     >
