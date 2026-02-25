@@ -33,12 +33,14 @@ import { StrikeThroughToolbar } from './toolbars/strikethrough';
 import { YoutubeToolbar } from './toolbars/youtube';
 import { YoutubeExtension } from './extensions/youtube';
 import TextAlign from '@tiptap/extension-text-align';
+import Link from '@tiptap/extension-link';
 import { useTRPC } from '@/trpc/client';
 import { useMutation } from '@tanstack/react-query';
 import { s3Client } from '@/modules/s3/lib/upload-client';
 import { toast } from 'sonner';
 import { ToolbarProvider } from './toolbars/toolbar-provider';
 import { HeadingToolbar } from './toolbars/heading';
+import { LinkToolbar } from './toolbars/link';
 
 interface TiptapEditorProps {
   content?: string;
@@ -90,6 +92,16 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         Subscript,
         Superscript,
         Underline,
+        Link.configure({
+          autolink: true,
+          openOnClick: false,
+          enableClickSelection: true,
+          linkOnPaste: true,
+          defaultProtocol: 'https',
+          HTMLAttributes: {
+            class: 'underline font-bold',
+          },
+        }),
         Color,
         Highlight.configure({
           multicolor: true,
@@ -171,6 +183,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
             <BulletListToolbar />
             <OrderedListToolbar />
             <CodeBlockToolbar />
+            <LinkToolbar />
             <BlockquoteToolbar />
             <AlignmentToolbar />
             <HardBreakToolbar />
