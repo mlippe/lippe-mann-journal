@@ -283,13 +283,13 @@
 }
 
 #album-swiper-modal #album-swiper-pagination,
-#album-swiper-mobile-feed .album-swiper-pagination {
-  @apply absolute left-1/2 -translate-x-1/2 z-10 flex w-auto! top-[initial]!;
+.album-swiper-mobile-feed .album-swiper-pagination {
+  @apply absolute! left-1/2! -translate-x-1/2! z-10 flex! w-auto! top-[initial]!;
 }
 
 #album-swiper-modal #album-swiper-pagination .swiper-pagination-bullet,
-#album-swiper-mobile-feed .album-swiper-pagination .swiper-pagination-bullet {
-  @apply bg-foreground opacity-40 transition-all m-0 rounded-md duration-300;
+.album-swiper-mobile-feed .album-swiper-pagination .swiper-pagination-bullet {
+  @apply bg-foreground opacity-40 transition-all m-0! rounded-md duration-300;
 }
 
 #album-swiper-modal #album-swiper-pagination {
@@ -304,15 +304,15 @@
   @apply opacity-95 w-3.5;
 }
 
-#album-swiper-mobile-feed .album-swiper-pagination {
-  @apply -bottom-2.5 gap-1.5;
+.album-swiper-mobile-feed .album-swiper-pagination {
+  @apply -bottom-2.5! gap-1.5;
 }
 
-#album-swiper-mobile-feed .album-swiper-pagination .swiper-pagination-bullet {
+.album-swiper-mobile-feed .album-swiper-pagination .swiper-pagination-bullet {
   @apply size-1.5;
 }
 
-#album-swiper-mobile-feed
+.album-swiper-mobile-feed
   .album-swiper-pagination
   .swiper-pagination-bullet-active {
   @apply opacity-95 w-2.5;

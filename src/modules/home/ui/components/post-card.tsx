@@ -220,7 +220,11 @@ const MediaContent = ({
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const uniquePagination = useId();
+  const id = useId();
+  const uniqueId = id.replace(/:/g, '');
+  const prevElId = `swiper-prev-${uniqueId}`;
+  const nextElId = `swiper-next-${uniqueId}`;
+  const paginationId = `swiper-pagination-${uniqueId}`;
 
   useEffect(() => {
     if (!isMobile || post.type !== 'ALBUM' || photos.length <= 1) return;
@@ -232,14 +236,20 @@ const MediaContent = ({
           observer.disconnect();
         }
       },
-      { rootMargin: '300px' }, // Start loading when 300px away
+      {
+        rootMargin: '300px',
+        threshold: 0,
+      },
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      observer.observe(currentContainer);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [isMobile, post.type, photos.length]);
 
   if (!firstPhoto) return null;
@@ -251,9 +261,8 @@ const MediaContent = ({
     if (post.type === 'ALBUM' && photos.length > 1) {
       return (
         <div
-          id='album-swiper-mobile-feed'
           ref={containerRef}
-          className='h-full w-full relative'
+          className='h-full w-full relative album-swiper-mobile-feed'
         >
           {shouldRenderSwiper ? (
             <>
@@ -264,11 +273,11 @@ const MediaContent = ({
                 loop
                 keyboard={{ enabled: true }}
                 navigation={{
-                  prevEl: '#album-swiper-prev',
-                  nextEl: '#album-swiper-next',
+                  prevEl: `#${prevElId}`,
+                  nextEl: `#${nextElId}`,
                 }}
                 pagination={{
-                  el: `#album-swiper-pagination-${uniquePagination}`,
+                  el: `#${paginationId}`,
                   clickable: true,
                 }}
                 className='h-full w-full'
@@ -291,7 +300,7 @@ const MediaContent = ({
                   </SwiperSlide>
                 ))}
                 <Button
-                  id='album-swiper-prev'
+                  id={prevElId}
                   size='icon-sm'
                   className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                   variant='outline'
@@ -299,7 +308,7 @@ const MediaContent = ({
                   <IconArrowLeft />
                 </Button>
                 <Button
-                  id='album-swiper-next'
+                  id={nextElId}
                   size='icon-sm'
                   className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                   variant='outline'
@@ -307,10 +316,7 @@ const MediaContent = ({
                   <IconArrowRight />
                 </Button>
               </Swiper>
-              <div
-                id={`album-swiper-pagination-${uniquePagination}`}
-                className='album-swiper-pagination'
-              />
+              <div id={paginationId} className='album-swiper-pagination' />
             </>
           ) : (
             <div className='h-full w-full p-3 relative'>
