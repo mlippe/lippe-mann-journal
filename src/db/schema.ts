@@ -172,6 +172,9 @@ export const posts = pgTable(
     type: postType('type').notNull(),
     tags: text('tags').array(),
     coverImage: text('cover_image'),
+    coverImageWidth: integer('cover_image_width'),
+    coverImageHeight: integer('cover_image_height'),
+    coverImageBlurData: text('cover_image_blur_data'),
     content: text('content'), // For BLOG posts
     ...timestamps,
   },

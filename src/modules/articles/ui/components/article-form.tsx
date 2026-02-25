@@ -93,6 +93,9 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
       content: post?.content || '',
       visibility: post?.visibility || 'public',
       coverImage: post?.coverImage || '',
+      coverImageWidth: post?.coverImageWidth || undefined,
+      coverImageHeight: post?.coverImageHeight || undefined,
+      coverImageBlurData: post?.coverImageBlurData || '',
       tags: post?.tags || [],
     },
   });
@@ -162,6 +165,11 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                     <FileUploader
                       onUploadSuccess={(key) => {
                         field.onChange(key);
+                      }}
+                      onMetadata={(info) => {
+                        form.setValue('coverImageWidth', info.width);
+                        form.setValue('coverImageHeight', info.height);
+                        form.setValue('coverImageBlurData', info.blurhash);
                       }}
                       folder='posts'
                       value={field.value}

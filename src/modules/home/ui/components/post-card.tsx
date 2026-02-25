@@ -1,5 +1,4 @@
 import { type PostWithPhotos } from '@/db/schema';
-import Image from 'next/image';
 import Link from 'next/link';
 import BlurImage from '@/components/blur-image';
 import { createPreview, formatRelativeCustom } from '@/lib/utils';
@@ -180,15 +179,22 @@ const ArticleContent = ({
   priority: boolean;
 }) => {
   if (post.coverImage && post.coverImage.length > 0) {
+    const aspectRatio =
+      post.coverImageWidth && post.coverImageHeight
+        ? post.coverImageWidth / post.coverImageHeight
+        : undefined;
+
     return (
       <div className='h-full p-3 relative'>
-        <Image
+        <BlurImage
           src={keyToUrl(post.coverImage)}
           alt={post.title}
           fill
           priority={priority}
           sizes='(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)'
           className='object-contain p-3'
+          blurhash={post.coverImageBlurData!}
+          aspectRatio={aspectRatio}
         />
       </div>
     );

@@ -12,9 +12,11 @@ import { keyToUrl } from "@/modules/s3/lib/key-to-url";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CloudUpload, ImageIcon, Upload, XIcon } from "lucide-react";
+import { getImageInfo, type TImageInfo } from "@/modules/photos/lib/utils";
 
 interface FileUploaderProps {
   onUploadSuccess?: (key: string) => void;
+  onMetadata?: (info: TImageInfo) => void;
   folder?: string;
   value?: string;
 }
@@ -53,6 +55,16 @@ const FileUploader = ({
       );
 
       try {
+        if (file.type.startsWith("image/")) {
+          getImageInfo(file)
+            .then((info) => {
+              onMetadata?.(info);
+            })
+            .catch((err) => {
+              console.error("Failed to get image info", err);
+            });
+        }
+
         const { publicUrl } = await s3Client.upload({
           file,
           folder,

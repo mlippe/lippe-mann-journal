@@ -10,6 +10,9 @@ export const postFormSchema = z.object({
   content: z.string().optional(),
   visibility: z.enum(['public', 'private']),
   coverImage: z.string().optional(),
+  coverImageWidth: z.number().optional(),
+  coverImageHeight: z.number().optional(),
+  coverImageBlurData: z.string().optional(),
   tags: z.array(z.string()),
   description: z.string().optional(),
 });
