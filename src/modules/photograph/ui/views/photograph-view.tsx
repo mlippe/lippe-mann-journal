@@ -144,7 +144,7 @@ const DesktopMedia = ({
       {isAlbum ? (
         <>
           <Swiper
-            id='album-swiper'
+            id='album-swiper-modal'
             modules={[Navigation, Pagination, Keyboard]}
             slidesPerView={1}
             onSlideChange={(s) => onSlideChange(s.realIndex)}

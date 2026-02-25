@@ -5,7 +5,7 @@ import BlurImage from '@/components/blur-image';
 import { createPreview, formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard } from 'swiper/modules';
 import 'swiper/css';
@@ -210,6 +210,8 @@ const MediaContent = ({
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const uniquePagination = useId();
+
   useEffect(() => {
     if (!isMobile || post.type !== 'ALBUM' || photos.length <= 1) return;
 
@@ -239,7 +241,7 @@ const MediaContent = ({
     if (post.type === 'ALBUM' && photos.length > 1) {
       return (
         <div
-          id='album-swiper'
+          id='album-swiper-mobile-feed'
           ref={containerRef}
           className='h-full w-full relative'
         >
@@ -256,7 +258,7 @@ const MediaContent = ({
                   nextEl: '#album-swiper-next',
                 }}
                 pagination={{
-                  el: '#album-swiper-pagination',
+                  el: `#album-swiper-pagination-${uniquePagination}`,
                   clickable: true,
                 }}
                 className='h-full w-full'
@@ -295,7 +297,10 @@ const MediaContent = ({
                   <IconArrowRight />
                 </Button>
               </Swiper>
-              <div id='album-swiper-pagination' />
+              <div
+                id={`album-swiper-pagination-${uniquePagination}`}
+                className='album-swiper-pagination'
+              />
             </>
           ) : (
             <div className='h-full w-full p-3 relative'>
