@@ -126,41 +126,34 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         )}
       </div>
 
-      {/* Mobile Footer */}
+      {/* Mobile Footer Non Article */}
       {isMobile && !isArticle && (
-        <div className='p-3 pb-6 md:hidden flex gap-2 justify-between w-full'>
-          <p className='text-sm line-clamp-3 font-medium block mt-2'>
+        <div className='p-3 pt-5 pb-6 md:hidden flex gap-2 flex-col w-full'>
+          <p className='text-sm line-clamp-3  block max-w-xl pr-2 w-full'>
             {post.title}
           </p>
-
-          <Button
-            variant='secondary'
-            className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 '
-            asChild
+          <a
+            className='text-xs underline flex items-center gap-1 text-foreground/70'
+            href={href}
           >
-            <a href={href}>
-              <IconArrowUpRight />
-            </a>
-          </Button>
+            Mehr Details <IconArrowUpRight className='size-3.5' />
+          </a>
         </div>
       )}
+      {/* Mobile Footer Article */}
       {isMobile && isArticle && (
-        <div className='p-3 pb-6 md:hidden flex gap-2 flex-col w-full'>
-          <p className='text-lg tracking-tight leading-snug font-medium block'>
+        <div className='p-3 pb-6 md:hidden flex gap-2 flex-col w-full '>
+          <p className='text-lg tracking-tight leading-snug font-medium block max-w-xl'>
             {post.title}
           </p>
-          <p className='text-sm line-clamp-3 text-foreground/70 -mt-0.5'>
+          <p className='text-sm line-clamp-3 text-foreground/70 -mt-0.5 max-w-lg'>
             {createPreview(post.content)}
           </p>
 
-          <Button
-            variant='secondary'
-            className='text-[0.7rem]! uppercase tracking-widest gap-1.5 px-2.5 py-1.5 mt-2'
-            asChild
-          >
+          <Button variant='outline' className='text-xs  gap-1  mt-2' asChild>
             <Link href={href}>
-              Artikel lesen
-              <IconArrowUpRight />
+              Weiterlesen
+              <IconArrowUpRight className='size-3.5' />
             </Link>
           </Button>
         </div>
