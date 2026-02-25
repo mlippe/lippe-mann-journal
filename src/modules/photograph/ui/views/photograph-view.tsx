@@ -37,6 +37,8 @@ import 'swiper/css/keyboard';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Photo } from '@/db/schema';
+import { de } from 'date-fns/locale';
+import BlurImage from '@/components/blur-image';
 
 // --- Types ---
 
@@ -83,7 +85,7 @@ const PhotoInfo = ({
         'flex flex-col justify-between backdrop-blur-xl',
         isModal
           ? 'h-full bg-background/95 w-3/16'
-          : 'bg-muted/50 w-full md:w-5/16 lg:w-3/16',
+          : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16',
       )}
     >
       <div>
@@ -98,9 +100,11 @@ const PhotoInfo = ({
           )}
         </div>
         <div className='p-3'>
-          <p className='font-medium'>{post.title}</p>
-          <p className='text-xs text-muted-foreground'>
-            {format(post.createdAt, 'dd.MM.yyyy')}
+          <p className='font-medium text-lg leading-tight tracking-tight mb-1'>
+            {post.title}
+          </p>
+          <p className='text-sm text-muted-foreground'>
+            {format(post.createdAt, 'dd.MM.yyyy, p', { locale: de })}
           </p>
         </div>
       </div>
@@ -134,7 +138,7 @@ const DesktopMedia = ({
         'bg-background p-3 relative group flex items-center justify-center',
         isModal
           ? 'w-13/16 h-full'
-          : 'w-full md:w-11/16 lg:w-13/16 min-h-[50vh]',
+          : 'w-full md:w-11/16 lg:w-12/16 xl:w-13/16 min-h-[50vh]',
       )}
     >
       {isAlbum ? (
@@ -158,12 +162,14 @@ const DesktopMedia = ({
                 key={ptp.photo.id}
                 className='h-full flex items-center justify-center cursor-ew-resize'
               >
-                <Image
+                <BlurImage
                   src={keyToUrl(ptp.photo.url)}
                   alt={title}
                   width={ptp.photo.width}
                   height={ptp.photo.height}
                   className='max-w-full max-h-full w-full h-full object-contain'
+                  blurhash={ptp.photo.blurData}
+                  aspectRatio={ptp.photo.aspectRatio}
                   priority={i === 0}
                 />
               </SwiperSlide>
@@ -202,13 +208,14 @@ const DesktopMedia = ({
         </>
       ) : (
         <div className='flex items-center justify-center w-full h-full relative'>
-          <Image
+          <BlurImage
             src={keyToUrl(photos[0].photo.url)}
             alt={title}
             width={photos[0].photo.width}
             height={photos[0].photo.height}
             className='max-w-full max-h-full object-contain'
-            priority
+            blurhash={photos[0].photo.blurData}
+            aspectRatio={photos[0].photo.aspectRatio}
           />
           <Button
             size='icon-sm'
@@ -238,13 +245,15 @@ const MobileMediaList = ({
       (ptp, i) =>
         ptp && (
           <div key={ptp.photo.id} className='mt-6 relative'>
-            <Image
+            <BlurImage
               src={keyToUrl(ptp.photo.url)}
               alt={title}
               width={ptp.photo.width}
               height={ptp.photo.height}
               className='max-w-full w-full h-full object-contain max-h-screen'
               priority={i === 0}
+              blurhash={ptp.photo.blurData}
+              aspectRatio={ptp.photo.aspectRatio}
             />
             {ptp.photo.make && (
               <div className='p-3 bg-muted/50'>
