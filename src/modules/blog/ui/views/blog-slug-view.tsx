@@ -23,7 +23,7 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
             width={896}
             height={400}
             quality={75}
-            className='w-full max-h-screen object-contain mb-5'
+            className='w-full max-h-screen object-contain mb-5 bg-foreground/10'
           />
         )}
 

@@ -45,7 +45,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
 
   return (
     <div className='w-full pt-8 space-y-12 max-w-420 mx-auto relative'>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-[0.06rem] border-y border-muted -mx-3 md:mx-0'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem]  border-muted  border-y-12 md:border-y -mx-3 md:mx-0'>
         {filteredPosts.map((post, i) => (
           <PostCard key={post.id} post={post} index={i} />
         ))}
