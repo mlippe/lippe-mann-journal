@@ -262,7 +262,7 @@ const MediaContent = ({
       return (
         <div
           ref={containerRef}
-          className='h-full w-full relative album-swiper-mobile-feed'
+          className='album-swiper-mobile-feed absolute inset-0'
         >
           {shouldRenderSwiper ? (
             <>
