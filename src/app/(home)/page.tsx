@@ -20,14 +20,13 @@ export const dynamic = 'force-dynamic';
 const page = async () => {
   const queryClient = getQueryClient();
   await queryClient.prefetchQuery(
-    trpc.collections.getFeaturedCollections.queryOptions({ limit: 12 }),
+    trpc.collections.getFeaturedCollections.queryOptions({ limit: 5 }),
   );
   await queryClient.prefetchInfiniteQuery(
     trpc.posts.getPublished.infiniteQueryOptions(
       { limit: 5 },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        initialPageParam: 1,
       },
     ),
   );
