@@ -15,6 +15,8 @@ import {
 } from '@/modules/home/ui/views/infinite-feed-view';
 import IntroCard from '@/modules/home/ui/components/intro-card';
 
+export const dynamic = 'force-dynamic';
+
 const page = async () => {
   const queryClient = getQueryClient();
   await queryClient.prefetchQuery(
@@ -25,6 +27,7 @@ const page = async () => {
       { limit: 5 },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialPageParam: 1,
       },
     ),
   );

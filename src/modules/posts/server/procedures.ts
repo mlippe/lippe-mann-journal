@@ -217,7 +217,7 @@ export const postsRouter = createTRPCRouter({
 
       const data = await ctx.db.query.posts.findMany({
         where: (posts, { eq }) => eq(posts.visibility, 'public'),
-        orderBy: [desc(posts.createdAt)],
+        orderBy: (posts, { desc }) => [desc(posts.createdAt), desc(posts.id)],
         limit: limit,
         offset: offset,
         columns: {
