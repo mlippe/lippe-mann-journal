@@ -19,6 +19,11 @@ const readexPro = Readex_Pro({
 export const metadata: Metadata = {
   title: siteConfig.metadata.title,
   description: siteConfig.metadata.description,
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.BETTER_AUTH_URL ||
+      'http://localhost:3000',
+  ),
 };
 
 export default function RootLayout({
