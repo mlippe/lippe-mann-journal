@@ -6,7 +6,7 @@ import cloudflareLoader from './cloudflare-image-loader';
  * If Cloudflare is configured, it uses the Cloudflare image resizing service.
  * Otherwise, it falls back to Next.js built-in image optimization.
  */
-export function getOptimizedImageUrl(src: string, width: number = 800): string {
+export function getOptimizedImageUrl(src: string, width: number = 1080): string {
   if (!src) return '';
 
   // If Cloudflare loader is enabled, use it
@@ -16,15 +16,28 @@ export function getOptimizedImageUrl(src: string, width: number = 800): string {
 
   // Fallback to Next.js image optimization
   // We need an absolute URL for social fetchers
-  const baseUrl =
+  const rawBaseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.BETTER_AUTH_URL ||
     'http://localhost:3000';
 
-  const url = new URL(`${baseUrl}/_next/image`);
-  url.searchParams.set('url', src);
-  url.searchParams.set('w', width.toString());
-  url.searchParams.set('q', '70');
+  // Ensure baseUrl has a protocol and no trailing slash
+  let baseUrl = rawBaseUrl.trim();
+  if (!baseUrl.startsWith('http')) {
+    baseUrl = `https://${baseUrl}`;
+  }
+  baseUrl = baseUrl.replace(/\/+$/, '');
 
-  return url.toString();
+  // If src is already an absolute URL, we can use it directly in the url parameter
+  // Next.js _next/image requires the url to be encoded
+  try {
+    const url = new URL(`${baseUrl}/_next/image`);
+    url.searchParams.set('url', src);
+    url.searchParams.set('w', width.toString());
+    url.searchParams.set('q', '75');
+    return url.toString();
+  } catch (e) {
+    console.error('Error generating optimized image URL:', e);
+    return src;
+  }
 }
