@@ -3,6 +3,7 @@ import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
 import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { getOptimizedImageUrl } from '@/lib/images';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -18,11 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return {};
 
   const firstPhoto = data.postsToPhotos?.[0]?.photo;
-  const imageUrl = firstPhoto
+  const rawImageUrl = firstPhoto
     ? keyToUrl(firstPhoto.url)
     : data.coverImage
       ? keyToUrl(data.coverImage)
       : undefined;
+
+  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
 
   const description = `Schau dir dieses Foto "${data.title}" in meinem Journal an.`;
 

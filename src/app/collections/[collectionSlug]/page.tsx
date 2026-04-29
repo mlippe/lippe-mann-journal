@@ -9,6 +9,7 @@ import {
   InfiniteFeedViewLoadingStatus,
 } from '@/modules/home/ui/views/infinite-feed-view';
 import Image from 'next/image';
+import { getOptimizedImageUrl } from '@/lib/images';
 
 export const generateMetadata = async ({
   params,
@@ -22,9 +23,26 @@ export const generateMetadata = async ({
     }),
   );
 
+  const imageUrl = collection?.coverImageUrl
+    ? getOptimizedImageUrl(collection.coverImageUrl)
+    : undefined;
+
+  const description = collection?.description || 'Collection details and posts.';
+
   return {
     title: collection?.name || 'Collection',
-    description: collection?.description || 'Collection details and posts.',
+    description,
+    openGraph: {
+      title: collection?.name || 'Collection',
+      description,
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: collection?.name || 'Collection',
+      description,
+      images: imageUrl ? [imageUrl] : [],
+    },
   };
 };
 

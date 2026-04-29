@@ -3,6 +3,7 @@ import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
 import { ArticleSlugView } from '@/modules/blog/ui/views/blog-slug-view';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { getOptimizedImageUrl } from '@/lib/images';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -17,7 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) return {};
 
-  const imageUrl = data.coverImage ? keyToUrl(data.coverImage) : undefined;
+  const rawImageUrl = data.coverImage ? keyToUrl(data.coverImage) : undefined;
+  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
   const description = `Lies den Artikel "${data.title}" in meinem Journal.`;
 
   return {

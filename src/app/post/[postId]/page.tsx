@@ -5,6 +5,8 @@ import Footer from '@/components/footer';
 import Image from 'next/image';
 import { Post, Photo } from '@/db/schema';
 import RichTextViewer from '@/components/editor/rich-text-viewer';
+import { getOptimizedImageUrl } from '@/lib/images';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 export const generateMetadata = async ({
   params,
@@ -16,8 +18,29 @@ export const generateMetadata = async ({
     trpc.posts.getPostById.queryOptions({ postId: params.postId }),
   );
 
+  if (!post) return {};
+
+  const postWithPhotos = post as Post & { postsToPhotos: { photo: Photo }[] };
+  const firstPhoto = postWithPhotos.postsToPhotos?.[0]?.photo;
+  const rawImageUrl = firstPhoto
+    ? keyToUrl(firstPhoto.url)
+    : post.coverImage
+      ? keyToUrl(post.coverImage)
+      : undefined;
+
+  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
+
   return {
-    title: post?.title || 'Post',
+    title: post.title || 'Post',
+    openGraph: {
+      title: post.title || 'Post',
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title || 'Post',
+      images: imageUrl ? [imageUrl] : [],
+    },
   };
 };
 
