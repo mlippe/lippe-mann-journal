@@ -74,7 +74,10 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
     >
       {/* Mobile Header */}
       {isMobile && (
-        <div className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'>
+        <a
+          className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'
+          href={href}
+        >
           <div className='flex items-center gap-2'>
             <div className='size-9 bg-muted rounded-full flex justify-center items-center'>
               <PostTypeIcon className='size-4.5!' />
@@ -87,7 +90,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <p className='text-xs uppercase text-muted-foreground font-mono'>
             {formatRelativeCustom(post.createdAt)}
           </p>
-        </div>
+        </a>
       )}
 
       <div className='flex-1 min-h-0 relative aspect-[0.8]'>
