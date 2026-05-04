@@ -9,6 +9,8 @@ import { type PostGetPublished } from '@/modules/posts/types';
 import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
 import { PostCard } from '../components/post-card';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import VectorTopLeftAnimation from '../components/vector-top-left-animation';
 
 interface InfiniteFeedViewProps {
   collectionSlug?: string;
@@ -62,25 +64,28 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
         ))}
       </div>
 
-      {isFetchingNextPage && <LoadingSkeletons count={2} />}
+      {isFetchingNextPage && <InfiniteFeedViewLoadingStatus />}
     </div>
   );
 };
 
-const LoadingSkeletons = ({ count = 3 }: { count?: number }) => (
-  <div className='w-full space-y-8 py-8 max-w-420 mx-auto'>
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem]  border-muted  border-y-12 md:border-y -mx-3 md:mx-0'>
-      {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className='w-full aspect-[0.8] rounded-none' />
-      ))}
-    </div>
-  </div>
-);
-
 export const InfiniteFeedViewLoadingStatus = () => {
   return (
-    <div className='w-full py-8'>
-      <LoadingSkeletons count={3} />
+    <div className='mt-3 w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3'>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className='w-full relative group cursor-pointer'>
+          <AspectRatio
+            ratio={0.75 / 1}
+            className='overflow-hidden rounded-lg relative'
+          >
+            <Skeleton className='w-full h-full' />
+          </AspectRatio>
+
+          <div className='absolute top-0 left-0 z-20'>
+            <VectorTopLeftAnimation title='Loading...' />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
