@@ -218,7 +218,18 @@ const MediaContent = ({
   priority: boolean;
 }) => {
   const photos = post.postsToPhotos || [];
-  const firstPhoto = photos[0]?.photo;
+  const [randomIndex, setRandomIndex] = useState(0);
+
+  useEffect(() => {
+    if (post.type === 'ALBUM' && photos.length > 1) {
+      const handle = window.requestAnimationFrame(() => {
+        setRandomIndex(Math.floor(Math.random() * photos.length));
+      });
+      return () => window.cancelAnimationFrame(handle);
+    }
+  }, [post.type, photos.length]);
+
+  const coverPhoto = photos[randomIndex]?.photo || photos[0]?.photo;
 
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -255,7 +266,7 @@ const MediaContent = ({
     };
   }, [isMobile, post.type, photos.length]);
 
-  if (!firstPhoto) return null;
+  if (!coverPhoto) return null;
 
   const sizes =
     '(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)';
@@ -283,6 +294,7 @@ const MediaContent = ({
                   el: `#${paginationId}`,
                   clickable: true,
                 }}
+                initialSlide={randomIndex}
                 className='h-full w-full'
               >
                 {photos.map((ptp, i) => (
@@ -324,13 +336,13 @@ const MediaContent = ({
           ) : (
             <div className='h-full w-full p-3 relative'>
               <BlurImage
-                src={keyToUrl(firstPhoto.url)}
-                alt={firstPhoto.title ?? post.title}
+                src={keyToUrl(coverPhoto.url)}
+                alt={coverPhoto.title ?? post.title}
                 fill
                 priority={priority}
                 sizes={sizes}
-                blurhash={firstPhoto.blurData}
-                aspectRatio={firstPhoto.aspectRatio ?? undefined}
+                blurhash={coverPhoto.blurData}
+                aspectRatio={coverPhoto.aspectRatio ?? undefined}
                 className='object-contain p-3'
               />
             </div>
@@ -342,13 +354,13 @@ const MediaContent = ({
     return (
       <a href={href} className='h-full w-full p-3 relative block'>
         <BlurImage
-          src={keyToUrl(firstPhoto.url)}
-          alt={firstPhoto.title ?? post.title}
+          src={keyToUrl(coverPhoto.url)}
+          alt={coverPhoto.title ?? post.title}
           fill
           priority={priority}
           sizes={sizes}
-          blurhash={firstPhoto.blurData}
-          aspectRatio={firstPhoto.aspectRatio ?? undefined}
+          blurhash={coverPhoto.blurData}
+          aspectRatio={coverPhoto.aspectRatio ?? undefined}
           className='object-contain p-3'
         />
       </a>
@@ -359,13 +371,13 @@ const MediaContent = ({
   return (
     <Link className='block h-full p-3 relative group' href={href}>
       <BlurImage
-        src={keyToUrl(firstPhoto.url)}
-        alt={firstPhoto.title ?? post.title}
+        src={keyToUrl(coverPhoto.url)}
+        alt={coverPhoto.title ?? post.title}
         fill
         priority={priority}
         sizes={sizes}
-        blurhash={firstPhoto.blurData}
-        aspectRatio={firstPhoto.aspectRatio ?? undefined}
+        blurhash={coverPhoto.blurData}
+        aspectRatio={coverPhoto.aspectRatio ?? undefined}
         className='object-contain p-3 transition-opacity duration-300'
       />
     </Link>
