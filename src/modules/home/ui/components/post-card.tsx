@@ -219,6 +219,7 @@ const MediaContent = ({
 }) => {
   const photos = post.postsToPhotos || [];
   const [randomIndex, setRandomIndex] = useState(0);
+  const firstPhoto = photos.at(0)?.photo;
 
   useEffect(() => {
     if (post.type === 'ALBUM' && photos.length > 1) {
@@ -370,6 +371,18 @@ const MediaContent = ({
   // Desktop view: Link to modal with hover preview for albums
   return (
     <Link className='block h-full p-3 relative group' href={href}>
+      {firstPhoto && (
+        <BlurImage
+          src={keyToUrl(firstPhoto.url)}
+          alt={firstPhoto.title ?? post.title}
+          fill
+          priority={priority}
+          sizes={sizes}
+          blurhash={firstPhoto.blurData}
+          aspectRatio={firstPhoto.aspectRatio ?? undefined}
+          className='object-contain p-3 transition-opacity duration-300'
+        />
+      )}
       <BlurImage
         src={keyToUrl(coverPhoto.url)}
         alt={coverPhoto.title ?? post.title}
@@ -378,7 +391,7 @@ const MediaContent = ({
         sizes={sizes}
         blurhash={coverPhoto.blurData}
         aspectRatio={coverPhoto.aspectRatio ?? undefined}
-        className='object-contain p-3 transition-opacity duration-300'
+        className='object-contain p-3 group-hover:opacity-0 transition-opacity duration-500 bg-background'
       />
     </Link>
   );
