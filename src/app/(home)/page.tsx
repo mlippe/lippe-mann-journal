@@ -39,7 +39,7 @@ const page = async () => {
           <IntroCard />
 
           {/* FEATURED COLLECTIONS  */}
-          <Suspense fallback={<FeaturedCollectionsViewLoadingStatus />}>
+          {/* <Suspense fallback={<FeaturedCollectionsViewLoadingStatus />}>
             <ErrorBoundary
               fallback={
                 <p>
@@ -50,7 +50,7 @@ const page = async () => {
             >
               <FeaturedCollectionsView />
             </ErrorBoundary>
-          </Suspense>
+          </Suspense> */}
 
           {/* INFINITE FEED  */}
           <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
