@@ -13,9 +13,11 @@ export default function cloudflareLoader({
   width: number;
   quality?: number;
 }) {
-  // If it's a local asset (starts with /), don't optimize with Cloudflare
+  // If it's a local asset (starts with /), optimize with Next.js built-in optimization
   if (src.startsWith("/")) {
-    return src;
+    return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${
+      quality || 75
+    }`;
   }
 
   // If it's already an optimized Cloudflare URL, return it

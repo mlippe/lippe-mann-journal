@@ -4,11 +4,12 @@ import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
+import { type PostGetPublished } from '@/modules/posts/types';
 import Footer from '@/components/footer';
-import {
-  FeaturedCollectionsView,
-  FeaturedCollectionsViewLoadingStatus,
-} from '@/modules/home/ui/views/featured-collections-view';
+// import {
+//   FeaturedCollectionsView,
+//   FeaturedCollectionsViewLoadingStatus,
+// } from '@/modules/home/ui/views/featured-collections-view';
 import {
   InfiniteFeedView,
   InfiniteFeedViewLoadingStatus,
@@ -22,14 +23,11 @@ const page = async () => {
   await queryClient.prefetchQuery(
     trpc.collections.getFeaturedCollections.queryOptions({ limit: 5 }),
   );
-  await queryClient.prefetchInfiniteQuery(
-    trpc.posts.getPublished.infiniteQueryOptions(
-      { limit: 5 },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    ),
-  );
+  await queryClient.prefetchInfiniteQuery({
+    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+    getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
+    initialPageParam: 1,
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

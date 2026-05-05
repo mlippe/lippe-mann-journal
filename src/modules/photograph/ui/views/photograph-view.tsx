@@ -178,6 +178,7 @@ const DesktopMedia = ({
               size='icon-sm'
               className='absolute top-1/2 left-1 -translate-y-1/2 z-10 bg-background/50 backdrop-blur-sm border-none'
               variant='outline'
+              aria-label='Vorheriges Foto'
             >
               <IconArrowLeft />
             </Button>
@@ -186,6 +187,7 @@ const DesktopMedia = ({
               size='icon-sm'
               className='absolute top-1/2 right-1 -translate-y-1/2 z-10 bg-background/50 backdrop-blur-sm border-none'
               variant='outline'
+              aria-label='Nächstes Foto'
             >
               <IconArrowRight />
             </Button>

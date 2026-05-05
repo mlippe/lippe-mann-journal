@@ -3,6 +3,7 @@ import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { type CollectionGetPostsInCollection } from '@/modules/collections/types';
 import Footer from '@/components/footer';
 import {
   InfiniteFeedView,
@@ -60,14 +61,15 @@ const SingleCollectionView = async ({
   );
 
   // Prefetch first page of posts in collection
-  await queryClient.prefetchInfiniteQuery(
-    trpc.collections.getPostsInCollection.infiniteQueryOptions(
-      { collectionSlug, limit: 5 },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    ),
-  );
+  await queryClient.prefetchInfiniteQuery({
+    ...trpc.collections.getPostsInCollection.infiniteQueryOptions({
+      collectionSlug,
+      limit: 5,
+    }),
+    getNextPageParam: (lastPage: CollectionGetPostsInCollection) =>
+      lastPage.nextCursor,
+    initialPageParam: 1,
+  });
 
   if (!collection) {
     return <div className='text-center py-10'>Collection not found.</div>;

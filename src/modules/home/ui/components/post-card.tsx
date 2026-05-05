@@ -320,6 +320,7 @@ const MediaContent = ({
                   size='icon-sm'
                   className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                   variant='outline'
+                  aria-label='Vorheriges Foto'
                 >
                   <IconArrowLeft />
                 </Button>
@@ -328,6 +329,7 @@ const MediaContent = ({
                   size='icon-sm'
                   className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
                   variant='outline'
+                  aria-label='Nächstes Foto'
                 >
                   <IconArrowRight />
                 </Button>
@@ -369,18 +371,20 @@ const MediaContent = ({
   }
 
   // Desktop view: Link to modal with hover preview for albums
+  const isSamePhoto = firstPhoto?.id === coverPhoto.id;
+
   return (
     <Link className='block h-full p-3 relative group' href={href}>
-      {firstPhoto && (
+      {!isSamePhoto && firstPhoto && (
         <BlurImage
           src={keyToUrl(firstPhoto.url)}
           alt={firstPhoto.title ?? post.title}
           fill
-          priority={priority}
+          priority={false}
           sizes={sizes}
           blurhash={firstPhoto.blurData}
           aspectRatio={firstPhoto.aspectRatio ?? undefined}
-          className='object-contain p-3 transition-opacity duration-300'
+          className='object-contain p-3'
         />
       )}
       <BlurImage
@@ -391,7 +395,10 @@ const MediaContent = ({
         sizes={sizes}
         blurhash={coverPhoto.blurData}
         aspectRatio={coverPhoto.aspectRatio ?? undefined}
-        className='object-contain p-3 group-hover:opacity-0 transition-opacity duration-500 bg-background'
+        className={cn(
+          'object-contain p-3 transition-opacity duration-500 bg-background',
+          !isSamePhoto && 'group-hover:opacity-0',
+        )}
       />
     </Link>
   );

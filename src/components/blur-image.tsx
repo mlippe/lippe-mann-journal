@@ -61,9 +61,9 @@ const BlurImageInner = function BlurImageInner({
     <div className={containerStyle}>
       {showBlurhash && (
         <div
-          className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-500 ease-in-out ${
-            imageLoaded ? 'opacity-0' : 'opacity-100'
-          }`}
+          className={`absolute inset-0 flex items-center justify-center pointer-events-none ${
+            priority ? "" : "transition-opacity duration-500 ease-in-out"
+          } ${imageLoaded ? "opacity-0" : "opacity-100"}`}
         >
           <div
             className={className ?? ''}
@@ -103,13 +103,15 @@ const BlurImageInner = function BlurImageInner({
         priority={priority}
         className={`${
           className ?? ''
-        } transition-opacity duration-500 ease-in-out ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
+        } ${
+          priority
+            ? 'opacity-100'
+            : `transition-opacity duration-500 ease-in-out ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`
         }`}
         onLoad={() => {
-          window.requestAnimationFrame(() => {
-            setImageLoaded(true);
-          });
+          setImageLoaded(true);
         }}
         onError={() => {
           setShowPlaceholder(false);

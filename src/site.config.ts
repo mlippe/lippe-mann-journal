@@ -90,7 +90,7 @@ export const siteConfig = {
    * Set to "cloudflare" to use the Cloudflare custom image loader,
    * or "default" to use Next.js built-in image optimization.
    */
-  imageLoader: 'default' as 'cloudflare' | 'default',
+  imageLoader: 'cloudflare' as 'cloudflare' | 'default',
 
   /**
    * Gear / equipment shown on the About page.
