@@ -279,3 +279,60 @@ export const postsToPhotosRelations = relations(postsToPhotos, ({ one }) => ({
     references: [posts.id],
   }),
 }));
+
+/*******************
+ *******************
+ * Social Features *
+ *******************
+ *******************/
+
+export const likes = pgTable(
+  'likes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => posts.id, { onDelete: 'cascade' }),
+    userFingerprint: text('user_fingerprint').notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    index('likes_post_idx').on(t.postId),
+    index('likes_fingerprint_idx').on(t.userFingerprint),
+    sql`UNIQUE(${t.postId}, ${t.userFingerprint})`,
+  ],
+);
+
+export const comments = pgTable(
+  'comments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => posts.id, { onDelete: 'cascade' }),
+    userFingerprint: text('user_fingerprint').notNull(),
+    username: text('username').notNull(),
+    content: text('content').notNull(),
+    ...timestamps,
+  },
+  (t) => [index('comments_post_idx').on(t.postId)],
+);
+
+export const likesRelations = relations(likes, ({ one }) => ({
+  post: one(posts, {
+    fields: [likes.postId],
+    references: [posts.id],
+  }),
+}));
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  post: one(posts, {
+    fields: [comments.postId],
+    references: [posts.id],
+  }),
+}));
+
+export const postsSocialRelations = relations(posts, ({ many }) => ({
+  likes: many(likes),
+  comments: many(comments),
+}));

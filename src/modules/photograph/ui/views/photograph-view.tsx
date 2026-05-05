@@ -38,6 +38,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Photo } from '@/db/schema';
 import { de } from 'date-fns/locale';
 import BlurImage from '@/components/blur-image';
+import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
 
 // --- Types ---
 
@@ -81,13 +82,13 @@ const PhotoInfo = ({
   return (
     <div
       className={cn(
-        'flex flex-col justify-between backdrop-blur-xl',
+        'flex flex-col backdrop-blur-xl',
         isModal
           ? 'h-full bg-background/95 w-5/16 lg:w-4/16 xl:w-3/16'
-          : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16',
+          : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16 h-full',
       )}
     >
-      <div>
+      <div className='flex flex-col h-full'>
         <div className='flex items-center justify-between border-b p-3 gap-1'>
           <Author size='sm' />
           {isModal && (
@@ -98,7 +99,7 @@ const PhotoInfo = ({
             </DialogClose>
           )}
         </div>
-        <div className='p-3'>
+        <div className='p-3 border-b bg-muted/20'>
           <p className='font-medium text-lg leading-tight tracking-tight mb-1'>
             {post.title}
           </p>
@@ -106,12 +107,18 @@ const PhotoInfo = ({
             {format(post.createdAt, 'dd.MM.yyyy, p', { locale: de })}
           </p>
         </div>
-      </div>
-      {showExif && hasExif && (
-        <div className='p-3 border-t'>
-          <ExifPreview exif={exif} showLogo={false} size='sm' />
+
+        {/* SOCIAL INTERACTIONS AREA */}
+        <div className='flex-1 min-h-0 p-3'>
+          <SocialInteractions postId={post.id} />
         </div>
-      )}
+
+        {showExif && hasExif && (
+          <div className='p-3 border-t bg-muted/10'>
+            <ExifPreview exif={exif} showLogo={false} size='sm' />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -235,9 +242,11 @@ const DesktopMedia = ({
 };
 
 const MobileMediaList = ({
+  post,
   photos,
   title,
 }: {
+  post: PostGetOne;
   photos: { photo: Photo }[];
   title: string;
 }) => (
@@ -278,6 +287,9 @@ const MobileMediaList = ({
           </div>
         ),
     )}
+    <div className='mt-8 border-t pt-6'>
+      <SocialInteractions postId={post.id} />
+    </div>
   </div>
 );
 
@@ -309,13 +321,15 @@ export const PhotographView = ({
   const content =
     isMobile && !isModal ? (
       <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3'>
-        <PhotoInfo
-          post={post}
-          exif={currentExif}
-          isModal={false}
-          showExif={false}
-        />
-        <MobileMediaList photos={photos} title={post.title} />
+        <div className='px-3 border-b pb-4'>
+          <PhotoInfo
+            post={post}
+            exif={currentExif}
+            isModal={false}
+            showExif={false}
+          />
+        </div>
+        <MobileMediaList post={post} photos={photos} title={post.title} />
       </div>
     ) : (
       <div

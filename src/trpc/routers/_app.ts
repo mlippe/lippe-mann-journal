@@ -5,6 +5,7 @@ import { s3Router } from '@/modules/s3/server/procedures';
 import { blogRouter } from '@/modules/blog/server/procedures';
 import { dashboardRouter } from '@/modules/dashboard/server/procedures';
 import { collectionsRouter } from '@/modules/collections/server/procedures'; // New import
+import { socialRouter } from '@/modules/social/server/procedures';
 
 export const appRouter = createTRPCRouter({
   posts: postsRouter,
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   blog: blogRouter,
   dashboard: dashboardRouter,
   collections: collectionsRouter, // New router
+  social: socialRouter,
 });
 // export type definition of API
 export type AppRouter = typeof appRouter;

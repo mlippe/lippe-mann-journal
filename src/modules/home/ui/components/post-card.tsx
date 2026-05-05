@@ -23,6 +23,7 @@ import {
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
 import clsx from 'clsx';
 
 const POST_TYPE_INFO = {
@@ -145,9 +146,12 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       {/* Mobile Footer Non Article */}
       {isMobile && !isArticle && (
         <div className='p-3 pt-5 pb-6 md:hidden flex gap-2 flex-col w-full'>
-          <p className='text-sm line-clamp-3  block max-w-xl pr-2 w-full'>
-            {post.title}
-          </p>
+          <div className='flex items-center justify-between gap-4'>
+            <p className='text-sm line-clamp-3 block max-w-xl pr-2 flex-1'>
+              {post.title}
+            </p>
+            <SocialInteractions postId={post.id} variant='compact' />
+          </div>
           <a
             className='text-xs underline flex items-center gap-1 text-foreground/70'
             href={href}
@@ -397,7 +401,6 @@ const MediaContent = ({
           aspectRatio={firstPhoto.aspectRatio ?? undefined}
           className='object-contain p-3'
         />
-      )}
       <BlurImage
         src={keyToUrl(coverPhoto.url)}
         alt={coverPhoto.title ?? post.title}
@@ -411,6 +414,12 @@ const MediaContent = ({
           !isSamePhoto && 'group-hover:opacity-0 transition-opacity duration-500',
         )}
       />
-    </Link>
-  );
-};
+      </Link>
+      <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
+      <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
+        <SocialInteractions postId={post.id} variant='compact' />
+      </div>
+      </div>
+      </>
+      );
+      };
