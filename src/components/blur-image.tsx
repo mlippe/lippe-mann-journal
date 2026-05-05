@@ -41,6 +41,10 @@ const BlurImageInner = function BlurImageInner({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
 
+  // Extract background classes to apply them only when loaded
+  const hasBackground = className?.includes('bg-background');
+  const baseClassName = className?.replace('bg-background', '').trim();
+
   const containerStyle = fill
     ? 'absolute inset-0 flex items-center justify-center'
     : 'relative w-full h-full flex justify-center items-center';
@@ -48,12 +52,17 @@ const BlurImageInner = function BlurImageInner({
   useEffect(() => {
     if (!imageLoaded) return;
 
+    if (priority) {
+      setShowPlaceholder(false);
+      return;
+    }
+
     const timeout = window.setTimeout(() => {
       setShowPlaceholder(false);
     }, 550);
 
     return () => window.clearTimeout(timeout);
-  }, [imageLoaded]);
+  }, [imageLoaded, priority]);
 
   const showBlurhash = showPlaceholder && blurhash && blurhash.length >= 6;
 
@@ -62,11 +71,11 @@ const BlurImageInner = function BlurImageInner({
       {showBlurhash && (
         <div
           className={`absolute inset-0 flex items-center justify-center pointer-events-none ${
-            priority ? "" : "transition-opacity duration-500 ease-in-out"
-          } ${imageLoaded ? "opacity-0" : "opacity-100"}`}
+            priority ? '' : 'transition-opacity duration-500 ease-in-out'
+          } ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
         >
           <div
-            className={className ?? ''}
+            className={baseClassName ?? ''}
             style={{
               aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
               width: aspectRatio
@@ -101,8 +110,8 @@ const BlurImageInner = function BlurImageInner({
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}
         priority={priority}
-        className={`${
-          className ?? ''
+        className={`${baseClassName ?? ''} ${
+          hasBackground && imageLoaded ? 'bg-background' : ''
         } ${
           priority
             ? 'opacity-100'

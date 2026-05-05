@@ -51,6 +51,7 @@ interface PostCardProps {
 
 export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
   const isMobile = useIsMobile();
+  const [isHovered, setIsHovered] = useState(false);
   const isArticle = post.type === 'ARTICLE';
   const PostTypeIcon = POST_TYPE_INFO[post.type].icon;
   const postTypeDisplayString = POST_TYPE_INFO[post.type].displayString;
@@ -135,6 +136,8 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             href={href}
             isMobile={isMobile}
             priority={isPriority}
+            isHovered={isHovered}
+            setIsHovered={setIsHovered}
           />
         )}
       </div>
@@ -211,11 +214,15 @@ const MediaContent = ({
   href,
   isMobile,
   priority,
+  isHovered,
+  setIsHovered,
 }: {
   post: PostWithPhotos;
   href: string;
   isMobile: boolean;
   priority: boolean;
+  isHovered: boolean;
+  setIsHovered: (value: boolean) => void;
 }) => {
   const photos = post.postsToPhotos || [];
   const [randomIndex, setRandomIndex] = useState(0);
@@ -374,8 +381,12 @@ const MediaContent = ({
   const isSamePhoto = firstPhoto?.id === coverPhoto.id;
 
   return (
-    <Link className='block h-full p-3 relative group' href={href}>
-      {!isSamePhoto && firstPhoto && (
+    <Link
+      className='block h-full p-3 relative group'
+      href={href}
+      onMouseEnter={() => setIsHovered(true)}
+    >
+      {isHovered && !isSamePhoto && firstPhoto && (
         <BlurImage
           src={keyToUrl(firstPhoto.url)}
           alt={firstPhoto.title ?? post.title}
@@ -396,8 +407,8 @@ const MediaContent = ({
         blurhash={coverPhoto.blurData}
         aspectRatio={coverPhoto.aspectRatio ?? undefined}
         className={cn(
-          'object-contain p-3 transition-opacity duration-500 bg-background',
-          !isSamePhoto && 'group-hover:opacity-0',
+          'object-contain p-3 bg-background',
+          !isSamePhoto && 'group-hover:opacity-0 transition-opacity duration-500',
         )}
       />
     </Link>
