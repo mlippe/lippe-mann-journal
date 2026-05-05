@@ -82,7 +82,7 @@ const PhotoInfo = ({
   return (
     <div
       className={cn(
-        'flex flex-col backdrop-blur-xl',
+        'flex flex-col backdrop-blur-xl min-h-0',
         isModal
           ? 'h-full bg-background/95 w-5/16 lg:w-4/16 xl:w-3/16'
           : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16 h-full',
@@ -109,7 +109,7 @@ const PhotoInfo = ({
         </div>
 
         {/* SOCIAL INTERACTIONS AREA */}
-        <div className='flex-1 min-h-0 p-3'>
+        <div className='grow min-h-0 p-3 '>
           <SocialInteractions postId={post.id} />
         </div>
 
@@ -144,7 +144,7 @@ const DesktopMedia = ({
         'bg-background p-3 relative group flex items-center justify-center',
         isModal
           ? 'w-11/16 lg:w-12/16 xl:w-13/16 h-full'
-          : 'w-full md:w-11/16 lg:w-12/16 xl:w-13/16 min-h-[50vh]',
+          : 'w-full md:w-11/16 lg:w-12/16 xl:w-13/16 min-h-[50vh] h-full',
       )}
     >
       {isAlbum ? (
@@ -337,7 +337,7 @@ export const PhotographView = ({
           'flex overflow-hidden min-h-0 min-w-0',
           isModal
             ? 'rounded-sm w-full h-full'
-            : 'flex-col md:flex-row w-full border border-border/50 max-h-[calc(100vh-5rem)] mt-12',
+            : 'flex-col md:flex-row w-full border border-border/50 md:h-[calc(100vh-12rem)] max-h-[calc(100vh-5rem)] mt-12',
         )}
       >
         <DesktopMedia

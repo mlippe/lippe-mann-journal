@@ -99,6 +99,7 @@ export const postsRouter = createTRPCRouter({
             with: {
               photo: true,
             },
+            // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },
         },
@@ -131,6 +132,7 @@ export const postsRouter = createTRPCRouter({
             with: {
               photo: true,
             },
+            // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },
         },
@@ -267,6 +269,7 @@ export const postsRouter = createTRPCRouter({
                 },
               },
             },
+            // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },
         },

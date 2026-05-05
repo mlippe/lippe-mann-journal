@@ -17,6 +17,7 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconArrowUpRight,
+  IconHeartFilled,
   IconLibraryPhoto,
   IconPhoto,
   IconTextSize,
@@ -25,6 +26,10 @@ import { Badge } from '@/components/ui/badge';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
 import clsx from 'clsx';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTRPC } from '@/trpc/client';
+import { useIdentity } from '@/hooks/use-identity';
+import { type SocialInteractionsData } from '@/modules/social/types';
 
 const POST_TYPE_INFO = {
   PHOTO: {
@@ -64,7 +69,6 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       ? `/photo/${post.slug}`
       : `/album/${post.slug}`;
 
-  const ContentWrapper = !isMobile ? Link : 'div';
   const isPriority = index < 3;
 
   return (
@@ -118,7 +122,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         )}
 
         {isArticle ? (
-          <ContentWrapper href={href} className='block h-full relative'>
+          <div className='block h-full relative'>
             <ArticleContent post={post} priority={isPriority} />
             <div className='hidden md:flex md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-500 absolute inset-0 bg-linear-to-b from-background/0 to-background/95 to-60% xl:to-80% from-40% flex-col justify-end'>
               <div className='xl:p-12 p-8'>
@@ -130,7 +134,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
                 </p>
               </div>
             </div>
-          </ContentWrapper>
+          </div>
         ) : (
           <MediaContent
             post={post}
@@ -150,7 +154,11 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             <p className='text-sm line-clamp-3 block max-w-xl pr-2 flex-1'>
               {post.title}
             </p>
-            <SocialInteractions postId={post.id} variant='compact' />
+            <SocialInteractions
+              postId={post.id}
+              variant='compact'
+              commentHref={href}
+            />
           </div>
           <a
             className='text-xs underline flex items-center gap-1 text-foreground/70'
@@ -228,6 +236,74 @@ const MediaContent = ({
   isHovered: boolean;
   setIsHovered: (value: boolean) => void;
 }) => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { fingerprint, isLoaded } = useIdentity();
+
+  const interactionParams = {
+    postId: post.id,
+    userFingerprint: fingerprint ?? undefined,
+  };
+  const queryOptions =
+    trpc.social.getInteractions.queryOptions(interactionParams);
+
+  const toggleLike = useMutation(
+    trpc.social.toggleLike.mutationOptions({
+      onMutate: async () => {
+        await queryClient.cancelQueries({ queryKey: queryOptions.queryKey });
+        const previous = queryClient.getQueryData<SocialInteractionsData>(
+          queryOptions.queryKey,
+        );
+
+        if (previous) {
+          queryClient.setQueryData<SocialInteractionsData>(
+            queryOptions.queryKey,
+            {
+              ...previous,
+              likeCount: previous.hasLiked
+                ? previous.likeCount - 1
+                : previous.likeCount + 1,
+              hasLiked: !previous.hasLiked,
+            },
+          );
+        }
+        return { previous };
+      },
+      onError: (err, newLike, context) => {
+        if (context?.previous) {
+          queryClient.setQueryData(queryOptions.queryKey, context.previous);
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: queryOptions.queryKey });
+      },
+    }),
+  );
+
+  const lastTap = useRef<number>(0);
+  const [showHeart, setShowHeart] = useState(false);
+
+  const handleDoubleTap = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isMobile) return;
+
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      // Double tap detected
+      e.preventDefault(); // Prevent navigation on double tap
+      const interactions = queryClient.getQueryData<SocialInteractionsData>(
+        queryOptions.queryKey,
+      );
+      if (fingerprint && isLoaded && !interactions?.hasLiked) {
+        toggleLike.mutate({ postId: post.id, userFingerprint: fingerprint });
+      }
+      setShowHeart(true);
+      setTimeout(() => setShowHeart(false), 800);
+    }
+    lastTap.current = now;
+  };
+
   const photos = post.postsToPhotos || [];
   const [randomIndex, setRandomIndex] = useState(0);
   const firstPhoto = photos.at(0)?.photo;
@@ -313,6 +389,7 @@ const MediaContent = ({
                   <SwiperSlide
                     key={ptp.photo.id}
                     className='p-3 h-full relative'
+                    onClick={handleDoubleTap}
                   >
                     <BlurImage
                       src={keyToUrl(ptp.photo.url)}
@@ -324,6 +401,11 @@ const MediaContent = ({
                       aspectRatio={ptp.photo.aspectRatio ?? undefined}
                       className='object-contain p-3'
                     />
+                    {showHeart && (
+                      <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
+                        <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
+                      </div>
+                    )}
                   </SwiperSlide>
                 ))}
                 <Button
@@ -366,7 +448,10 @@ const MediaContent = ({
     }
 
     return (
-      <a href={href} className='h-full w-full p-3 relative block'>
+      <div
+        className='h-full w-full p-3 relative block'
+        onClick={handleDoubleTap}
+      >
         <BlurImage
           src={keyToUrl(coverPhoto.url)}
           alt={coverPhoto.title ?? post.title}
@@ -377,7 +462,12 @@ const MediaContent = ({
           aspectRatio={coverPhoto.aspectRatio ?? undefined}
           className='object-contain p-3'
         />
-      </a>
+        {showHeart && (
+          <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
+            <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -385,41 +475,44 @@ const MediaContent = ({
   const isSamePhoto = firstPhoto?.id === coverPhoto.id;
 
   return (
-    <Link
-      className='block h-full p-3 relative group'
-      href={href}
-      onMouseEnter={() => setIsHovered(true)}
-    >
-      {isHovered && !isSamePhoto && firstPhoto && (
-        <BlurImage
-          src={keyToUrl(firstPhoto.url)}
-          alt={firstPhoto.title ?? post.title}
-          fill
-          priority={false}
-          sizes={sizes}
-          blurhash={firstPhoto.blurData}
-          aspectRatio={firstPhoto.aspectRatio ?? undefined}
-          className='object-contain p-3'
-        />
-      <BlurImage
-        src={keyToUrl(coverPhoto.url)}
-        alt={coverPhoto.title ?? post.title}
-        fill
-        priority={priority}
-        sizes={sizes}
-        blurhash={coverPhoto.blurData}
-        aspectRatio={coverPhoto.aspectRatio ?? undefined}
-        className={cn(
-          'object-contain p-3 bg-background',
-          !isSamePhoto && 'group-hover:opacity-0 transition-opacity duration-500',
+    <>
+      <Link
+        className='block h-full p-3 relative group'
+        href={href}
+        onMouseEnter={() => setIsHovered(true)}
+      >
+        {isHovered && !isSamePhoto && firstPhoto && (
+          <BlurImage
+            src={keyToUrl(firstPhoto.url)}
+            alt={firstPhoto.title ?? post.title}
+            fill
+            priority={false}
+            sizes={sizes}
+            blurhash={firstPhoto.blurData}
+            aspectRatio={firstPhoto.aspectRatio ?? undefined}
+            className='object-contain p-3'
+          />
         )}
-      />
+        <BlurImage
+          src={keyToUrl(coverPhoto.url)}
+          alt={coverPhoto.title ?? post.title}
+          fill
+          priority={priority}
+          sizes={sizes}
+          blurhash={coverPhoto.blurData}
+          aspectRatio={coverPhoto.aspectRatio ?? undefined}
+          className={cn(
+            'object-contain p-3 bg-background',
+            !isSamePhoto &&
+              'group-hover:opacity-0 transition-opacity duration-500',
+          )}
+        />
       </Link>
       <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
-      <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
-        <SocialInteractions postId={post.id} variant='compact' />
+        <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
+          <SocialInteractions postId={post.id} variant='compact' />
+        </div>
       </div>
-      </div>
-      </>
-      );
-      };
+    </>
+  );
+};

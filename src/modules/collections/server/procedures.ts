@@ -1,12 +1,17 @@
-import { z } from "zod";
-import { createTRPCRouter, baseProcedure } from "@/trpc/init";
-import { desc, count, eq, and, exists } from "drizzle-orm"; // Added 'exists'
-import { collections, posts, postsWithPhotos, postsToCollections } from "@/db/schema";
-import { TRPCError } from "@trpc/server";
+import { z } from 'zod';
+import { createTRPCRouter, baseProcedure } from '@/trpc/init';
+import { desc, count, eq, and, exists } from 'drizzle-orm'; // Added 'exists'
+import {
+  collections,
+  posts,
+  postsWithPhotos,
+  postsToCollections,
+} from '@/db/schema';
+import { TRPCError } from '@trpc/server';
 import {
   DEFAULT_PAGE_SIZE, // DEFAULT_PAGE not used here
   MAX_PAGE_SIZE,
-} from "@/constants";
+} from '@/constants';
 
 // Zod schema for the output of getPostsInCollection
 export const postsInCollectionOutputSchema = z.object({
@@ -19,9 +24,11 @@ export const postsInCollectionOutputSchema = z.object({
 export const collectionsRouter = createTRPCRouter({
   getAllCollections: baseProcedure
     .input(
-      z.object({
-        limit: z.number().min(1).max(MAX_PAGE_SIZE).default(MAX_PAGE_SIZE), // Default to max size for listing all
-      }).optional()
+      z
+        .object({
+          limit: z.number().min(1).max(MAX_PAGE_SIZE).default(MAX_PAGE_SIZE), // Default to max size for listing all
+        })
+        .optional(),
     )
     .query(async ({ ctx, input }) => {
       const limit = input?.limit ?? MAX_PAGE_SIZE;
@@ -42,8 +49,8 @@ export const collectionsRouter = createTRPCRouter({
 
       if (!collection) {
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Collection not found",
+          code: 'NOT_FOUND',
+          message: 'Collection not found',
         });
       }
       return collection;
@@ -87,24 +94,28 @@ export const collectionsRouter = createTRPCRouter({
 
       if (!collection) {
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Collection not found",
+          code: 'NOT_FOUND',
+          message: 'Collection not found',
         });
       }
 
       // Query posts linked to this collection
       const data = await ctx.db.query.posts.findMany({
-        where: (posts, { and, eq, exists }) => and(
-          eq(posts.visibility, 'public'),
-          exists(
-            ctx.db.select().from(postsToCollections).where(
-              and(
-                eq(postsToCollections.postId, posts.id),
-                eq(postsToCollections.collectionId, collection.id)
-              )
-            )
-          )
-        ),
+        where: (posts, { and, eq, exists }) =>
+          and(
+            eq(posts.visibility, 'public'),
+            exists(
+              ctx.db
+                .select()
+                .from(postsToCollections)
+                .where(
+                  and(
+                    eq(postsToCollections.postId, posts.id),
+                    eq(postsToCollections.collectionId, collection.id),
+                  ),
+                ),
+            ),
+          ),
         orderBy: [desc(posts.createdAt)],
         limit: limit,
         offset: (cursor - 1) * limit,
@@ -113,6 +124,7 @@ export const collectionsRouter = createTRPCRouter({
             with: {
               photo: true,
             },
+            // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },
         },
@@ -125,11 +137,12 @@ export const collectionsRouter = createTRPCRouter({
         .select({ count: count() })
         .from(posts)
         .leftJoin(postsToCollections, eq(posts.id, postsToCollections.postId))
-        .where(and(
-          eq(postsToCollections.collectionId, collection.id),
-          eq(posts.visibility, 'public')
-        ));
-
+        .where(
+          and(
+            eq(postsToCollections.collectionId, collection.id),
+            eq(posts.visibility, 'public'),
+          ),
+        );
 
       const totalPages = Math.ceil(total.count / limit);
 

@@ -8,8 +8,21 @@ const STORAGE_KEYS = {
   USERNAME: 'lm_journal_username',
 };
 
-const RANDOM_ADJECTIVES = ['Sonniger', 'Wilder', 'Goldener', 'Stiller', 'Bunter', 'Abenteuerlicher'];
-const RANDOM_NOUNS = ['Entdecker', 'Reisender', 'Beobachter', 'Künstler', 'Wanderer', 'Fotograf'];
+const RANDOM_ADJECTIVES = [
+  'Caffeinated', 'Baffled', 'Global', 'Nomadic', 'Spicy', 'Clumsy', 'Sassy', 'Zen', 
+  'Hyperactive', 'Grumpy', 'Majestic', 'Funky', 'Wobbly', 'Electric', 'Shady', 'Fancy', 
+  'Crispy', 'Dizzy', 'Stealthy', 'Glittery', 'Salty', 'Cosmic', 'Vintage', 'Sonic', 
+  'Cheeky', 'Rusty', 'Fluffy', 'Gritty', 'Puffy', 'Sneaky', 'Turbo', 'Glitched', 
+  'Radiant', 'Vexed', 'Lo-fi'
+];
+
+const RANDOM_NOUNS = [
+  'Explorer', 'Voyager', 'Artist', 'Legend', 'Potato', 'Ninja', 'Panda', 'Llama', 
+  'Captain', 'Wizard', 'Sloth', 'Burrito', 'Unicorn', 'Cactus', 'Pickle', 'Raccoon', 
+  'Viking', 'Astronaut', 'Goblin', 'Dino', 'Wombat', 'Octopus', 'Badger', 'Yeti', 
+  'Cyborg', 'Ghost', 'Taco', 'Muffin', 'Penguin', 'Hamster', 'Sasquatch', 'Kangaroo', 
+  'Capybara', 'Axolotl', 'Narwhal'
+];
 
 const generateRandomUsername = () => {
   const adj = RANDOM_ADJECTIVES[Math.floor(Math.random() * RANDOM_ADJECTIVES.length)];

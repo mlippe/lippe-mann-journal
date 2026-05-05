@@ -76,6 +76,22 @@ export const socialRouter = createTRPCRouter({
       return newComment;
     }),
 
+  updateUsername: baseProcedure
+    .input(z.object({
+      userFingerprint: z.string().min(1),
+      newUsername: z.string().min(1),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { userFingerprint, newUsername } = input;
+
+      await ctx.db
+        .update(comments)
+        .set({ username: newUsername })
+        .where(eq(comments.userFingerprint, userFingerprint));
+
+      return { success: true };
+    }),
+
   getInteractions: baseProcedure
     .input(z.object({
       postId: z.string().uuid(),

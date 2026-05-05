@@ -111,7 +111,8 @@ export const postsRouter = createTRPCRouter({
             with: {
               photo: true,
             },
-            orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
+            // @ts-expect-error: unspecified any
+            orderBy: (t, { asc }) => [asc(t.sortOrder)],
           },
         },
       });
