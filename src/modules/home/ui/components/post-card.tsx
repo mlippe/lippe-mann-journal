@@ -5,7 +5,7 @@ import BlurImage from '@/components/blur-image';
 import { createPreview, formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard } from 'swiper/modules';
 import 'swiper/css';
@@ -305,19 +305,12 @@ const MediaContent = ({
   };
 
   const photos = post.postsToPhotos || [];
-  const [randomIndex, setRandomIndex] = useState(0);
   const firstPhoto = photos.at(0)?.photo;
 
-  useEffect(() => {
-    if (post.type === 'ALBUM' && photos.length > 1) {
-      const handle = window.requestAnimationFrame(() => {
-        setRandomIndex(Math.floor(Math.random() * photos.length));
-      });
-      return () => window.cancelAnimationFrame(handle);
-    }
-  }, [post.type, photos.length]);
+  // Use the server-provided coverIndex if available, otherwise use 0
+  const coverIndex = post.coverIndex ?? 0;
 
-  const coverPhoto = photos[randomIndex]?.photo || photos[0]?.photo;
+  const coverPhoto = photos[coverIndex]?.photo || photos[0]?.photo;
 
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -382,7 +375,7 @@ const MediaContent = ({
                   el: `#${paginationId}`,
                   clickable: true,
                 }}
-                initialSlide={randomIndex}
+                initialSlide={coverIndex}
                 className='h-full w-full'
               >
                 {photos.map((ptp, i) => (

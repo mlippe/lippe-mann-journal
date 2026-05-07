@@ -6,6 +6,7 @@ import {
   posts,
   postsWithPhotos,
   postsToCollections,
+  PostWithPhotos,
 } from '@/db/schema';
 import { TRPCError } from '@trpc/server';
 import {
@@ -146,8 +147,18 @@ export const collectionsRouter = createTRPCRouter({
 
       const totalPages = Math.ceil(total.count / limit);
 
+      const items = (data as PostWithPhotos[]).map((post) => ({
+        ...post,
+        coverIndex:
+          post.type === 'ALBUM' &&
+          post.postsToPhotos &&
+          post.postsToPhotos.length > 0
+            ? Math.floor(Math.random() * post.postsToPhotos.length)
+            : 0,
+      }));
+
       return {
-        items: data,
+        items,
         nextCursor,
         total: total.count,
         totalPages,

@@ -105,7 +105,7 @@ const AboutPage = () => {
                 gepostet. Möchte ich nicht mehr. Ich möchte allerdings eine
                 öffentliche Bühne für diese Inhalte.
               </p>
-              <p className='md:text-lg'>
+              <div className='md:text-lg'>
                 <b className='font-medium '>
                   Gedanken zu Themen, die mich beschäftigen, die ich interessant
                   finde:
@@ -140,7 +140,7 @@ const AboutPage = () => {
                   </li>
                 </ul>
                 Wie häufig was zu den Themen kommt, wird sich zeigen.
-              </p>
+              </div>
             </div>
           </div>
         </CardContainer>

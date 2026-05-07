@@ -19,6 +19,7 @@ import {
   postsUpdateSchema,
   postsWithPhotos,
   postsToPhotos,
+  PostWithPhotos,
 } from '@/db/schema';
 
 export const postsRouter = createTRPCRouter({
@@ -287,8 +288,18 @@ export const postsRouter = createTRPCRouter({
 
       const totalPages = Math.ceil(total.count / limit);
 
+      const items = (data as PostWithPhotos[]).map((post) => ({
+        ...post,
+        coverIndex:
+          post.type === 'ALBUM' &&
+          post.postsToPhotos &&
+          post.postsToPhotos.length > 0
+            ? Math.floor(Math.random() * post.postsToPhotos.length)
+            : 0,
+      }));
+
       return {
-        items: data,
+        items,
         nextCursor,
         total: total.count,
         totalPages,

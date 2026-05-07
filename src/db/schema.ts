@@ -196,6 +196,7 @@ export const postsWithPhotos = createSelectSchema(posts).extend({
       }),
     )
     .optional(),
+  coverIndex: z.number().optional(),
 });
 export type PostWithPhotos = z.infer<typeof postsWithPhotos>;
 
