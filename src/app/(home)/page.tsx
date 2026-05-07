@@ -16,28 +16,15 @@ import {
 } from '@/modules/home/ui/views/infinite-feed-view';
 import IntroCard from '@/modules/home/ui/components/intro-card';
 
-export const dynamic = 'force-dynamic';
-
-const page = async () => {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(
-    trpc.collections.getFeaturedCollections.queryOptions({ limit: 5 }),
-  );
-  await queryClient.prefetchInfiniteQuery({
-    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
-    getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
-    initialPageParam: 1,
-  });
-
+const page = () => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className='flex flex-col w-full'>
-        <div className='w-full lg:mt-16  mt-10 pb-3'>
-          {/* INTRO CARD  */}
-          <IntroCard />
+    <div className='flex flex-col w-full'>
+      <div className='w-full lg:mt-16  mt-10 pb-3'>
+        {/* INTRO CARD  */}
+        <IntroCard />
 
-          {/* FEATURED COLLECTIONS  */}
-          {/* <Suspense fallback={<FeaturedCollectionsViewLoadingStatus />}>
+        {/* FEATURED COLLECTIONS  */}
+        {/* <Suspense fallback={<FeaturedCollectionsViewLoadingStatus />}>
             <ErrorBoundary
               fallback={
                 <p>
@@ -50,25 +37,40 @@ const page = async () => {
             </ErrorBoundary>
           </Suspense> */}
 
-          {/* INFINITE FEED  */}
-          <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
-            <ErrorBoundary
-              fallback={
-                <p>
-                  Something went wrong while showing the infinite feed, please
-                  try again.
-                </p>
-              }
-            >
-              <InfiniteFeedView />
-            </ErrorBoundary>
-          </Suspense>
+        {/* INFINITE FEED  */}
+        <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
+          <ErrorBoundary
+            fallback={
+              <p>
+                Something went wrong while showing the infinite feed, please
+                try again.
+              </p>
+            }
+          >
+            <InfiniteFeedSuspense />
+          </ErrorBoundary>
+        </Suspense>
 
-          <Footer />
-        </div>
+        <Footer />
       </div>
-    </HydrationBoundary>
+    </div>
   );
 };
+
+async function InfiniteFeedSuspense() {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchInfiniteQuery({
+    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+    getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
+    initialPageParam: 1,
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <InfiniteFeedView />
+    </HydrationBoundary>
+  );
+}
 
 export default page;
