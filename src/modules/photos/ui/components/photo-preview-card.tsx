@@ -4,7 +4,7 @@ import BlurImage from '@/components/blur-image';
 import { BrandsLogo } from '@/components/brands-logo';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { formatExposureTime } from '@/modules/photos/lib/utils';
+import { formatExifDate, formatExposureTime } from '@/modules/photos/lib/utils';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 interface PhotoPreviewCardProps {
@@ -110,11 +110,7 @@ export function PhotoPreviewCard({
                   <div className='flex items-center text-xs text-gray-500'>
                     <p>
                       {dateTimeOriginal &&
-                        new Date(dateTimeOriginal).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
+                        formatExifDate(dateTimeOriginal, 'MMMM d, yyyy')}
                     </p>
                   </div>
                 </div>

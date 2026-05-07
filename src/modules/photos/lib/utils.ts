@@ -1,5 +1,7 @@
 import { ExifParserFactory } from 'ts-exif-parser';
 import { encode } from 'blurhash';
+import { format, type Locale } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 /**
  * Format exposure time to string (e.g., "1/1000")
@@ -178,6 +180,76 @@ const loadImage = async (file: File): Promise<HTMLImageElement> => {
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
   });
+};
+
+/**
+ * Format EXIF date without timezone shifts.
+ * EXIF dates are usually stored as local time without timezone info.
+ * This function treats the date as UTC and formats it to show the "Camera Time".
+ */
+export const formatExifDate = (
+  date: Date | string | number | undefined | null,
+  formatStr: string = 'dd.MM.yyyy, p',
+  options?: { locale?: Locale },
+): string => {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+
+  // Create a new Date object using UTC components as local components
+  // This effectively shows the date "as is" without timezone conversion
+  const utcDate = new Date(
+    d.getUTCFullYear(),
+    d.getUTCMonth(),
+    d.getUTCDate(),
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+  );
+
+  return format(utcDate, formatStr, { locale: options?.locale ?? de });
+};
+
+/**
+ * Convert a date to a string suitable for datetime-local input, using UTC components.
+ */
+export const toDatetimeLocalString = (
+  date: Date | string | number | undefined | null,
+): string => {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const hours = String(d.getUTCHours()).padStart(2, '0');
+  const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+/**
+ * Convert a datetime-local input string to a Date object, treating components as UTC.
+ */
+export const fromDatetimeLocalString = (value: string): Date | null => {
+  if (!value) return null;
+  const [datePart, timePart] = value.split('T');
+  if (!datePart || !timePart) return null;
+  const dateParts = datePart.split('-').map(Number);
+  const timeParts = timePart.split(':').map(Number);
+
+  if (dateParts.length !== 3 || timeParts.length < 2) return null;
+
+  return new Date(
+    Date.UTC(
+      dateParts[0],
+      dateParts[1] - 1,
+      dateParts[2],
+      timeParts[0],
+      timeParts[1],
+    ),
+  );
 };
 
 /**

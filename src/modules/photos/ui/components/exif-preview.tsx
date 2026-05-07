@@ -1,9 +1,11 @@
 import { BrandsLogo } from '@/components/brands-logo';
 import { Separator } from '@/components/ui/separator';
-import { formatExposureTime, TExifData } from '@/modules/photos/lib/utils';
+import {
+  formatExifDate,
+  formatExposureTime,
+  TExifData,
+} from '@/modules/photos/lib/utils';
 import clsx from 'clsx';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
 
 export const ExifPreview = ({
   exif,
@@ -93,10 +95,7 @@ export const ExifPreview = ({
             </div>
             <div className='flex items-center text-xs text-foreground/60'>
               <p>
-                {exif.dateTimeOriginal &&
-                  format(exif.dateTimeOriginal, 'dd.MM.yyyy, p', {
-                    locale: de,
-                  })}
+                {exif.dateTimeOriginal && formatExifDate(exif.dateTimeOriginal)}
               </p>
             </div>
           </div>

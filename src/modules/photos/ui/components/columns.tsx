@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { photoGetMany } from '../../types';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import BlurImage from '@/components/blur-image';
-import { format } from 'date-fns';
+import { formatExifDate } from '../../lib/utils';
 import { DeletePhotoButton } from './delete-photo-button';
 import Link from 'next/link';
 import { PenBoxIcon } from 'lucide-react';
@@ -43,8 +43,8 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
       const takenAt = row.original.dateTimeOriginal;
       if (!takenAt) return <span>-</span>;
 
-      // Use date-fns for consistent formatting across SSR and client
-      const formatted = format(new Date(takenAt), 'MMM d, yyyy HH:mm');
+      // Use formatExifDate for consistent formatting without timezone shifts
+      const formatted = formatExifDate(takenAt, 'MMM d, yyyy HH:mm');
 
       return <span suppressHydrationWarning>{formatted}</span>;
     },

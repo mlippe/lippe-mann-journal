@@ -19,11 +19,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { format } from 'date-fns';
+
 import { ApertureSelector } from '../components/aperture-selector';
 import { ShutterSpeedSelector } from '../components/shutter-speed-selector';
 import { ISOSelector } from '../components/iso-selector';
 import { ExposureCompensationSelector } from '../components/exposure-compensation-selector';
+import { formatExifDate } from '../../lib/utils';
 
 interface PhotoIdViewProps {
   id: string;
@@ -82,7 +83,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   }
 
   const takenAt = data.dateTimeOriginal
-    ? format(new Date(data.dateTimeOriginal), 'd MMM yyyy')
+    ? formatExifDate(data.dateTimeOriginal, 'd MMM yyyy')
     : null;
 
   return (

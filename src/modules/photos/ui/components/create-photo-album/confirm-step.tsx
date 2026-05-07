@@ -26,7 +26,11 @@ import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { TExifData } from '@/modules/photos/lib/utils';
+import {
+  fromDatetimeLocalString,
+  TExifData,
+  toDatetimeLocalString,
+} from '@/modules/photos/lib/utils';
 
 const ConfirmStep = ({
   photos: initialPhotos,
@@ -363,18 +367,10 @@ const ConfirmStep = ({
                           <FormControl>
                             <Input
                               type='datetime-local'
-                              value={
-                                field.value
-                                  ? new Date(field.value)
-                                      .toISOString()
-                                      .slice(0, 16)
-                                  : ''
-                              }
+                              value={toDatetimeLocalString(field.value)}
                               onChange={(e) =>
                                 field.onChange(
-                                  e.target.value
-                                    ? new Date(e.target.value)
-                                    : null,
+                                  fromDatetimeLocalString(e.target.value),
                                 )
                               }
                             />

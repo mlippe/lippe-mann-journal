@@ -24,7 +24,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { ExifPreview } from '@/modules/photos/ui/components/exif-preview';
-import { TExifData } from '@/modules/photos/lib/utils';
+import {
+  fromDatetimeLocalString,
+  TExifData,
+  toDatetimeLocalString,
+} from '@/modules/photos/lib/utils';
 import { ApertureSelector } from '@/modules/photos/ui/components/aperture-selector';
 import { ShutterSpeedSelector } from '@/modules/photos/ui/components/shutter-speed-selector';
 import { ISOSelector } from '@/modules/photos/ui/components/iso-selector';
@@ -417,18 +421,10 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                         <FormControl>
                           <Input
                             type='datetime-local'
-                            value={
-                              field.value
-                                ? new Date(field.value)
-                                    .toISOString()
-                                    .slice(0, 16)
-                                : ''
-                            }
+                            value={toDatetimeLocalString(field.value)}
                             onChange={(e) =>
                               field.onChange(
-                                e.target.value
-                                  ? new Date(e.target.value)
-                                  : null,
+                                fromDatetimeLocalString(e.target.value),
                               )
                             }
                           />
