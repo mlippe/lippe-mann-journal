@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Textarea } from '@/components/ui/textarea';
@@ -279,7 +278,7 @@ export const SocialInteractions = ({
                 initialSize='sm'
                 className={cn(
                   'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300  py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30',
-                  commentContent.length > 0 && 'min-h-[60px]',
+                  commentContent.length > 0 && 'min-h-15',
                 )}
               />
               <div

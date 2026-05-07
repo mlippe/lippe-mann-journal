@@ -1,7 +1,7 @@
-const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || "";
+const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || '';
 
 const normalizeSrc = (src: string) => {
-  return src.startsWith("/") ? src.slice(1) : src;
+  return src.startsWith('/') ? src.slice(1) : src;
 };
 
 export default function cloudflareLoader({
@@ -14,12 +14,12 @@ export default function cloudflareLoader({
   quality?: number;
 }) {
   // If it's a local asset (starts with /), let Next.js handle it
-  if (src.startsWith("/")) {
+  if (src.startsWith('/')) {
     return src;
   }
 
   // If it's already an optimized Cloudflare URL, return it
-  if (src.includes("/cdn-cgi/image/")) {
+  if (src.includes('/cdn-cgi/image/')) {
     return src;
   }
 
@@ -27,14 +27,15 @@ export default function cloudflareLoader({
   if (quality) {
     params.push(`quality=${quality}`);
   }
-  const paramsString = params.join(",");
+  const paramsString = params.join(',');
 
   // If src is a full URL, extract the pathname. Otherwise, use it as is.
   let relativeSrc = src;
-  if (src.startsWith("http")) {
+  if (src.startsWith('http')) {
     try {
       relativeSrc = new URL(src).pathname;
     } catch (e) {
+      console.error(e);
       // If URL parsing fails, fall back to original src
     }
   }

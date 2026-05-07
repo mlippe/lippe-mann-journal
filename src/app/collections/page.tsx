@@ -4,8 +4,6 @@ import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Footer from '@/components/footer';
-import { Collection } from '@/db/schema';
-import CityCard from '@/modules/home/ui/components/city-card'; // Reusing CityCard for collections
 
 export const metadata = {
   title: 'Collections',

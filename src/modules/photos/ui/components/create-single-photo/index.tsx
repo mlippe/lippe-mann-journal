@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TExifData, TImageInfo } from '../../../lib/utils';
 import UploadStep from './upload-step';
 import ConfirmStep from './confirm-step';
@@ -38,7 +38,7 @@ const CreateSinglePhoto = () => {
     setIsSubmitting(true);
 
     createPhoto.mutate(finalData, {
-      onSuccess: async (data) => {
+      onSuccess: async () => {
         // Invalidate queries to refetch photos list
         await queryClient.invalidateQueries(
           trpc.photos.getMany.queryOptions({}),

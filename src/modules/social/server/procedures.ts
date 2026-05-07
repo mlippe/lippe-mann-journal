@@ -1,21 +1,16 @@
 import { z } from 'zod';
-import {
-  baseProcedure,
-  createTRPCRouter,
-} from '@/trpc/init';
+import { baseProcedure, createTRPCRouter } from '@/trpc/init';
 import { eq, and, sql, desc } from 'drizzle-orm';
-import { TRPCError } from '@trpc/server';
-import {
-  likes,
-  comments,
-} from '@/db/schema';
+import { likes, comments } from '@/db/schema';
 
 export const socialRouter = createTRPCRouter({
   toggleLike: baseProcedure
-    .input(z.object({
-      postId: z.string().uuid(),
-      userFingerprint: z.string().min(1),
-    }))
+    .input(
+      z.object({
+        postId: z.string().uuid(),
+        userFingerprint: z.string().min(1),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { postId, userFingerprint } = input;
 
@@ -25,8 +20,8 @@ export const socialRouter = createTRPCRouter({
         .where(
           and(
             eq(likes.postId, postId),
-            eq(likes.userFingerprint, userFingerprint)
-          )
+            eq(likes.userFingerprint, userFingerprint),
+          ),
         )
         .limit(1);
 
@@ -37,29 +32,29 @@ export const socialRouter = createTRPCRouter({
           .where(
             and(
               eq(likes.postId, postId),
-              eq(likes.userFingerprint, userFingerprint)
-            )
+              eq(likes.userFingerprint, userFingerprint),
+            ),
           );
         return { liked: false };
       } else {
         // Like
-        await ctx.db
-          .insert(likes)
-          .values({
-            postId,
-            userFingerprint,
-          });
+        await ctx.db.insert(likes).values({
+          postId,
+          userFingerprint,
+        });
         return { liked: true };
       }
     }),
 
   addComment: baseProcedure
-    .input(z.object({
-      postId: z.string().uuid(),
-      userFingerprint: z.string().min(1),
-      username: z.string().min(1),
-      content: z.string().min(1).max(1000),
-    }))
+    .input(
+      z.object({
+        postId: z.string().uuid(),
+        userFingerprint: z.string().min(1),
+        username: z.string().min(1),
+        content: z.string().min(1).max(1000),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { postId, userFingerprint, username, content } = input;
 
@@ -77,10 +72,12 @@ export const socialRouter = createTRPCRouter({
     }),
 
   updateUsername: baseProcedure
-    .input(z.object({
-      userFingerprint: z.string().min(1),
-      newUsername: z.string().min(1),
-    }))
+    .input(
+      z.object({
+        userFingerprint: z.string().min(1),
+        newUsername: z.string().min(1),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { userFingerprint, newUsername } = input;
 
@@ -93,10 +90,12 @@ export const socialRouter = createTRPCRouter({
     }),
 
   getInteractions: baseProcedure
-    .input(z.object({
-      postId: z.string().uuid(),
-      userFingerprint: z.string().optional(),
-    }))
+    .input(
+      z.object({
+        postId: z.string().uuid(),
+        userFingerprint: z.string().optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { postId, userFingerprint } = input;
 
@@ -121,8 +120,8 @@ export const socialRouter = createTRPCRouter({
           .where(
             and(
               eq(likes.postId, postId),
-              eq(likes.userFingerprint, userFingerprint)
-            )
+              eq(likes.userFingerprint, userFingerprint),
+            ),
           )
           .limit(1);
         hasLiked = !!likeRecord;

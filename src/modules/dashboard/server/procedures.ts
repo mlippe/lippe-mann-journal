@@ -1,7 +1,7 @@
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { photos, posts, collections } from "@/db/schema";
-import { sql, and, gte } from "drizzle-orm";
-import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
+import { photos, posts, collections } from '@/db/schema';
+import { sql } from 'drizzle-orm';
+import { z } from 'zod';
 
 export const dashboardRouter = createTRPCRouter({
   getPhotosCountByMonth: protectedProcedure
@@ -61,7 +61,7 @@ export const dashboardRouter = createTRPCRouter({
       .select({ count: sql<number>`COUNT(*)::int` })
       .from(posts);
     const totalPosts = totalPostsResult?.count ?? 0;
-    
+
     // Get posts by type
     const postsByTypeResult = await ctx.db
       .select({ type: posts.type, count: sql<number>`COUNT(*)::int` })

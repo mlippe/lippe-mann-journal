@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createTRPCRouter, baseProcedure } from '@/trpc/init';
-import { desc, count, eq, and, exists } from 'drizzle-orm'; // Added 'exists'
+import { desc, count, eq, and } from 'drizzle-orm'; // Added 'exists'
 import {
   collections,
   posts,

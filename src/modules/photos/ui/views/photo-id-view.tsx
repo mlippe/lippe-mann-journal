@@ -17,8 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 
 import { ApertureSelector } from '../components/aperture-selector';
 import { ShutterSpeedSelector } from '../components/shutter-speed-selector';

@@ -1,5 +1,5 @@
-import Graphic from "@/components/graphic";
-import { PiArrowRight } from "react-icons/pi";
+import Graphic from '@/components/graphic';
+import { PiArrowRight } from 'react-icons/pi';
 
 interface Props {
   title: string;
@@ -7,21 +7,21 @@ interface Props {
 
 const VectorTopLeftAnimation = ({ title }: Props) => {
   return (
-    <div className="relative bg-background rounded-br-[18px]">
-      <div className="pt-2 px-4 pb-3 overflow-hidden">
-        <div className="text-sm font-light flex items-center">
+    <div className='relative bg-background rounded-br-[18px]'>
+      <div className='pt-2 px-4 pb-3 overflow-hidden'>
+        <div className='text-sm font-light flex items-center'>
           <p>{title}</p>
-          <div className="w-0 group-hover:w-[24px] transition-[width] duration-300 ease-out overflow-hidden">
-            <PiArrowRight size={14} className="ml-2 shrink-0" />
+          <div className='w-0 group-hover:w-6 transition-[width] duration-300 ease-out overflow-hidden'>
+            <PiArrowRight size={14} className='ml-2 shrink-0' />
           </div>
         </div>
       </div>
 
-      <div className="absolute size-[18px]">
+      <div className='absolute size-4.5'>
         <Graphic />
       </div>
 
-      <div className="absolute size-[18px] top-0 -right-[18px]">
+      <div className='absolute size-4.5 top-0 -right-4.5'>
         <Graphic />
       </div>
     </div>

@@ -1,69 +1,68 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createAuthedCaller, buildPhotoInput } from "@/test/helpers";
-import { db } from "@/db";
-import { photos } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
-import { getSession } from "@/modules/auth/lib/get-session";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { createAuthedCaller, buildPhotoInput } from '@/test/helpers';
+import { db } from '@/db';
+import { photos } from '@/db/schema';
+import { getSession } from '@/modules/auth/lib/get-session';
 
 // Clean up test data before each test
 beforeEach(async () => {
   await db.delete(photos);
 });
 
-describe("photos.create", () => {
-  it("should insert a photo and return it", async () => {
+describe('photos.create', () => {
+  it('should insert a photo and return it', async () => {
     const caller = createAuthedCaller();
     const input = buildPhotoInput();
 
     const result = await caller.photos.create(input);
 
     expect(result).toBeDefined();
-    expect(result.title).toBe("Test Photo");
-    expect(result.url).toBe("photos/test-photo.jpg");
+    expect(result.title).toBe('Test Photo');
+    expect(result.url).toBe('photos/test-photo.jpg');
     expect(result.id).toBeDefined();
   });
 
-  it("should reject unauthenticated requests", async () => {
+  it('should reject unauthenticated requests', async () => {
     // Override getSession to return null (unauthenticated)
     vi.mocked(getSession).mockResolvedValueOnce(null);
 
     const caller = createAuthedCaller();
     const input = buildPhotoInput();
 
-    await expect(caller.photos.create(input)).rejects.toThrow("UNAUTHORIZED");
+    await expect(caller.photos.create(input)).rejects.toThrow('UNAUTHORIZED');
   });
 });
 
-describe("photos.update", () => {
-  it("should update photo fields and updatedAt", async () => {
+describe('photos.update', () => {
+  it('should update photo fields and updatedAt', async () => {
     const caller = createAuthedCaller();
     const photo = await caller.photos.create(buildPhotoInput());
 
     const updated = await caller.photos.update({
       id: photo.id,
-      title: "Updated Title",
+      title: 'Updated Title',
     });
 
-    expect(updated.title).toBe("Updated Title");
+    expect(updated.title).toBe('Updated Title');
     expect(new Date(updated.updatedAt).getTime()).toBeGreaterThanOrEqual(
       new Date(photo.updatedAt).getTime(),
     );
   });
 
-  it("should return NOT_FOUND for non-existent photo", async () => {
+  it('should return NOT_FOUND for non-existent photo', async () => {
     const caller = createAuthedCaller();
 
     await expect(
       caller.photos.update({
-        id: "00000000-0000-0000-0000-000000000000",
-        title: "Nope",
+        id: '00000000-0000-0000-0000-000000000000',
+        title: 'Nope',
       }),
-    ).rejects.toThrow("NOT_FOUND");
+    ).rejects.toThrow('NOT_FOUND');
   });
 });
 
-describe("photos.getOne", () => {
-  it("should return a photo by id", async () => {
+describe('photos.getOne', () => {
+  it('should return a photo by id', async () => {
     const caller = createAuthedCaller();
     const created = await caller.photos.create(buildPhotoInput());
 
@@ -74,8 +73,8 @@ describe("photos.getOne", () => {
   });
 });
 
-describe("photos.getMany", () => {
-  it("should return paginated results", async () => {
+describe('photos.getMany', () => {
+  it('should return paginated results', async () => {
     const caller = createAuthedCaller();
 
     // Create 3 photos
@@ -95,32 +94,32 @@ describe("photos.getMany", () => {
     expect(result.totalPages).toBe(2);
   });
 
-  it("should filter by search term", async () => {
+  it('should filter by search term', async () => {
     const caller = createAuthedCaller();
-    await caller.photos.create(buildPhotoInput({ title: "Sunset Beach" }));
-    await caller.photos.create(buildPhotoInput({ title: "Mountain View" }));
+    await caller.photos.create(buildPhotoInput({ title: 'Sunset Beach' }));
+    await caller.photos.create(buildPhotoInput({ title: 'Mountain View' }));
 
-    const result = await caller.photos.getMany({ search: "sunset" });
+    const result = await caller.photos.getMany({ search: 'sunset' });
 
     expect(result.items).toHaveLength(1);
-    expect(result.items[0].title).toBe("Sunset Beach");
+    expect(result.items[0].title).toBe('Sunset Beach');
   });
 
-  it("should escape LIKE wildcards in search", async () => {
+  it('should escape LIKE wildcards in search', async () => {
     const caller = createAuthedCaller();
-    await caller.photos.create(buildPhotoInput({ title: "100% Pure" }));
-    await caller.photos.create(buildPhotoInput({ title: "100 Days" }));
+    await caller.photos.create(buildPhotoInput({ title: '100% Pure' }));
+    await caller.photos.create(buildPhotoInput({ title: '100 Days' }));
 
     // Search for literal "100%" — should only match "100% Pure", not "100 Days"
-    const result = await caller.photos.getMany({ search: "100%" });
+    const result = await caller.photos.getMany({ search: '100%' });
 
     expect(result.items).toHaveLength(1);
-    expect(result.items[0].title).toBe("100% Pure");
+    expect(result.items[0].title).toBe('100% Pure');
   });
 });
 
-describe("photos.remove", () => {
-  it("should delete a photo", async () => {
+describe('photos.remove', () => {
+  it('should delete a photo', async () => {
     const caller = createAuthedCaller();
     const photo = await caller.photos.create(buildPhotoInput());
 
@@ -132,11 +131,11 @@ describe("photos.remove", () => {
     expect(found).toBeUndefined();
   });
 
-  it("should return NOT_FOUND for non-existent photo", async () => {
+  it('should return NOT_FOUND for non-existent photo', async () => {
     const caller = createAuthedCaller();
 
     await expect(
-      caller.photos.remove({ id: "00000000-0000-0000-0000-000000000000" }),
-    ).rejects.toThrow("Photo not found");
+      caller.photos.remove({ id: '00000000-0000-0000-0000-000000000000' }),
+    ).rejects.toThrow('Photo not found');
   });
 });

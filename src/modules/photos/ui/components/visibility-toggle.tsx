@@ -67,7 +67,7 @@ export function VisibilityToggle({
         disabled={updatePhoto.isPending}
         aria-label='Toggle visibility'
       />
-      <span className='text-sm text-muted-foreground min-w-[50px]'>
+      <span className='text-sm text-muted-foreground min-w-12.5'>
         {visibility === 'public' ? 'Public' : 'Private'}
       </span>
     </div>
