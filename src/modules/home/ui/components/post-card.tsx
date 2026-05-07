@@ -99,7 +99,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         </a>
       )}
 
-      <div className='flex-1 min-h-0 relative aspect-[0.8]'>
+      <div className='relative aspect-[0.8]'>
         {/* Open Badge */}
         <Badge
           variant='default'
