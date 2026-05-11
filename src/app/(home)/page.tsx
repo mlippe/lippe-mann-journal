@@ -1,20 +1,14 @@
 import { Suspense } from 'react';
-import { trpc } from '@/trpc/server';
-import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
-import { type PostGetPublished } from '@/modules/posts/types';
 import Footer from '@/components/footer';
-// import {
-//   FeaturedCollectionsView,
-//   FeaturedCollectionsViewLoadingStatus,
-// } from '@/modules/home/ui/views/featured-collections-view';
 import {
   InfiniteFeedView,
   InfiniteFeedViewLoadingStatus,
 } from '@/modules/home/ui/views/infinite-feed-view';
 import IntroCard from '@/modules/home/ui/components/intro-card';
+
+export const dynamic = 'force-dynamic';
 
 const page = () => {
   return (
@@ -58,18 +52,8 @@ const page = () => {
 };
 
 async function InfiniteFeedSuspense() {
-  const queryClient = getQueryClient();
-
-  await queryClient.prefetchInfiniteQuery({
-    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
-    getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
-    initialPageParam: 1,
-  });
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <InfiniteFeedView />
-    </HydrationBoundary>
+    <InfiniteFeedView />
   );
 }
 

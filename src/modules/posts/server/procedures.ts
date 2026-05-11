@@ -290,12 +290,7 @@ export const postsRouter = createTRPCRouter({
 
       const items = (data as PostWithPhotos[]).map((post) => ({
         ...post,
-        coverIndex:
-          post.type === 'ALBUM' &&
-          post.postsToPhotos &&
-          post.postsToPhotos.length > 0
-            ? Math.floor(Math.random() * post.postsToPhotos.length)
-            : 0,
+        coverIndex: 0,
       }));
 
       return {
