@@ -31,8 +31,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const s3Url = process.env.NEXT_PUBLIC_S3_PUBLIC_URL;
+  const s3Domain = s3Url ? new URL(s3Url).origin : null;
+
   return (
     <html lang='en' suppressHydrationWarning>
+      <head>
+        {s3Domain && <link rel='preconnect' href={s3Domain} />}
+      </head>
       <body className={`${readexPro.className} antialiased`}>
         <NuqsAdapter>
           <TRPCReactProvider>

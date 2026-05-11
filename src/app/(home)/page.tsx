@@ -1,6 +1,11 @@
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { getQueryClient } from '@/trpc/server';
+import { trpc } from '@/trpc/server';
+import { type PostGetPublished } from '@/modules/posts/types';
+
 import Footer from '@/components/footer';
 import {
   InfiniteFeedView,
@@ -18,18 +23,7 @@ const page = () => {
         <IntroCard />
 
         {/* FEATURED COLLECTIONS  */}
-        {/* <Suspense fallback={<FeaturedCollectionsViewLoadingStatus />}>
-            <ErrorBoundary
-              fallback={
-                <p>
-                  Something went wrong while showing featured collections,
-                  please try again.
-                </p>
-              }
-            >
-              <FeaturedCollectionsView />
-            </ErrorBoundary>
-          </Suspense> */}
+        {/* ... (commented out code) ... */}
 
         {/* INFINITE FEED  */}
         <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
@@ -52,8 +46,18 @@ const page = () => {
 };
 
 async function InfiniteFeedSuspense() {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchInfiniteQuery({
+    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+    getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
+    initialPageParam: 1,
+  });
+
   return (
-    <InfiniteFeedView />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <InfiniteFeedView />
+    </HydrationBoundary>
   );
 }
 
