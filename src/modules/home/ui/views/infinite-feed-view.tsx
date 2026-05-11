@@ -33,6 +33,8 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
       ...queryOptions,
       getNextPageParam: (lastPage: FeedPage) => lastPage.nextCursor,
       initialPageParam: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 10, // 10 minutes stability
     });
 
   const { lastElementRef } = useIntersectionObserver({
