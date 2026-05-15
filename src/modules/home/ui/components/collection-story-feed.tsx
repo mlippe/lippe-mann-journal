@@ -13,19 +13,18 @@ export const CollectionStoryFeed = () => {
   const { data: collections, isLoading } = useQuery(
     trpc.collections.getFeaturedCollections.queryOptions({ limit: 10 }),
   );
+  if (!collections || collections.length === 0) {
+    return null;
+  }
 
   if (isLoading) {
     return <CollectionStorySkeleton />;
   }
 
-  if (!collections || collections.length === 0) {
-    return null;
-  }
-
   return (
-    <div className='w-full py-6'>
+    <div className='w-full max-w-3xl mx-auto py-6'>
       <ScrollArea className='w-full whitespace-nowrap rounded-md'>
-        <div className='flex w-max space-x-4 px-4'>
+        <div className='flex w-max space-x-4 px-4  py-2'>
           {collections.map((collection) => {
             const imageUrl = collection.coverImageUrl
               ? keyToUrl(collection.coverImageUrl)
@@ -39,9 +38,9 @@ export const CollectionStoryFeed = () => {
                 href={`/collections/${collection.slug}`}
                 className='flex flex-col items-center gap-2 group'
               >
-                <div className='p-0.5 rounded-full bg-gradient-to-tr from-yellow-400 to-fuchsia-600 transition-transform group-hover:scale-105 active:scale-95'>
+                <div className='p-0.5 rounded-full bg-linear-to-tr from-muted to-[#be3e62] transition-transform group-hover:scale-105 active:scale-95'>
                   <div className='p-0.5 rounded-full bg-background'>
-                    <Avatar className='size-16 border-2 border-background'>
+                    <Avatar className='size-16 '>
                       {imageUrl && (
                         <AvatarImage
                           src={imageUrl}
@@ -56,11 +55,11 @@ export const CollectionStoryFeed = () => {
                   </div>
                 </div>
                 <div className='flex flex-col items-center'>
-                  <span className='text-xs font-medium max-w-[80px] truncate'>
+                  <span className='text-xs font-medium max-w-32 truncate'>
                     {collection.name}
                   </span>
                   <span className='text-[10px] text-muted-foreground'>
-                    {collection.postCount} posts
+                    {collection.postCount} Einträge
                   </span>
                 </div>
               </Link>
@@ -79,7 +78,7 @@ export const CollectionStorySkeleton = () => {
       <div className='flex w-max space-x-4 px-4'>
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className='flex flex-col items-center gap-2'>
-            <Skeleton className='size-[72px] rounded-full' />
+            <Skeleton className='size-18 rounded-full' />
             <Skeleton className='h-3 w-12' />
             <Skeleton className='h-2 w-8' />
           </div>

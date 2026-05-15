@@ -11,13 +11,15 @@ interface CollectionCardProps {
 }
 
 export const CollectionCard = ({ collection }: CollectionCardProps) => {
-  const imageUrl = collection.coverImageUrl ? keyToUrl(collection.coverImageUrl) : null;
+  const imageUrl = collection.coverImageUrl
+    ? keyToUrl(collection.coverImageUrl)
+    : null;
 
   return (
     <Link href={`/collections/${collection.slug}`} className='group'>
-      <Card className='overflow-hidden border-none bg-muted/30 transition-all hover:bg-muted/50 rounded-2xl'>
+      <Card className='overflow-hidden border-none bg-muted/30 transition-all hover:bg-muted/50 rounded-2xl py-0'>
         <CardContent className='p-0'>
-          <div className='relative aspect-[16/9] w-full overflow-hidden'>
+          <div className='relative aspect-square w-full overflow-hidden'>
             {imageUrl ? (
               <Image
                 src={imageUrl}
@@ -38,12 +40,12 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
               </div>
             )}
           </div>
-          <div className='p-5'>
+          <div className='p-4'>
             <h3 className='text-lg font-bold group-hover:text-primary transition-colors'>
               {collection.name}
             </h3>
             {collection.description && (
-              <p className='mt-1 text-sm text-foreground/70 line-clamp-2 font-light'>
+              <p className='mt-0.5 text-sm text-foreground/70 line-clamp-2 font-light'>
                 {collection.description}
               </p>
             )}

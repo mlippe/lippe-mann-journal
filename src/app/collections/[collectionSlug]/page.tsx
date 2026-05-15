@@ -30,7 +30,8 @@ export const generateMetadata = async ({
     ? getOptimizedImageUrl(collection.coverImageUrl)
     : undefined;
 
-  const description = collection?.description || 'Collection details and posts.';
+  const description =
+    collection?.description || 'Collection details and posts.';
 
   return {
     title: collection?.name || 'Collection',
@@ -103,33 +104,32 @@ async function CollectionHeaderSuspense({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className='flex justify-center -mx-3 mb-8'>
-        <div className='flex flex-col items-center gap-4 p-6 font-light relative max-w-3xl w-full'>
+      <div className='flex justify-center -mx-3'>
+        <div className='flex flex-col items-center gap-4 p-4 md:p-6 font-light relative max-w-3xl w-full'>
           {/* COLLECTION ICON/IMAGE  */}
-          <div className='size-20 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 to-fuchsia-600'>
-            <div className='size-full rounded-full bg-background p-0.5'>
-              <div className='relative size-full rounded-full overflow-hidden bg-muted flex items-center justify-center'>
-                {collection.coverImageUrl ? (
-                  <Image
-                    src={keyToUrl(collection.coverImageUrl)}
-                    alt={collection.name}
-                    fill
-                    className='object-cover'
-                  />
-                ) : (
-                  <span className='text-xl font-bold text-muted-foreground'>
-                    {collection.name.substring(0, 2).toUpperCase()}
-                  </span>
-                )}
-              </div>
+
+          <div className='md:size-28 size-16 sm:size-20 rounded-full bg-background '>
+            <div className='relative size-full rounded-full overflow-hidden bg-muted flex items-center justify-center'>
+              {collection.coverImageUrl ? (
+                <Image
+                  src={keyToUrl(collection.coverImageUrl)}
+                  alt={collection.name}
+                  fill
+                  className='object-cover'
+                />
+              ) : (
+                <span className='text-xl font-bold text-muted-foreground'>
+                  {collection.name.substring(0, 2).toUpperCase()}
+                </span>
+              )}
             </div>
           </div>
 
           {/* NAME & DESCRIPTION */}
           <div className='flex flex-col items-center text-center'>
-            <h1 className='text-2xl font-bold'>{collection.name}</h1>
+            <h1 className='text-base font-medium'>{collection.name}</h1>
             {collection.description && (
-              <p className='mt-2 text-foreground/70 text-lg max-w-xl'>
+              <p className='mt-2 text-center text-foreground text-sm  md:text-base max-w-xl'>
                 {collection.description}
               </p>
             )}
@@ -140,7 +140,11 @@ async function CollectionHeaderSuspense({
   );
 }
 
-async function InfiniteFeedSuspense({ collectionSlug }: { collectionSlug: string }) {
+async function InfiniteFeedSuspense({
+  collectionSlug,
+}: {
+  collectionSlug: string;
+}) {
   const queryClient = getQueryClient();
 
   await queryClient.prefetchInfiniteQuery({

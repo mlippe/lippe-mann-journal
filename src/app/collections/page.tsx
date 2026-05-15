@@ -8,8 +8,8 @@ import { CollectionCard } from '@/modules/collections/ui/components/collection-c
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata = {
-  title: 'Collections',
-  description: 'Browse all photo and story collections.',
+  title: 'Sammlungen',
+  description: ' Schau Dir alle Sammlungen an, die es in diesem Journal gibt.',
 };
 
 const AllCollectionsView = async () => {
@@ -32,7 +32,7 @@ const CollectionsLoading = () => {
     <div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className='space-y-4'>
-          <Skeleton className='aspect-[16/9] w-full rounded-2xl' />
+          <Skeleton className='aspect-video w-full rounded-2xl' />
           <div className='space-y-2 px-2'>
             <Skeleton className='h-6 w-1/2' />
             <Skeleton className='h-4 w-full' />
@@ -54,10 +54,10 @@ const page = async () => {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className='flex flex-col w-full'>
         <div className='w-full lg:mt-16 mt-10 pb-3 px-4 md:px-0 max-w-420 mx-auto'>
-          <div className='mb-12'>
-            <h1 className='text-4xl font-bold tracking-tight'>Collections</h1>
-            <p className='mt-2 text-lg text-foreground/70 font-light'>
-              Explore themed sets of photos and articles.
+          <div className='mb-12 flex flex-col items-center'>
+            <h1 className='text-xl font-medium text-center'>Sammlungen</h1>
+            <p className='mt-2 text-foreground text-sm  md:text-base max-w-xl text-center font-light'>
+              Schau Dir alle Sammlungen an, die es in diesem Journal gibt.
             </p>
           </div>
 
