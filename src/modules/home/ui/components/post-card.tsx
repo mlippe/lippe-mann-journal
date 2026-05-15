@@ -122,7 +122,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         )}
 
         {isArticle ? (
-          <div className='block h-full relative'>
+          <Link href={href} className='block h-full relative'>
             <ArticleContent post={post} priority={isPriority} />
             <div className='hidden md:flex md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-500 absolute inset-0 bg-linear-to-b from-background/0 to-background/95 to-60% xl:to-80% from-40% flex-col justify-end'>
               <div className='xl:p-12 p-8'>
@@ -134,7 +134,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
         ) : (
           <MediaContent
             post={post}

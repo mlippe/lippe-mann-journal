@@ -8,42 +8,97 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import RichTextViewer from '@/components/editor/rich-text-viewer';
 import { format } from 'date-fns';
 import { FeedPreview } from '@/modules/home/ui/components/feed-preview';
+import { calculateReadingTime } from '@/modules/articles/lib/reading-time';
+import { useEffect, useState } from 'react';
+import Author from '@/components/author';
+import { Separator } from '@/components/ui/separator';
+import { siteConfig } from '@/site.config';
 
 export const ArticleSlugView = ({ slug }: { slug: string }) => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.posts.getOne.queryOptions({ slug }));
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const readingTime = calculateReadingTime(data.content);
 
   return (
-    <div className='mt-16 flex flex-col gap-4 pb-6 items-center'>
-      <div className='max-w-4xl w-full'>
-        {data.coverImage && (
-          <Image
-            src={keyToUrl(data.coverImage) || '/placeholder.svg'}
-            alt='Image'
-            width={896}
-            height={400}
-            quality={75}
-            className='w-full max-h-screen object-contain mb-5 bg-foreground/10'
-          />
-        )}
+    <div className='flex flex-col items-center w-full'>
+      {/* PROGRESS BAR  */}
+      <div className='fixed top-0 left-0 w-full h-1 z-50 bg-muted'>
+        <div 
+          className='h-full bg-primary transition-all duration-150 ease-out'
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
 
-        {/* CONTENT  */}
-        <div className=''>
-          <span className='text-base text-foreground/80 mb-2 block'>
-            {format(data.createdAt, 'dd.MM.yyyy')}
-          </span>
-          <h1 className='text-4xl tracking-tight lg:text-5xl mb-6 font-bold'>
+      <article className='w-full max-w-screen-md px-4 lg:px-0 pt-10 lg:pt-20'>
+        {/* HEADER SECTION  */}
+        <header className='mb-10 lg:mb-16'>
+          <h1 className='text-4xl lg:text-6xl font-bold tracking-tight mb-8 leading-[1.1]'>
             {data.title}
           </h1>
-        </div>
+          
+          <div className='flex items-center justify-between mb-8'>
+            <div className='flex items-center gap-4'>
+              <Author size='md' />
+              <div className='flex flex-col text-sm text-muted-foreground'>
+                <div className='flex items-center gap-2'>
+                  <span>{format(data.createdAt, 'MMM d, yyyy')}</span>
+                  <span>·</span>
+                  <span>{readingTime} min read</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* POST PREVIEW */}
-        <div className='-mx-3'>
+          {data.coverImage && (
+            <div className='relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-muted mb-12'>
+              <Image
+                src={keyToUrl(data.coverImage) || '/placeholder.svg'}
+                alt={data.title}
+                fill
+                priority
+                className='object-cover'
+              />
+            </div>
+          )}
+        </header>
+
+        {/* ARTICLE CONTENT  */}
+        <div className='max-w-none mb-20 font-sans leading-relaxed text-foreground/90'>
           <RichTextViewer content={data.content || ''} />
         </div>
+
+        <Separator className='mb-8' />
+
+        {/* AUTHOR CARD  */}
+        <div className='flex flex-col lg:flex-row gap-6 items-center lg:items-start p-8 rounded-3xl bg-muted/30 border mb-20'>
+          <Author size='md' />
+          <div className='flex-1 text-center lg:text-left space-y-2'>
+            <h3 className='font-bold text-lg'>About {siteConfig.name}</h3>
+            <p className='text-muted-foreground font-light leading-relaxed'>
+              {siteConfig.bio}
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <div className='w-full max-w-420 px-4 lg:px-0'>
+        <FeedPreview excludeSlug={slug} />
       </div>
-      <FeedPreview excludeSlug={slug} />
-      <div className='mt-10 w-full'>
+
+      <div className='mt-20 w-full'>
         <Footer />
       </div>
     </div>

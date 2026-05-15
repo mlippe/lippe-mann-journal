@@ -1,34 +1,45 @@
 /* Tiptap Editor Styles */
 .ProseMirror {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
+  padding: 0;
   outline: none !important;
   position: relative;
+  font-family: inherit;
+  line-height: 1.8;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  pointer-events: none;
+  float: left;
+  height: 0;
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  opacity: 0.5;
 }
 
 h1.tiptap-heading {
   margin-bottom: 1.5rem;
-  margin-top: 2rem;
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-  font-weight: 700;
+  margin-top: 3rem;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 h2.tiptap-heading {
-  margin-bottom: 1rem;
-  margin-top: 1.5rem;
+  margin-bottom: 1.25rem;
+  margin-top: 2.5rem;
   font-size: 1.875rem;
-  line-height: 2.25rem;
+  line-height: 1.3;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 h3.tiptap-heading {
-  margin-bottom: 0.75rem;
-  margin-top: 1rem;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  font-weight: 600;
 }
 
 h1.tiptap-heading:first-child,
@@ -37,32 +48,34 @@ h3.tiptap-heading:first-child {
   margin-top: 0;
 }
 
-h1.tiptap-heading + h2.tiptap-heading,
-h1.tiptap-heading + h3.tiptap-heading,
-h2.tiptap-heading + h1.tiptap-heading,
-h2.tiptap-heading + h3.tiptap-heading,
-h3.tiptap-heading + h1.tiptap-heading,
-h3.tiptap-heading + h2.tiptap-heading {
-  margin-top: 0;
-}
-
-.tiptap p.is-editor-empty:first-child::before {
-  pointer-events: none;
-  float: left;
-  height: 0;
-  color: hsl(var(--accent-foreground));
-  content: attr(data-placeholder);
-}
-
 .tiptap ul,
 .tiptap ol {
-  padding: 0 1rem;
+  padding: 0 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.tiptap li {
+  margin-bottom: 0.5rem;
 }
 
 .tiptap blockquote {
-  border-left: 3px solid gray;
-  margin: 1.5rem 0;
-  padding-left: 1rem;
+  border-left: 4px solid hsl(var(--primary));
+  margin: 2.5rem 0;
+  padding-left: 1.5rem;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: hsl(var(--foreground) / 0.8);
+}
+
+.tiptap hr {
+  margin: 3rem 0;
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.tiptap img {
+  border-radius: var(--radius-lg);
+  margin: 2rem 0;
 }
 
 /* Tiptap BubbleMenu and FloatingMenu styles */

@@ -26,12 +26,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { TagsInput } from './tags-input';
+import { CollectionSelect } from '@/modules/posts/ui/components/collection-select';
 
 import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import TiptapEditor from '@/components/editor';
+import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const formSchema = postFormSchema;
 
@@ -94,6 +98,8 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
       visibility: post?.visibility || 'public',
       coverImage: post?.coverImage || '',
       tags: post?.tags || [],
+      collectionIds:
+        post?.postsToCollections?.map((ptc) => ptc.collection.id) || [],
     },
   });
 
@@ -117,47 +123,62 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
   }
 
   return (
-    <div>
+    <div className='max-w-screen-xl mx-auto'>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className='grid grid-cols-1 md:grid-cols-3 gap-6 items-start'
+          className='flex flex-col lg:flex-row gap-10 items-start'
         >
-          <div className='space-y-6 md:col-span-2'>
-            <FormField
-              control={form.control}
-              name='title'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Title' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {/* Main Content Area */}
+          <div className='flex-1 w-full space-y-8'>
+            <div className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='title'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder='Article Title'
+                        className='text-4xl lg:text-5xl font-bold border-none px-0 focus-visible:ring-0 placeholder:opacity-30 h-auto py-2 bg-transparent shadow-none'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='slug'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input placeholder='post-url-slug' {...field} disabled />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='slug'
+                render={({ field }) => (
+                  <FormItem className='flex items-center gap-2 text-muted-foreground text-sm'>
+                    <span className='whitespace-nowrap opacity-50 font-medium uppercase tracking-wider text-[10px]'>
+                      URL Slug:
+                    </span>
+                    <FormControl>
+                      <input
+                        className='bg-transparent border-none p-0 focus:outline-none focus:ring-0 w-full disabled:opacity-100'
+                        {...field}
+                        disabled
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
 
             <FormField
               control={form.control}
               name='coverImage'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image</FormLabel>
+                  <FormLabel className='text-muted-foreground uppercase tracking-wider text-[10px] font-bold'>
+                    Cover Image
+                  </FormLabel>
                   <FormControl>
                     <FileUploader
                       onUploadSuccess={(key) => {
@@ -177,70 +198,103 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
               name='content'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <TiptapEditor
-                      content={field.value || ''}
-                      onChange={field.onChange}
-                    />
+                    <div className='min-h-[500px] prose prose-lg dark:prose-invert max-w-none'>
+                      <TiptapEditor
+                        content={field.value || ''}
+                        onChange={field.onChange}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
 
-            <FormField
-              control={form.control}
-              name='tags'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tags</FormLabel>
-                  <FormControl>
-                    <TagsInput
-                      value={Array.isArray(field.value) ? field.value : []}
-                      onChange={(tags) => field.onChange(tags)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {/* Sidebar Settings */}
+          <aside className='w-full lg:w-80 space-y-8 lg:sticky lg:top-24'>
+            <div className='p-6 rounded-2xl bg-muted/30 border space-y-6'>
+              <div className='space-y-4'>
+                <h3 className='text-sm font-bold uppercase tracking-widest opacity-50'>
+                  Publish Settings
+                </h3>
 
-            <div className='pt-2'>
-              <Button type='submit' disabled={isPending}>
-                {post ? 'Update' : 'Create'}
+                <FormField
+                  control={form.control}
+                  name='visibility'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-xs'>Visibility</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='bg-background'>
+                            <SelectValue placeholder='Select visibility' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='public'>Public</SelectItem>
+                          <SelectItem value='private'>Private</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='collectionIds'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-xs'>Collections</FormLabel>
+                      <FormControl>
+                        <CollectionSelect
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='tags'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-xs'>Tags</FormLabel>
+                      <FormControl>
+                        <TagsInput
+                          value={Array.isArray(field.value) ? field.value : []}
+                          onChange={(tags) => field.onChange(tags)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Button
+                type='submit'
+                className='w-full h-12 text-base font-bold rounded-xl'
+                disabled={isPending}
+              >
+                {post ? 'Update Article' : 'Publish Article'}
               </Button>
             </div>
-          </div>
-          {/* Right Form Section */}
-          <div className='space-y-6 md:col-span-1 md:sticky md:top-24 self-start'>
-            <FormField
-              control={form.control}
-              name='visibility'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Visibility</FormLabel>
-                  <FormControl>
-                    <Select
-                      {...field}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select visibility' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='public'>Public</SelectItem>
-                        <SelectItem value='private'>Private</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+
+            {post && (
+              <div className='px-6 py-4 text-[10px] text-muted-foreground uppercase tracking-widest flex justify-between border rounded-2xl border-dashed'>
+                <span>Created: {format(post.createdAt, 'MMM d, yyyy')}</span>
+              </div>
+            )}
+          </aside>
         </form>
       </Form>
     </div>
