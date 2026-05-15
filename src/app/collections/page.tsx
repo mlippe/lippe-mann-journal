@@ -7,6 +7,8 @@ import Footer from '@/components/footer';
 import { CollectionCard } from '@/modules/collections/ui/components/collection-card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Sammlungen',
   description: ' Schau Dir alle Sammlungen an, die es in diesem Journal gibt.',
@@ -19,7 +21,7 @@ const AllCollectionsView = async () => {
   );
 
   return (
-    <div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div className='w-full grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-6'>
       {collections.map((collection) => (
         <CollectionCard key={collection.id} collection={collection} />
       ))}
@@ -29,7 +31,7 @@ const AllCollectionsView = async () => {
 
 const CollectionsLoading = () => {
   return (
-    <div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div className='w-full grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-6'>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className='space-y-4'>
           <Skeleton className='aspect-video w-full rounded-2xl' />
@@ -46,15 +48,15 @@ const CollectionsLoading = () => {
 const page = async () => {
   const queryClient = getQueryClient();
   // Prefetch all collections
-  void queryClient.prefetchQuery(
+  await queryClient.prefetchQuery(
     trpc.collections.getAllCollections.queryOptions({}),
   );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className='flex flex-col w-full'>
-        <div className='w-full lg:mt-16 mt-10 pb-3 px-4 md:px-0 max-w-420 mx-auto'>
-          <div className='mb-12 flex flex-col items-center'>
+        <div className='w-full lg:mt-18 mt-10 pb-3 px-4 md:px-0 max-w-420 mx-auto'>
+          <div className='mb-10 lg:mb-15 flex flex-col items-center p-4'>
             <h1 className='text-xl font-medium text-center'>Sammlungen</h1>
             <p className='mt-2 text-foreground text-sm  md:text-base max-w-xl text-center font-light'>
               Schau Dir alle Sammlungen an, die es in diesem Journal gibt.

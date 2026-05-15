@@ -1,6 +1,10 @@
 import { z } from 'zod';
-import { createTRPCRouter, baseProcedure, protectedProcedure } from '@/trpc/init';
-import { desc, count, eq, and, sql } from 'drizzle-orm';
+import {
+  createTRPCRouter,
+  baseProcedure,
+  protectedProcedure,
+} from '@/trpc/init';
+import { desc, count, eq, and } from 'drizzle-orm';
 import {
   collections,
   posts,
@@ -9,12 +13,12 @@ import {
   PostWithPhotos,
   collectionsInsertSchema,
   collectionsUpdateSchema,
+  Collection,
+  Post,
 } from '@/db/schema';
 import { TRPCError } from '@trpc/server';
-import {
-  DEFAULT_PAGE_SIZE,
-  MAX_PAGE_SIZE,
-} from '@/constants';
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@/constants';
+import { Context } from 'node:vm';
 
 // Zod schema for the output of getPostsInCollection
 export const postsInCollectionOutputSchema = z.object({
@@ -23,6 +27,49 @@ export const postsInCollectionOutputSchema = z.object({
   total: z.number(),
   totalPages: z.number(),
 });
+
+// Helper to enhance collection data with post count and latest image
+async function enhanceCollection(ctx: Context, collection: Collection) {
+  const [postCountResult] = await ctx.db
+    .select({ count: count() })
+    .from(postsToCollections)
+    .innerJoin(posts, eq(postsToCollections.postId, posts.id))
+    .where(
+      and(
+        eq(postsToCollections.collectionId, collection.id),
+        eq(posts.visibility, 'public'),
+      ),
+    );
+
+  const latestPost = await ctx.db.query.posts.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    where: (posts: Post, { exists, and, eq }: any) =>
+      and(
+        eq(posts.visibility, 'public'),
+        exists(
+          ctx.db
+            .select()
+            .from(postsToCollections)
+            .where(
+              and(
+                eq(postsToCollections.postId, posts.id),
+                eq(postsToCollections.collectionId, collection.id),
+              ),
+            ),
+        ),
+      ),
+    orderBy: [desc(posts.createdAt)],
+    columns: {
+      coverImage: true,
+    },
+  });
+
+  return {
+    ...collection,
+    postCount: (postCountResult?.count as number) ?? 0,
+    latestPostImage: (latestPost?.coverImage as string) ?? null,
+  };
+}
 
 export const collectionsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -39,7 +86,8 @@ export const collectionsRouter = createTRPCRouter({
     .input(collectionsUpdateSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...values } = input;
-      if (!id) throw new TRPCError({ code: 'BAD_REQUEST', message: 'ID is required' });
+      if (!id)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'ID is required' });
 
       const [updatedCollection] = await ctx.db
         .update(collections)
@@ -48,7 +96,10 @@ export const collectionsRouter = createTRPCRouter({
         .returning();
 
       if (!updatedCollection) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Collection not found' });
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Collection not found',
+        });
       }
       return updatedCollection;
     }),
@@ -62,7 +113,10 @@ export const collectionsRouter = createTRPCRouter({
         .returning();
 
       if (!deletedCollection) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Collection not found' });
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Collection not found',
+        });
       }
       return deletedCollection;
     }),
@@ -77,17 +131,25 @@ export const collectionsRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const limit = input?.limit ?? MAX_PAGE_SIZE;
+
       const data = await ctx.db.query.collections.findMany({
         orderBy: [desc(collections.createdAt)],
         limit: limit,
       });
-      return data;
+
+      // Enhance with post count and latest post image
+      const enhancedData = await Promise.all(
+        data.map(async (collection) => enhanceCollection(ctx, collection)),
+      );
+
+      return enhancedData;
     }),
 
   getCollectionBySlug: baseProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ ctx, input }) => {
       const { slug } = input;
+
       const collection = await ctx.db.query.collections.findFirst({
         where: eq(collections.slug, slug),
       });
@@ -98,6 +160,7 @@ export const collectionsRouter = createTRPCRouter({
           message: 'Collection not found',
         });
       }
+
       return collection;
     }),
 
@@ -118,46 +181,7 @@ export const collectionsRouter = createTRPCRouter({
 
       // Enhance with post count and latest post image
       const enhancedData = await Promise.all(
-        data.map(async (collection) => {
-          const [postCountResult] = await ctx.db
-            .select({ count: count() })
-            .from(postsToCollections)
-            .innerJoin(posts, eq(postsToCollections.postId, posts.id))
-            .where(
-              and(
-                eq(postsToCollections.collectionId, collection.id),
-                eq(posts.visibility, 'public'),
-              ),
-            );
-
-          const latestPost = await ctx.db.query.posts.findFirst({
-            where: (posts, { exists, and, eq }) =>
-              and(
-                eq(posts.visibility, 'public'),
-                exists(
-                  ctx.db
-                    .select()
-                    .from(postsToCollections)
-                    .where(
-                      and(
-                        eq(postsToCollections.postId, posts.id),
-                        eq(postsToCollections.collectionId, collection.id),
-                      ),
-                    ),
-                ),
-              ),
-            orderBy: [desc(posts.createdAt)],
-            columns: {
-              coverImage: true,
-            },
-          });
-
-          return {
-            ...collection,
-            postCount: postCountResult?.count ?? 0,
-            latestPostImage: latestPost?.coverImage ?? null,
-          };
-        }),
+        data.map(async (collection) => enhanceCollection(ctx, collection)),
       );
 
       return enhancedData;

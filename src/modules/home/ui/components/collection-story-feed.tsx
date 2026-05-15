@@ -13,12 +13,13 @@ export const CollectionStoryFeed = () => {
   const { data: collections, isLoading } = useQuery(
     trpc.collections.getFeaturedCollections.queryOptions({ limit: 10 }),
   );
-  if (!collections || collections.length === 0) {
-    return null;
-  }
 
   if (isLoading) {
     return <CollectionStorySkeleton />;
+  }
+
+  if (!collections || collections.length === 0) {
+    return null;
   }
 
   return (

@@ -149,6 +149,10 @@ export const collections = pgTable('collections', {
 });
 
 export type Collection = InferSelectModel<typeof collections>;
+export type EnhancedCollection = InferSelectModel<typeof collections> & {
+  postCount: number;
+  latestPostImage: string;
+};
 export const collectionsInsertSchema = createInsertSchema(collections);
 export const collectionsSelectSchema = createSelectSchema(collections);
 export const collectionsUpdateSchema = createUpdateSchema(collections);

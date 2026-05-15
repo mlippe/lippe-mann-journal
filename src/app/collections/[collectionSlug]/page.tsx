@@ -9,9 +9,7 @@ import {
   InfiniteFeedView,
   InfiniteFeedViewLoadingStatus,
 } from '@/modules/home/ui/views/infinite-feed-view';
-import Image from 'next/image';
 import { getOptimizedImageUrl } from '@/lib/images';
-import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 export const generateMetadata = async ({
   params,
@@ -62,7 +60,13 @@ const SingleCollectionView = async ({
       <div className='w-full lg:mt-16 mt-10 pb-3'>
         {/* Collection Header */}
         <Suspense
-          fallback={<div className='h-32 w-full animate-pulse bg-muted' />}
+          fallback={
+            <div className='px-4 py-7 w-full  flex flex-col gap-5 justify-cente items-center'>
+              <div className='animate-pulse bg-foreground/10 w-full  max-w-36 rounded-xl h-5' />
+
+              <div className='animate-pulse bg-foreground/10 w-full max-w-56 rounded-xl h-3' />
+            </div>
+          }
         >
           <CollectionHeaderSuspense collectionSlug={collectionSlug} />
         </Suspense>
@@ -106,28 +110,9 @@ async function CollectionHeaderSuspense({
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className='flex justify-center -mx-3'>
         <div className='flex flex-col items-center gap-4 p-4 md:p-6 font-light relative max-w-3xl w-full'>
-          {/* COLLECTION ICON/IMAGE  */}
-
-          <div className='md:size-28 size-16 sm:size-20 rounded-full bg-background '>
-            <div className='relative size-full rounded-full overflow-hidden bg-muted flex items-center justify-center'>
-              {collection.coverImageUrl ? (
-                <Image
-                  src={keyToUrl(collection.coverImageUrl)}
-                  alt={collection.name}
-                  fill
-                  className='object-cover'
-                />
-              ) : (
-                <span className='text-xl font-bold text-muted-foreground'>
-                  {collection.name.substring(0, 2).toUpperCase()}
-                </span>
-              )}
-            </div>
-          </div>
-
           {/* NAME & DESCRIPTION */}
           <div className='flex flex-col items-center text-center'>
-            <h1 className='text-base font-medium'>{collection.name}</h1>
+            <h1 className='text-xl font-medium'>{collection.name}</h1>
             {collection.description && (
               <p className='mt-2 text-center text-foreground text-sm  md:text-base max-w-xl'>
                 {collection.description}

@@ -35,7 +35,6 @@ import { useRouter } from 'next/navigation';
 import TiptapEditor from '@/components/editor';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 const formSchema = postFormSchema;
 
@@ -123,7 +122,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
   }
 
   return (
-    <div className='max-w-screen-xl mx-auto'>
+    <div className='max-w-7xl mx-auto'>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -199,7 +198,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className='min-h-[500px] prose prose-lg dark:prose-invert max-w-none'>
+                    <div className='min-h-125 prose prose-lg dark:prose-invert max-w-none'>
                       <TiptapEditor
                         content={field.value || ''}
                         onChange={field.onChange}
