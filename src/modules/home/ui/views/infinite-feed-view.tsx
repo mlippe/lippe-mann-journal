@@ -75,7 +75,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
 
 export const InfiniteFeedViewLoadingStatus = () => {
   return (
-    <div className='w-full space-y-8 py-8 max-w-420 mx-auto'>
+    <div className='w-full space-y-8 md:py-8 py-4 max-w-420 mx-auto'>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem] border-muted border-y-12 md:border-y -mx-3 md:mx-0'>
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className='w-full relative'>

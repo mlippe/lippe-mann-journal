@@ -95,13 +95,16 @@ export const CollectionStoryFeed = () => {
 
 export const CollectionStorySkeleton = () => {
   return (
-    <div className='w-full py-6'>
-      <div className='flex w-max space-x-4 px-4'>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className='flex flex-col items-center gap-2'>
-            <Skeleton className='size-18 rounded-full' />
-            <Skeleton className='h-3 w-12' />
-            <Skeleton className='h-2 w-8' />
+    <div className='w-full max-w-xl mx-auto  pb-3.5 pt-1   md:pb-16.5 overflow-hidden'>
+      <div className='flex w-max space-x-10 md:space-x-12 md:px-6 px-5'>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className='flex flex-col items-center gap-2.5 md:gap-2 animate-pulse'
+          >
+            <Skeleton className='md:size-18 size-16 rounded-full ' />
+            <Skeleton className='h-3 w-12 ' />
+            <Skeleton className='h-2 w-8 ' />
           </div>
         ))}
       </div>
