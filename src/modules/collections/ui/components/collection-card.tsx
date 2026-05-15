@@ -17,8 +17,6 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
       ? keyToUrl(collection.latestPostImage)
       : null;
 
-  console.log('collection card', collection);
-
   return (
     <Link href={`/collections/${collection.slug}`} className='group'>
       <Card className='overflow-hidden border-none bg-muted/30 transition-all hover:bg-muted/50 rounded-2xl py-0 h-full'>

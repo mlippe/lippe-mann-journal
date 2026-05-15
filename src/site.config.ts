@@ -24,7 +24,7 @@ export const siteConfig = {
   role: 'Digital Product Engineer',
 
   /** Short bio shown on the home page profile card */
-  bio: 'In diesem Journal teile ich Bilder aus dem täglichen Leben, Einblicke in aktuelle Projekte und Gedankenfetzen.',
+  bio: 'Ein visuelles Tagebuch — und manchmal mehr.',
 
   /** Avatar image path (place your avatar in /public/avatar.jpg) */
   avatar: '/avatar.jpg',
