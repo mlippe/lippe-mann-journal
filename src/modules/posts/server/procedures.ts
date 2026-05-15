@@ -19,14 +19,20 @@ import {
   postsUpdateSchema,
   postsWithPhotos,
   postsToPhotos,
+  postsToCollections,
   PostWithPhotos,
+  collectionsSelectSchema,
 } from '@/db/schema';
 
 export const postsRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(postsInsertSchema)
+    .input(
+      postsInsertSchema.extend({
+        collectionIds: z.array(z.string().uuid()).optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const values = input;
+      const { collectionIds, ...values } = input;
 
       const existingPost = await ctx.db
         .select()
@@ -40,9 +46,20 @@ export const postsRouter = createTRPCRouter({
         });
       }
 
-      const [newPost] = await ctx.db.insert(posts).values(values).returning();
+      return await ctx.db.transaction(async (tx) => {
+        const [newPost] = await tx.insert(posts).values(values).returning();
 
-      return newPost;
+        if (collectionIds && collectionIds.length > 0) {
+          await tx.insert(postsToCollections).values(
+            collectionIds.map((collectionId) => ({
+              postId: newPost.id,
+              collectionId,
+            })),
+          );
+        }
+
+        return newPost;
+      });
     }),
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -62,31 +79,67 @@ export const postsRouter = createTRPCRouter({
       return data;
     }),
   update: protectedProcedure
-    .input(postsUpdateSchema)
+    .input(
+      postsUpdateSchema.extend({
+        collectionIds: z.array(z.string().uuid()).optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const { id } = input;
+      const { id, collectionIds, ...values } = input;
 
       if (!id) {
         throw new TRPCError({ code: 'BAD_REQUEST' });
       }
 
-      const [updatedPost] = await ctx.db
-        .update(posts)
-        .set({
-          ...input,
-        })
-        .where(eq(posts.id, id))
-        .returning();
+      return await ctx.db.transaction(async (tx) => {
+        const [updatedPost] = await tx
+          .update(posts)
+          .set({
+            ...values,
+            updatedAt: new Date(),
+          })
+          .where(eq(posts.id, id))
+          .returning();
 
-      if (!updatedPost) {
-        throw new TRPCError({ code: 'NOT_FOUND' });
-      }
+        if (!updatedPost) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
 
-      return updatedPost;
+        if (collectionIds !== undefined) {
+          // Remove existing links
+          await tx
+            .delete(postsToCollections)
+            .where(eq(postsToCollections.postId, id));
+
+          // Insert new links
+          if (collectionIds.length > 0) {
+            await tx.insert(postsToCollections).values(
+              collectionIds.map((collectionId) => ({
+                postId: id,
+                collectionId,
+              })),
+            );
+          }
+        }
+
+        return updatedPost;
+      });
     }),
   getOne: authedProcedure
     .input(z.object({ slug: z.string() }))
-    .output(postsWithPhotos)
+    .output(
+      postsWithPhotos.extend({
+        postsToCollections: z
+          .array(
+            z.object({
+              postId: z.string(),
+              collectionId: z.string(),
+              collection: collectionsSelectSchema,
+            }),
+          )
+          .optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const filters = [eq(posts.slug, input.slug)];
       if (!ctx.auth) {
@@ -103,6 +156,11 @@ export const postsRouter = createTRPCRouter({
             // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
           },
+          postsToCollections: {
+            with: {
+              collection: true,
+            },
+          },
         },
       });
 
@@ -117,7 +175,19 @@ export const postsRouter = createTRPCRouter({
     }),
   getPostById: authedProcedure
     .input(z.object({ postId: z.string().uuid() }))
-    .output(postsWithPhotos)
+    .output(
+      postsWithPhotos.extend({
+        postsToCollections: z
+          .array(
+            z.object({
+              postId: z.string(),
+              collectionId: z.string(),
+              collection: collectionsSelectSchema,
+            }),
+          )
+          .optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { postId } = input;
 
@@ -135,6 +205,11 @@ export const postsRouter = createTRPCRouter({
             },
             // @ts-expect-error: unspecified any
             orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
+          },
+          postsToCollections: {
+            with: {
+              collection: true,
+            },
           },
         },
       });

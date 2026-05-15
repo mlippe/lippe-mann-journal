@@ -34,12 +34,14 @@ import { ShutterSpeedSelector } from '@/modules/photos/ui/components/shutter-spe
 import { ISOSelector } from '@/modules/photos/ui/components/iso-selector';
 import { ExposureCompensationSelector } from '@/modules/photos/ui/components/exposure-compensation-selector';
 import { TagsInput } from '@/modules/articles/ui/components/tags-input';
+import { CollectionSelect } from './collection-select';
 import { confirmStepSchema } from '@/modules/photos/ui/components/create-single-photo/types';
 
 // Extend the creation schema with tags for the edit view
 const formSchema = confirmStepSchema.extend({
   postVisibility: z.enum(['private', 'public']),
   tags: z.array(z.string()),
+  collectionIds: z.array(z.string().uuid()),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +60,8 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
       postTitle: post.title,
       postVisibility: post.visibility,
       tags: post.tags || [],
+      collectionIds:
+        post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
       title: photo?.title || '',
       make: photo?.make || undefined,
       model: photo?.model || undefined,
@@ -110,6 +114,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         title: values.postTitle,
         visibility: values.postVisibility,
         tags: values.tags,
+        collectionIds: values.collectionIds,
       }),
       updatePhoto.mutateAsync({
         id: photo.id,
@@ -154,6 +159,23 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                   <FormLabel>Post Title</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='collectionIds'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Collections</FormLabel>
+                  <FormControl>
+                    <CollectionSelect
+                      value={field.value || []}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -12,6 +12,10 @@ import {
   InfiniteFeedViewLoadingStatus,
 } from '@/modules/home/ui/views/infinite-feed-view';
 import IntroCard from '@/modules/home/ui/components/intro-card';
+import {
+  CollectionStoryFeed,
+  CollectionStorySkeleton,
+} from '@/modules/home/ui/components/collection-story-feed';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +27,9 @@ const page = () => {
         <IntroCard />
 
         {/* FEATURED COLLECTIONS  */}
-        {/* ... (commented out code) ... */}
+        <Suspense fallback={<CollectionStorySkeleton />}>
+          <CollectionStoryFeed />
+        </Suspense>
 
         {/* INFINITE FEED  */}
         <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>

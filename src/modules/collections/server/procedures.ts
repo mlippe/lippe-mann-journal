@@ -1,16 +1,18 @@
 import { z } from 'zod';
-import { createTRPCRouter, baseProcedure } from '@/trpc/init';
-import { desc, count, eq, and } from 'drizzle-orm'; // Added 'exists'
+import { createTRPCRouter, baseProcedure, protectedProcedure } from '@/trpc/init';
+import { desc, count, eq, and, sql } from 'drizzle-orm';
 import {
   collections,
   posts,
   postsWithPhotos,
   postsToCollections,
   PostWithPhotos,
+  collectionsInsertSchema,
+  collectionsUpdateSchema,
 } from '@/db/schema';
 import { TRPCError } from '@trpc/server';
 import {
-  DEFAULT_PAGE_SIZE, // DEFAULT_PAGE not used here
+  DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
 } from '@/constants';
 
@@ -23,11 +25,53 @@ export const postsInCollectionOutputSchema = z.object({
 });
 
 export const collectionsRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(collectionsInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const [newCollection] = await ctx.db
+        .insert(collections)
+        .values(input)
+        .returning();
+      return newCollection;
+    }),
+
+  update: protectedProcedure
+    .input(collectionsUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...values } = input;
+      if (!id) throw new TRPCError({ code: 'BAD_REQUEST', message: 'ID is required' });
+
+      const [updatedCollection] = await ctx.db
+        .update(collections)
+        .set({ ...values, updatedAt: new Date() })
+        .where(eq(collections.id, id))
+        .returning();
+
+      if (!updatedCollection) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Collection not found' });
+      }
+      return updatedCollection;
+    }),
+
+  remove: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const [deletedCollection] = await ctx.db
+        .delete(collections)
+        .where(eq(collections.id, input.id))
+        .returning();
+
+      if (!deletedCollection) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Collection not found' });
+      }
+      return deletedCollection;
+    }),
+
   getAllCollections: baseProcedure
     .input(
       z
         .object({
-          limit: z.number().min(1).max(MAX_PAGE_SIZE).default(MAX_PAGE_SIZE), // Default to max size for listing all
+          limit: z.number().min(1).max(MAX_PAGE_SIZE).default(MAX_PAGE_SIZE),
         })
         .optional(),
     )
@@ -72,7 +116,51 @@ export const collectionsRouter = createTRPCRouter({
         limit: limit,
       });
 
-      return data;
+      // Enhance with post count and latest post image
+      const enhancedData = await Promise.all(
+        data.map(async (collection) => {
+          const [postCountResult] = await ctx.db
+            .select({ count: count() })
+            .from(postsToCollections)
+            .innerJoin(posts, eq(postsToCollections.postId, posts.id))
+            .where(
+              and(
+                eq(postsToCollections.collectionId, collection.id),
+                eq(posts.visibility, 'public'),
+              ),
+            );
+
+          const latestPost = await ctx.db.query.posts.findFirst({
+            where: (posts, { exists, and, eq }) =>
+              and(
+                eq(posts.visibility, 'public'),
+                exists(
+                  ctx.db
+                    .select()
+                    .from(postsToCollections)
+                    .where(
+                      and(
+                        eq(postsToCollections.postId, posts.id),
+                        eq(postsToCollections.collectionId, collection.id),
+                      ),
+                    ),
+                ),
+              ),
+            orderBy: [desc(posts.createdAt)],
+            columns: {
+              coverImage: true,
+            },
+          });
+
+          return {
+            ...collection,
+            postCount: postCountResult?.count ?? 0,
+            latestPostImage: latestPost?.coverImage ?? null,
+          };
+        }),
+      );
+
+      return enhancedData;
     }),
 
   getPostsInCollection: baseProcedure

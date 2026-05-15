@@ -23,6 +23,7 @@ const Footer = () => {
           title='Seiten'
           links={[
             { title: 'Feed', href: '/' },
+            { title: 'Sammlungen', href: '/collections' },
             { title: 'Über das Journal', href: '/about' },
           ]}
         />

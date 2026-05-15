@@ -11,16 +11,18 @@ import {
 } from '@/modules/home/ui/views/infinite-feed-view';
 import Image from 'next/image';
 import { getOptimizedImageUrl } from '@/lib/images';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: { collectionSlug: string };
+  params: Promise<{ collectionSlug: string }>;
 }) => {
+  const { collectionSlug } = await params;
   const queryClient = getQueryClient();
   const collection = await queryClient.fetchQuery(
     trpc.collections.getCollectionBySlug.queryOptions({
-      slug: params.collectionSlug,
+      slug: collectionSlug,
     }),
   );
 
@@ -47,34 +49,49 @@ export const generateMetadata = async ({
   };
 };
 
-const SingleCollectionView = ({
+const SingleCollectionView = async ({
   params,
 }: {
-  params: { collectionSlug: string };
+  params: Promise<{ collectionSlug: string }>;
 }) => {
-  const { collectionSlug } = params;
+  const { collectionSlug } = await params;
 
   return (
-    <div className='flex flex-col min-h-screen w-full'>
-      {/* Collection Header */}
-      <Suspense fallback={<div className='w-full h-[50vh] bg-muted animate-pulse' />}>
-        <CollectionHeaderSuspense collectionSlug={collectionSlug} />
-      </Suspense>
-
-      {/* Posts in Collection (Infinite Feed) */}
-      <div className='w-full max-w-3xl mx-auto space-y-8 py-8 px-4'>
-        <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
-          <ErrorBoundary fallback={<p>Error loading posts.</p>}>
-            <InfiniteFeedSuspense collectionSlug={collectionSlug} />
-          </ErrorBoundary>
+    <div className='flex flex-col w-full'>
+      <div className='w-full lg:mt-16 mt-10 pb-3'>
+        {/* Collection Header */}
+        <Suspense
+          fallback={<div className='h-32 w-full animate-pulse bg-muted' />}
+        >
+          <CollectionHeaderSuspense collectionSlug={collectionSlug} />
         </Suspense>
+
+        {/* Posts in Collection (Infinite Feed) */}
+        <div className='w-full'>
+          <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
+            <ErrorBoundary
+              fallback={
+                <p className='text-center py-10'>
+                  Something went wrong while showing the collection feed, please
+                  try again.
+                </p>
+              }
+            >
+              <InfiniteFeedSuspense collectionSlug={collectionSlug} />
+            </ErrorBoundary>
+          </Suspense>
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };
 
-async function CollectionHeaderSuspense({ collectionSlug }: { collectionSlug: string }) {
+async function CollectionHeaderSuspense({
+  collectionSlug,
+}: {
+  collectionSlug: string;
+}) {
   const queryClient = getQueryClient();
   const collection = await queryClient.fetchQuery(
     trpc.collections.getCollectionBySlug.queryOptions({ slug: collectionSlug }),
@@ -86,22 +103,37 @@ async function CollectionHeaderSuspense({ collectionSlug }: { collectionSlug: st
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className='relative w-full h-[50vh] flex items-end p-8 text-white'>
-        {collection.coverImageUrl && (
-          <Image
-            src={collection.coverImageUrl}
-            alt={collection.name}
-            fill
-            className='object-cover -z-10'
-            priority
-          />
-        )}
-        <div className='absolute inset-0 bg-black/50 -z-10' />
-        <div>
-          <h1 className='text-5xl font-bold'>{collection.name}</h1>
-          {collection.description && (
-            <p className='text-xl mt-2'>{collection.description}</p>
-          )}
+      <div className='flex justify-center -mx-3 mb-8'>
+        <div className='flex flex-col items-center gap-4 p-6 font-light relative max-w-3xl w-full'>
+          {/* COLLECTION ICON/IMAGE  */}
+          <div className='size-20 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 to-fuchsia-600'>
+            <div className='size-full rounded-full bg-background p-0.5'>
+              <div className='relative size-full rounded-full overflow-hidden bg-muted flex items-center justify-center'>
+                {collection.coverImageUrl ? (
+                  <Image
+                    src={keyToUrl(collection.coverImageUrl)}
+                    alt={collection.name}
+                    fill
+                    className='object-cover'
+                  />
+                ) : (
+                  <span className='text-xl font-bold text-muted-foreground'>
+                    {collection.name.substring(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* NAME & DESCRIPTION */}
+          <div className='flex flex-col items-center text-center'>
+            <h1 className='text-2xl font-bold'>{collection.name}</h1>
+            {collection.description && (
+              <p className='mt-2 text-foreground/70 text-lg max-w-xl'>
+                {collection.description}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </HydrationBoundary>

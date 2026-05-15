@@ -12,4 +12,5 @@ export const postFormSchema = z.object({
   coverImage: z.string().optional(),
   tags: z.array(z.string()),
   description: z.string().optional(),
+  collectionIds: z.array(z.string().uuid()),
 });

@@ -34,6 +34,7 @@ import { ShutterSpeedSelector } from '@/modules/photos/ui/components/shutter-spe
 import { ISOSelector } from '@/modules/photos/ui/components/iso-selector';
 import { ExposureCompensationSelector } from '@/modules/photos/ui/components/exposure-compensation-selector';
 import { TagsInput } from '@/modules/articles/ui/components/tags-input';
+import { CollectionSelect } from './collection-select';
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { confirmStepSchema } from '@/modules/photos/ui/components/create-photo-album/types';
@@ -41,6 +42,7 @@ import { confirmStepSchema } from '@/modules/photos/ui/components/create-photo-a
 // Extend the creation schema with tags for the edit view
 const formSchema = confirmStepSchema.extend({
   tags: z.array(z.string()),
+  collectionIds: z.array(z.string().uuid()),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -82,6 +84,8 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       postTitle: post.title,
       postVisibility: post.visibility,
       tags: post.tags || [],
+      collectionIds:
+        post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
       photos: initialPhotos,
     },
   });
@@ -121,6 +125,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         title: values.postTitle,
         visibility: values.postVisibility,
         tags: values.tags,
+        collectionIds: values.collectionIds,
       });
 
       // 2. Update post-to-photos relations (reordering/removal)
@@ -186,6 +191,23 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                   <FormLabel>Album Title</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='collectionIds'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Collections</FormLabel>
+                  <FormControl>
+                    <CollectionSelect
+                      value={field.value || []}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

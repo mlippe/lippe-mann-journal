@@ -33,6 +33,11 @@ const data = {
       icon: 'post',
     },
     {
+      title: 'Collections',
+      url: '/dashboard/collections',
+      icon: 'post',
+    },
+    {
       title: 'Profile',
       url: '/dashboard/profile',
       icon: 'user',
