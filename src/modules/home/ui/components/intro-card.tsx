@@ -11,7 +11,7 @@ const IntroCard = () => {
     <div className='flex justify-center -mx-3'>
       <Link
         href='/about'
-        className='flex flex-col justify-between gap-6 p-6 hover:bg-muted-foreground/10 transition-all rounded-2xl duration-150 ease-[cubic-bezier(0.22, 1, 0.36, 1)] font-light relative group h-full max-w-3xl w-full'
+        className='flex flex-col justify-between gap-6 p-6 hover:bg-muted-foreground/10 transition-all rounded-2xl duration-150 ease-[cubic-bezier(0.22, 1, 0.36, 1)] font-light relative group h-full max-w-3xl w-fit'
       >
         <div className='flex gap-3 items-center flex-col'>
           {/* AVATAR  */}
