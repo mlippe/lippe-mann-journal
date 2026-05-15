@@ -21,7 +21,8 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const totalHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
       const progress = (window.scrollY / totalHeight) * 100;
       setScrollProgress(progress);
     };
@@ -36,43 +37,41 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
     <div className='flex flex-col items-center w-full'>
       {/* PROGRESS BAR  */}
       <div className='fixed top-0 left-0 w-full h-1 z-50 bg-muted'>
-        <div 
+        <div
           className='h-full bg-primary transition-all duration-150 ease-out'
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      <article className='w-full max-w-screen-md px-4 lg:px-0 pt-10 lg:pt-20'>
+      <article className='w-full max-w-3xl px-4 lg:px-0 pt-0 lg:pt-15'>
         {/* HEADER SECTION  */}
         <header className='mb-10 lg:mb-16'>
-          <h1 className='text-4xl lg:text-6xl font-bold tracking-tight mb-8 leading-[1.1]'>
-            {data.title}
-          </h1>
-          
-          <div className='flex items-center justify-between mb-8'>
-            <div className='flex items-center gap-4'>
-              <Author size='md' />
-              <div className='flex flex-col text-sm text-muted-foreground'>
-                <div className='flex items-center gap-2'>
-                  <span>{format(data.createdAt, 'MMM d, yyyy')}</span>
-                  <span>·</span>
-                  <span>{readingTime} min read</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {data.coverImage && (
-            <div className='relative w-full aspect-[21/9] rounded-2xl overflow-hidden bg-muted mb-12'>
+            <div className='relative rounded-b-3xl md:rounded-3xl overflow-hidden bg-muted mb-10 -mx-7 flex justify-center'>
               <Image
                 src={keyToUrl(data.coverImage) || '/placeholder.svg'}
                 alt={data.title}
-                fill
+                width={768}
+                height={600}
                 priority
-                className='object-cover'
               />
             </div>
           )}
+          <h1 className='text-3xl lg:text-5xl font-bold tracking-tight mb-8 leading-[1.1]'>
+            {data.title}
+          </h1>
+
+          <div className='flex items-center justify-between mb-8 w-full flex-wrap'>
+            <div className='flex items-center gap-4 justify-between w-full'>
+              <Author size='md' />
+              <div className='flex flex-col items-end text-sm text-muted-foreground'>
+                <span className='font-medium'>
+                  {format(data.createdAt, 'MMM d, yyyy')}
+                </span>
+                <span>{readingTime} Min Lesezeit</span>
+              </div>
+            </div>
+          </div>
         </header>
 
         {/* ARTICLE CONTENT  */}
