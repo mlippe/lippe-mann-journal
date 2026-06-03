@@ -4,6 +4,7 @@ import { trpc } from '@/trpc/server';
 import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -49,7 +50,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const PhotoPage = async ({ params }: Props) => {
   const { slug } = await params;
-  return <PhotographDetailPage slug={slug} isModal={false} />;
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <PhotographDetailPage slug={slug} isModal={false} />
+    </HydrationBoundary>
+  );
 };
 
 export default PhotoPage;

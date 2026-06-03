@@ -24,6 +24,7 @@ import {
 } from "@tiptap/react";
 import { Image as ImageIcon, Link, Upload } from "lucide-react";
 import { type FormEvent, useState } from "react";
+import { getImageInfo } from "@/modules/photos/lib/utils";
 
 export interface ImagePlaceholderOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -150,17 +151,32 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
     }
   };
 
-  const handleAcceptedFiles = (acceptedFiles: File[]) => {
-    acceptedFiles.map((file) => {
-      const reader = new FileReader();
+  const handleAcceptedFiles = async (acceptedFiles: File[]) => {
+    for (const file of acceptedFiles) {
+      try {
+        const imageInfo = await getImageInfo(file);
+        const reader = new FileReader();
 
-      reader.onload = () => {
-        const src = reader.result as string;
-        editor.chain().focus().setImage({ src }).run();
-      };
+        reader.onload = () => {
+          const src = reader.result as string;
+          editor
+            .chain()
+            .focus()
+            .setImage({
+              src,
+              blurhash: imageInfo.blurhash,
+              aspectRatio: imageInfo.aspectRatio,
+              originalWidth: imageInfo.width,
+              originalHeight: imageInfo.height,
+            })
+            .run();
+        };
 
-      reader.readAsDataURL(file);
-    });
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Failed to get image info:", error);
+      }
+    }
 
     if (extension.options.onDrop) {
       extension.options.onDrop(acceptedFiles, editor);
@@ -283,7 +299,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                 >
                   Embed Image
                 </Button>
-                <p className="text-center text-xs text-gray-11">
+                <p className="center text-xs text-gray-11">
                   Works with any image from the web
                 </p>
               </form>

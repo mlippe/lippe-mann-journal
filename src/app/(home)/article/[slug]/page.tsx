@@ -4,6 +4,7 @@ import { trpc } from '@/trpc/server';
 import { ArticleSlugView } from '@/modules/blog/ui/views/blog-slug-view';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -42,7 +43,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const ArticlePage = async ({ params }: Props) => {
   const { slug } = await params;
-  return <ArticleSlugView slug={slug} />;
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ArticleSlugView slug={slug} />
+    </HydrationBoundary>
+  );
 };
 
 export default ArticlePage;

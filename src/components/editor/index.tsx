@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import { ToolbarProvider } from './toolbars/toolbar-provider';
 import { HeadingToolbar } from './toolbars/heading';
 import { LinkToolbar } from './toolbars/link';
+import { getImageInfo } from '@/modules/photos/lib/utils';
 
 interface TiptapEditorProps {
   content?: string;
@@ -121,6 +122,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
             if (!file) return;
 
             try {
+              const imageInfo = await getImageInfo(file);
               const { publicUrl } = await s3Client.upload({
                 file,
                 folder: 'posts',
@@ -139,7 +141,17 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
                 },
               });
 
-              editor.chain().focus().setImage({ src: publicUrl }).run();
+              editor
+                .chain()
+                .focus()
+                .setImage({
+                  src: publicUrl,
+                  blurhash: imageInfo.blurhash,
+                  aspectRatio: imageInfo.aspectRatio,
+                  originalWidth: imageInfo.width,
+                  originalHeight: imageInfo.height,
+                })
+                .run();
 
               toast.success('Image uploaded successfully');
             } catch (error) {
@@ -201,7 +213,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         onClick={() => {
           editor.chain().focus().run();
         }}
-        className='cursor-text min-h-72 bg-background relative pt-10'
+        className='cursor-text min-h-72 bg-background relative pt-10 px-6 w-fit'
       >
         <BubbleMenu editor={editor} className='z-50'>
           <ToolbarProvider editor={editor}>

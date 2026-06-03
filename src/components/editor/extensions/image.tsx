@@ -34,6 +34,7 @@ import { keyToUrl } from "@/modules/s3/lib/key-to-url";
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import BlurImage from "@/components/blur-image";
 
 export const ImageExtension = Image.extend({
   group: 'block',
@@ -51,6 +52,18 @@ export const ImageExtension = Image.extend({
       },
       align: {
         default: 'center',
+      },
+      blurhash: {
+        default: null,
+      },
+      aspectRatio: {
+        default: null,
+      },
+      originalWidth: {
+        default: null,
+      },
+      originalHeight: {
+        default: null,
       },
     };
   },
@@ -77,6 +90,10 @@ export const ImageExtension = Image.extend({
             title: img.getAttribute('title'),
             width: width,
             align: align,
+            blurhash: img.getAttribute('data-blurhash'),
+            aspectRatio: img.getAttribute('data-aspect-ratio'),
+            originalWidth: img.getAttribute('data-original-width'),
+            originalHeight: img.getAttribute('data-original-height'),
           };
         },
       },
@@ -87,7 +104,15 @@ export const ImageExtension = Image.extend({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { width, align, ...rest } = HTMLAttributes;
+    const {
+      width,
+      align,
+      blurhash,
+      aspectRatio,
+      originalWidth,
+      originalHeight,
+      ...rest
+    } = HTMLAttributes;
     const style = [];
 
     if (width) {
@@ -113,6 +138,10 @@ export const ImageExtension = Image.extend({
         mergeAttributes(this.options.HTMLAttributes, rest, {
           width: '100%',
           style: 'width: 100%; height: auto;',
+          'data-blurhash': blurhash,
+          'data-aspect-ratio': aspectRatio,
+          'data-original-width': originalWidth,
+          'data-original-height': originalHeight,
         }),
       ],
       ['figcaption', 0],
@@ -299,13 +328,33 @@ function TiptapImage(props: NodeViewProps) {
           resizing && "",
         )}
       >
-        <img
-          ref={imageRef}
-          src={imageSrc}
-          alt={node.attrs.alt}
-          title={node.attrs.title}
-          className="max-w-full h-auto"
-        />
+        <div 
+          className="relative w-full overflow-hidden rounded-md"
+          style={{ 
+            aspectRatio: node.attrs.aspectRatio || undefined,
+          }}
+        >
+          {node.attrs.blurhash ? (
+            <BlurImage
+              src={imageSrc}
+              alt={node.attrs.alt || ""}
+              title={node.attrs.title || ""}
+              blurhash={node.attrs.blurhash}
+              aspectRatio={node.attrs.aspectRatio}
+              width={node.attrs.originalWidth}
+              height={node.attrs.originalHeight}
+              className="w-full h-auto"
+            />
+          ) : (
+            <img
+              ref={imageRef}
+              src={imageSrc}
+              alt={node.attrs.alt}
+              title={node.attrs.title}
+              className="max-w-full h-auto"
+            />
+          )}
+        </div>
         <figcaption className="text-center mt-2">
           <NodeViewContent />
         </figcaption>

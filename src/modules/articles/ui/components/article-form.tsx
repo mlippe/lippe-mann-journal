@@ -161,7 +161,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                     <FormControl>
                       <Input
                         placeholder='Article Title'
-                        className='text-4xl lg:text-5xl font-bold border-none px-0 focus-visible:ring-0 placeholder:opacity-30 h-auto py-2 bg-transparent shadow-none'
+                        className='text-xl lg:text-2xl font-bold border-none px-0 focus-visible:ring-0 placeholder:opacity-30 h-auto py-2 bg-transparent shadow-none'
                         {...field}
                       />
                     </FormControl>
