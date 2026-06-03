@@ -43,7 +43,7 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
         />
       </div>
 
-      <article className='w-full max-w-3xl px-4 lg:px-0 pt-0 lg:pt-15'>
+      <article className='w-full max-w-3xl px-2 lg:px-0 pt-0 lg:pt-15'>
         {/* HEADER SECTION  */}
         <header className='mb-10 lg:mb-16'>
           {data.coverImage && (
@@ -53,7 +53,15 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
                 alt={data.title}
                 width={768}
                 height={600}
+                className='absolute top-0 left-0 object-cover blur-xl w-full h-full'
+              />
+              <Image
+                src={keyToUrl(data.coverImage) || '/placeholder.svg'}
+                alt={data.title}
+                width={768}
+                height={600}
                 priority
+                className='relative z-1'
               />
             </div>
           )}
