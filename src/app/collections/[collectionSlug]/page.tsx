@@ -16,36 +16,42 @@ export const generateMetadata = async ({
 }: {
   params: Promise<{ collectionSlug: string }>;
 }) => {
-  const { collectionSlug } = await params;
-  const queryClient = getQueryClient();
-  const collection = await queryClient.fetchQuery(
-    trpc.collections.getCollectionBySlug.queryOptions({
-      slug: collectionSlug,
-    }),
-  );
+  try {
+    const { collectionSlug } = await params;
+    const queryClient = getQueryClient();
+    const collection = await queryClient.fetchQuery(
+      trpc.collections.getCollectionBySlug.queryOptions({
+        slug: collectionSlug,
+      }),
+    );
 
-  const imageUrl = collection?.coverImageUrl
-    ? getOptimizedImageUrl(collection.coverImageUrl)
-    : undefined;
+    const imageUrl = collection?.coverImageUrl
+      ? getOptimizedImageUrl(collection.coverImageUrl)
+      : undefined;
 
-  const description =
-    collection?.description || 'Collection details and posts.';
+    const description =
+      collection?.description || 'Collection details and posts.';
 
-  return {
-    title: collection?.name || 'Collection',
-    description,
-    openGraph: {
+    return {
       title: collection?.name || 'Collection',
       description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: collection?.name || 'Collection',
-      description,
-      images: imageUrl ? [imageUrl] : [],
-    },
-  };
+      openGraph: {
+        title: collection?.name || 'Collection',
+        description,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: collection?.name || 'Collection',
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Sammlung',
+    };
+  }
 };
 
 const SingleCollectionView = async ({

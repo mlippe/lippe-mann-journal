@@ -11,34 +11,41 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = (await params).slug;
-  const queryClient = getQueryClient();
-  const data = await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({ slug }),
-  );
+  try {
+    const slug = (await params).slug;
+    const queryClient = getQueryClient();
+    const data = await queryClient.fetchQuery(
+      trpc.posts.getOne.queryOptions({ slug }),
+    );
 
-  if (!data) return {};
+    if (!data) return {};
 
-  const rawImageUrl = data.coverImage ? keyToUrl(data.coverImage) : undefined;
-  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
-  const description = `Lies den Artikel "${data.title}" in meinem Journal.`;
+    const rawImageUrl = data.coverImage ? keyToUrl(data.coverImage) : undefined;
+    const imageUrl =
+      rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
+    const description = `Lies den Artikel "${data.title}" in meinem Journal.`;
 
-  return {
-    title: data.title,
-    description,
-    openGraph: {
+    return {
       title: data.title,
       description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: data.title,
-      description,
-      images: imageUrl ? [imageUrl] : [],
-    },
-  };
+      openGraph: {
+        title: data.title,
+        description,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: 'article',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: data.title,
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Artikel',
+    };
+  }
 }
 
 const ArticlePage = async ({ params }: Props) => {

@@ -136,6 +136,7 @@ export const ImageExtension = Image.extend({
       [
         'img',
         mergeAttributes(this.options.HTMLAttributes, rest, {
+          src: keyToUrl(rest.src),
           width: '100%',
           style: 'width: 100%; height: auto;',
           'data-blurhash': blurhash,

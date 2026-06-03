@@ -11,41 +11,48 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = (await params).slug;
-  const queryClient = getQueryClient();
-  const data = await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({ slug }),
-  );
+  try {
+    const slug = (await params).slug;
+    const queryClient = getQueryClient();
+    const data = await queryClient.fetchQuery(
+      trpc.posts.getOne.queryOptions({ slug }),
+    );
 
-  if (!data) return {};
+    if (!data) return {};
 
-  const firstPhoto = data.postsToPhotos?.[0]?.photo;
-  const rawImageUrl = firstPhoto
-    ? keyToUrl(firstPhoto.url)
-    : data.coverImage
-      ? keyToUrl(data.coverImage)
-      : undefined;
+    const firstPhoto = data.postsToPhotos?.[0]?.photo;
+    const rawImageUrl = firstPhoto
+      ? keyToUrl(firstPhoto.url)
+      : data.coverImage
+        ? keyToUrl(data.coverImage)
+        : undefined;
 
-  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
+    const imageUrl =
+      rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
 
-  const description = `Schau dir das Album "${data.title}" in meinem Journal an.`;
+    const description = `Schau dir das Album "${data.title}" in meinem Journal an.`;
 
-  return {
-    title: data.title,
-    description,
-    openGraph: {
+    return {
       title: data.title,
       description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: data.title,
-      description,
-      images: imageUrl ? [imageUrl] : [],
-    },
-  };
+      openGraph: {
+        title: data.title,
+        description,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: 'article',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: data.title,
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Album',
+    };
+  }
 }
 
 const AlbumPage = async ({ params }: Props) => {
