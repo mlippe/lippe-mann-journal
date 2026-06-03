@@ -39,6 +39,10 @@ export function DeletePostButton({
           await queryClient.invalidateQueries(
             trpc.posts.getMany.queryOptions({}),
           );
+          await queryClient.invalidateQueries(
+            trpc.posts.getPublished.queryOptions({}),
+          );
+          await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
           toast.success('Post deleted successfully');
         },
         onError: (error) => {

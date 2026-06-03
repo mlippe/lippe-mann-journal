@@ -8,7 +8,7 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Form,
   FormControl,
@@ -90,6 +90,44 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
     },
   });
 
+  useEffect(() => {
+    if (post) {
+      const photos = (post.postsToPhotos || []).map((ptp) => ({
+        id: ptp.photo.id,
+        url: ptp.photo.url,
+        blurData: ptp.photo.blurData,
+        title: ptp.photo.title,
+        aspectRatio: ptp.photo.aspectRatio,
+        width: ptp.photo.width,
+        height: ptp.photo.height,
+        make: ptp.photo.make,
+        model: ptp.photo.model,
+        lensModel: ptp.photo.lensModel,
+        focalLength: ptp.photo.focalLength,
+        focalLength35mm: ptp.photo.focalLength35mm,
+        fNumber: ptp.photo.fNumber,
+        iso: ptp.photo.iso,
+        exposureTime: ptp.photo.exposureTime,
+        exposureCompensation: ptp.photo.exposureCompensation,
+        latitude: ptp.photo.latitude,
+        longitude: ptp.photo.longitude,
+        gpsAltitude: ptp.photo.gpsAltitude,
+        dateTimeOriginal: ptp.photo.dateTimeOriginal
+          ? new Date(ptp.photo.dateTimeOriginal)
+          : null,
+      }));
+
+      form.reset({
+        postTitle: post.title,
+        postVisibility: post.visibility,
+        tags: post.tags || [],
+        collectionIds:
+          post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
+        photos,
+      });
+    }
+  }, [post, form]);
+
   const { fields, move, remove } = useFieldArray({
     control: form.control,
     name: 'photos',
@@ -101,6 +139,9 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: post.slug }),
         );
+        queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
+        queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
+        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
       },
     }),
   );
@@ -111,6 +152,9 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: post.slug }),
         );
+        queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
+        queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
+        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
       },
     }),
   );

@@ -54,6 +54,9 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         await queryClient.invalidateQueries(
           trpc.posts.getMany.queryOptions({}),
         );
+        await queryClient.invalidateQueries(
+          trpc.posts.getPublished.queryOptions({}),
+        );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
         router.push(`/dashboard/posts/${data.slug}`);
@@ -75,6 +78,9 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         );
         await queryClient.invalidateQueries(
           trpc.posts.getMany.queryOptions({}),
+        );
+        await queryClient.invalidateQueries(
+          trpc.posts.getPublished.queryOptions({}),
         );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
@@ -102,14 +108,30 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
     },
   });
 
+  useEffect(() => {
+    if (post) {
+      form.reset({
+        title: post.title || '',
+        slug: post.slug || '',
+        content: post.content || '',
+        visibility: post.visibility || 'public',
+        coverImage: post.coverImage || '',
+        tags: post.tags || [],
+        collectionIds:
+          post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
+      });
+    }
+  }, [post, form]);
+
   const title = form.watch('title');
 
   useEffect(() => {
-    if (title) {
+    // Only auto-generate slug for new articles
+    if (title && !post) {
       const slug = generateSlug(title);
       form.setValue('slug', slug);
     }
-  }, [title, form]);
+  }, [title, form, post]);
 
   const isPending = createArticle.isPending || updateArticle.isPending;
 
@@ -227,7 +249,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                       <FormLabel className='text-xs'>Visibility</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger className='bg-background'>

@@ -8,7 +8,7 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Form,
   FormControl,
@@ -81,12 +81,44 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
     },
   });
 
+  useEffect(() => {
+    if (post) {
+      const p = post.postsToPhotos?.[0]?.photo;
+      form.reset({
+        postTitle: post.title,
+        postVisibility: post.visibility,
+        tags: post.tags || [],
+        collectionIds:
+          post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
+        title: p?.title || '',
+        make: p?.make || undefined,
+        model: p?.model || undefined,
+        lensModel: p?.lensModel || undefined,
+        focalLength: p?.focalLength || undefined,
+        focalLength35mm: p?.focalLength35mm || undefined,
+        fNumber: p?.fNumber || undefined,
+        iso: p?.iso || undefined,
+        exposureTime: p?.exposureTime || undefined,
+        exposureCompensation: p?.exposureCompensation || undefined,
+        dateTimeOriginal: p?.dateTimeOriginal
+          ? new Date(p.dateTimeOriginal)
+          : undefined,
+        latitude: p?.latitude ?? undefined,
+        longitude: p?.longitude ?? undefined,
+        gpsAltitude: p?.gpsAltitude ?? undefined,
+      });
+    }
+  }, [post, form]);
+
   const updatePost = useMutation(
     trpc.posts.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: post.slug }),
         );
+        queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
+        queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
+        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         toast.success('Post updated');
       },
       onError: (e) => toast.error(`Failed to update post: ${e.message}`),
@@ -99,6 +131,9 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: post.slug }),
         );
+        queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
+        queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
+        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         toast.success('Photo metadata updated');
       },
       onError: (e) => toast.error(`Failed to update photo: ${e.message}`),

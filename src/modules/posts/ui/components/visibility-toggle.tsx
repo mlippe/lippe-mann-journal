@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,12 @@ export function VisibilityToggle({
   initialValue,
 }: VisibilityToggleProps) {
   const [visibility, setVisibility] = useState(initialValue);
+
+  // Sync state with prop if it changes externally
+  useEffect(() => {
+    setVisibility(initialValue);
+  }, [initialValue]);
+
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -39,13 +45,16 @@ export function VisibilityToggle({
           await queryClient.invalidateQueries(
             trpc.posts.getMany.queryOptions({}),
           );
+          await queryClient.invalidateQueries(
+            trpc.posts.getPublished.queryOptions({}),
+          );
           toast.success(
             `Post is now ${newValue === "public" ? "public" : "private"}`,
           );
         },
         onError: (error) => {
           // Revert on error
-          setVisibility(newValue === "public" ? "private" : "public");
+          setVisibility(initialValue);
           toast.error(error.message || "Failed to update visibility");
         },
       },

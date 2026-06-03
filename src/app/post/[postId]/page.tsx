@@ -12,56 +12,64 @@ import { Suspense } from 'react';
 export const generateMetadata = async ({
   params,
 }: {
-  params: { postId: string };
+  params: Promise<{ postId: string }>;
 }) => {
-  const queryClient = getQueryClient();
-  const post = await queryClient.fetchQuery(
-    trpc.posts.getPostById.queryOptions({ postId: params.postId }),
-  );
+  try {
+    const { postId } = await params;
+    const queryClient = getQueryClient();
+    const post = await queryClient.fetchQuery(
+      trpc.posts.getPostById.queryOptions({ postId }),
+    );
 
-  if (!post) return {};
+    if (!post) return {};
 
-  const postWithPhotos = post as Post & { postsToPhotos: { photo: Photo }[] };
-  const firstPhoto = postWithPhotos.postsToPhotos?.[0]?.photo;
-  const rawImageUrl = firstPhoto
-    ? keyToUrl(firstPhoto.url)
-    : post.coverImage
-      ? keyToUrl(post.coverImage)
-      : undefined;
+    const postWithPhotos = post as Post & { postsToPhotos: { photo: Photo }[] };
+    const firstPhoto = postWithPhotos.postsToPhotos?.[0]?.photo;
+    const rawImageUrl = firstPhoto
+      ? keyToUrl(firstPhoto.url)
+      : post.coverImage
+        ? keyToUrl(post.coverImage)
+        : undefined;
 
-  const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
+    const imageUrl =
+      rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
 
-  let description = '';
-  if (post.type === 'ARTICLE') {
-    description = `Lies den Artikel "${post.title}" in meinem Journal.`;
-  } else if (post.type === 'PHOTO') {
-    description = `Schau dir dieses Foto "${post.title}" in meinem Journal an.`;
-  } else if (post.type === 'ALBUM') {
-    description = `Schau dir das Album "${post.title}" in meinem Journal an.`;
-  } else {
-    description = `Sieh dir "${post.title}" in meinem Journal an.`;
+    let description = '';
+    if (post.type === 'ARTICLE') {
+      description = `Lies den Artikel "${post.title}" in meinem Journal.`;
+    } else if (post.type === 'PHOTO') {
+      description = `Schau dir dieses Foto "${post.title}" in meinem Journal an.`;
+    } else if (post.type === 'ALBUM') {
+      description = `Schau dir das Album "${post.title}" in meinem Journal an.`;
+    } else {
+      description = `Sieh dir "${post.title}" in meinem Journal an.`;
+    }
+
+    return {
+      title: post.title || 'Post',
+      description,
+      openGraph: {
+        title: post.title || 'Post',
+        description,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: 'article',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.title || 'Post',
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Post',
+    };
   }
-
-  return {
-    title: post.title || 'Post',
-    description,
-    openGraph: {
-      title: post.title || 'Post',
-      description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title || 'Post',
-      description,
-      images: imageUrl ? [imageUrl] : [],
-    },
-  };
 };
 
-const SinglePostView = ({ params }: { params: { postId: string } }) => {
-  const { postId } = params;
+const SinglePostView = async ({ params }: { params: Promise<{ postId: string }> }) => {
+  const { postId } = await params;
 
   return (
     <div className='flex flex-col min-h-screen w-full'>
