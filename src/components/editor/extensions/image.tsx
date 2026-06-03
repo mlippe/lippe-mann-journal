@@ -64,12 +64,19 @@ export const ImageExtension = Image.extend({
           if (typeof element === 'string') return false;
           const img = element.querySelector('img');
           if (!img) return false;
+
+          const width = element.style.width || img.getAttribute('width');
+          const align =
+            element.getAttribute('data-align') ||
+            element.style.textAlign ||
+            'center';
+
           return {
             src: img.getAttribute('src'),
             alt: img.getAttribute('alt'),
             title: img.getAttribute('title'),
-            width: element.style.width || img.getAttribute('width'),
-            align: element.style.textAlign || 'center',
+            width: width,
+            align: align,
           };
         },
       },
@@ -80,12 +87,34 @@ export const ImageExtension = Image.extend({
   },
 
   renderHTML({ HTMLAttributes }) {
+    const { width, align, ...rest } = HTMLAttributes;
+    const style = [];
+
+    if (width) {
+      style.push(`width: ${typeof width === 'number' ? width + 'px' : width}`);
+    }
+
+    if (align === 'center') {
+      style.push('margin-left: auto; margin-right: auto');
+    } else if (align === 'right') {
+      style.push('margin-left: auto; margin-right: 0');
+    } else if (align === 'left') {
+      style.push('margin-left: 0; margin-right: auto');
+    }
+
     return [
       'figure',
       {
-        style: `width: ${HTMLAttributes.width}; text-align: ${HTMLAttributes.align}`,
+        style: style.join('; '),
+        'data-align': align,
       },
-      ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)],
+      [
+        'img',
+        mergeAttributes(this.options.HTMLAttributes, rest, {
+          width: '100%',
+          style: 'width: 100%; height: auto;',
+        }),
+      ],
       ['figcaption', 0],
     ];
   },
