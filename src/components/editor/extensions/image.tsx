@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
-"use client";
+'use client';
 
-import Image from "@tiptap/extension-image";
+import Image from '@tiptap/extension-image';
 import {
   mergeAttributes,
   NodeViewContent,
   type NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
-} from "@tiptap/react";
+} from '@tiptap/react';
 import {
   AlignCenter,
   AlignLeft,
@@ -17,24 +17,24 @@ import {
   Maximize,
   MoreVertical,
   Trash,
-} from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { cn, duplicateContent } from "@/lib/utils";
-import { keyToUrl } from "@/modules/s3/lib/key-to-url";
-import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import BlurImage from "@/components/blur-image";
+} from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
+import { cn, duplicateContent } from '@/lib/utils';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { useTRPC } from '@/trpc/client';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import BlurImage from '@/components/blur-image';
 
 export const ImageExtension = Image.extend({
   group: 'block',
@@ -161,8 +161,8 @@ function TiptapImage(props: NodeViewProps) {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const [resizing, setResizing] = useState(false);
-  const [resizingPosition, setResizingPosition] = useState<"left" | "right">(
-    "left",
+  const [resizingPosition, setResizingPosition] = useState<'left' | 'right'>(
+    'left',
   );
   const [resizeInitialWidth, setResizeInitialWidth] = useState(0);
   const [resizeInitialMouseX, setResizeInitialMouseX] = useState(0);
@@ -171,26 +171,26 @@ function TiptapImage(props: NodeViewProps) {
 
   const rawSrc = node.attrs.src as string | null | undefined;
   const imageSrc =
-    typeof rawSrc === "string" &&
-    !rawSrc.startsWith("http://") &&
-    !rawSrc.startsWith("https://") &&
-    !rawSrc.startsWith("data:")
+    typeof rawSrc === 'string' &&
+    !rawSrc.startsWith('http://') &&
+    !rawSrc.startsWith('https://') &&
+    !rawSrc.startsWith('data:')
       ? keyToUrl(rawSrc)
-      : (rawSrc ?? "");
+      : (rawSrc ?? '');
 
   const handleDeleteImage = useCallback(async () => {
     if (
-      typeof rawSrc === "string" &&
-      !rawSrc.startsWith("http://") &&
-      !rawSrc.startsWith("https://") &&
-      !rawSrc.startsWith("data:")
+      typeof rawSrc === 'string' &&
+      !rawSrc.startsWith('http://') &&
+      !rawSrc.startsWith('https://') &&
+      !rawSrc.startsWith('data:')
     ) {
       try {
         await deleteFile.mutateAsync({ key: rawSrc });
-        toast.success("Image deleted successfully");
+        toast.success('Image deleted successfully');
       } catch (error) {
         toast.error(
-          error instanceof Error ? error.message : "Failed to delete image",
+          error instanceof Error ? error.message : 'Failed to delete image',
         );
       }
     }
@@ -203,7 +203,7 @@ function TiptapImage(props: NodeViewProps) {
     position,
   }: {
     e: React.MouseEvent<HTMLDivElement, MouseEvent>;
-    position: "left" | "right";
+    position: 'left' | 'right';
   }) {
     startResize(e);
     setResizingPosition(position);
@@ -227,7 +227,7 @@ function TiptapImage(props: NodeViewProps) {
     }
 
     let dx = event.clientX - resizeInitialMouseX;
-    if (resizingPosition === "left") {
+    if (resizingPosition === 'left') {
       dx = resizeInitialMouseX - event.clientX;
     }
 
@@ -249,7 +249,7 @@ function TiptapImage(props: NodeViewProps) {
 
   function handleTouchStart(
     event: React.TouchEvent,
-    position: "left" | "right",
+    position: 'left' | 'right',
   ) {
     event.preventDefault();
 
@@ -269,7 +269,7 @@ function TiptapImage(props: NodeViewProps) {
     }
 
     let dx = event.touches[0].clientX - resizeInitialMouseX;
-    if (resizingPosition === "left") {
+    if (resizingPosition === 'left') {
       dx = resizeInitialMouseX - event.touches[0].clientX;
     }
 
@@ -292,16 +292,16 @@ function TiptapImage(props: NodeViewProps) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     // Mouse events
-    window.addEventListener("mousemove", resize);
-    window.addEventListener("mouseup", endResize);
+    window.addEventListener('mousemove', resize);
+    window.addEventListener('mouseup', endResize);
     // Touch events
-    window.addEventListener("touchmove", handleTouchMove);
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
     return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", endResize);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', endResize);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [
     resizing,
@@ -315,36 +315,36 @@ function TiptapImage(props: NodeViewProps) {
     <NodeViewWrapper
       ref={nodeRef}
       className={cn(
-        "relative flex flex-col rounded-md border-2 border-transparent",
-        selected ? "border-blue-300" : "",
-        node.attrs.align === "left" && "left-0 translate-x-0",
-        node.attrs.align === "center" && "left-1/2 -translate-x-1/2",
-        node.attrs.align === "right" && "left-full -translate-x-full",
+        'relative flex flex-col rounded-md border-2 border-transparent',
+        selected ? 'border-blue-300' : '',
+        node.attrs.align === 'left' && 'left-0 translate-x-0',
+        node.attrs.align === 'center' && 'left-1/2 -translate-x-1/2',
+        node.attrs.align === 'right' && 'left-full -translate-x-full',
       )}
-      style={{ width: node.attrs.width, maxWidth: "100%" }}
+      style={{ width: node.attrs.width, maxWidth: '100%' }}
     >
       <div
         className={cn(
-          "group relative flex flex-col rounded-md",
-          resizing && "",
+          'group relative flex flex-col rounded-md',
+          resizing && '',
         )}
       >
-        <div 
-          className="relative w-full overflow-hidden rounded-md"
-          style={{ 
+        <div
+          className='relative w-full overflow-hidden rounded-md'
+          style={{
             aspectRatio: node.attrs.aspectRatio || undefined,
           }}
         >
           {node.attrs.blurhash ? (
             <BlurImage
               src={imageSrc}
-              alt={node.attrs.alt || ""}
-              title={node.attrs.title || ""}
+              alt={node.attrs.alt || ''}
+              title={node.attrs.title || ''}
               blurhash={node.attrs.blurhash}
               aspectRatio={node.attrs.aspectRatio}
               width={node.attrs.originalWidth}
               height={node.attrs.originalHeight}
-              className="w-full h-auto"
+              className='w-full h-auto'
             />
           ) : (
             <img
@@ -352,92 +352,92 @@ function TiptapImage(props: NodeViewProps) {
               src={imageSrc}
               alt={node.attrs.alt}
               title={node.attrs.title}
-              className="max-w-full h-auto"
+              className='max-w-full h-auto'
             />
           )}
         </div>
-        <figcaption className="text-center mt-2">
+        <figcaption className='text-center mt-2'>
           <NodeViewContent />
         </figcaption>
 
         {editor?.isEditable && (
           <>
             <div
-              className="absolute inset-y-0 z-20 flex w-[25px] cursor-col-resize items-center justify-start p-2"
+              className='absolute inset-y-0 z-20 flex w-[25px] cursor-col-resize items-center justify-start p-2'
               style={{ left: 0 }}
               onMouseDown={(event) => {
-                handleResizingPosition({ e: event, position: "left" });
+                handleResizingPosition({ e: event, position: 'left' });
               }}
-              onTouchStart={(event) => handleTouchStart(event, "left")}
+              onTouchStart={(event) => handleTouchStart(event, 'left')}
             >
-              <div className="z-20 h-[70px] w-1 rounded-xl border bg-[rgba(0,0,0,0.65)] opacity-0 transition-all group-hover:opacity-100" />
+              <div className='z-20 h-[70px] w-1 rounded-xl border bg-[rgba(0,0,0,0.65)] opacity-0 transition-all group-hover:opacity-100' />
             </div>
             <div
-              className="absolute inset-y-0 z-20 flex w-[25px] cursor-col-resize items-center justify-end p-2"
+              className='absolute inset-y-0 z-20 flex w-[25px] cursor-col-resize items-center justify-end p-2'
               style={{ right: 0 }}
               onMouseDown={(event) => {
-                handleResizingPosition({ e: event, position: "right" });
+                handleResizingPosition({ e: event, position: 'right' });
               }}
-              onTouchStart={(event) => handleTouchStart(event, "right")}
+              onTouchStart={(event) => handleTouchStart(event, 'right')}
             >
-              <div className="z-20 h-[70px] w-1 rounded-xl border bg-[rgba(0,0,0,0.65)] opacity-0 transition-all group-hover:opacity-100" />
+              <div className='z-20 h-[70px] w-1 rounded-xl border bg-[rgba(0,0,0,0.65)] opacity-0 transition-all group-hover:opacity-100' />
             </div>
             <div
               className={cn(
-                "absolute right-4 top-4 flex items-center gap-1 rounded-md border bg-background p-1 opacity-0 transition-opacity",
-                !resizing && "group-hover:opacity-100",
-                openedMore && "opacity-100",
+                'absolute right-4 top-4 flex items-center gap-1 rounded-md border bg-background p-1 opacity-0 transition-opacity',
+                !resizing && 'group-hover:opacity-100',
+                openedMore && 'opacity-100',
               )}
             >
               <Button
-                type="button"
-                size="icon"
+                type='button'
+                size='icon'
                 className={cn(
-                  "size-7",
-                  node.attrs.align === "left" && "bg-accent",
+                  'size-7',
+                  node.attrs.align === 'left' && 'bg-accent',
                 )}
-                variant="ghost"
+                variant='ghost'
                 onClick={() => {
                   updateAttributes({
-                    align: "left",
+                    align: 'left',
                   });
                 }}
               >
-                <AlignLeft className="size-4" />
+                <AlignLeft className='size-4' />
               </Button>
               <Button
-                type="button"
-                size="icon"
+                type='button'
+                size='icon'
                 className={cn(
-                  "size-7",
-                  node.attrs.align === "center" && "bg-accent",
+                  'size-7',
+                  node.attrs.align === 'center' && 'bg-accent',
                 )}
-                variant="ghost"
+                variant='ghost'
                 onClick={() => {
                   updateAttributes({
-                    align: "center",
+                    align: 'center',
                   });
                 }}
               >
-                <AlignCenter className="size-4" />
+                <AlignCenter className='size-4' />
               </Button>
               <Button
-                type="button"
-                size="icon"
+                type='button'
+                size='icon'
                 className={cn(
-                  "size-7",
-                  node.attrs.align === "right" && "bg-accent",
+                  'size-7',
+                  node.attrs.align === 'right' && 'bg-accent',
                 )}
-                variant="ghost"
+                variant='ghost'
                 onClick={() => {
                   updateAttributes({
-                    align: "right",
+                    align: 'right',
                   });
                 }}
               >
-                <AlignRight className="size-4" />
+                <AlignRight className='size-4' />
               </Button>
-              <Separator orientation="vertical" className="h-[20px]" />
+              <Separator orientation='vertical' className='h-[20px]' />
               <DropdownMenu
                 open={openedMore}
                 onOpenChange={(val) => {
@@ -446,41 +446,41 @@ function TiptapImage(props: NodeViewProps) {
               >
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="button"
-                    size="icon"
-                    className="size-7"
-                    variant="ghost"
+                    type='button'
+                    size='icon'
+                    className='size-7'
+                    variant='ghost'
                   >
-                    <MoreVertical className="size-4" />
+                    <MoreVertical className='size-4' />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  align="start"
+                  align='start'
                   alignOffset={-90}
-                  className="mt-1 text-sm"
+                  className='mt-1 text-sm'
                 >
                   <DropdownMenuItem
                     onClick={() => {
                       duplicateContent(editor);
                     }}
                   >
-                    <Copy className="mr-2 size-4" /> Duplicate
+                    <Copy className='mr-2 size-4' /> Duplicate
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
                       updateAttributes({
-                        width: "fit-content",
+                        width: 'fit-content',
                       });
                     }}
                   >
-                    <Maximize className="mr-2 size-4" /> Full Screen
+                    <Maximize className='mr-2 size-4' /> Full Screen
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
+                    className='text-destructive focus:text-destructive'
                     onClick={handleDeleteImage}
                   >
-                    <Trash className="mr-2 size-4" /> Delete Image
+                    <Trash className='mr-2 size-4' /> Delete Image
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

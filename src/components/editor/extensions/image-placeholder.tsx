@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   NODE_HANDLES_SELECTED_STYLE_CLASSNAME,
   cn,
   isValidUrl,
-} from "@/lib/utils";
+} from '@/lib/utils';
 import {
   type CommandProps,
   type Editor,
@@ -21,10 +21,10 @@ import {
   NodeViewWrapper,
   ReactNodeViewRenderer,
   mergeAttributes,
-} from "@tiptap/react";
-import { Image as ImageIcon, Link, Upload } from "lucide-react";
-import { type FormEvent, useState } from "react";
-import { getImageInfo } from "@/modules/photos/lib/utils";
+} from '@tiptap/react';
+import { Image as ImageIcon, Link, Upload } from 'lucide-react';
+import { type FormEvent, useState } from 'react';
+import { getImageInfo } from '@/modules/photos/lib/utils';
 
 export interface ImagePlaceholderOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -36,7 +36,7 @@ export interface ImagePlaceholderOptions {
   maxSize?: number;
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     imagePlaceholder: {
       /**
@@ -48,7 +48,7 @@ declare module "@tiptap/core" {
 }
 
 export const ImagePlaceholder = Node.create<ImagePlaceholderOptions>({
-  name: "image-placeholder",
+  name: 'image-placeholder',
 
   addOptions() {
     return {
@@ -59,14 +59,14 @@ export const ImagePlaceholder = Node.create<ImagePlaceholderOptions>({
     };
   },
 
-  group: "block",
+  group: 'block',
 
   parseHTML() {
     return [{ tag: `div[data-type="${this.name}"]` }];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["div", mergeAttributes(HTMLAttributes)];
+    return ['div', mergeAttributes(HTMLAttributes)];
   },
 
   addNodeView() {
@@ -79,7 +79,7 @@ export const ImagePlaceholder = Node.create<ImagePlaceholderOptions>({
     return {
       insertImagePlaceholder: () => (props: CommandProps) => {
         return props.commands.insertContent({
-          type: "image-placeholder",
+          type: 'image-placeholder',
         });
       },
     };
@@ -90,7 +90,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
   const { editor, extension, selected } = props;
 
   const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState('');
   const [urlError, setUrlError] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
   const [isDragReject, setIsDragReject] = useState(false);
@@ -162,19 +162,22 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
           editor
             .chain()
             .focus()
-            .setImage({
-              src,
-              blurhash: imageInfo.blurhash,
-              aspectRatio: imageInfo.aspectRatio,
-              originalWidth: imageInfo.width,
-              originalHeight: imageInfo.height,
+            .insertContent({
+              type: 'image',
+              attrs: {
+                src,
+                blurhash: imageInfo.blurhash,
+                aspectRatio: imageInfo.aspectRatio,
+                originalWidth: imageInfo.width,
+                originalHeight: imageInfo.height,
+              },
             })
             .run();
         };
 
         reader.readAsDataURL(file);
       } catch (error) {
-        console.error("Failed to get image info:", error);
+        console.error('Failed to get image info:', error);
       }
     }
 
@@ -195,34 +198,43 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
       setUrlError(true);
       return;
     }
-    if (url !== "") {
-      editor.chain().focus().setImage({ src: url }).run();
+    if (url !== '') {
+      editor
+        .chain()
+        .focus()
+        .insertContent({
+          type: 'image',
+          attrs: {
+            src: url,
+          },
+        })
+        .run();
       extension.options.onEmbed(url, editor);
     }
   };
 
   return (
-    <NodeViewWrapper className="w-full">
+    <NodeViewWrapper className='w-full'>
       <Popover modal open={open}>
         <PopoverTrigger
           onClick={() => {
             setOpen(true);
           }}
           asChild
-          className="w-full"
+          className='w-full'
         >
           <div
             className={cn(
-              "flex cursor-pointer items-center gap-3 rounded-md bg-accent p-2 py-3 text-sm text-accent-foreground transition-colors hover:bg-secondary",
-              selected && "bg-primary/10 hover:bg-primary/20",
+              'flex cursor-pointer items-center gap-3 rounded-md bg-accent p-2 py-3 text-sm text-accent-foreground transition-colors hover:bg-secondary',
+              selected && 'bg-primary/10 hover:bg-primary/20',
             )}
           >
-            <ImageIcon className="h-6 w-6" />
+            <ImageIcon className='h-6 w-6' />
             Add an image
           </div>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[450px] px-0 py-2"
+          className='w-[450px] px-0 py-2'
           onPointerDownOutside={() => {
             setOpen(false);
           }}
@@ -230,51 +242,51 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
             setOpen(false);
           }}
         >
-          <Tabs defaultValue="upload" className="px-3">
+          <Tabs defaultValue='upload' className='px-3'>
             <TabsList>
-              <TabsTrigger className="px-2 py-1 text-sm" value="upload">
-                <Upload className="mr-2 h-4 w-4" />
+              <TabsTrigger className='px-2 py-1 text-sm' value='upload'>
+                <Upload className='mr-2 h-4 w-4' />
                 Upload
               </TabsTrigger>
-              <TabsTrigger className="px-2 py-1 text-sm" value="url">
-                <Link className="mr-2 h-4 w-4" />
+              <TabsTrigger className='px-2 py-1 text-sm' value='url'>
+                <Link className='mr-2 h-4 w-4' />
                 Embed link
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="upload">
+            <TabsContent value='upload'>
               <div
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 className={cn(
-                  "my-2 rounded-md border border-dashed text-sm transition-colors",
-                  isDragActive && "border-primary bg-secondary",
-                  isDragReject && "border-destructive bg-destructive/10",
-                  "hover:bg-secondary",
+                  'my-2 rounded-md border border-dashed text-sm transition-colors',
+                  isDragActive && 'border-primary bg-secondary',
+                  isDragReject && 'border-destructive bg-destructive/10',
+                  'hover:bg-secondary',
                 )}
               >
                 <input
-                  type="file"
+                  type='file'
                   accept={Object.keys(
                     extension.options.allowedMimeTypes || {},
-                  ).join(",")}
+                  ).join(',')}
                   multiple={extension.options.maxFiles !== 1}
                   onChange={handleFileInputChange}
-                  className="hidden"
-                  id="file-input"
+                  className='hidden'
+                  id='file-input'
                 />
                 <label
-                  htmlFor="file-input"
-                  className="flex h-28 w-full cursor-pointer flex-col items-center justify-center text-center"
+                  htmlFor='file-input'
+                  className='flex h-28 w-full cursor-pointer flex-col items-center justify-center text-center'
                 >
-                  <Upload className="mx-auto mb-2 h-6 w-6" />
+                  <Upload className='mx-auto mb-2 h-6 w-6' />
                   Drag & drop or click to upload
                 </label>
               </div>
             </TabsContent>
-            <TabsContent value="url">
+            <TabsContent value='url'>
               <form onSubmit={handleInsertEmbed}>
                 <Input
                   value={url}
@@ -284,22 +296,22 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                       setUrlError(false);
                     }
                   }}
-                  placeholder="Paste the image link..."
+                  placeholder='Paste the image link...'
                 />
                 {urlError && (
-                  <p className="py-1.5 text-xs text-danger-11">
+                  <p className='py-1.5 text-xs text-danger-11'>
                     Please enter a valid URL
                   </p>
                 )}
                 <Button
                   onClick={handleInsertEmbed}
-                  type="button"
-                  size="sm"
-                  className="my-2 h-8 w-full p-2 text-xs"
+                  type='button'
+                  size='sm'
+                  className='my-2 h-8 w-full p-2 text-xs'
                 >
                   Embed Image
                 </Button>
-                <p className="center text-xs text-gray-11">
+                <p className='center text-xs text-gray-11'>
                   Works with any image from the web
                 </p>
               </form>

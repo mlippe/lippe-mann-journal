@@ -144,12 +144,15 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
               editor
                 .chain()
                 .focus()
-                .setImage({
-                  src: publicUrl,
-                  blurhash: imageInfo.blurhash,
-                  aspectRatio: imageInfo.aspectRatio,
-                  originalWidth: imageInfo.width,
-                  originalHeight: imageInfo.height,
+                .insertContent({
+                  type: 'image',
+                  attrs: {
+                    src: publicUrl,
+                    blurhash: imageInfo.blurhash,
+                    aspectRatio: imageInfo.aspectRatio,
+                    originalWidth: imageInfo.width,
+                    originalHeight: imageInfo.height,
+                  },
                 })
                 .run();
 
