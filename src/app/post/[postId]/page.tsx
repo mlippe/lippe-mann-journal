@@ -31,15 +31,30 @@ export const generateMetadata = async ({
 
   const imageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
 
+  let description = '';
+  if (post.type === 'ARTICLE') {
+    description = `Lies den Artikel "${post.title}" in meinem Journal.`;
+  } else if (post.type === 'PHOTO') {
+    description = `Schau dir dieses Foto "${post.title}" in meinem Journal an.`;
+  } else if (post.type === 'ALBUM') {
+    description = `Schau dir das Album "${post.title}" in meinem Journal an.`;
+  } else {
+    description = `Sieh dir "${post.title}" in meinem Journal an.`;
+  }
+
   return {
     title: post.title || 'Post',
+    description,
     openGraph: {
       title: post.title || 'Post',
+      description,
       images: imageUrl ? [{ url: imageUrl }] : [],
+      type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title || 'Post',
+      description,
       images: imageUrl ? [imageUrl] : [],
     },
   };
