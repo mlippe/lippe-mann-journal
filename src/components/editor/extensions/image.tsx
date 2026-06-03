@@ -3,6 +3,7 @@
 
 import Image from "@tiptap/extension-image";
 import {
+  mergeAttributes,
   NodeViewContent,
   type NodeViewProps,
   NodeViewWrapper,
@@ -35,27 +36,58 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const ImageExtension = Image.extend({
+  group: 'block',
+  content: 'inline*',
+  isolating: true,
+
   addAttributes() {
     return {
-      src: {
-        default: null,
-      },
-      alt: {
-        default: null,
-      },
-      title: {
-        default: null,
-      },
+      ...this.parent?.(),
       width: {
-        default: "100%",
+        default: '100%',
       },
       height: {
         default: null,
       },
       align: {
-        default: "center",
+        default: 'center',
       },
     };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'figure',
+        contentElement: 'figcaption',
+        getAttrs: (element) => {
+          if (typeof element === 'string') return false;
+          const img = element.querySelector('img');
+          if (!img) return false;
+          return {
+            src: img.getAttribute('src'),
+            alt: img.getAttribute('alt'),
+            title: img.getAttribute('title'),
+            width: element.style.width || img.getAttribute('width'),
+            align: element.style.textAlign || 'center',
+          };
+        },
+      },
+      {
+        tag: 'img[src]',
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      'figure',
+      {
+        style: `width: ${HTMLAttributes.width}; text-align: ${HTMLAttributes.align}`,
+      },
+      ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)],
+      ['figcaption', 0],
+    ];
   },
 
   addNodeView: () => {
@@ -245,7 +277,7 @@ function TiptapImage(props: NodeViewProps) {
           title={node.attrs.title}
           className="max-w-full h-auto"
         />
-        <figcaption className="text-center">
+        <figcaption className="text-center mt-2">
           <NodeViewContent />
         </figcaption>
 
