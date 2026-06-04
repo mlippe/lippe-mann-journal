@@ -34,20 +34,20 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
   const readingTime = calculateReadingTime(data.content);
 
   return (
-    <div className='flex flex-col items-center w-full'>
+    <div className='flex flex-col items-center -mt-3 w-full'>
       {/* PROGRESS BAR  */}
-      <div className='fixed top-0 left-0 w-full h-1 z-50 bg-muted'>
+      <div className='fixed top-0 left-0 w-full h-1 z-50 bg-muted/20'>
         <div
           className='h-full bg-primary transition-all duration-150 ease-out'
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      <article className='w-full max-w-3xl px-2 lg:px-0 pt-0 lg:pt-15'>
+      <article className='w-full lg:px-4 '>
         {/* HEADER SECTION  */}
         <header className='mb-10 lg:mb-16'>
           {data.coverImage && (
-            <div className='relative rounded-b-3xl md:rounded-3xl overflow-hidden bg-muted mb-10 -mx-7 flex justify-center'>
+            <div className='relative  overflow-hidden bg-muted mb-10 flex justify-center rounded-b-xl lg:rounded-b-4xl'>
               <Image
                 src={keyToUrl(data.coverImage) || '/placeholder.svg'}
                 alt={data.title}
@@ -65,25 +65,27 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
               />
             </div>
           )}
-          <h1 className='text-3xl lg:text-5xl font-bold tracking-tight mb-8 leading-[1.1]'>
-            {data.title}
-          </h1>
+          <div className='max-w-3xl mx-auto px-2'>
+            <h1 className='text-3xl lg:text-5xl font-bold tracking-tight mb-8 leading-[1.1] '>
+              {data.title}
+            </h1>
 
-          <div className='flex items-center justify-between mb-8 w-full flex-wrap'>
-            <div className='flex items-center gap-4 justify-between w-full'>
-              <Author size='md' />
-              <div className='flex flex-col items-end text-sm text-muted-foreground'>
-                <span className='font-medium'>
-                  {format(data.createdAt, 'MMM d, yyyy')}
-                </span>
-                <span>{readingTime} Min Lesezeit</span>
+            <div className='flex items-center justify-between mb-8 w-full flex-wrap'>
+              <div className='flex items-center gap-4 justify-between w-full'>
+                <Author size='md' />
+                <div className='flex flex-col items-end text-sm text-muted-foreground'>
+                  <span className='font-medium'>
+                    {format(data.createdAt, 'MMM d, yyyy')}
+                  </span>
+                  <span>{readingTime} Min Lesezeit</span>
+                </div>
               </div>
             </div>
           </div>
         </header>
 
         {/* ARTICLE CONTENT  */}
-        <div className='max-w-none mb-20 font-sans leading-relaxed text-foreground/90'>
+        <div className='mb-20 font-sans leading-relaxed text-foreground/90 max-w-3xl mx-auto px-2'>
           <RichTextViewer content={data.content || ''} />
         </div>
 
