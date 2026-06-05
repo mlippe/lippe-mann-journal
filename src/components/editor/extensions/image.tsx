@@ -35,6 +35,7 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import BlurImage from '@/components/blur-image';
+import { getOptimizedImageUrl } from '@/lib/images';
 
 export const ImageExtension = Image.extend({
   group: 'block',
@@ -127,6 +128,9 @@ export const ImageExtension = Image.extend({
       style.push('margin-left: 0; margin-right: auto');
     }
 
+    const src = keyToUrl(rest.src);
+    const optimizedSrc = getOptimizedImageUrl(src, 1200);
+
     return [
       'figure',
       {
@@ -136,7 +140,7 @@ export const ImageExtension = Image.extend({
       [
         'img',
         mergeAttributes(this.options.HTMLAttributes, rest, {
-          src: keyToUrl(rest.src),
+          src: optimizedSrc,
           width: '100%',
           style: 'width: 100%; height: auto;',
           'data-blurhash': blurhash,
@@ -329,26 +333,17 @@ function TiptapImage(props: NodeViewProps) {
             aspectRatio: node.attrs.aspectRatio || undefined,
           }}
         >
-          {node.attrs.blurhash ? (
-            <BlurImage
-              src={imageSrc}
-              alt={node.attrs.alt || ''}
-              title={node.attrs.title || ''}
-              blurhash={node.attrs.blurhash}
-              aspectRatio={node.attrs.aspectRatio}
-              width={node.attrs.originalWidth}
-              height={node.attrs.originalHeight}
-              className='w-full h-auto'
-            />
-          ) : (
-            <img
-              ref={imageRef}
-              src={imageSrc}
-              alt={node.attrs.alt}
-              title={node.attrs.title}
-              className='max-w-full h-auto'
-            />
-          )}
+          <BlurImage
+            src={imageSrc}
+            alt={node.attrs.alt || ''}
+            title={node.attrs.title || ''}
+            blurhash={node.attrs.blurhash}
+            aspectRatio={node.attrs.aspectRatio}
+            width={Number(node.attrs.originalWidth) || 1200}
+            height={Number(node.attrs.originalHeight) || 800}
+            sizes='(max-width: 768px) 100vw, 768px'
+            className='w-full h-auto'
+          />
         </div>
         <figcaption className='text-center mt-2'>
           <NodeViewContent />

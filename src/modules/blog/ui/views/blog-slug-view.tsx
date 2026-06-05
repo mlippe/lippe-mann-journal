@@ -14,6 +14,7 @@ import Author from '@/components/author';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { siteConfig } from '@/site.config';
+import { getOptimizedImageUrl } from '@/lib/images';
 
 export const ArticleSkeleton = () => {
   return (
@@ -97,7 +98,10 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
           {data.coverImage && (
             <div className='relative  overflow-hidden bg-muted mb-10 flex justify-center rounded-b-xl lg:rounded-b-4xl'>
               <Image
-                src={keyToUrl(data.coverImage) || '/placeholder.svg'}
+                src={
+                  getOptimizedImageUrl(keyToUrl(data.coverImage), 100) ||
+                  '/placeholder.svg'
+                }
                 alt={data.title}
                 width={768}
                 height={600}
@@ -109,7 +113,8 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
                 width={768}
                 height={600}
                 priority
-                className='relative z-1'
+                sizes='(max-width: 768px) 100vw, 768px'
+                className='relative z-1 w-auto h-auto'
               />
             </div>
           )}

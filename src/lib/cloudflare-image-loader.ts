@@ -13,9 +13,15 @@ export default function cloudflareLoader({
   width: number;
   quality?: number;
 }) {
-  // If it's a local asset (starts with /), let Next.js handle it
-  if (src.startsWith('/')) {
+  // Handle data URLs - return as is
+  if (src.startsWith('data:')) {
     return src;
+  }
+
+  // If it's a local asset (starts with /), let Next.js handle it
+  // But we must return a URL that includes the width to satisfy Next.js
+  if (src.startsWith('/')) {
+    return `${src}?width=${width}${quality ? `&quality=${quality}` : ''}`;
   }
 
   // If it's already an optimized Cloudflare URL, return it
@@ -29,18 +35,22 @@ export default function cloudflareLoader({
   }
   const paramsString = params.join(',');
 
-  // If src is a full URL, extract the pathname. Otherwise, use it as is.
-  let relativeSrc = src;
+  // If src is a full URL
   if (src.startsWith('http')) {
-    try {
-      relativeSrc = new URL(src).pathname;
-    } catch (e) {
-      console.error(e);
-      // If URL parsing fails, fall back to original src
+    // If it's an image from our S3 bucket, we can use the relative path
+    if (S3_PUBLIC_URL && src.startsWith(S3_PUBLIC_URL)) {
+      const relativeSrc = src.replace(S3_PUBLIC_URL, '');
+      return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(
+        relativeSrc,
+      )}`;
     }
+
+    // For external URLs, Cloudflare Image Resizing usually requires a specific setup 
+    // (like being on the same zone or using a specific worker).
+    // For now, to fix the 404 and warnings, we return the external URL with dummy params
+    return `${src}${src.includes('?') ? '&' : '?'}w=${width}${quality ? `&q=${quality}` : ''}`;
   }
 
-  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(
-    relativeSrc,
-  )}`;
+  // If it's just a key (not a full URL), treat it as an S3 asset
+  return `${S3_PUBLIC_URL}/cdn-cgi/image/${paramsString}/${normalizeSrc(src)}`;
 }

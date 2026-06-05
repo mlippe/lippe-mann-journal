@@ -5,7 +5,6 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
-import Underline from '@tiptap/extension-underline';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import { ImageExtension } from './extensions/image';
@@ -62,7 +61,6 @@ export default function RichTextViewer({ content }: RichTextProps) {
       }),
       TextStyle,
       FontSize,
-      Underline,
       Color,
       Highlight.configure({
         multicolor: true,

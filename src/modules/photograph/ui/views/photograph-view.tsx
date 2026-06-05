@@ -177,6 +177,7 @@ const DesktopMedia = ({
                   blurhash={ptp.photo.blurData}
                   aspectRatio={ptp.photo.aspectRatio}
                   priority={i === 0}
+                  sizes='(max-width: 1024px) 100vw, 80vw'
                 />
               </SwiperSlide>
             ))}
@@ -224,6 +225,7 @@ const DesktopMedia = ({
             className='max-w-full max-h-full object-contain'
             blurhash={photos[0].photo.blurData}
             aspectRatio={photos[0].photo.aspectRatio}
+            sizes='(max-width: 1024px) 100vw, 80vw'
           />
           <Button
             size='icon-sm'
@@ -264,6 +266,7 @@ const MobileMediaList = ({
               priority={i === 0}
               blurhash={ptp.photo.blurData}
               aspectRatio={ptp.photo.aspectRatio}
+              sizes='100vw'
             />
             {ptp.photo.make && (
               <div className='p-3 bg-muted/50'>

@@ -8,7 +8,7 @@ interface BlurImageProps extends Omit<
   ImageProps,
   'onLoad' | 'onLoadingComplete'
 > {
-  blurhash: string;
+  blurhash?: string | null;
   aspectRatio?: number;
 }
 
@@ -110,6 +110,7 @@ const BlurImageInner = function BlurImageInner({
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}
         priority={priority}
+        style={!fill ? { width: '100%', height: 'auto' } : undefined}
         className={`${baseClassName ?? ''} ${
           hasBackground && imageLoaded ? 'bg-background' : ''
         } ${

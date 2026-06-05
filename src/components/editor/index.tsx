@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
-import Underline from '@tiptap/extension-underline';
 import { EditorContent, type Extension, useEditor } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -92,7 +91,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         FontSize,
         Subscript,
         Superscript,
-        Underline,
         Link.configure({
           autolink: true,
           openOnClick: false,
