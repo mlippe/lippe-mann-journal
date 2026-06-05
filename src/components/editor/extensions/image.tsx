@@ -170,13 +170,7 @@ function TiptapImage(props: NodeViewProps) {
   const [openedMore, setOpenedMore] = useState(false);
 
   const rawSrc = node.attrs.src as string | null | undefined;
-  const imageSrc =
-    typeof rawSrc === 'string' &&
-    !rawSrc.startsWith('http://') &&
-    !rawSrc.startsWith('https://') &&
-    !rawSrc.startsWith('data:')
-      ? keyToUrl(rawSrc)
-      : (rawSrc ?? '');
+  const imageSrc = keyToUrl(rawSrc);
 
   const handleDeleteImage = useCallback(async () => {
     if (
