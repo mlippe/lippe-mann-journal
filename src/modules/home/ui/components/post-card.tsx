@@ -99,7 +99,12 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         </a>
       )}
 
-      <div className='relative aspect-[0.8]'>
+      <div
+        className={cn(
+          'relative aspect-[0.8]',
+          isArticle && isMobile && 'aspect-[1.25]',
+        )}
+      >
         {/* Open Badge */}
         <Badge
           variant='default'
@@ -174,11 +179,11 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <p className='text-lg tracking-tight leading-snug font-medium block max-w-xl'>
             {post.title}
           </p>
-          <p className='text-sm line-clamp-3 text-foreground/70 -mt-0.5 max-w-lg'>
+          <p className='text-sm line-clamp-4 text-foreground/70 -mt-0.5 max-w-lg'>
             {createPreview(post.content)}
           </p>
 
-          <Button variant='outline' className='text-xs  gap-1  mt-2' asChild>
+          <Button className='text-xs  gap-1  mt-2' size='lg' asChild>
             <Link href={href}>
               Weiterlesen
               <IconArrowUpRight className='size-3.5' />

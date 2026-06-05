@@ -116,7 +116,10 @@ export function formatRelativeCustom(
   return formatRelative(date, baseDate, { locale });
 }
 
-export function createPreview(html: string | null | undefined, length: number = 200) {
+export function createPreview(
+  html: string | null | undefined,
+  length: number = 400,
+) {
   if (!html) return '';
 
   const text = html
