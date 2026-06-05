@@ -88,11 +88,10 @@ export const ColorToolbar = () => {
                 style={{
                   color: editorState.currentColor,
                 }}
-                className={cn("h-8 w-14 p-0 font-normal")}
+                className={cn("h-8 w-8 p-0 font-normal")}
                 onMouseDown={(e) => e.preventDefault()}
               >
                 <span className="text-md">A</span>
-                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>

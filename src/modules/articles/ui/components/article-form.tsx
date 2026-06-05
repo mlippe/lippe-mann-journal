@@ -151,7 +151,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
           className='flex flex-col lg:flex-row gap-10 items-start'
         >
           {/* Main Content Area */}
-          <div className='flex-1 w-full space-y-8'>
+          <div className='flex-1 w-full min-w-0 space-y-8'>
             <div className='space-y-4'>
               <FormField
                 control={form.control}

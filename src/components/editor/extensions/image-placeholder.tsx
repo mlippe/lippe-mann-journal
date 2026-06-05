@@ -234,7 +234,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
           </div>
         </PopoverTrigger>
         <PopoverContent
-          className='w-[450px] px-0 py-2'
+          className='w-[calc(100vw-2rem)] max-w-[450px] px-0 py-2'
           onPointerDownOutside={() => {
             setOpen(false);
           }}

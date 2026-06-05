@@ -51,11 +51,10 @@ export const FontSizeToolbar = () => {
               type="button"
               variant="ghost"
               size="sm"
-              className={cn("h-8 w-14 px-2 gap-0.5 font-normal")}
+              className={cn("h-8 w-8 px-0 font-normal")}
               onMouseDown={(e) => e.preventDefault()}
             >
               <span className="text-xs font-medium">{currentSize}</span>
-              <ChevronDown className="h-3 w-3 opacity-50" />
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>

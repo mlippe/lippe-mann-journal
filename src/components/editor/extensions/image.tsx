@@ -230,11 +230,15 @@ function TiptapImage(props: NodeViewProps) {
     }
 
     const newWidth = Math.max(resizeInitialWidth + dx, 150); // Minimum width: 150
-    const parentWidth = nodeRef.current?.parentElement?.offsetWidth || 0; // Get the parent element's width
+    const parentWidth = nodeRef.current?.parentElement?.parentElement?.offsetWidth || 0; // Get the parent element's width
 
-    if (newWidth < parentWidth) {
+    if (newWidth <= parentWidth) {
       updateAttributes({
         width: newWidth,
+      });
+    } else {
+      updateAttributes({
+        width: '100%',
       });
     }
   }
@@ -272,11 +276,15 @@ function TiptapImage(props: NodeViewProps) {
     }
 
     const newWidth = Math.max(resizeInitialWidth + dx, 150);
-    const parentWidth = nodeRef.current?.parentElement?.offsetWidth || 0;
+    const parentWidth = nodeRef.current?.parentElement?.parentElement?.offsetWidth || 0;
 
-    if (newWidth < parentWidth) {
+    if (newWidth <= parentWidth) {
       updateAttributes({
         width: newWidth,
+      });
+    } else {
+      updateAttributes({
+        width: '100%',
       });
     }
   }
@@ -319,7 +327,10 @@ function TiptapImage(props: NodeViewProps) {
         node.attrs.align === 'center' && 'left-1/2 -translate-x-1/2',
         node.attrs.align === 'right' && 'left-full -translate-x-full',
       )}
-      style={{ width: node.attrs.width, maxWidth: '100%' }}
+      style={{ 
+        width: node.attrs.width === 'fit-content' ? 'fit-content' : '100%',
+        maxWidth: node.attrs.width === 'fit-content' ? '100%' : Math.min(Number(node.attrs.width) || 1200, 1200) + 'px'
+      }}
     >
       <div
         className={cn(

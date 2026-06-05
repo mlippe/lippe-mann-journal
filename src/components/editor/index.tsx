@@ -182,10 +182,10 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   }
 
   return (
-    <div className='border relative rounded-md pb-3'>
-      <div className='flex w-full items-center py-2 px-2 justify-between border-b sticky top-0 left-0 bg-background z-10'>
+    <div className='border relative rounded-md pb-3 w-full'>
+      <div className='flex w-full items-center py-2 px-2 border-b sticky top-0 left-0 bg-background z-10'>
         <ToolbarProvider editor={editor}>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-2 flex-wrap'>
             <UndoToolbar />
             <RedoToolbar />
             <Separator orientation='vertical' className='h-7' />
@@ -214,7 +214,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
         onClick={() => {
           editor.chain().focus().run();
         }}
-        className='cursor-text min-h-72 bg-background relative pt-10 px-6 w-fit'
+        className='cursor-text min-h-72 bg-background relative pt-10 px-6 w-full'
       >
         <BubbleMenu editor={editor} className='z-50'>
           <ToolbarProvider editor={editor}>
