@@ -1,10 +1,14 @@
 import { Metadata } from 'next';
 import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
-import { ArticleSlugView } from '@/modules/blog/ui/views/blog-slug-view';
+import {
+  ArticleSkeleton,
+  ArticleSlugView,
+} from '@/modules/blog/ui/views/blog-slug-view';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { Suspense } from 'react';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -50,6 +54,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const ArticlePage = async ({ params }: Props) => {
   const { slug } = await params;
+
+  return (
+    <Suspense fallback={<ArticleSkeleton />}>
+      <ArticleSuspense slug={slug} />
+    </Suspense>
+  );
+};
+
+async function ArticleSuspense({ slug }: { slug: string }) {
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
@@ -59,6 +72,6 @@ const ArticlePage = async ({ params }: Props) => {
       <ArticleSlugView slug={slug} />
     </HydrationBoundary>
   );
-};
+}
 
 export default ArticlePage;

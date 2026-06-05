@@ -288,6 +288,10 @@
   }
 }
 
+.animate-shimmer {
+  @apply bg-linear-to-r from-transparent via-foreground/10 to-transparent;
+}
+
 /* Utility to visually hide scrollbars but keep scrolling */
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */

@@ -12,7 +12,55 @@ import { calculateReadingTime } from '@/modules/articles/lib/reading-time';
 import { useEffect, useState } from 'react';
 import Author from '@/components/author';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { siteConfig } from '@/site.config';
+
+export const ArticleSkeleton = () => {
+  return (
+    <div className='flex flex-col items-center -mt-3 w-full'>
+      <article className='w-full lg:px-4 animate-pulse'>
+        {/* HEADER SECTION SKELETON */}
+        <header className='mb-10 lg:mb-16'>
+          <div className='relative overflow-hidden bg-muted mb-10 flex justify-center rounded-b-xl lg:rounded-b-4xl h-100 lg:h-150'>
+            <Skeleton className='w-full h-full animate-shimmer' />
+          </div>
+          <div className='max-w-3xl mx-auto px-2'>
+            <Skeleton className='h-10 lg:h-14 w-3/4 mb-8' />
+
+            <div className='flex items-center justify-between mb-8 w-full flex-wrap'>
+              <div className='flex items-center gap-4 justify-between w-full'>
+                <div className='flex items-center gap-3'>
+                  <Skeleton className='size-10 rounded-full' />
+                  <div className='space-y-2'>
+                    <Skeleton className='h-4 w-24' />
+                  </div>
+                </div>
+                <div className='flex flex-col items-end gap-2'>
+                  <Skeleton className='h-4 w-24' />
+                  <Skeleton className='h-4 w-20' />
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* ARTICLE CONTENT SKELETON */}
+        <div className='mb-20 max-w-3xl mx-auto px-2 space-y-4'>
+          <Skeleton className='h-4 w-full' />
+          <Skeleton className='h-4 w-[95%]' />
+          <Skeleton className='h-4 w-[98%]' />
+          <Skeleton className='h-4 w-[92%]' />
+          <Skeleton className='h-4 w-full' />
+          <div className='pt-4'>
+            <Skeleton className='h-4 w-[88%]' />
+          </div>
+          <Skeleton className='h-4 w-[94%]' />
+          <Skeleton className='h-4 w-[96%]' />
+        </div>
+      </article>
+    </div>
+  );
+};
 
 export const ArticleSlugView = ({ slug }: { slug: string }) => {
   const trpc = useTRPC();

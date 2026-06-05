@@ -2,9 +2,11 @@ import { Metadata } from 'next';
 import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
 import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
+import { LoadingState } from '@/modules/photograph/ui/views/photograph-view';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { Suspense } from 'react';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -57,6 +59,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const PhotoPage = async ({ params }: Props) => {
   const { slug } = await params;
+
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <PhotoSuspense slug={slug} />
+    </Suspense>
+  );
+};
+
+async function PhotoSuspense({ slug }: { slug: string }) {
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
@@ -66,6 +77,6 @@ const PhotoPage = async ({ params }: Props) => {
       <PhotographDetailPage slug={slug} isModal={false} />
     </HydrationBoundary>
   );
-};
+}
 
 export default PhotoPage;
