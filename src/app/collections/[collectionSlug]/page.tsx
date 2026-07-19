@@ -10,6 +10,7 @@ import {
   InfiniteFeedViewLoadingStatus,
 } from '@/modules/home/ui/views/infinite-feed-view';
 import { getOptimizedImageUrl } from '@/lib/images';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 export const generateMetadata = async ({
   params,
@@ -26,11 +27,12 @@ export const generateMetadata = async ({
     );
 
     const imageUrl = collection?.coverImageUrl
-      ? getOptimizedImageUrl(collection.coverImageUrl)
+      ? getOptimizedImageUrl(keyToUrl(collection.coverImageUrl))
       : undefined;
 
-    const description =
-      collection?.description || 'Collection details and posts.';
+    const description = collection
+      ? `Schau dir die Sammlung "${collection.name}" in meinem Journal an.`
+      : 'Schau dir meine Sammlung in meinem Journal an.';
 
     return {
       title: collection?.name || 'Collection',
