@@ -332,4 +332,10 @@ export const photosRouter = createTRPCRouter({
         totalPages,
       };
     }),
+  createMany: protectedProcedure
+    .input(z.array(photosInsertSchema))
+    .mutation(async ({ ctx, input }) => {
+      if (input.length === 0) return [];
+      return await ctx.db.insert(photos).values(input).returning();
+    }),
 });

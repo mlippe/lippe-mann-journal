@@ -27,8 +27,11 @@ import { ExifPreview } from '@/modules/photos/ui/components/exif-preview';
 import {
   fromDatetimeLocalString,
   TExifData,
+  TImageInfo,
   toDatetimeLocalString,
 } from '@/modules/photos/lib/utils';
+import { PhotoUploader } from '@/modules/photos/ui/components/photo-uploader';
+import { DEFAULT_PHOTOS_UPLOAD_FOLDER } from '@/constants';
 import { ApertureSelector } from '@/modules/photos/ui/components/aperture-selector';
 import { ShutterSpeedSelector } from '@/modules/photos/ui/components/shutter-speed-selector';
 import { ISOSelector } from '@/modules/photos/ui/components/iso-selector';
@@ -128,7 +131,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
     }
   }, [post, form]);
 
-  const { fields, move, remove } = useFieldArray({
+  const { fields, move, remove, append } = useFieldArray({
     control: form.control,
     name: 'photos',
   });
@@ -160,10 +163,68 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
   );
 
   const updatePhoto = useMutation(trpc.photos.update.mutationOptions());
+  const createManyPhotos = useMutation(
+    trpc.photos.createMany.mutationOptions(),
+  );
+
+  const handlePhotoUploaded = (
+    url: string,
+    exif: TExifData | null,
+    imageInfo: TImageInfo,
+  ) => {
+    append({
+      id: crypto.randomUUID(),
+      url,
+      title: imageInfo.fileName || 'Untitled.jpg',
+      aspectRatio: imageInfo.width / imageInfo.height,
+      width: imageInfo.width,
+      height: imageInfo.height,
+      blurData: imageInfo.blurhash || '',
+      make: exif?.make || null,
+      model: exif?.model || null,
+      lensModel: exif?.lensModel || null,
+      focalLength: exif?.focalLength || null,
+      focalLength35mm: exif?.focalLength35mm || null,
+      fNumber: exif?.fNumber || null,
+      iso: exif?.iso || null,
+      exposureTime: exif?.exposureTime || null,
+      exposureCompensation: exif?.exposureCompensation || null,
+      latitude: exif?.latitude || null,
+      longitude: exif?.longitude || null,
+      gpsAltitude: exif?.gpsAltitude || null,
+      dateTimeOriginal: exif?.dateTimeOriginal
+        ? new Date(exif.dateTimeOriginal)
+        : null,
+    });
+  };
 
   async function onSubmit(values: FormValues) {
     try {
-      // 1. Update post basic info
+      // 1. Separate new and existing photos
+      const existingPhotoIds = new Set(initialPhotos.map((p) => p.id));
+      const newPhotos = values.photos.filter((p) => !existingPhotoIds.has(p.id));
+      const existingPhotos = values.photos.filter((p) => existingPhotoIds.has(p.id));
+
+      // 2. Insert new photos and get their real database IDs
+      let insertedPhotos: any[] = [];
+      if (newPhotos.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const photosToInsert = newPhotos.map(({ id, ...rest }) => rest);
+        insertedPhotos = await createManyPhotos.mutateAsync(photosToInsert);
+      }
+
+      // 3. Map new photos back to their inserted IDs to preserve sorting order
+      let newPhotoIndex = 0;
+      const finalPhotoIds = values.photos.map((p) => {
+        if (!existingPhotoIds.has(p.id)) {
+          const inserted = insertedPhotos[newPhotoIndex];
+          newPhotoIndex++;
+          return inserted.id;
+        }
+        return p.id;
+      });
+
+      // 4. Update post basic info
       await updatePost.mutateAsync({
         id: post.id,
         title: values.postTitle,
@@ -172,15 +233,15 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         collectionIds: values.collectionIds,
       });
 
-      // 2. Update post-to-photos relations (reordering/removal)
+      // 5. Update post-to-photos relations (reordering/removal/additions)
       await updateAlbumPhotos.mutateAsync({
         postId: post.id,
-        photoIds: values.photos.map((p) => p.id),
+        photoIds: finalPhotoIds,
       });
 
-      // 3. Update each photo's metadata
+      // 6. Update each photo's metadata (only for existing photos)
       await Promise.all(
-        values.photos.map((p) =>
+        existingPhotos.map((p) =>
           updatePhoto.mutateAsync({
             id: p.id,
             title: p.title,
@@ -214,7 +275,8 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
   const isPending =
     updatePost.isPending ||
     updateAlbumPhotos.isPending ||
-    updatePhoto.isPending;
+    updatePhoto.isPending ||
+    createManyPhotos.isPending;
 
   return (
     <Form {...form}>
@@ -300,7 +362,19 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         </Card>
 
         <div className='space-y-4'>
-          <h3 className='text-xl font-semibold'>Photos</h3>
+          <div className='flex items-center justify-between'>
+            <h3 className='text-xl font-semibold'>Photos</h3>
+          </div>
+
+          <Card>
+            <CardContent className='pt-6'>
+              <PhotoUploader
+                folder={DEFAULT_PHOTOS_UPLOAD_FOLDER}
+                onUploadSuccess={handlePhotoUploaded}
+                multiple={true}
+              />
+            </CardContent>
+          </Card>
           {fields.map((field, index) => (
             <Card
               key={field.id}
