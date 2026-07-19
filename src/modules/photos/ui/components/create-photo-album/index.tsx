@@ -49,6 +49,7 @@ const CreatePhotoAlbum = () => {
         postTitle: data.postTitle,
         postVisibility: data.postVisibility,
         photos: finalPhotos,
+        collectionIds: data.collectionIds,
       },
       {
         onSuccess: async () => {

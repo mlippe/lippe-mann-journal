@@ -13,6 +13,7 @@ import {
   photosInsertSchema,
   posts,
   postsToPhotos,
+  postsToCollections,
 } from '@/db/schema';
 import { TRPCError } from '@trpc/server';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -30,10 +31,11 @@ export const photosRouter = createTRPCRouter({
         ...photosInsertSchema.shape,
         postTitle: z.string(),
         postVisibility: z.enum(['public', 'private']).default('private'),
+        collectionIds: z.array(z.string().uuid()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { postTitle, postVisibility, ...photoData } = input;
+      const { postTitle, postVisibility, collectionIds, ...photoData } = input;
 
       try {
         const [result] = await ctx.db.transaction(async (tx) => {
@@ -67,6 +69,15 @@ export const photosRouter = createTRPCRouter({
             sortOrder: 0,
           });
 
+          if (collectionIds && collectionIds.length > 0) {
+            await tx.insert(postsToCollections).values(
+              collectionIds.map((collectionId) => ({
+                postId: post.id,
+                collectionId,
+              })),
+            );
+          }
+
           return [photo];
         });
 
@@ -86,15 +97,17 @@ export const photosRouter = createTRPCRouter({
         postTitle: z.string(),
         postVisibility: z.enum(['public', 'private']).default('private'),
         photos: z.array(photosInsertSchema),
+        collectionIds: z.array(z.string().uuid()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { postTitle, postVisibility, photos: inputPhotos, collectionIds } = input;
       try {
         const [albumPost] = await ctx.db.transaction(async (tx) => {
           // 1. Insert all photos
           const insertedPhotos = await tx
             .insert(photos)
-            .values(input.photos)
+            .values(inputPhotos)
             .returning();
 
           if (insertedPhotos.length === 0) {
@@ -102,16 +115,16 @@ export const photosRouter = createTRPCRouter({
           }
 
           // 2. Create the album post
-          const baseSlug = generateSlug(input.postTitle);
+          const baseSlug = generateSlug(postTitle);
           const uniqueSlug = `album-${baseSlug}-${insertedPhotos[0].id.slice(0, 4)}`;
 
           const [post] = await tx
             .insert(posts)
             .values({
-              title: input.postTitle,
+              title: postTitle,
               slug: uniqueSlug,
               type: 'ALBUM',
-              visibility: input.postVisibility,
+              visibility: postVisibility,
               coverImage: insertedPhotos[0].url,
             })
             .returning();
@@ -128,6 +141,15 @@ export const photosRouter = createTRPCRouter({
           }));
 
           await tx.insert(postsToPhotos).values(links);
+
+          if (collectionIds && collectionIds.length > 0) {
+            await tx.insert(postsToCollections).values(
+              collectionIds.map((collectionId) => ({
+                postId: post.id,
+                collectionId,
+              })),
+            );
+          }
 
           return [post];
         });

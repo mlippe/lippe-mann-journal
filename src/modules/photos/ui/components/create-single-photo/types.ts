@@ -15,6 +15,7 @@ export type UploadStepData = z.infer<typeof uploadStepSchema>;
 export const confirmStepSchema = z.object({
   postVisibility: z.enum(['private', 'public']).default('private'),
   postTitle: z.string().min(1, { message: 'Title is required' }),
+  collectionIds: z.array(z.string().uuid()).default([]),
 
   title: z.string().min(1, { message: 'Title is required' }),
 

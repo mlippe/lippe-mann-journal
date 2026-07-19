@@ -24,6 +24,7 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
 import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema } from './types';
+import { CollectionSelect } from '@/modules/posts/ui/components/collection-select';
 
 const ConfirmStep = ({
   url,
@@ -48,6 +49,7 @@ const ConfirmStep = ({
     defaultValues: {
       postTitle: '',
       postVisibility: 'public',
+      collectionIds: [],
       title: imageInfo?.fileName || 'Untitled.jpg',
       make: exif?.make,
       model: exif?.model,
@@ -162,6 +164,23 @@ const ConfirmStep = ({
                           {...field}
                           placeholder='Post title'
                         ></Textarea>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='collectionIds'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className='mb-3'>Collections</FormLabel>
+                      <FormControl>
+                        <CollectionSelect
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

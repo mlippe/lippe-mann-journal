@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { CollectionSelect } from '@/modules/posts/ui/components/collection-select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
@@ -45,10 +46,11 @@ const ConfirmStep = ({
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const form = useForm<ConfirmStepData>({
-    resolver: zodResolver(confirmStepSchema),
+    resolver: zodResolver(confirmStepSchema) as any,
     defaultValues: {
       postTitle: '',
       postVisibility: 'public',
+      collectionIds: [],
       photos: initialPhotos,
     },
     mode: 'onChange',
@@ -77,6 +79,23 @@ const ConfirmStep = ({
                   <FormLabel>Album Title</FormLabel>
                   <FormControl>
                     <Textarea {...field} placeholder='Enter album title' />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='collectionIds'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Collections</FormLabel>
+                  <FormControl>
+                    <CollectionSelect
+                      value={field.value || []}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
