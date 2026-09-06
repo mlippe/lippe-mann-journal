@@ -49,7 +49,7 @@ interface PhotographViewProps {
 
 // --- Helper Functions ---
 
-const getExifFromPhoto = (photo: Photo): TExifData => ({
+const getExifFromPhoto = (photo?: Photo | null): TExifData => ({
   make: photo?.make ?? undefined,
   model: photo?.model ?? undefined,
   lensModel: photo?.lensModel ?? undefined,
@@ -137,6 +137,7 @@ const DesktopMedia = ({
   activeIndex: number;
 }) => {
   const isAlbum = photos.length > 1;
+  const currentPhoto = photos[activeIndex]?.photo ?? photos[0]?.photo;
 
   return (
     <div
@@ -201,21 +202,20 @@ const DesktopMedia = ({
             </Button>
             <div id='album-swiper-pagination' />
           </Swiper>
-          <Button
-            size='icon-sm'
-            asChild
-            className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10'
-            variant='outline'
-          >
-            <Link
-              target='_blank'
-              href={keyToUrl(photos[activeIndex].photo.url)}
+          {currentPhoto && (
+            <Button
+              size='icon-sm'
+              asChild
+              className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 z-10'
+              variant='outline'
             >
-              <IconArrowsMaximize />
-            </Link>
-          </Button>
+              <Link target='_blank' href={keyToUrl(currentPhoto.url)}>
+                <IconArrowsMaximize />
+              </Link>
+            </Button>
+          )}
         </>
-      ) : (
+      ) : photos[0]?.photo ? (
         <div className='flex items-center justify-center w-full h-full relative'>
           <BlurImage
             src={keyToUrl(photos[0].photo.url)}
@@ -238,7 +238,7 @@ const DesktopMedia = ({
             </Link>
           </Button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
@@ -312,14 +312,61 @@ export const PhotographView = ({
     setIsModalOpen(openState);
   };
 
+  const photos = useMemo(() => {
+    if (post.postsToPhotos && post.postsToPhotos.length > 0) {
+      return post.postsToPhotos;
+    }
+    if (post.coverImage) {
+      return [
+        {
+          postId: post.id,
+          photoId: post.id,
+          sortOrder: 0,
+          photo: {
+            id: post.id,
+            url: post.coverImage,
+            title: post.title,
+            aspectRatio: 1,
+            width: 1200,
+            height: 800,
+            blurData: '',
+            make: null,
+            model: null,
+            lensModel: null,
+            focalLength: null,
+            focalLength35mm: null,
+            fNumber: null,
+            iso: null,
+            exposureTime: null,
+            exposureCompensation: null,
+            latitude: null,
+            longitude: null,
+            gpsAltitude: null,
+            dateTimeOriginal: post.createdAt,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+          },
+        },
+      ];
+    }
+    return [];
+  }, [post]);
+
+  const currentPhoto = useMemo(() => {
+    if (!photos || photos.length === 0) return null;
+    const safeIndex =
+      swiperActiveIndex >= 0 && swiperActiveIndex < photos.length
+        ? swiperActiveIndex
+        : 0;
+    return photos[safeIndex]?.photo ?? null;
+  }, [photos, swiperActiveIndex]);
+
   const currentExif = useMemo(
-    () => getExifFromPhoto(post.postsToPhotos!.at(swiperActiveIndex)!.photo!),
-    [post.postsToPhotos, swiperActiveIndex],
+    () => getExifFromPhoto(currentPhoto),
+    [currentPhoto],
   );
 
-  if (!post.postsToPhotos?.at(0)) return null;
-
-  const photos = post.postsToPhotos;
+  if (photos.length === 0) return null;
 
   const content =
     isMobile && !isModal ? (

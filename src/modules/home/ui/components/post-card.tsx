@@ -352,10 +352,59 @@ const MediaContent = ({
     };
   }, [isMobile, post.type, photos.length]);
 
-  if (!coverPhoto) return null;
+  if (!coverPhoto && !post.coverImage) return null;
 
   const sizes =
     '(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)';
+
+  if (!coverPhoto && post.coverImage) {
+    if (isMobile) {
+      return (
+        <div
+          className='h-full w-full p-3 relative block'
+          onClick={handleDoubleTap}
+        >
+          <BlurImage
+            src={keyToUrl(post.coverImage)}
+            alt={post.title}
+            fill
+            priority={priority}
+            sizes={sizes}
+            className='object-contain p-3'
+          />
+          {showHeart && (
+            <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
+              <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <Link
+          className='block h-full p-3 relative group'
+          href={href}
+          onMouseEnter={() => setIsHovered(true)}
+        >
+          <BlurImage
+            src={keyToUrl(post.coverImage)}
+            alt={post.title}
+            fill
+            priority={priority}
+            sizes={sizes}
+            className='object-contain p-3 bg-background'
+          />
+        </Link>
+        <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
+          <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
+            <SocialInteractions postId={post.id} variant='compact' />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (isMobile) {
     if (post.type === 'ALBUM' && photos.length > 1) {

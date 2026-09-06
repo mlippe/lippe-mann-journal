@@ -6,6 +6,14 @@ import { getSession } from '@/modules/auth/lib/get-session';
 
 // Clean up test data before each test
 beforeEach(async () => {
+  if (
+    !process.env.TEST_DATABASE_URL ||
+    process.env.DATABASE_URL?.includes('neon.tech')
+  ) {
+    throw new Error(
+      'SAFETY CHECK: Tests must run against an isolated test database (TEST_DATABASE_URL), not production!',
+    );
+  }
   await db.delete(photos);
 });
 
