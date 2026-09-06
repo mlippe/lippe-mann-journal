@@ -9,11 +9,14 @@ import { siteConfig } from '@/site.config';
 // Vercel Analytics
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+import localFont from 'next/font/local';
 
-import { Readex_Pro } from 'next/font/google';
 
-const readexPro = Readex_Pro({
-  subsets: ['latin'],
+const imdGrotesk = localFont({
+  src: './font/imd_grotesk_variable.otf',
+  weight: '200 800',
+  variable: '--font-sans',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -36,10 +39,10 @@ export default function RootLayout({
 
   return (
     <html lang='en' suppressHydrationWarning>
-      <head>
-        {s3Domain && <link rel='preconnect' href={s3Domain} />}
-      </head>
-      <body className={`${readexPro.className} antialiased`}>
+      <head>{s3Domain && <link rel='preconnect' href={s3Domain} />}</head>
+      <body
+        className={`${imdGrotesk.variable} ${imdGrotesk.className} font-sans antialiased`}
+      >
         <NuqsAdapter>
           <TRPCReactProvider>
             <ThemeProvider attribute='class'>
