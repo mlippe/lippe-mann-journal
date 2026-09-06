@@ -8,9 +8,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
@@ -35,6 +36,7 @@ import {
 
 const ConfirmStep = ({
   photos: initialPhotos,
+  setPhotos,
   isSubmitting,
   onSubmit,
 }: {
@@ -45,13 +47,88 @@ const ConfirmStep = ({
 }) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
+  const sanitizedInitialPhotos: AlbumPhoto[] = initialPhotos.map((photo) => ({
+    ...photo,
+    title: photo.title?.trim() || 'Untitled.jpg',
+    aspectRatio:
+      typeof photo.aspectRatio === 'number' &&
+      Number.isFinite(photo.aspectRatio) &&
+      photo.aspectRatio > 0
+        ? photo.aspectRatio
+        : 1,
+    width:
+      typeof photo.width === 'number' &&
+      Number.isFinite(photo.width) &&
+      photo.width > 0
+        ? photo.width
+        : 1,
+    height:
+      typeof photo.height === 'number' &&
+      Number.isFinite(photo.height) &&
+      photo.height > 0
+        ? photo.height
+        : 1,
+    blurData: photo.blurData || '',
+    make: typeof photo.make === 'string' && photo.make.trim() ? photo.make.trim() : null,
+    model: typeof photo.model === 'string' && photo.model.trim() ? photo.model.trim() : null,
+    lensModel:
+      typeof photo.lensModel === 'string' && photo.lensModel.trim()
+        ? photo.lensModel.trim()
+        : null,
+    focalLength:
+      typeof photo.focalLength === 'number' && Number.isFinite(photo.focalLength)
+        ? photo.focalLength
+        : null,
+    focalLength35mm:
+      typeof photo.focalLength35mm === 'number' &&
+      Number.isFinite(photo.focalLength35mm)
+        ? photo.focalLength35mm
+        : null,
+    fNumber:
+      typeof photo.fNumber === 'number' && Number.isFinite(photo.fNumber)
+        ? photo.fNumber
+        : null,
+    iso:
+      typeof photo.iso === 'number' && Number.isFinite(photo.iso)
+        ? photo.iso
+        : null,
+    exposureTime:
+      typeof photo.exposureTime === 'number' &&
+      Number.isFinite(photo.exposureTime)
+        ? photo.exposureTime
+        : null,
+    exposureCompensation:
+      typeof photo.exposureCompensation === 'number' &&
+      Number.isFinite(photo.exposureCompensation)
+        ? photo.exposureCompensation
+        : null,
+    latitude:
+      typeof photo.latitude === 'number' && Number.isFinite(photo.latitude)
+        ? photo.latitude
+        : null,
+    longitude:
+      typeof photo.longitude === 'number' && Number.isFinite(photo.longitude)
+        ? photo.longitude
+        : null,
+    gpsAltitude:
+      typeof photo.gpsAltitude === 'number' && Number.isFinite(photo.gpsAltitude)
+        ? photo.gpsAltitude
+        : null,
+    dateTimeOriginal:
+      photo.dateTimeOriginal instanceof Date &&
+      !isNaN(photo.dateTimeOriginal.getTime())
+        ? photo.dateTimeOriginal
+        : null,
+  }));
+
   const form = useForm<ConfirmStepData>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(confirmStepSchema) as any,
     defaultValues: {
       postTitle: '',
       postVisibility: 'public',
       collectionIds: [],
-      photos: initialPhotos,
+      photos: sanitizedInitialPhotos,
     },
     mode: 'onChange',
   });
@@ -62,9 +139,46 @@ const ConfirmStep = ({
     name: 'photos',
   });
 
+  const onInvalid = (errors: FieldErrors<ConfirmStepData>) => {
+    console.error('Album creation validation errors:', errors);
+
+    if (errors.postTitle) {
+      toast.error(errors.postTitle.message || 'Please enter an album title.');
+      return;
+    }
+
+    if (errors.photos) {
+      if (typeof errors.photos.message === 'string') {
+        toast.error(errors.photos.message);
+        return;
+      }
+
+      if (Array.isArray(errors.photos)) {
+        const errorIndex = errors.photos.findIndex((p) => p !== undefined);
+        if (errorIndex !== -1) {
+          setExpandedIndex(errorIndex);
+          const photoError = errors.photos[errorIndex];
+          const firstField = photoError
+            ? Object.values(photoError)[0]
+            : null;
+          const msg =
+            firstField &&
+            typeof firstField === 'object' &&
+            'message' in firstField
+              ? String(firstField.message)
+              : 'Please check the photo details.';
+          toast.error(`Photo ${errorIndex + 1}: ${msg}`);
+          return;
+        }
+      }
+    }
+
+    toast.error('Please check the form for errors before creating the album.');
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className='space-y-8'>
         {/* Album Global Settings */}
         <Card>
           <CardHeader>
@@ -158,7 +272,15 @@ const ConfirmStep = ({
                         variant='ghost'
                         size='icon'
                         disabled={index === 0}
-                        onClick={() => move(index, index - 1)}
+                        onClick={() => {
+                          move(index, index - 1);
+                          setPhotos((prev) => {
+                            const updated = [...prev];
+                            const [moved] = updated.splice(index, 1);
+                            updated.splice(index - 1, 0, moved);
+                            return updated;
+                          });
+                        }}
                       >
                         <ArrowUp className='h-4 w-4' />
                       </Button>
@@ -170,7 +292,15 @@ const ConfirmStep = ({
                         variant='ghost'
                         size='icon'
                         disabled={index === fields.length - 1}
-                        onClick={() => move(index, index + 1)}
+                        onClick={() => {
+                          move(index, index + 1);
+                          setPhotos((prev) => {
+                            const updated = [...prev];
+                            const [moved] = updated.splice(index, 1);
+                            updated.splice(index + 1, 0, moved);
+                            return updated;
+                          });
+                        }}
                       >
                         <ArrowDown className='h-4 w-4' />
                       </Button>
@@ -179,7 +309,12 @@ const ConfirmStep = ({
                         variant='ghost'
                         size='icon'
                         className='text-destructive'
-                        onClick={() => remove(index)}
+                        onClick={() => {
+                          remove(index);
+                          setPhotos((prev) =>
+                            prev.filter((_, i) => i !== index),
+                          );
+                        }}
                       >
                         <Trash2 className='h-4 w-4' />
                       </Button>
@@ -314,6 +449,7 @@ const ConfirmStep = ({
                               }
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -329,6 +465,7 @@ const ConfirmStep = ({
                               onChange={field.onChange}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -344,6 +481,7 @@ const ConfirmStep = ({
                               onChange={field.onChange}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -359,6 +497,7 @@ const ConfirmStep = ({
                               onChange={field.onChange}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -374,6 +513,7 @@ const ConfirmStep = ({
                               onChange={field.onChange}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -394,6 +534,7 @@ const ConfirmStep = ({
                               }
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -404,7 +545,7 @@ const ConfirmStep = ({
           ))}
         </div>
 
-        <div className='sticky  bottom-2 flex justify-end gap-4 p-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg'>
+        <div className='sticky bottom-2 z-20 flex justify-end gap-4 p-4 bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg'>
           <Button
             type='submit'
             size='lg'

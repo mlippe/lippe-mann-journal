@@ -14,13 +14,26 @@ const UploadStep = ({
     exif: TExifData | null,
     imageInfo: TImageInfo,
   ) => {
+    const width =
+      Number.isFinite(imageInfo.width) && imageInfo.width > 0
+        ? imageInfo.width
+        : 1;
+    const height =
+      Number.isFinite(imageInfo.height) && imageInfo.height > 0
+        ? imageInfo.height
+        : 1;
+    const aspectRatio =
+      Number.isFinite(imageInfo.aspectRatio) && imageInfo.aspectRatio > 0
+        ? imageInfo.aspectRatio
+        : Number((width / height).toFixed(2)) || 1;
+
     const newPhoto: AlbumPhoto = {
       id: crypto.randomUUID(),
       url,
-      title: imageInfo.fileName || 'Untitled.jpg',
-      aspectRatio: imageInfo.width / imageInfo.height,
-      width: imageInfo.width,
-      height: imageInfo.height,
+      title: imageInfo.fileName?.trim() || 'Untitled.jpg',
+      aspectRatio,
+      width,
+      height,
       blurData: imageInfo.blurhash || '',
       ...exif,
     };

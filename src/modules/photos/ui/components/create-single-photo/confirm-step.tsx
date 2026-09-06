@@ -8,9 +8,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { useForm, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { toast } from 'sonner';
 import { TExifData, TImageInfo } from '../../../lib/utils';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -69,6 +70,19 @@ const ConfirmStep = ({
   });
   const { handleSubmit } = form;
 
+  const onInvalid = (errors: FieldErrors<ConfirmStepData>) => {
+    console.error('Photo creation validation errors:', errors);
+    if (errors.postTitle) {
+      toast.error(errors.postTitle.message || 'Please enter a post title.');
+      return;
+    }
+    if (errors.title) {
+      toast.error(errors.title.message || 'Please enter a photo title.');
+      return;
+    }
+    toast.error('Please check the form for errors before saving.');
+  };
+
   const onSubmit = (data: ConfirmStepData) => {
     if (isEditExif) {
       setExif((prev) => ({
@@ -98,7 +112,7 @@ const ConfirmStep = ({
     <>
       <Form {...form}>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, onInvalid)}
           className='space-y-4 @container'
         >
           {url && imageInfo && (

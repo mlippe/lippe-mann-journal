@@ -241,7 +241,7 @@ export const fromDatetimeLocalString = (value: string): Date | null => {
 
   if (dateParts.length !== 3 || timeParts.length < 2) return null;
 
-  return new Date(
+  const d = new Date(
     Date.UTC(
       dateParts[0],
       dateParts[1] - 1,
@@ -250,7 +250,47 @@ export const fromDatetimeLocalString = (value: string): Date | null => {
       timeParts[1],
     ),
   );
+  return isNaN(d.getTime()) ? null : d;
 };
+
+export function parseExifDate(val: unknown): Date | undefined {
+  if (!val) return undefined;
+  if (val instanceof Date) {
+    return isNaN(val.getTime()) ? undefined : val;
+  }
+  if (typeof val === 'number') {
+    if (!Number.isFinite(val)) return undefined;
+    const d = new Date(val * (val < 1e11 ? 1000 : 1));
+    return isNaN(d.getTime()) ? undefined : d;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return undefined;
+    const normalized = trimmed.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3');
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? undefined : d;
+  }
+  return undefined;
+}
+
+export function parseExifNumber(val: unknown): number | undefined {
+  if (typeof val === 'number' && Number.isFinite(val)) {
+    return val;
+  }
+  if (typeof val === 'string' && val.trim() !== '') {
+    const num = Number(val);
+    if (Number.isFinite(num)) return num;
+  }
+  return undefined;
+}
+
+export function parseExifString(val: unknown): string | undefined {
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+  return undefined;
+}
 
 /**
  * Extract EXIF data from photo file
@@ -285,27 +325,19 @@ export const getPhotoExif = async (file: File): Promise<TExifData | null> => {
 
     // Type cast and validation
     const exifData: TExifData = {
-      make: Make as string | undefined,
-      model: Model as string | undefined,
-      lensModel: LensModel as string | undefined,
-      focalLength: typeof FocalLength === 'number' ? FocalLength : undefined,
-      focalLength35mm:
-        typeof FocalLengthIn35mmFormat === 'number'
-          ? FocalLengthIn35mmFormat
-          : undefined,
-      fNumber: typeof FNumber === 'number' ? FNumber : undefined,
-      iso: typeof ISO === 'number' ? ISO : undefined,
-      exposureTime: typeof ExposureTime === 'number' ? ExposureTime : undefined,
-      exposureCompensation:
-        typeof ExposureCompensation === 'number'
-          ? ExposureCompensation
-          : undefined,
-      latitude: typeof GPSLatitude === 'number' ? GPSLatitude : undefined,
-      longitude: typeof GPSLongitude === 'number' ? GPSLongitude : undefined,
-      gpsAltitude: typeof GPSAltitude === 'number' ? GPSAltitude : undefined,
-      dateTimeOriginal: DateTimeOriginal
-        ? new Date(DateTimeOriginal * 1000)
-        : undefined,
+      make: parseExifString(Make),
+      model: parseExifString(Model),
+      lensModel: parseExifString(LensModel),
+      focalLength: parseExifNumber(FocalLength),
+      focalLength35mm: parseExifNumber(FocalLengthIn35mmFormat),
+      fNumber: parseExifNumber(FNumber),
+      iso: parseExifNumber(ISO),
+      exposureTime: parseExifNumber(ExposureTime),
+      exposureCompensation: parseExifNumber(ExposureCompensation),
+      latitude: parseExifNumber(GPSLatitude),
+      longitude: parseExifNumber(GPSLongitude),
+      gpsAltitude: parseExifNumber(GPSAltitude),
+      dateTimeOriginal: parseExifDate(DateTimeOriginal),
     };
 
     return exifData;
@@ -356,12 +388,17 @@ export const getImageInfo = async (file: File): Promise<TImageInfo> => {
       throw new Error('Failed to generate blurhash');
     }
 
+    const width = Number.isFinite(img.width) && img.width > 0 ? img.width : 1;
+    const height = Number.isFinite(img.height) && img.height > 0 ? img.height : 1;
+    const calculatedAspect = Number((width / height).toFixed(2));
+    const aspectRatio = Number.isFinite(calculatedAspect) && calculatedAspect > 0 ? calculatedAspect : 1;
+
     const imageInfo: TImageInfo = {
-      width: img.width,
-      height: img.height,
-      aspectRatio: Number((img.width / img.height).toFixed(2)),
+      width,
+      height,
+      aspectRatio,
       blurhash,
-      fileName: file.name,
+      fileName: file.name?.trim() || undefined,
       mimeType: file.type,
       fileSize: file.size,
     };
