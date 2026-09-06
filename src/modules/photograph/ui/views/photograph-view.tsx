@@ -421,40 +421,128 @@ export const PhotographView = ({
   );
 };
 
-export const LoadingState = () => {
-  const aspectRatio = 3 / 2;
-  const containerWidth = `min(65vh * ${aspectRatio}, 90vw)`;
-
+export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) => {
   return (
-    <div className='h-screen flex justify-center items-center relative overflow-hidden bg-background'>
-      <div className='absolute inset-0 -z-10'>
-        <div className='absolute inset-0 bg-muted blur-2xl scale-110' />
-        <div className='absolute inset-0 bg-background/40' />
-      </div>
-
-      <div className='flex justify-center pb-14 w-full'>
-        <div
-          className='bg-background relative shadow-2xl rounded-lg w-full border'
-          style={{
-            maxWidth: containerWidth,
-            aspectRatio: aspectRatio,
-            maxHeight: '65dvh',
-          }}
-        >
-          <Skeleton className='w-full h-full rounded-lg' />
-
-          <div className='absolute -bottom-12 left-0 px-6 py-3 w-full bg-background flex justify-between items-center select-none shadow-md rounded-b-lg border-t'>
-            <div className='flex flex-col text-center gap-2'>
-              <Skeleton className='h-4 w-32' />
-              <Skeleton className='h-3 w-40' />
+    <div className='w-full'>
+      {/* Mobile Skeleton Layout */}
+      <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3 md:hidden'>
+        <div className='px-3 border-b pb-4'>
+          <div className='flex flex-col h-full bg-muted/50 w-full'>
+            {/* Author bar */}
+            <div className='flex items-center justify-between border-b p-3 gap-1'>
+              <div className='flex items-center gap-2'>
+                <Skeleton className='size-8 rounded-full' />
+                <Skeleton className='h-4 w-28' />
+              </div>
             </div>
 
-            <div className='flex items-center gap-2'>
-              <Skeleton className='h-8 w-8 rounded-full' />
-              <div className='hidden sm:flex flex-col gap-2'>
-                <Skeleton className='h-4 w-48' />
-                <Skeleton className='h-3 w-28' />
+            {/* Title & Date */}
+            <div className='p-3 border-b bg-muted/20 space-y-1.5'>
+              <Skeleton className='h-6 w-3/4' />
+              <Skeleton className='h-3.5 w-32' />
+            </div>
+
+            {/* Social Interactions */}
+            <div className='p-3 space-y-4'>
+              <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-1.5'>
+                  <Skeleton className='size-6 rounded-full' />
+                  <Skeleton className='h-4 w-6 rounded-xs' />
+                </div>
+                <div className='flex items-center gap-1.5'>
+                  <Skeleton className='size-6 rounded-full' />
+                  <Skeleton className='h-4 w-6 rounded-xs' />
+                </div>
               </div>
+              <div className='pt-2 border-t space-y-2'>
+                <Skeleton className='h-2.5 w-32' />
+                <Skeleton className='h-10 w-full rounded-md' />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Media List Skeleton */}
+        <div className='bg-background p-3 relative flex flex-col w-full'>
+          <div className='mt-6'>
+            <Skeleton className='w-full aspect-[3/2] rounded-xs' />
+          </div>
+          <div className='mt-6'>
+            <Skeleton className='w-full aspect-[3/2] rounded-xs' />
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Skeleton Layout */}
+      <div
+        className={cn(
+          'hidden md:flex overflow-hidden min-h-0 min-w-0',
+          isModal
+            ? 'rounded-sm w-full h-full'
+            : 'flex-col md:flex-row w-full border border-border/50 md:h-[calc(100vh-12rem)] max-h-[calc(100vh-5rem)] mt-12',
+        )}
+      >
+        {/* Left: Media Area */}
+        <div className='flex items-center justify-center h-full w-full relative flex-1 min-h-0 min-w-0 bg-background p-8'>
+          <Skeleton className='w-full h-full max-h-[70vh] rounded-xs' />
+        </div>
+
+        {/* Right: Info Sidebar */}
+        <div
+          className={cn(
+            'flex flex-col backdrop-blur-xl min-h-0 border-l border-border/50',
+            isModal
+              ? 'h-full bg-background/95 w-5/16 lg:w-4/16 xl:w-3/16'
+              : 'bg-muted/50 w-full md:w-5/16 lg:w-4/16 xl:w-3/16 h-full',
+          )}
+        >
+          {/* Author */}
+          <div className='flex items-center justify-between border-b p-3 gap-1'>
+            <div className='flex items-center gap-2'>
+              <Skeleton className='size-8 rounded-full' />
+              <Skeleton className='h-4 w-28' />
+            </div>
+          </div>
+
+          {/* Title & Date */}
+          <div className='p-3 border-b bg-muted/20 space-y-1.5'>
+            <Skeleton className='h-6 w-4/5' />
+            <Skeleton className='h-3.5 w-32' />
+          </div>
+
+          {/* Social Interactions */}
+          <div className='grow min-h-0 p-3 flex flex-col gap-4'>
+            <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-1.5'>
+                <Skeleton className='size-6 rounded-full' />
+                <Skeleton className='h-4 w-6 rounded-xs' />
+              </div>
+              <div className='flex items-center gap-1.5'>
+                <Skeleton className='size-6 rounded-full' />
+                <Skeleton className='h-4 w-6 rounded-xs' />
+              </div>
+            </div>
+
+            <div className='flex-1 space-y-4 py-2 overflow-hidden'>
+              <div className='flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between'>
+                  <Skeleton className='h-3.5 w-24' />
+                  <Skeleton className='h-2.5 w-16' />
+                </div>
+                <Skeleton className='h-3.5 w-4/5' />
+              </div>
+              <div className='flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between'>
+                  <Skeleton className='h-3.5 w-20' />
+                  <Skeleton className='h-2.5 w-14' />
+                </div>
+                <Skeleton className='h-3.5 w-2/3' />
+              </div>
+            </div>
+
+            <div className='pt-2 border-t space-y-2 mt-auto'>
+              <Skeleton className='h-2.5 w-32' />
+              <Skeleton className='h-10 w-full rounded-md' />
             </div>
           </div>
         </div>

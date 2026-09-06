@@ -44,10 +44,7 @@ export const SocialInteractions = ({
   const queryOptions =
     trpc.social.getInteractions.queryOptions(interactionParams);
 
-  const { data: interactions, isLoading } = useQuery({
-    ...queryOptions,
-    enabled: isLoaded,
-  });
+  const { data: interactions, isLoading } = useQuery(queryOptions);
 
   const toggleLike = useMutation(
     trpc.social.toggleLike.mutationOptions({
@@ -135,11 +132,61 @@ export const SocialInteractions = ({
     setIsEditingUsername(true);
   };
 
-  if (isLoading || !isLoaded) {
+  if (isLoading && !interactions) {
+    if (variant === 'compact') {
+      return (
+        <div className='flex items-center gap-3 py-0.5'>
+          <div className='flex items-center gap-1'>
+            <Skeleton className='size-5 rounded-full' />
+            <Skeleton className='h-3.5 w-4 rounded-xs' />
+          </div>
+          <div className='flex items-center gap-1'>
+            <Skeleton className='size-5 rounded-full' />
+            <Skeleton className='h-3.5 w-4 rounded-xs' />
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className='flex gap-4 items-center h-full'>
-        <Skeleton className='h-8 w-12' />
-        <Skeleton className='h-8 w-12' />
+      <div className='flex flex-col h-full gap-4'>
+        {/* Actions Skeleton */}
+        <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
+        </div>
+
+        {/* Comments List Skeleton */}
+        <div className='flex-1 pr-4 -mr-4 overflow-y-auto space-y-4'>
+          <div className='flex flex-col gap-1.5'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-3.5 w-24' />
+              <Skeleton className='h-2.5 w-16' />
+            </div>
+            <Skeleton className='h-3.5 w-4/5' />
+          </div>
+          <div className='flex flex-col gap-1.5'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-3.5 w-20' />
+              <Skeleton className='h-2.5 w-14' />
+            </div>
+            <Skeleton className='h-3.5 w-2/3' />
+          </div>
+        </div>
+
+        {/* Footer Area with Username Toggle & Textarea Skeleton */}
+        <div className='pt-2 border-t space-y-2 mt-auto'>
+          <Skeleton className='h-2.5 w-32' />
+          <div className='relative flex items-end gap-2'>
+            <Skeleton className='h-10 flex-1 rounded-md' />
+          </div>
+        </div>
       </div>
     );
   }

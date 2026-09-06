@@ -70,7 +70,15 @@ const PhotoPage = async ({ params }: Props) => {
 async function PhotoSuspense({ slug }: { slug: string }) {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
+  const post = await queryClient.fetchQuery(
+    trpc.posts.getOne.queryOptions({ slug }),
+  );
+
+  if (post?.id) {
+    await queryClient.prefetchQuery(
+      trpc.social.getInteractions.queryOptions({ postId: post.id }),
+    );
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

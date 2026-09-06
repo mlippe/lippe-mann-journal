@@ -19,6 +19,12 @@ export const PhotographDetailPage = async ({
     trpc.posts.getOne.queryOptions({ slug }),
   );
 
+  if (post?.id) {
+    await queryClient.prefetchQuery(
+      trpc.social.getInteractions.queryOptions({ postId: post.id }),
+    );
+  }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<LoadingState />}>
