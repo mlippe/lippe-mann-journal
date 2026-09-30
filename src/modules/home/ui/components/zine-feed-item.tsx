@@ -241,7 +241,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 return (
                   <Link
                     href={href}
-                    className='relative block group overflow-hidden bg-muted/20 sticky top-20 self-start rounded-xs transition-shadow hover:shadow-lg cursor-ansehen'
+                    className='relative block group overflow-hidden bg-muted/20 sticky top-20 self-start rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                     style={{ flex: `${r1 * 1.8} 1 0%` }}
                   >
                     <div

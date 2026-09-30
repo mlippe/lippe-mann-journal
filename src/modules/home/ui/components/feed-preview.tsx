@@ -76,7 +76,7 @@ const ZineCardCollage = ({
 
     return (
       <div
-        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
+        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 rounded-xs transition-transform duration-500 ease-out group-hover:-translate-y-0.5 cursor-ansehen'
         style={{ aspectRatio: `${clampedR}` }}
       >
         <BlurImage
@@ -108,7 +108,7 @@ const ZineCardCollage = ({
 
     return (
       <div
-        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
+        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 rounded-xs transition-transform duration-500 ease-out group-hover:-translate-y-0.5 cursor-ansehen'
         style={{ aspectRatio: `${clampedRatio}` }}
       >
         {isSide ? (
@@ -207,7 +207,7 @@ const ZineCardCollage = ({
 
   return (
     <div
-      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
+      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 rounded-xs transition-transform duration-500 ease-out group-hover:-translate-y-0.5 cursor-ansehen'
       style={{ aspectRatio: `${clampedRatio}` }}
     >
       {isHeroLeft ? (

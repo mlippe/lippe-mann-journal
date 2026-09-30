@@ -390,7 +390,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.index)}
-            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
               maxHeight: 'min(86vh, calc(100dvh - 5rem))',
@@ -448,7 +448,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.index)}
-            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
               maxHeight: 'min(86vh, calc(100dvh - 5rem))',
@@ -531,7 +531,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.startIndex)}
-            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratioA}`,
               maxHeight: isMobileSideBySide
@@ -589,7 +589,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.startIndex + 1)}
-            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratioB}`,
               maxHeight: isMobileSideBySide
