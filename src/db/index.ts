@@ -11,18 +11,19 @@ const isLocal = process.env.DATABASE_PROVIDER === "local";
 
 // Use 'pg' for local/docker development and 'neon-serverless' for serverless/production
 // Neon serverless (via WebSockets) supports transactions, which neon-http does not.
-function createDb() {
+function createPool() {
   return isLocal
-    ? drizzlePg(new pg.Pool({ connectionString: process.env.DATABASE_URL! }), {
-        schema,
-      })
-    : drizzleNeon(new Pool({ connectionString: process.env.DATABASE_URL! }), {
-        schema,
-      });
+    ? new pg.Pool({ connectionString: process.env.DATABASE_URL! })
+    : new Pool({ connectionString: process.env.DATABASE_URL! });
 }
 
-// Cache on globalThis to prevent connection pool leaks during Next.js HMR
+// Cache connection pool on globalThis to prevent connection pool leaks during Next.js HMR,
+// while allowing Drizzle ORM to use the latest schema on module re-evaluation.
 const globalForDb = globalThis as unknown as {
-  db: ReturnType<typeof createDb>;
+  pool: ReturnType<typeof createPool>;
 };
-export const db = (globalForDb.db ??= createDb());
+const pool = (globalForDb.pool ??= createPool());
+
+export const db = isLocal
+  ? drizzlePg(pool as pg.Pool, { schema })
+  : drizzleNeon(pool as Pool, { schema });

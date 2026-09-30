@@ -96,6 +96,11 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
     },
   });
 
+  const { fields, move, remove, append, replace } = useFieldArray({
+    control: form.control,
+    name: 'photos',
+  });
+
   useEffect(() => {
     if (post) {
       const photos = (post.postsToPhotos || []).map((ptp) => ({
@@ -133,13 +138,9 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
           post.postsToCollections?.map((ptc) => ptc.collection.id) || [],
         photos,
       });
+      replace(photos);
     }
-  }, [post, form]);
-
-  const { fields, move, remove, append } = useFieldArray({
-    control: form.control,
-    name: 'photos',
-  });
+  }, [post, form, replace]);
 
   const updatePost = useMutation(
     trpc.posts.update.mutationOptions({
@@ -429,8 +430,13 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                   Cover Photo
                 </div>
               )}
-              {form.watch(`photos.${index}.isHighlight`) && index !== 0 && (
-                <div className='absolute top-0 right-0 bg-amber-500 text-black text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold font-mono z-10 flex items-center gap-1'>
+              {form.watch(`photos.${index}.isHighlight`) && (
+                <div
+                  className={cn(
+                    'absolute top-0 bg-amber-500 text-black text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold font-mono z-10 flex items-center gap-1',
+                    index === 0 ? 'right-24' : 'right-0',
+                  )}
+                >
                   <Star className='size-2.5 fill-black' />
                   Highlight
                 </div>
@@ -493,9 +499,15 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                             type='button'
                             size='sm'
                             variant={highlightField.value ? 'default' : 'outline'}
-                            onClick={() =>
-                              highlightField.onChange(!highlightField.value)
-                            }
+                            onClick={() => {
+                              const nextVal = !highlightField.value;
+                              highlightField.onChange(nextVal);
+                              form.setValue(`photos.${index}.isHighlight`, nextVal, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              });
+                            }}
                             className={cn(
                               'text-xs font-mono gap-1.5 transition-all cursor-pointer h-8',
                               highlightField.value

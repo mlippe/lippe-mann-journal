@@ -51,7 +51,7 @@ export const columns: ColumnDef<Post>[] = [
           />
 
           <Button variant='ghost' size='icon' asChild>
-            <Link href={editPath}>
+            <Link href={editPath} prefetch={false}>
               <PenBoxIcon className='h-4 w-4' />
             </Link>
           </Button>

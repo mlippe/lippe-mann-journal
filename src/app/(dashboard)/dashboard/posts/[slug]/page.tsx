@@ -6,6 +6,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { PostEditView } from '@/modules/posts/ui/views/post-edit-view';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{
     slug: string;
