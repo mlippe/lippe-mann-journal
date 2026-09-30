@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getQueryClient } from '@/trpc/server';
 import { trpc } from '@/trpc/server';
 import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
-import { LoadingState } from '@/modules/photograph/ui/views/photograph-view';
+import { EditorialStorySkeleton } from '@/modules/photograph/ui/views/editorial-story-skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
 import { Suspense } from 'react';
@@ -60,7 +60,7 @@ const PhotoPage = async ({ params }: Props) => {
   const { slug } = await params;
 
   return (
-    <Suspense fallback={<LoadingState isModal={false} />}>
+    <Suspense fallback={<EditorialStorySkeleton />}>
       <PhotographDetailPage slug={slug} isModal={false} />
     </Suspense>
   );

@@ -1,7 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getQueryClient, trpc } from '@/trpc/server';
-import { PhotographView } from './photograph-view';
+import { EditorialStoryView } from './editorial-story-view';
 import { FeedPreview } from '@/modules/home/ui/components/feed-preview';
 
 interface PhotographDetailPageProps {
@@ -32,10 +32,10 @@ export const PhotographDetailPage = async ({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ErrorBoundary fallback={<p>Error loading post.</p>}>
-        <PhotographView post={post} isModal={isModal} />
+      <ErrorBoundary fallback={<p className='text-center py-20 font-mono text-sm text-muted-foreground'>Eintrag konnte nicht geladen werden.</p>}>
+        <EditorialStoryView post={post} />
         {!isModal && (
-          <div className='mt-4'>
+          <div className='mt-16'>
             <FeedPreview excludeSlug={slug} />
           </div>
         )}
