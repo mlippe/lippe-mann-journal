@@ -14,6 +14,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useIdentity } from '@/hooks/use-identity';
 import { type SocialInteractionsData } from '@/modules/social/types';
 import { ScrollReveal } from '@/components/scroll-reveal';
+import { calculateReadingTime } from '@/modules/articles/lib/reading-time';
+import { cn, createPreview } from '@/lib/utils';
 
 interface ZineFeedItemProps {
   post: PostWithPhotos;
@@ -112,12 +114,34 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
     ? format(new Date(post.createdAt), 'dd. MMMM yyyy', { locale: de })
     : '';
 
-  // On the zine feed, only display the first paragraph / before first newline
-  const cleanContent = useMemo(() => {
+  const coverImageUrl = post.coverImage
+    ? keyToUrl(post.coverImage)
+    : coverPhoto?.url
+      ? keyToUrl(coverPhoto.url)
+      : null;
+  const hasImage = Boolean(coverImageUrl);
+
+  const readingTime = useMemo(() => {
+    if (!isArticle) return 0;
+    return Math.max(1, calculateReadingTime(post.content));
+  }, [isArticle, post.content]);
+
+  // Clean lead text / excerpt for editorial header
+  const leadText = useMemo(() => {
+    if (isArticle) {
+      if (!post.content) return null;
+      const withoutHeadings = post.content.replace(
+        /<h[1-3][^>]*>.*?<\/h[1-3]>/gi,
+        ' ',
+      );
+      const source =
+        withoutHeadings.trim().length > 40 ? withoutHeadings : post.content;
+      return createPreview(source, hasImage ? 260 : 380);
+    }
     if (!post.content) return null;
     const firstLine = post.content.trim().split(/\r?\n/)[0].trim();
     return firstLine || null;
-  }, [post.content]);
+  }, [isArticle, post.content, hasImage]);
 
   // Stable seed for layout variety
   const seed = useMemo(
@@ -126,31 +150,31 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   );
 
   // Creative Desktop Layout Variations:
-  // - 'solo': single photo
+  // - 'solo': single photo or article
   // - 'bold-diptych': 2 large photos side-by-side filling the container
   // - 'hero-companion-stack': 1 large anchor left (~60%) + 2 stacked companions right (~40%)
   // - 'hero-diptych-spread': 1 dominant anchor top + 2 large photos below
   const desktopLayout = useMemo(() => {
-    if (!hasMultiplePhotos || photos.length === 1) return 'solo';
+    if (isArticle || !hasMultiplePhotos || photos.length === 1) return 'solo';
     if (photos.length === 2) return 'bold-diptych';
 
     const mod = seed % 3;
     if (mod === 0) return 'hero-companion-stack';
     if (mod === 1) return 'bold-diptych';
     return 'hero-diptych-spread';
-  }, [hasMultiplePhotos, photos.length, seed]);
+  }, [isArticle, hasMultiplePhotos, photos.length, seed]);
 
   // Mobile layout style:
   // - 'sticky-deck': 2 photos stacked like a tactile card deck (Photo 1 pins, Photo 2 glides up)
   // - 'mobile-diptych': 2 photos side by side with smooth ScrollReveal
   // - 'single': large full-width hero with smooth ScrollReveal
   const mobileLayout = useMemo(() => {
-    if (!hasMultiplePhotos || photos.length < 2) return 'single';
+    if (isArticle || !hasMultiplePhotos || photos.length < 2) return 'single';
     // Mix sticky card deck (~65%) randomly with scroll reveals (diptych / single)
     const mod = seed % 3;
     if (mod !== 0) return 'sticky-deck';
     return seed % 2 === 0 ? 'mobile-diptych' : 'single';
-  }, [hasMultiplePhotos, photos.length, seed]);
+  }, [isArticle, hasMultiplePhotos, photos.length, seed]);
 
   return (
     <article
@@ -159,7 +183,9 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
         !priority
           ? {
               contentVisibility: 'auto',
-              containIntrinsicSize: 'auto none auto 800px',
+              containIntrinsicSize: hasImage
+                ? 'auto none auto 800px'
+                : 'auto none auto 280px',
             }
           : undefined
       }
@@ -167,13 +193,19 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
       {/* Editorial Header */}
       <header className='mb-6 md:mb-8 space-y-2 max-w-3xl'>
         <div className='flex items-center gap-2 text-[11px] uppercase font-mono tracking-widest text-muted-foreground'>
-          <span>
+          <span className={isArticle ? 'font-semibold text-foreground/90' : ''}>
             {isArticle
               ? 'Artikel'
               : hasMultiplePhotos
                 ? `Serie (${photos.length} Fotos)`
                 : 'Einzelaufnahme'}
           </span>
+          {isArticle && (
+            <>
+              <span>·</span>
+              <span>{readingTime} Min Lesezeit</span>
+            </>
+          )}
           <span>·</span>
           <span>{formattedDate}</span>
         </div>
@@ -184,16 +216,17 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           </Link>
         </h2>
 
-        {/* Field Note / Journal Text */}
-        {cleanContent && (
+        {/* Field Note / Journal Text / Article Excerpt */}
+        {leadText && (
           <p className='pt-2 text-base md:text-lg font-serif italic text-foreground/80 leading-relaxed max-w-2xl'>
-            {cleanContent}
+            {leadText}
           </p>
         )}
       </header>
 
       {/* Main Photographic Presentation */}
-      <div className='relative w-full' onClick={handleDoubleTap}>
+      {hasImage && (
+        <div className='relative w-full' onClick={handleDoubleTap}>
         {/* Double Tap Heart Feedback */}
         {showHeart && (
           <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
@@ -446,14 +479,17 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 }}
               >
                 <BlurImage
-                  src={keyToUrl(coverPhoto?.url || post.coverImage)}
+                  src={coverImageUrl!}
                   alt={coverPhoto?.title ?? post.title}
                   fill
                   priority={priority}
                   blurhash={coverPhoto?.blurData}
-                  aspectRatio={coverPhoto?.aspectRatio}
+                  aspectRatio={coverPhoto?.aspectRatio || 1.5}
                   sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
-                  className='object-contain bg-muted/20 '
+                  className={cn(
+                    'bg-muted/20',
+                    isArticle ? 'object-cover' : 'object-contain',
+                  )}
                 />
               </Link>
             </ScrollReveal>
@@ -570,20 +606,21 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 }}
               >
                 <BlurImage
-                  src={keyToUrl(coverPhoto?.url || post.coverImage)}
+                  src={coverImageUrl!}
                   alt={coverPhoto?.title ?? post.title}
                   fill
                   priority={priority}
                   blurhash={coverPhoto?.blurData}
-                  aspectRatio={coverPhoto?.aspectRatio}
+                  aspectRatio={coverPhoto?.aspectRatio || 1.5}
                   sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
-                  className='object-contain'
+                  className={isArticle ? 'object-cover' : 'object-contain'}
                 />
               </Link>
             </ScrollReveal>
           )}
         </div>
       </div>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────
        * Editorial Footer: ONE Clear & Concise CTA
@@ -614,3 +651,5 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
     </article>
   );
 };
+
+
