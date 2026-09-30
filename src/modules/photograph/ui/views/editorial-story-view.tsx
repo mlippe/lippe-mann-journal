@@ -969,26 +969,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         })}
       </div>
 
-      {/* 2.5 EDITORIAL COLOPHON (Fine-Art Prints on demand) */}
-      <section className='relative z-20 bg-background mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
-        <span className='text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-muted-foreground'>
-          Fine-Art Prints & Abzüge
-        </span>
-        <p className='text-xs sm:text-sm text-muted-foreground font-serif italic max-w-md mx-auto leading-relaxed'>
-          Als unabhängiger Fotograf fertige ich ausgewählte Aufnahmen dieser
-          Serie gerne als hochwertigen Fine-Art Print auf Anfrage an.
-        </p>
-        <div className='pt-1'>
-          <a
-            href={createSeriesPrintInquiryUrl()}
-            className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border/70 bg-background hover:bg-muted text-[11px] sm:text-xs font-mono uppercase tracking-wider transition-colors text-foreground/80 hover:text-foreground'
-          >
-            <IconMail className='size-3.5 text-muted-foreground' />
-            <span>Print zu dieser Serie anfragen</span>
-          </a>
-        </div>
-      </section>
-
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
@@ -1001,7 +981,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               Dokumentation & Fotografie aus dem Alltag.
             </p>
           </div>
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-3 flex-wrap'>
+            <a
+              href={createSeriesPrintInquiryUrl()}
+              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+            >
+              <IconMail className='size-3.5 text-muted-foreground' />
+              <span>Print zu dieser Serie anfragen</span>
+            </a>
             <button
               onClick={() => {
                 if (fingerprint && isLoaded) {
@@ -1043,7 +1030,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
 
         {/* Curator's Guestbook (Gästebuch) */}
-        <div className='bg-muted/30 border border-border/40 rounded-lg p-4 sm:p-6 md:p-8 max-w-3xl mx-auto'>
+        <div className='bg-muted/30 border border-border/40 rounded-lg p-3 sm:p-4 md:p-6 max-w-3xl mx-auto'>
           <h3 className='text-lg font-medium tracking-tight mb-6 flex items-center gap-2'>
             <IconMessageCircle className='size-5 text-muted-foreground' />
             <span>Gästebuch der Serie</span>
