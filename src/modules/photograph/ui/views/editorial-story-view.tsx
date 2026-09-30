@@ -552,13 +552,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
       </header>
 
-      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop) */}
-      <div className='space-y-12 md:space-y-20'>
+      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Sticky Stacking) */}
+      <div className='relative w-full'>
         {blocks.map((block, bIdx) => {
           /* ─────────────────────────────────────────────────────────────
            * BUILDING BLOCK 1: [ HERO BLEED ]
            * Strictly never taller than viewport height, never wider than width,
            * 100% native aspect ratio preserved. Opens lightbox on click!
+           * Pinned with sticky depth as subsequent blocks overlay it.
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'hero') {
             const photo = block.photo;
@@ -569,52 +570,58 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 : 3 / 2);
 
             return (
-              <section key={`hero-${photo.id}`} className='space-y-4'>
-                <div className='flex justify-center w-full'>
-                  <div
-                    className='flex flex-col items-end'
-                    style={{
-                      width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
-                      maxWidth: '100%',
-                    }}
-                  >
+              <section
+                key={`hero-${photo.id}`}
+                style={{ zIndex: bIdx + 1 }}
+                className='relative w-full bg-background pb-16 md:pb-28'
+              >
+                <div className='sticky top-14 md:top-20'>
+                  <div className='flex justify-center w-full'>
                     <div
-                      onClick={() => setLightboxIndex(block.index)}
-                      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
+                      className='group/plate flex flex-col items-end'
                       style={{
-                        aspectRatio: `${ratio}`,
-                        maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                        width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+                        maxWidth: '100%',
                       }}
                     >
-                      <BlurImage
-                        src={keyToUrl(photo.url)}
-                        alt={photo.title || post.title}
-                        fill
-                        blurhash={photo.blurData}
-                        aspectRatio={ratio}
-                        className='object-contain w-full h-full'
-                        priority
-                        sizes='(max-width: 1024px) 100vw, 1200px'
-                      />
+                      <div
+                        onClick={() => setLightboxIndex(block.index)}
+                        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        style={{
+                          aspectRatio: `${ratio}`,
+                          maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                        }}
+                      >
+                        <BlurImage
+                          src={keyToUrl(photo.url)}
+                          alt={photo.title || post.title}
+                          fill
+                          blurhash={photo.blurData}
+                          aspectRatio={ratio}
+                          className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+                          priority
+                          sizes='(max-width: 1024px) 100vw, 1200px'
+                        />
 
-                      {/* Actions overlay (Top Right) */}
-                      <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLightboxIndex(block.index);
-                          }}
-                          className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                          aria-label='Foto vergrößern'
-                        >
-                          <IconArrowsMaximize className='size-4' />
-                        </button>
+                        {/* Actions overlay (Top Right) */}
+                        <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxIndex(block.index);
+                            }}
+                            className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                            aria-label='Foto vergrößern'
+                          >
+                            <IconArrowsMaximize className='size-4' />
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Frame number outside image (Bottom Right) */}
-                    <div className='pt-1.5 text-[11px] font-mono tracking-widest text-muted-foreground select-none'>
-                      <span>{String(block.index + 1).padStart(2, '0')}</span>
+                      {/* Frame number outside image (Bottom Right) */}
+                      <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+                        <span>{String(block.index + 1).padStart(2, '0')}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -624,7 +631,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                  * Positioned immediately under the hero bleed anchor if provided
                  * ───────────────────────────────────────────────────────── */}
                 {post.content && post.content.trim().length > 0 && (
-                  <div className='max-w-2xl mx-auto pt-6 md:pt-10'>
+                  <div className='max-w-2xl mx-auto pt-8 md:pt-14 px-4'>
                     <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                       <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
                         {post.content.trim()}
@@ -641,6 +648,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
            * Strict zero-crop proportional flexbox: both images share equal
            * height, never exceed viewport height or width.
            * Plate numbers placed directly below each photo (Bottom Right).
+           * Sticky stacking card effect on mobile & desktop!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'diptych') {
             const [photoA, photoB] = block.photos;
@@ -658,100 +666,103 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`diptych-${photoA.id}-${photoB.id}`}
-                className='w-full'
+                style={{ zIndex: bIdx + 1 }}
+                className='relative w-full bg-background pt-8 md:pt-14 pb-16 md:pb-28 border-t border-border/30 shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.5)] transition-shadow'
               >
-                <div className='flex flex-col md:flex-row items-center md:items-start justify-center gap-8 w-full'>
-                  {/* Photo A */}
-                  <div
-                    className='w-full md:w-auto flex flex-col items-end md:flex-[var(--ratio-a)_1_0%]'
-                    style={
-                      {
-                        '--ratio-a': ratioA,
-                        maxWidth: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
-                      } as React.CSSProperties
-                    }
-                  >
+                <div className='sticky top-14 md:top-20'>
+                  <div className='flex flex-col md:flex-row items-center md:items-start justify-center gap-8 w-full'>
+                    {/* Photo A */}
                     <div
-                      onClick={() => setLightboxIndex(block.startIndex)}
-                      className='w-full relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in'
-                      style={{
-                        aspectRatio: `${ratioA}`,
-                        maxHeight: 'min(82vh, calc(100dvh - 6rem))',
-                      }}
+                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-a)_1_0%] sticky md:static top-14 z-0 md:z-auto'
+                      style={
+                        {
+                          '--ratio-a': ratioA,
+                          maxWidth: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
+                        } as React.CSSProperties
+                      }
                     >
-                      <BlurImage
-                        src={keyToUrl(photoA.url)}
-                        alt={photoA.title || post.title}
-                        fill
-                        blurhash={photoA.blurData}
-                        aspectRatio={ratioA}
-                        className='object-contain w-full h-full'
-                        sizes='(max-width: 768px) 100vw, 50vw'
-                      />
-                      <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLightboxIndex(block.startIndex);
-                          }}
-                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                          aria-label='Foto vergrößern'
-                        >
-                          <IconArrowsMaximize className='size-3.5' />
-                        </button>
+                      <div
+                        onClick={() => setLightboxIndex(block.startIndex)}
+                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        style={{
+                          aspectRatio: `${ratioA}`,
+                          maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                        }}
+                      >
+                        <BlurImage
+                          src={keyToUrl(photoA.url)}
+                          alt={photoA.title || post.title}
+                          fill
+                          blurhash={photoA.blurData}
+                          aspectRatio={ratioA}
+                          className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+                          sizes='(max-width: 768px) 100vw, 50vw'
+                        />
+                        <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxIndex(block.startIndex);
+                            }}
+                            className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                            aria-label='Foto vergrößern'
+                          >
+                            <IconArrowsMaximize className='size-3.5' />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Frame index number outside Photo A (Bottom Right) */}
+                      <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+                        <span>{String(block.startIndex + 1).padStart(2, '0')}</span>
                       </div>
                     </div>
 
-                    {/* Frame index number outside Photo A (Bottom Right) */}
-                    <div className='pt-1.5 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground select-none'>
-                      <span>{String(block.startIndex + 1).padStart(2, '0')}</span>
-                    </div>
-                  </div>
-
-                  {/* Photo B */}
-                  <div
-                    className='w-full md:w-auto flex flex-col items-end md:flex-[var(--ratio-b)_1_0%]'
-                    style={
-                      {
-                        '--ratio-b': ratioB,
-                        maxWidth: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
-                      } as React.CSSProperties
-                    }
-                  >
+                    {/* Photo B */}
                     <div
-                      onClick={() => setLightboxIndex(block.startIndex + 1)}
-                      className='w-full relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in'
-                      style={{
-                        aspectRatio: `${ratioB}`,
-                        maxHeight: 'min(82vh, calc(100dvh - 6rem))',
-                      }}
+                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-b)_1_0%] relative md:static z-10 md:z-auto bg-background md:bg-transparent mt-8 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-border/20 shadow-[0_-16px_32px_-10px_rgba(0,0,0,0.2)] md:shadow-none'
+                      style={
+                        {
+                          '--ratio-b': ratioB,
+                          maxWidth: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
+                        } as React.CSSProperties
+                      }
                     >
-                      <BlurImage
-                        src={keyToUrl(photoB.url)}
-                        alt={photoB.title || post.title}
-                        fill
-                        blurhash={photoB.blurData}
-                        aspectRatio={ratioB}
-                        className='object-contain w-full h-full'
-                        sizes='(max-width: 768px) 100vw, 50vw'
-                      />
-                      <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLightboxIndex(block.startIndex + 1);
-                          }}
-                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                          aria-label='Foto vergrößern'
-                        >
-                          <IconArrowsMaximize className='size-3.5' />
-                        </button>
+                      <div
+                        onClick={() => setLightboxIndex(block.startIndex + 1)}
+                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        style={{
+                          aspectRatio: `${ratioB}`,
+                          maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                        }}
+                      >
+                        <BlurImage
+                          src={keyToUrl(photoB.url)}
+                          alt={photoB.title || post.title}
+                          fill
+                          blurhash={photoB.blurData}
+                          aspectRatio={ratioB}
+                          className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+                          sizes='(max-width: 768px) 100vw, 50vw'
+                        />
+                        <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxIndex(block.startIndex + 1);
+                            }}
+                            className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                            aria-label='Foto vergrößern'
+                          >
+                            <IconArrowsMaximize className='size-3.5' />
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Frame index number outside Photo B (Bottom Right) */}
-                    <div className='pt-1.5 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground select-none'>
-                      <span>{String(block.startIndex + 2).padStart(2, '0')}</span>
+                      {/* Frame index number outside Photo B (Bottom Right) */}
+                      <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+                        <span>{String(block.startIndex + 2).padStart(2, '0')}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -763,6 +774,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
            * SOLO FEATURE FRAME
            * Breathing room / detail highlight, viewport-fitted!
            * Plate number placed directly below photo (Bottom Right).
+           * Sticky stacking card effect!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'solo') {
             const photo = block.photo;
@@ -775,50 +787,53 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`solo-${photo.id}`}
-                className='w-full max-w-5xl mx-auto'
+                style={{ zIndex: bIdx + 1 }}
+                className='relative w-full bg-background pt-8 md:pt-14 pb-16 md:pb-28 border-t border-border/30 shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.5)] transition-shadow'
               >
-                <div className='flex justify-center w-full'>
-                  <div
-                    className='flex flex-col items-end'
-                    style={{
-                      width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
-                      maxWidth: '100%',
-                    }}
-                  >
+                <div className='sticky top-14 md:top-20'>
+                  <div className='flex justify-center w-full max-w-5xl mx-auto'>
                     <div
-                      onClick={() => setLightboxIndex(block.index)}
-                      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
+                      className='group/plate flex flex-col items-end'
                       style={{
-                        aspectRatio: `${ratio}`,
-                        maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                        width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+                        maxWidth: '100%',
                       }}
                     >
-                      <BlurImage
-                        src={keyToUrl(photo.url)}
-                        alt={photo.title || post.title}
-                        fill
-                        blurhash={photo.blurData}
-                        aspectRatio={ratio}
-                        className='object-contain w-full h-full'
-                        sizes='(max-width: 1024px) 100vw, 900px'
-                      />
-                      <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLightboxIndex(block.index);
-                          }}
-                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                          aria-label='Foto vergrößern'
-                        >
-                          <IconArrowsMaximize className='size-3.5' />
-                        </button>
+                      <div
+                        onClick={() => setLightboxIndex(block.index)}
+                        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        style={{
+                          aspectRatio: `${ratio}`,
+                          maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                        }}
+                      >
+                        <BlurImage
+                          src={keyToUrl(photo.url)}
+                          alt={photo.title || post.title}
+                          fill
+                          blurhash={photo.blurData}
+                          aspectRatio={ratio}
+                          className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+                          sizes='(max-width: 1024px) 100vw, 900px'
+                        />
+                        <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxIndex(block.index);
+                            }}
+                            className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                            aria-label='Foto vergrößern'
+                          >
+                            <IconArrowsMaximize className='size-3.5' />
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Frame number outside Solo image (Bottom Right) */}
-                    <div className='pt-1.5 text-[11px] font-mono tracking-widest text-muted-foreground select-none'>
-                      <span>{String(block.index + 1).padStart(2, '0')}</span>
+                      {/* Frame number outside Solo image (Bottom Right) */}
+                      <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+                        <span>{String(block.index + 1).padStart(2, '0')}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -831,7 +846,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       </div>
 
       {/* 2.5 EDITORIAL COLOPHON (Fine-Art Prints on demand) */}
-      <section className='mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
+      <section className='relative z-50 bg-background mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
         <span className='text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-muted-foreground'>
           Fine-Art Prints & Abzüge
         </span>
@@ -852,7 +867,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
-        className='mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
+        className='relative z-50 bg-background mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
       >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div>
