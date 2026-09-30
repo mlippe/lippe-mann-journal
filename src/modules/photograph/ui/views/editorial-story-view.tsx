@@ -212,13 +212,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
   };
 
-  const createPrintInquiryUrl = (photo: Photo) => {
-    const photoTitle = photo.title || 'Aufnahme';
+  const createSeriesPrintInquiryUrl = () => {
     const subject = encodeURIComponent(
-      `Print-Anfrage: ${photoTitle} (aus „${post.title}“)`,
+      `Print-Anfrage: Serie „${post.title}“`,
     );
     const body = encodeURIComponent(
-      `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print von dieser Aufnahme:\n\n• Serie: ${post.title}\n• Foto: ${photoTitle}\n• Bild-Link: ${keyToUrl(photo.url)}\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
+      `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print aus deiner Serie „${post.title}“:\n\n• Serie: ${post.title}\n• Motiv / Wunschfoto: [z. B. Titel oder Bildnummer]\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
     );
     return `mailto:manuel@lippe-mann.de?subject=${subject}&body=${body}`;
   };
@@ -547,15 +546,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                     {/* Actions overlay (Top Right) */}
                     <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                      <a
-                        href={createPrintInquiryUrl(photo)}
-                        onClick={(e) => e.stopPropagation()}
-                        className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                        title='Print anfragen'
-                        aria-label='Print dieser Aufnahme anfragen'
-                      >
-                        <IconMail className='size-4' />
-                      </a>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -661,15 +651,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
                       <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <a
-                          href={createPrintInquiryUrl(photoA)}
-                          onClick={(e) => e.stopPropagation()}
-                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                          title='Print anfragen'
-                          aria-label='Print anfragen'
-                        >
-                          <IconMail className='size-3.5' />
-                        </a>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -712,15 +693,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
                       <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                        <a
-                          href={createPrintInquiryUrl(photoB)}
-                          onClick={(e) => e.stopPropagation()}
-                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                          title='Print anfragen'
-                          aria-label='Print anfragen'
-                        >
-                          <IconMail className='size-3.5' />
-                        </a>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -793,15 +765,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                             sizes='(max-width: 768px) 80vw, 300px'
                           />
                           <div className='absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                            <a
-                              href={createPrintInquiryUrl(photo)}
-                              onClick={(e) => e.stopPropagation()}
-                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                              title='Print anfragen'
-                              aria-label='Print anfragen'
-                            >
-                              <IconMail className='size-3' />
-                            </a>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -868,15 +831,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       sizes='(max-width: 1024px) 100vw, 900px'
                     />
                     <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                      <a
-                        href={createPrintInquiryUrl(photo)}
-                        onClick={(e) => e.stopPropagation()}
-                        className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                        title='Print anfragen'
-                        aria-label='Print anfragen'
-                      >
-                        <IconMail className='size-3.5' />
-                      </a>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -912,10 +866,29 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         })}
       </div>
 
+      {/* 2.5 EDITORIAL COLOPHON (Fine-Art Prints on demand) */}
+      <section className='mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
+        <span className='text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-muted-foreground'>
+          Fine-Art Prints & Abzüge
+        </span>
+        <p className='text-xs sm:text-sm text-muted-foreground font-serif italic max-w-md mx-auto leading-relaxed'>
+          Als unabhängiger Fotograf fertige ich ausgewählte Aufnahmen dieser Serie gerne als hochwertigen Fine-Art Print auf Anfrage an.
+        </p>
+        <div className='pt-1'>
+          <a
+            href={createSeriesPrintInquiryUrl()}
+            className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border/70 bg-background hover:bg-muted text-[11px] sm:text-xs font-mono uppercase tracking-wider transition-colors text-foreground/80 hover:text-foreground'
+          >
+            <IconMail className='size-3.5 text-muted-foreground' />
+            <span>Print zu dieser Serie anfragen</span>
+          </a>
+        </div>
+      </section>
+
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
-        className='mt-20 md:mt-28 border-t border-border/60 pt-10 md:pt-14 space-y-12'
+        className='mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
       >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div>
@@ -1049,15 +1022,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       </>
                     )}
                   </button>
-
-                  <a
-                    href={createPrintInquiryUrl(photos[lightboxIndex])}
-                    className='p-1.5 sm:px-3 sm:py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 shrink-0'
-                    title='Print anfragen'
-                  >
-                    <IconMail className='size-4 sm:size-3.5' />
-                    <span className='hidden sm:inline'>Print anfragen</span>
-                  </a>
 
                   <button
                     onClick={() => {
