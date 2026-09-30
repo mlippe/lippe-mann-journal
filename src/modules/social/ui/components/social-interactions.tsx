@@ -28,14 +28,17 @@ interface SocialInteractionsProps {
   postId: string;
   variant?: 'compact' | 'full';
   commentHref?: string;
+  showActions?: boolean;
 }
 
 export const SocialInteractionsSkeleton = ({
   variant = 'full',
   showMockComments = false,
+  showActions = true,
 }: {
   variant?: 'compact' | 'full';
   showMockComments?: boolean;
+  showActions?: boolean;
 }) => {
   if (variant === 'compact') {
     return (
@@ -55,16 +58,18 @@ export const SocialInteractionsSkeleton = ({
   return (
     <div className='flex flex-col h-full gap-4'>
       {/* Actions Skeleton */}
-      <div className='flex items-center gap-4'>
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-6 rounded-full' />
-          <Skeleton className='h-4 w-6 rounded-xs' />
+      {showActions && (
+        <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
         </div>
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-6 rounded-full' />
-          <Skeleton className='h-4 w-6 rounded-xs' />
-        </div>
-      </div>
+      )}
 
       {/* Comments List Skeleton */}
       {showMockComments && (
@@ -101,6 +106,7 @@ export const SocialInteractions = ({
   postId,
   variant = 'full',
   commentHref,
+  showActions = true,
 }: SocialInteractionsProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -212,6 +218,7 @@ export const SocialInteractions = ({
       <SocialInteractionsSkeleton
         variant={variant}
         showMockComments={false}
+        showActions={showActions}
       />
     );
   }
@@ -257,27 +264,29 @@ export const SocialInteractions = ({
   return (
     <div className='flex flex-col h-full gap-4'>
       {/* Actions */}
-      <div className='flex items-center gap-4'>
-        <button
-          onClick={handleLike}
-          className='flex items-center gap-1.5 group transition-colors'
-        >
-          {interactions?.hasLiked ? (
-            <IconHeartFilled className='size-6 text-red-500' />
-          ) : (
-            <IconHeart className='size-6 group-hover:text-red-500' />
-          )}
-          <span className='text-sm font-semibold'>
-            {interactions?.likeCount || 0}
-          </span>
-        </button>
-        <div className='flex items-center gap-1.5'>
-          <IconMessageCircle className='size-6' />
-          <span className='text-sm font-semibold'>
-            {interactions?.comments.length || 0}
-          </span>
+      {showActions && (
+        <div className='flex items-center gap-4'>
+          <button
+            onClick={handleLike}
+            className='flex items-center gap-1.5 group transition-colors'
+          >
+            {interactions?.hasLiked ? (
+              <IconHeartFilled className='size-6 text-red-500' />
+            ) : (
+              <IconHeart className='size-6 group-hover:text-red-500' />
+            )}
+            <span className='text-sm font-semibold'>
+              {interactions?.likeCount || 0}
+            </span>
+          </button>
+          <div className='flex items-center gap-1.5'>
+            <IconMessageCircle className='size-6' />
+            <span className='text-sm font-semibold'>
+              {interactions?.comments.length || 0}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Comments List */}
       <div className='flex-1 pr-4 -mr-4 overflow-y-auto'>

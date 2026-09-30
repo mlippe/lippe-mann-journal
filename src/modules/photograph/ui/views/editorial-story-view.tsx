@@ -1061,7 +1061,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             <IconMessageCircle className='size-5 text-muted-foreground' />
             <span>Gästebuch der Serie</span>
           </h3>
-          <SocialInteractions postId={post.id} variant='full' />
+          <SocialInteractions postId={post.id} variant='full' showActions={false} />
         </div>
       </footer>
 
