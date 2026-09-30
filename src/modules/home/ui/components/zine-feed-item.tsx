@@ -148,7 +148,17 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   }, [hasMultiplePhotos, photos.length, seed]);
 
   return (
-    <article className='w-full py-14 md:py-24 border-b border-border/40 last:border-b-0'>
+    <article
+      className='w-full py-14 md:py-24 border-b border-border/40 last:border-b-0'
+      style={
+        !priority
+          ? {
+              contentVisibility: 'auto',
+              containIntrinsicSize: 'auto none auto 800px',
+            }
+          : undefined
+      }
+    >
       {/* Editorial Header */}
       <header className='mb-6 md:mb-8 space-y-2 max-w-3xl'>
         <div className='flex items-center gap-2 text-[11px] uppercase font-mono tracking-widest text-muted-foreground'>
@@ -163,7 +173,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           <span>{formattedDate}</span>
         </div>
 
-        <h2 className='text-2xl sm:text-3xl md:text-4xl font-serif tracking-tight text-foreground'>
+        <h2 className='text-3xl md:text-4xl font-serif tracking-tight text-foreground'>
           <Link href={href} className='hover:opacity-80 transition-opacity'>
             {post.title}
           </Link>
@@ -192,7 +202,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
         <div className='hidden md:block w-full'>
           {/* VARIANT 1: BOLD DIPTYCH (2 large photos side-by-side with ScrollReveal) */}
           {desktopLayout === 'bold-diptych' && (
-            <ScrollReveal className='w-full'>
+            <ScrollReveal disabled={priority} className='w-full'>
               <div className='flex gap-4 lg:gap-6 w-full items-stretch'>
                 {photos.slice(0, 2).map((ptp, i) => {
                   const ratio =
@@ -218,7 +228,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           priority={priority && i === 0}
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
-                          sizes='(max-width: 1400px) 50vw, 650px'
+                          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px'
                           className='object-contain '
                         />
                       </div>
@@ -255,7 +265,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                         priority={priority}
                         blurhash={p1.blurData}
                         aspectRatio={r1}
-                        sizes='(max-width: 1400px) 65vw, 800px'
+                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
                         className='object-contain '
                       />
                     </div>
@@ -287,7 +297,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           fill
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
-                          sizes='(max-width: 1400px) 35vw, 450px'
+                          sizes='(max-width: 768px) 50vw, (max-width: 1200px) 35vw, 420px'
                           className='object-contain '
                         />
                       </div>
@@ -299,8 +309,8 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           )}
 
           {/* VARIANT 3: HERO + DIPTYCH SPREAD (1 big anchor top + 2 photos below, mixed sticky / reveal) */}
-          {desktopLayout === 'hero-diptych-spread' && (
-            seed % 2 === 0 ? (
+          {desktopLayout === 'hero-diptych-spread' &&
+            (seed % 2 === 0 ? (
               /* Desktop Sticky Glide: Hero pins briefly, diptych smoothly glides over */
               <div className='relative w-full pb-4'>
                 <div className='sticky top-20 z-0'>
@@ -320,7 +330,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       priority={priority}
                       blurhash={coverPhoto?.blurData}
                       aspectRatio={coverPhoto?.aspectRatio}
-                      sizes='(max-width: 1400px) 100vw, 1200px'
+                      sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                       className='object-contain bg-muted/20 '
                     />
                   </Link>
@@ -350,7 +360,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             fill
                             blurhash={ptp.photo.blurData}
                             aspectRatio={ratio}
-                            sizes='(max-width: 1400px) 50vw, 600px'
+                            sizes='(max-width: 768px) 50vw, (max-width: 1200px) 45vw, 576px'
                             className='object-contain bg-muted/20 '
                           />
                         </div>
@@ -361,7 +371,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               </div>
             ) : (
               /* Desktop Scroll Reveal Spread */
-              <ScrollReveal className='space-y-4 lg:space-y-6 w-full'>
+              <ScrollReveal disabled={priority} className='space-y-4 lg:space-y-6 w-full'>
                 <Link
                   href={href}
                   className='block relative group overflow-hidden max-h-[80vh] rounded-xs cursor-ansehen'
@@ -378,7 +388,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     priority={priority}
                     blurhash={coverPhoto?.blurData}
                     aspectRatio={coverPhoto?.aspectRatio}
-                    sizes='(max-width: 1400px) 100vw, 1200px'
+                    sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                     className='object-contain bg-muted/20 '
                   />
                 </Link>
@@ -407,7 +417,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             fill
                             blurhash={ptp.photo.blurData}
                             aspectRatio={ratio}
-                            sizes='(max-width: 1400px) 50vw, 600px'
+                            sizes='(max-width: 768px) 50vw, (max-width: 1200px) 45vw, 576px'
                             className='object-contain bg-muted/20 '
                           />
                         </div>
@@ -416,12 +426,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   })}
                 </div>
               </ScrollReveal>
-            )
-          )}
+            ))}
 
           {/* VARIANT 4: SINGLE LARGE SOLO HERO WITH SCROLL REVEAL */}
           {desktopLayout === 'solo' && (
-            <ScrollReveal className='w-full'>
+            <ScrollReveal disabled={priority} className='w-full'>
               <Link
                 href={href}
                 className='block relative group overflow-hidden max-h-[85vh] w-full rounded-xs cursor-ansehen'
@@ -438,7 +447,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   priority={priority}
                   blurhash={coverPhoto?.blurData}
                   aspectRatio={coverPhoto?.aspectRatio}
-                  sizes='(max-width: 1400px) 100vw, 1200px'
+                  sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                   className='object-contain bg-muted/20 '
                 />
               </Link>
@@ -471,7 +480,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     priority={priority}
                     blurhash={photos[0].photo.blurData}
                     aspectRatio={photos[0].photo.aspectRatio}
-                    sizes='100vw'
+                    sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
                     className='object-contain'
                   />
                   <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
@@ -497,7 +506,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     fill
                     blurhash={photos[1].photo.blurData}
                     aspectRatio={photos[1].photo.aspectRatio}
-                    sizes='100vw'
+                    sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
                     className='object-contain'
                   />
                   <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
@@ -508,7 +517,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             </div>
           ) : mobileLayout === 'mobile-diptych' ? (
             /* Mobile Diptych with Scroll Reveal */
-            <ScrollReveal className='w-full'>
+            <ScrollReveal disabled={priority} className='w-full'>
               <div className='flex gap-2.5 w-full items-stretch'>
                 {photos.slice(0, 2).map((ptp, i) => {
                   const ratio =
@@ -534,7 +543,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           priority={priority && i === 0}
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
-                          sizes='50vw'
+                          sizes='(max-width: 768px) 50vw, (max-width: 1200px) 50vw, 600px'
                           className='object-contain'
                         />
                       </div>
@@ -545,7 +554,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             </ScrollReveal>
           ) : (
             /* Mobile Single Hero with Scroll Reveal */
-            <ScrollReveal className='w-full'>
+            <ScrollReveal disabled={priority} className='w-full'>
               <Link
                 href={href}
                 className='block relative w-full overflow-hidden rounded-xs bg-muted/20 cursor-ansehen'
@@ -562,7 +571,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   priority={priority}
                   blurhash={coverPhoto?.blurData}
                   aspectRatio={coverPhoto?.aspectRatio}
-                  sizes='100vw'
+                  sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                   className='object-contain'
                 />
               </Link>

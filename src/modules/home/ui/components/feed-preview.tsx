@@ -513,7 +513,13 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
   }
 
   return (
-    <section className='w-full max-w-6xl mx-auto pt-14 md:pt-20 border-t border-border/40'>
+    <section
+      className='w-full max-w-6xl mx-auto pt-14 md:pt-20 border-t border-border/40'
+      style={{
+        contentVisibility: 'auto',
+        containIntrinsicSize: 'auto none auto 500px',
+      }}
+    >
       {/* Editorial Section Header */}
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12'>
         <div>
@@ -533,8 +539,8 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
 
       {/* Responsive 3-Card Grid */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-12 md:gap-8 lg:gap-10 xl:gap-14 items-start'>
-        {filteredPosts.map((post, i) => (
-          <ZinePreviewCard key={post.id} post={post} priority={i === 0} />
+        {filteredPosts.map((post) => (
+          <ZinePreviewCard key={post.id} post={post} priority={false} />
         ))}
       </div>
 

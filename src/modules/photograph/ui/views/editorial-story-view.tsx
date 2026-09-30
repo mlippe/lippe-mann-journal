@@ -403,8 +403,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               blurhash={photo.blurData}
               aspectRatio={ratio}
               className='object-contain w-full h-full'
-              priority
-              sizes='(max-width: 1024px) 100vw, 1200px'
+              priority={block.index === 0}
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'
             />
 
             {/* Actions overlay (Top Right) */}
@@ -461,7 +461,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               blurhash={photo.blurData}
               aspectRatio={ratio}
               className='object-contain w-full h-full'
-              sizes='(max-width: 1024px) 100vw, 900px'
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1024px'
             />
             <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
               <button
@@ -547,7 +547,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               aspectRatio={ratioA}
               className='object-contain w-full h-full'
               sizes={
-                isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
+                isMobileSideBySide
+                  ? '(max-width: 768px) 50vw, 550px'
+                  : '(max-width: 768px) 100vw, 550px'
               }
             />
             <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
@@ -605,7 +607,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               aspectRatio={ratioB}
               className='object-contain w-full h-full'
               sizes={
-                isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
+                isMobileSideBySide
+                  ? '(max-width: 768px) 50vw, 550px'
+                  : '(max-width: 768px) 100vw, 550px'
               }
             />
             <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
@@ -903,7 +907,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
       {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Mixed Sticky & Reveal) */}
       <div className='w-full'>
-        {storyUnits.map((unit) => {
+        {storyUnits.map((unit, unitIdx) => {
           if (unit.type === 'pinned-hero-unit') {
             return (
               <section
@@ -940,6 +944,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               <section
                 key={`pinned-pair-${blockId}`}
                 className='relative w-full mt-16 md:mt-28'
+                style={
+                  unitIdx > 0
+                    ? {
+                        contentVisibility: 'auto',
+                        containIntrinsicSize: 'auto none auto 800px',
+                      }
+                    : undefined
+                }
               >
                 {/* 1. PINNED FRAME */}
                 <div className='sticky top-14 md:top-20 z-0'>
@@ -962,7 +974,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   key={`hero-${block.photo.id}`}
                   className='relative w-full'
                 >
-                  <ScrollReveal>{renderHeroContent(block)}</ScrollReveal>
+                  <ScrollReveal disabled>{renderHeroContent(block)}</ScrollReveal>
 
                   {unit.hasFieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
@@ -985,6 +997,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               <section
                 key={`standard-${blockId}`}
                 className='w-full mt-16 md:mt-28'
+                style={
+                  unitIdx > 0
+                    ? {
+                        contentVisibility: 'auto',
+                        containIntrinsicSize: 'auto none auto 800px',
+                      }
+                    : undefined
+                }
               >
                 <ScrollReveal>{renderBlockContent(block)}</ScrollReveal>
               </section>

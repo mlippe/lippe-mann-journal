@@ -7,12 +7,14 @@ interface ScrollRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   className?: string;
   delayMs?: number;
+  disabled?: boolean;
 }
 
 export const ScrollReveal = ({
   children,
   className,
   delayMs = 0,
+  disabled = false,
   ...props
 }: ScrollRevealProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -20,6 +22,8 @@ export const ScrollReveal = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (disabled) return;
+
     // Immediate display if user prefers reduced motion
     if (
       typeof window !== 'undefined' &&
@@ -64,7 +68,15 @@ export const ScrollReveal = ({
       if (timer) clearTimeout(timer);
       if (completionTimer) clearTimeout(completionTimer);
     };
-  }, [delayMs]);
+  }, [delayMs, disabled]);
+
+  if (disabled) {
+    return (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div
