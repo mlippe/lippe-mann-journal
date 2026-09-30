@@ -19,6 +19,8 @@ import {
   IconHeart,
   IconHeartFilled,
   IconMail,
+  IconZoomIn,
+  IconZoomOut,
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
@@ -55,8 +57,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   const [copied, setCopied] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [activeHeartPhotoId, setActiveHeartPhotoId] = useState<string | null>(null);
-  const lastTap = useRef<number>(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+
+  // Touch swipe tracking refs
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   // Social query & mutation setup
   const interactionParams = {
@@ -152,7 +158,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     while (i < remaining.length) {
       const left = remaining.length - i;
 
-      // When 4 or more photos remain, and in rhythmic cadence, insert a contact strip
+      // When 4 or more photos remain, insert a contact strip
       if (left >= 4 && (i % 4 === 1 || left === 4)) {
         const stripCount = left >= 4 && left !== 5 ? 4 : 3;
         result.push({
@@ -192,24 +198,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
   };
 
-  const handleDoubleTap = (photoId: string) => (e: React.MouseEvent | React.TouchEvent) => {
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
-
-    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
-      e.preventDefault();
-      const interactions = queryClient.getQueryData<SocialInteractionsData>(
-        queryOptions.queryKey,
-      );
-      if (fingerprint && isLoaded && !interactions?.hasLiked) {
-        toggleLike.mutate({ postId: post.id, userFingerprint: fingerprint });
-      }
-      setActiveHeartPhotoId(photoId);
-      setTimeout(() => setActiveHeartPhotoId(null), 850);
-    }
-    lastTap.current = now;
-  };
-
   const createPrintInquiryUrl = (photo: Photo) => {
     const photoTitle = photo.title || 'Aufnahme';
     const subject = encodeURIComponent(
@@ -221,23 +209,40 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return `mailto:manuel@lippe-mann.de?subject=${subject}&body=${body}`;
   };
 
+  // Cycling photos in lightbox
+  const handleNextPhoto = useCallback(() => {
+    setLightboxIndex((prev) =>
+      prev !== null ? (prev + 1) % photos.length : null,
+    );
+    setIsZoomed(false);
+  }, [photos.length]);
+
+  const handlePrevPhoto = useCallback(() => {
+    setLightboxIndex((prev) =>
+      prev !== null ? (prev - 1 + photos.length) % photos.length : null,
+    );
+    setIsZoomed(false);
+  }, [photos.length]);
+
+  // Reset zoom on slide change
+  useEffect(() => {
+    setIsZoomed(false);
+  }, [lightboxIndex]);
+
   // Keyboard navigation for lightbox
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === 'ArrowRight') {
-        setLightboxIndex((prev) =>
-          prev !== null ? (prev + 1) % photos.length : null,
-        );
+        handleNextPhoto();
       } else if (e.key === 'ArrowLeft') {
-        setLightboxIndex((prev) =>
-          prev !== null ? (prev - 1 + photos.length) % photos.length : null,
-        );
+        handlePrevPhoto();
       } else if (e.key === 'Escape') {
         setLightboxIndex(null);
+        setIsZoomed(false);
       }
     },
-    [lightboxIndex, photos.length],
+    [lightboxIndex, handleNextPhoto, handlePrevPhoto],
   );
 
   useEffect(() => {
@@ -245,12 +250,51 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  // Touch swipe support in lightbox
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isZoomed) return;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isZoomed || touchStartX.current === null || touchStartY.current === null)
+      return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Minimum swipe distance 40px and predominantly horizontal
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        handleNextPhoto();
+      } else {
+        handlePrevPhoto();
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  // Click/Tap to zoom in lightbox
+  const handleImageZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomed) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setZoomOrigin({ x, y });
+      setIsZoomed(true);
+    } else {
+      setIsZoomed(false);
+    }
+  };
+
   const formattedDate = useMemo(() => {
     if (!post.createdAt) return '';
     return format(new Date(post.createdAt), 'dd. MMMM yyyy', { locale: de });
   }, [post.createdAt]);
 
-  const collections = post.postsToCollections?.map((ptc) => ptc.collection) || [];
+  const collections =
+    post.postsToCollections?.map((ptc) => ptc.collection) || [];
   const currentInteractions = queryClient.getQueryData<SocialInteractionsData>(
     queryOptions.queryKey,
   );
@@ -324,11 +368,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
       </header>
 
-      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE */}
+      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop) */}
       <div className='space-y-12 md:space-y-20'>
         {blocks.map((block, bIdx) => {
           /* ─────────────────────────────────────────────────────────────
            * BUILDING BLOCK 1: [ HERO BLEED ]
+           * Strictly never taller than viewport height, never wider than width,
+           * 100% native aspect ratio preserved. Opens lightbox on click!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'hero') {
             const photo = block.photo;
@@ -340,69 +386,68 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
             return (
               <section key={`hero-${photo.id}`} className='space-y-4'>
-                <div
-                  onClick={handleDoubleTap(photo.id)}
-                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
-                  style={{ aspectRatio: `${ratio}` }}
-                >
-                  <BlurImage
-                    src={keyToUrl(photo.url)}
-                    alt={photo.title || post.title}
-                    width={photo.width}
-                    height={photo.height}
-                    blurhash={photo.blurData}
-                    aspectRatio={ratio}
-                    className='object-contain w-full h-full'
-                    priority
-                    sizes='(max-width: 1024px) 100vw, 1200px'
-                  />
+                <div className='flex items-center justify-center w-full'>
+                  <div
+                    onClick={() => setLightboxIndex(block.index)}
+                    className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
+                    style={{
+                      aspectRatio: `${ratio}`,
+                      maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                      width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+                      maxWidth: '100%',
+                    }}
+                  >
+                    <BlurImage
+                      src={keyToUrl(photo.url)}
+                      alt={photo.title || post.title}
+                      fill
+                      blurhash={photo.blurData}
+                      aspectRatio={ratio}
+                      className='object-contain w-full h-full'
+                      priority
+                      sizes='(max-width: 1024px) 100vw, 1200px'
+                    />
 
-                  {/* Double tap heart feedback animation */}
-                  {activeHeartPhotoId === photo.id && (
-                    <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
-                      <IconHeartFilled className='size-20 sm:size-28 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                    {/* Actions overlay (Top Right) */}
+                    <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                      <a
+                        href={createPrintInquiryUrl(photo)}
+                        onClick={(e) => e.stopPropagation()}
+                        className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                        title='Print anfragen'
+                        aria-label='Print dieser Aufnahme anfragen'
+                      >
+                        <IconMail className='size-4' />
+                      </a>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLightboxIndex(block.index);
+                        }}
+                        className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                        aria-label='Foto vergrößern'
+                      >
+                        <IconArrowsMaximize className='size-4' />
+                      </button>
                     </div>
-                  )}
 
-                  {/* Actions overlay (Top Right) */}
-                  <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                    <a
-                      href={createPrintInquiryUrl(photo)}
-                      onClick={(e) => e.stopPropagation()}
-                      className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                      title='Print anfragen'
-                      aria-label='Print dieser Aufnahme anfragen'
-                    >
-                      <IconMail className='size-4' />
-                    </a>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setLightboxIndex(block.index);
-                      }}
-                      className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                      aria-label='Foto vergrößern'
-                    >
-                      <IconArrowsMaximize className='size-4' />
-                    </button>
+                    {/* Discrete bottom technical provenance badge */}
+                    {(photo.make || photo.lensModel || photo.focalLength) && (
+                      <div className='absolute bottom-3 left-3 px-2.5 py-1 rounded-sm bg-background/80 backdrop-blur-md text-[11px] font-mono tracking-tight text-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden sm:block'>
+                        {[
+                          photo.make && photo.model
+                            ? `${photo.make} ${photo.model}`
+                            : photo.make || photo.model,
+                          photo.lensModel,
+                          photo.focalLength ? `${photo.focalLength}mm` : null,
+                          photo.fNumber ? `f/${photo.fNumber}` : null,
+                          photo.iso ? `ISO ${photo.iso}` : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </div>
+                    )}
                   </div>
-
-                  {/* Discrete bottom technical provenance badge */}
-                  {(photo.make || photo.lensModel || photo.focalLength) && (
-                    <div className='absolute bottom-3 left-3 px-2.5 py-1 rounded-sm bg-background/80 backdrop-blur-md text-[11px] font-mono tracking-tight text-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden sm:block'>
-                      {[
-                        photo.make && photo.model
-                          ? `${photo.make} ${photo.model}`
-                          : photo.make || photo.model,
-                        photo.lensModel,
-                        photo.focalLength ? `${photo.focalLength}mm` : null,
-                        photo.fNumber ? `f/${photo.fNumber}` : null,
-                        photo.iso ? `ISO ${photo.iso}` : null,
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </div>
-                  )}
                 </div>
 
                 {/* ─────────────────────────────────────────────────────────
@@ -430,7 +475,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           /* ─────────────────────────────────────────────────────────────
            * BUILDING BLOCK 3: [ DIPTYCH (PAIR) ]
            * Strict zero-crop proportional flexbox: both images share equal
-           * height without a single pixel cropped!
+           * height, never exceed viewport height or width.
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'diptych') {
             const [photoA, photoB] = block.photos;
@@ -450,32 +495,34 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 key={`diptych-${photoA.id}-${photoB.id}`}
                 className='w-full'
               >
-                <div className='flex flex-col md:flex-row items-stretch justify-center gap-4 md:gap-8 w-full'>
+                <div className='flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 w-full'>
                   {/* Photo A */}
                   <div
-                    onClick={handleDoubleTap(photoA.id)}
-                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-pointer'
-                    style={{ flex: `${ratioA} 1 0%` }}
+                    onClick={() => setLightboxIndex(block.startIndex)}
+                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in flex items-center justify-center'
+                    style={{
+                      flex: `${ratioA} 1 0%`,
+                      maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                      maxWidth: '100%',
+                    }}
                   >
                     <div
-                      style={{ aspectRatio: `${ratioA}` }}
+                      style={{
+                        aspectRatio: `${ratioA}`,
+                        maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                        width: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
+                      }}
                       className='relative w-full'
                     >
                       <BlurImage
                         src={keyToUrl(photoA.url)}
                         alt={photoA.title || post.title}
-                        width={photoA.width}
-                        height={photoA.height}
+                        fill
                         blurhash={photoA.blurData}
                         aspectRatio={ratioA}
                         className='object-contain w-full h-full'
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
-                      {activeHeartPhotoId === photoA.id && (
-                        <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
-                          <IconHeartFilled className='size-16 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
-                        </div>
-                      )}
                       <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
                         <a
                           href={createPrintInquiryUrl(photoA)}
@@ -502,29 +549,31 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                   {/* Photo B */}
                   <div
-                    onClick={handleDoubleTap(photoB.id)}
-                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-pointer'
-                    style={{ flex: `${ratioB} 1 0%` }}
+                    onClick={() => setLightboxIndex(block.startIndex + 1)}
+                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in flex items-center justify-center'
+                    style={{
+                      flex: `${ratioB} 1 0%`,
+                      maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                      maxWidth: '100%',
+                    }}
                   >
                     <div
-                      style={{ aspectRatio: `${ratioB}` }}
+                      style={{
+                        aspectRatio: `${ratioB}`,
+                        maxHeight: 'min(82vh, calc(100dvh - 6rem))',
+                        width: `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
+                      }}
                       className='relative w-full'
                     >
                       <BlurImage
                         src={keyToUrl(photoB.url)}
                         alt={photoB.title || post.title}
-                        width={photoB.width}
-                        height={photoB.height}
+                        fill
                         blurhash={photoB.blurData}
                         aspectRatio={ratioB}
                         className='object-contain w-full h-full'
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
-                      {activeHeartPhotoId === photoB.id && (
-                        <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
-                          <IconHeartFilled className='size-16 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
-                        </div>
-                      )}
                       <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
                         <a
                           href={createPrintInquiryUrl(photoB)}
@@ -590,25 +639,22 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         className='shrink-0 w-[78vw] sm:w-[50vw] md:w-auto snap-center space-y-2'
                       >
                         <div
-                          onClick={handleDoubleTap(photo.id)}
-                          className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
-                          style={{ aspectRatio: `${ratio}` }}
+                          onClick={() => setLightboxIndex(actualIndex)}
+                          className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
+                          style={{
+                            aspectRatio: `${ratio}`,
+                            maxHeight: 'min(70vh, calc(100dvh - 8rem))',
+                          }}
                         >
                           <BlurImage
                             src={keyToUrl(photo.url)}
                             alt={photo.title || `Frame #${actualIndex + 1}`}
-                            width={photo.width}
-                            height={photo.height}
+                            fill
                             blurhash={photo.blurData}
                             aspectRatio={ratio}
                             className='object-contain w-full h-full'
                             sizes='(max-width: 768px) 80vw, 300px'
                           />
-                          {activeHeartPhotoId === photo.id && (
-                            <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
-                              <IconHeartFilled className='size-14 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
-                            </div>
-                          )}
                           <div className='absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
                             <a
                               href={createPrintInquiryUrl(photo)}
@@ -632,7 +678,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                           </div>
                         </div>
                         <div className='flex items-center justify-between text-[10px] font-mono text-muted-foreground'>
-                          <span>[{String(actualIndex + 1).padStart(2, '0')}]</span>
+                          <span>
+                            [{String(actualIndex + 1).padStart(2, '0')}]
+                          </span>
                           {photo.focalLength && (
                             <span>{photo.focalLength}mm</span>
                           )}
@@ -647,7 +695,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
           /* ─────────────────────────────────────────────────────────────
            * SOLO FEATURE FRAME
-           * Breathing room / detail highlight
+           * Breathing room / detail highlight, viewport-fitted!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'solo') {
             const photo = block.photo;
@@ -662,46 +710,47 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 key={`solo-${photo.id}`}
                 className='max-w-4xl mx-auto space-y-3'
               >
-                <div
-                  onClick={handleDoubleTap(photo.id)}
-                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
-                  style={{ aspectRatio: `${ratio}` }}
-                >
-                  <BlurImage
-                    src={keyToUrl(photo.url)}
-                    alt={photo.title || post.title}
-                    width={photo.width}
-                    height={photo.height}
-                    blurhash={photo.blurData}
-                    aspectRatio={ratio}
-                    className='object-contain w-full h-full'
-                    sizes='(max-width: 1024px) 100vw, 900px'
-                  />
-                  {activeHeartPhotoId === photo.id && (
-                    <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
-                      <IconHeartFilled className='size-20 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                <div className='flex items-center justify-center w-full'>
+                  <div
+                    onClick={() => setLightboxIndex(block.index)}
+                    className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
+                    style={{
+                      aspectRatio: `${ratio}`,
+                      maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+                      width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+                      maxWidth: '100%',
+                    }}
+                  >
+                    <BlurImage
+                      src={keyToUrl(photo.url)}
+                      alt={photo.title || post.title}
+                      fill
+                      blurhash={photo.blurData}
+                      aspectRatio={ratio}
+                      className='object-contain w-full h-full'
+                      sizes='(max-width: 1024px) 100vw, 900px'
+                    />
+                    <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                      <a
+                        href={createPrintInquiryUrl(photo)}
+                        onClick={(e) => e.stopPropagation()}
+                        className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                        title='Print anfragen'
+                        aria-label='Print anfragen'
+                      >
+                        <IconMail className='size-3.5' />
+                      </a>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLightboxIndex(block.index);
+                        }}
+                        className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                        aria-label='Foto vergrößern'
+                      >
+                        <IconArrowsMaximize className='size-3.5' />
+                      </button>
                     </div>
-                  )}
-                  <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                    <a
-                      href={createPrintInquiryUrl(photo)}
-                      onClick={(e) => e.stopPropagation()}
-                      className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
-                      title='Print anfragen'
-                      aria-label='Print anfragen'
-                    >
-                      <IconMail className='size-3.5' />
-                    </a>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setLightboxIndex(block.index);
-                      }}
-                      className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                      aria-label='Foto vergrößern'
-                    >
-                      <IconArrowsMaximize className='size-3.5' />
-                    </button>
                   </div>
                 </div>
                 {(photo.make || photo.lensModel || photo.focalLength) && (
@@ -727,7 +776,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       </div>
 
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
-      <footer id='guestbook' className='mt-20 md:mt-28 border-t border-border/60 pt-10 md:pt-14 space-y-12'>
+      <footer
+        id='guestbook'
+        className='mt-20 md:mt-28 border-t border-border/60 pt-10 md:pt-14 space-y-12'
+      >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div>
             <Author size='md' />
@@ -786,35 +838,73 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
       </footer>
 
-      {/* 4. FULLSCREEN LIGHTBOX DIALOG */}
+      {/* 4. FULLSCREEN LIGHTBOX DIALOG (100% Zoom, Swipes, Cycling & Full EXIF) */}
       <Dialog
         open={lightboxIndex !== null}
         onOpenChange={(open) => {
-          if (!open) setLightboxIndex(null);
+          if (!open) {
+            setLightboxIndex(null);
+            setIsZoomed(false);
+          }
         }}
       >
         <DialogContent
           showCloseButton={false}
-          className='bg-black/95 border-none max-w-screen! w-screen! h-screen! max-h-screen! p-0 m-0 rounded-none flex flex-col justify-between z-50 text-white'
+          className='bg-black/95 border-none max-w-screen! w-screen! h-screen! max-h-screen! p-0 m-0 rounded-none flex flex-col justify-between z-50 text-white overflow-hidden'
         >
           <DialogTitle className='sr-only'>Foto Großansicht</DialogTitle>
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
-            <div className='relative w-full h-full flex flex-col justify-between p-4 sm:p-6 select-none'>
-              {/* Top Controls */}
-              <div className='flex items-center justify-between z-20 text-white/80'>
-                <span className='text-xs font-mono tracking-widest uppercase'>
-                  {lightboxIndex + 1} / {photos.length}
-                </span>
+            <div
+              className='relative w-full h-full flex flex-col justify-between select-none overflow-hidden'
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Top Controls Bar */}
+              <div className='flex items-center justify-between z-20 text-white/80 p-3 sm:p-5 bg-linear-to-b from-black/80 to-transparent'>
+                <div className='flex items-center gap-2 sm:gap-3'>
+                  <span className='text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm'>
+                    {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
+                    {String(photos.length).padStart(2, '0')}
+                  </span>
+                  <span className='text-xs font-mono text-white/60 hidden sm:inline truncate max-w-xs'>
+                    {photos[lightboxIndex].title || post.title}
+                  </span>
+                </div>
 
-                <div className='flex items-center gap-3'>
+                {/* Actions & Zoom Toggle */}
+                <div className='flex items-center gap-2 sm:gap-3'>
+                  <button
+                    onClick={() => setIsZoomed((prev) => !prev)}
+                    className={cn(
+                      'px-2.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer',
+                      isZoomed
+                        ? 'bg-white text-black'
+                        : 'bg-white/10 hover:bg-white/20 text-white',
+                    )}
+                    title={isZoomed ? 'Zoom zurücksetzen' : '100% Zoom'}
+                  >
+                    {isZoomed ? (
+                      <>
+                        <IconZoomOut className='size-3.5' />
+                        <span>Einpassen</span>
+                      </>
+                    ) : (
+                      <>
+                        <IconZoomIn className='size-3.5' />
+                        <span>100% Zoom</span>
+                      </>
+                    )}
+                  </button>
+
                   <a
                     href={createPrintInquiryUrl(photos[lightboxIndex])}
-                    className='px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5'
+                    className='px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5'
                   >
                     <IconMail className='size-3.5' />
                     <span className='hidden sm:inline'>Print anfragen</span>
                   </a>
+
                   <button
                     onClick={() => {
                       if (fingerprint && isLoaded) {
@@ -824,7 +914,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         });
                       }
                     }}
-                    className='p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1.5'
+                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1'
                     aria-label='Serie liken'
                   >
                     <IconHeartFilled
@@ -839,50 +929,68 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       {currentInteractions?.likeCount || 0}
                     </span>
                   </button>
+
                   <button
-                    onClick={() => setLightboxIndex(null)}
-                    className='p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
-                    aria-label='Schließen'
+                    onClick={() => {
+                      setLightboxIndex(null);
+                      setIsZoomed(false);
+                    }}
+                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
+                    aria-label='Schließen (Esc)'
                   >
                     <IconX className='size-5' />
                   </button>
                 </div>
               </div>
 
-              {/* Main Image View (100% Native Aspect Ratio Guarantee) */}
-              <div className='relative grow flex items-center justify-center min-h-0 py-2'>
-                <BlurImage
-                  src={keyToUrl(photos[lightboxIndex].url)}
-                  alt={photos[lightboxIndex].title || post.title}
-                  width={photos[lightboxIndex].width}
-                  height={photos[lightboxIndex].height}
-                  blurhash={photos[lightboxIndex].blurData}
-                  aspectRatio={photos[lightboxIndex].aspectRatio}
-                  className='max-w-full max-h-full object-contain'
-                  sizes='100vw'
-                  priority
-                />
+              {/* Main Image Stage (100% Zoomable on Click / Tap) */}
+              <div
+                className='relative grow flex items-center justify-center min-h-0 w-full overflow-hidden'
+                onClick={handleImageZoomClick}
+              >
+                <div
+                  className={cn(
+                    'relative max-w-full max-h-full flex items-center justify-center transition-transform duration-300 ease-out',
+                    isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in',
+                  )}
+                  style={{
+                    transform: isZoomed ? 'scale(2.5)' : 'scale(1)',
+                    transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                  }}
+                >
+                  <BlurImage
+                    src={keyToUrl(photos[lightboxIndex].url)}
+                    alt={photos[lightboxIndex].title || post.title}
+                    width={photos[lightboxIndex].width}
+                    height={photos[lightboxIndex].height}
+                    blurhash={photos[lightboxIndex].blurData}
+                    aspectRatio={photos[lightboxIndex].aspectRatio}
+                    className='max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] object-contain select-none pointer-events-none'
+                    sizes='100vw'
+                    priority
+                  />
+                </div>
 
-                {/* Left/Right Prev/Next Buttons */}
-                {photos.length > 1 && (
+                {/* Left/Right Prev/Next Buttons (Visible when not zoomed) */}
+                {photos.length > 1 && !isZoomed && (
                   <>
                     <button
-                      onClick={() =>
-                        setLightboxIndex(
-                          (lightboxIndex - 1 + photos.length) % photos.length,
-                        )
-                      }
-                      className='absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white transition-colors cursor-pointer'
-                      aria-label='Vorheriges Foto'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePrevPhoto();
+                      }}
+                      className='absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-colors cursor-pointer z-30'
+                      aria-label='Vorheriges Foto (Pfeiltaste links)'
                     >
                       <IconChevronLeft className='size-6' />
                     </button>
                     <button
-                      onClick={() =>
-                        setLightboxIndex((lightboxIndex + 1) % photos.length)
-                      }
-                      className='absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white transition-colors cursor-pointer'
-                      aria-label='Nächstes Foto'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNextPhoto();
+                      }}
+                      className='absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-colors cursor-pointer z-30'
+                      aria-label='Nächstes Foto (Pfeiltaste rechts)'
                     >
                       <IconChevronRight className='size-6' />
                     </button>
@@ -890,33 +998,70 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 )}
               </div>
 
-              {/* Bottom Technical Caption */}
-              <div className='flex items-center justify-between text-xs font-mono text-white/70 z-20 pt-2'>
-                <span>
-                  {photos[lightboxIndex].title || `Aufnahme #${lightboxIndex + 1}`}
-                </span>
-                <span>
-                  {[
-                    photos[lightboxIndex].make && photos[lightboxIndex].model
-                      ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
-                      : photos[lightboxIndex].make,
-                    photos[lightboxIndex].lensModel,
-                    photos[lightboxIndex].focalLength
-                      ? `${photos[lightboxIndex].focalLength}mm`
-                      : null,
-                    photos[lightboxIndex].fNumber
-                      ? `f/${photos[lightboxIndex].fNumber}`
-                      : null,
-                    photos[lightboxIndex].exposureTime
-                      ? `1/${Math.round(1 / photos[lightboxIndex].exposureTime!)}s`
-                      : null,
-                    photos[lightboxIndex].iso
-                      ? `ISO ${photos[lightboxIndex].iso}`
-                      : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </span>
+              {/* Bottom Full EXIF Information Bar */}
+              <div className='z-20 text-white/80 p-3 sm:p-4 bg-linear-to-t from-black/90 to-transparent border-t border-white/10'>
+                <div className='flex flex-wrap items-center justify-between gap-y-2 gap-x-4 max-w-6xl mx-auto text-xs font-mono'>
+                  {/* Camera & Lens Details */}
+                  <div className='flex items-center gap-2 flex-wrap'>
+                    <IconCamera className='size-3.5 text-white/50 shrink-0' />
+                    <span className='font-medium text-white'>
+                      {[
+                        photos[lightboxIndex].make && photos[lightboxIndex].model
+                          ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
+                          : photos[lightboxIndex].make || photos[lightboxIndex].model,
+                      ]
+                        .filter(Boolean)
+                        .join(' ') || 'Kamera'}
+                    </span>
+                    {photos[lightboxIndex].lensModel && (
+                      <>
+                        <span className='text-white/30'>·</span>
+                        <span className='text-white/80'>
+                          {photos[lightboxIndex].lensModel}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Exposure Parameters */}
+                  <div className='flex items-center gap-2 flex-wrap text-white/70'>
+                    {photos[lightboxIndex].focalLength && (
+                      <span>{photos[lightboxIndex].focalLength}mm</span>
+                    )}
+                    {photos[lightboxIndex].fNumber && (
+                      <>
+                        <span className='text-white/30'>·</span>
+                        <span>f/{photos[lightboxIndex].fNumber}</span>
+                      </>
+                    )}
+                    {photos[lightboxIndex].exposureTime && (
+                      <>
+                        <span className='text-white/30'>·</span>
+                        <span>
+                          1/{Math.round(1 / photos[lightboxIndex].exposureTime!)}s
+                        </span>
+                      </>
+                    )}
+                    {photos[lightboxIndex].iso && (
+                      <>
+                        <span className='text-white/30'>·</span>
+                        <span>ISO {photos[lightboxIndex].iso}</span>
+                      </>
+                    )}
+                    {photos[lightboxIndex].width &&
+                      photos[lightboxIndex].height && (
+                        <>
+                          <span className='text-white/30 hidden md:inline'>
+                            ·
+                          </span>
+                          <span className='text-white/40 hidden md:inline'>
+                            {photos[lightboxIndex].width} ×{' '}
+                            {photos[lightboxIndex].height}
+                          </span>
+                        </>
+                      )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
