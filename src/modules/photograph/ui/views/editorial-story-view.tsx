@@ -181,9 +181,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
     const hero = photos[0];
     const remaining = photos.slice(1);
-    const result: EditorialBlock[] = [
-      { type: 'hero', photo: hero, index: 0 },
-    ];
+    const result: EditorialBlock[] = [{ type: 'hero', photo: hero, index: 0 }];
 
     let i = 0;
     let lastWasPair = false;
@@ -210,14 +208,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           const photoB = remaining[i + 1];
           const ratioA =
             photoA.aspectRatio ||
-            (photoA.width && photoA.height
-              ? photoA.width / photoA.height
-              : 1);
+            (photoA.width && photoA.height ? photoA.width / photoA.height : 1);
           const ratioB =
             photoB.aspectRatio ||
-            (photoB.width && photoB.height
-              ? photoB.width / photoB.height
-              : 1);
+            (photoB.width && photoB.height ? photoB.width / photoB.height : 1);
 
           // We pair when:
           // 1) Exactly 2 photos remain (fits cleanly as a closing pair)
@@ -341,9 +335,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   };
 
   const createSeriesPrintInquiryUrl = () => {
-    const subject = encodeURIComponent(
-      `Print-Anfrage: Serie „${post.title}“`,
-    );
+    const subject = encodeURIComponent(`Print-Anfrage: Serie „${post.title}“`);
     const body = encodeURIComponent(
       `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print aus deiner Serie „${post.title}“:\n\n• Serie: ${post.title}\n• Motiv / Wunschfoto: [z. B. Titel oder Bildnummer]\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
     );
@@ -567,42 +559,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     <article className='w-full max-w-6xl mx-auto py-6 md:py-12'>
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
       <header className='mt-10 md:mt-0 mb-8 md:mb-14'>
-        <div className='hidden md:flex items-center justify-between gap-4 mb-6 border-b border-border/40 pb-4'>
-          <button
-            onClick={() => router.back()}
-            className='inline-flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors cursor-pointer'
-          >
-            <IconArrowLeft className='size-3.5' />
-            <span>Zurück</span>
-          </button>
-
-          <div className='flex items-center gap-3'>
-            <button
-              onClick={handleShare}
-              className='inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer'
-            >
-              {copied ? (
-                <>
-                  <IconCheck className='size-3.5 text-emerald-500' />
-                  <span className='text-emerald-500'>Kopiert</span>
-                </>
-              ) : (
-                <>
-                  <IconShare className='size-3.5' />
-                  <span>Teilen</span>
-                </>
-              )}
-            </button>
-            <a
-              href='#guestbook'
-              className='inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors'
-            >
-              <IconMessageCircle className='size-3.5' />
-              <span>Gästebuch</span>
-            </a>
-          </div>
-        </div>
-
         {/* Editorial Story Title */}
         <div className='max-w-3xl'>
           <div className='flex flex-wrap items-center gap-2 mb-3'>
@@ -626,7 +582,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             ))}
           </div>
 
-          <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-serif tracking-tight text-foreground leading-[1.12] mb-4'>
+          <h1 className='text-3xl sm:text-4xl lg:text-[2.75rem] font-serif tracking-tight text-foreground leading-[1.12] mb-4'>
             {post.title}
           </h1>
         </div>
@@ -704,10 +660,15 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`hero-${photo.id}`}
-                className={cn('relative w-full', isHeroSticky && 'pb-16 md:pb-28')}
+                className={cn(
+                  'relative w-full',
+                  isHeroSticky && 'pb-16 md:pb-28',
+                )}
               >
                 {isHeroSticky ? (
-                  <div className='sticky top-14 md:top-20 z-0'>{heroContent}</div>
+                  <div className='sticky top-14 md:top-20 z-0'>
+                    {heroContent}
+                  </div>
                 ) : (
                   <ScrollReveal>{heroContent}</ScrollReveal>
                 )}
@@ -846,7 +807,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                         {/* Frame index number outside Photo A (Bottom Right) */}
                         <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>{String(block.startIndex + 1).padStart(2, '0')}</span>
+                          <span>
+                            {String(block.startIndex + 1).padStart(2, '0')}
+                          </span>
                         </div>
                       </div>
 
@@ -906,7 +869,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                         {/* Frame index number outside Photo B (Bottom Right) */}
                         <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>{String(block.startIndex + 2).padStart(2, '0')}</span>
+                          <span>
+                            {String(block.startIndex + 2).padStart(2, '0')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -988,7 +953,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                         {/* Frame number outside Solo image (Bottom Right) */}
                         <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>{String(block.index + 1).padStart(2, '0')}</span>
+                          <span>
+                            {String(block.index + 1).padStart(2, '0')}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1008,7 +975,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           Fine-Art Prints & Abzüge
         </span>
         <p className='text-xs sm:text-sm text-muted-foreground font-serif italic max-w-md mx-auto leading-relaxed'>
-          Als unabhängiger Fotograf fertige ich ausgewählte Aufnahmen dieser Serie gerne als hochwertigen Fine-Art Print auf Anfrage an.
+          Als unabhängiger Fotograf fertige ich ausgewählte Aufnahmen dieser
+          Serie gerne als hochwertigen Fine-Art Print auf Anfrage an.
         </p>
         <div className='pt-1'>
           <a
@@ -1122,7 +1090,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               {/* Top Controls Bar */}
               <div
                 className='shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent'
-                style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+                style={{
+                  paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))',
+                }}
               >
                 <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
                   <span className='text-[11px] sm:text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
@@ -1306,7 +1276,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               {/* Bottom Full EXIF Information Bar */}
               <div
                 className='shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10'
-                style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
+                style={{
+                  paddingBottom:
+                    'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))',
+                }}
               >
                 <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 max-w-6xl mx-auto text-[11px] sm:text-xs font-mono leading-tight'>
                   {/* Camera & Lens Details */}
@@ -1314,9 +1287,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     <IconCamera className='size-3.5 text-white/50 shrink-0' />
                     <span className='font-medium text-white truncate max-w-[200px] sm:max-w-none'>
                       {[
-                        photos[lightboxIndex].make && photos[lightboxIndex].model
+                        photos[lightboxIndex].make &&
+                        photos[lightboxIndex].model
                           ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
-                          : photos[lightboxIndex].make || photos[lightboxIndex].model,
+                          : photos[lightboxIndex].make ||
+                            photos[lightboxIndex].model,
                       ]
                         .filter(Boolean)
                         .join(' ') || 'Kamera'}
@@ -1346,7 +1321,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       <>
                         <span className='text-white/30'>·</span>
                         <span>
-                          1/{Math.round(1 / photos[lightboxIndex].exposureTime!)}s
+                          1/
+                          {Math.round(1 / photos[lightboxIndex].exposureTime!)}s
                         </span>
                       </>
                     )}
