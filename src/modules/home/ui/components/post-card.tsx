@@ -4,7 +4,6 @@ import Link from 'next/link';
 import BlurImage from '@/components/blur-image';
 import { createPreview, formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard } from 'swiper/modules';
@@ -56,7 +55,6 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
-  const isMobile = useIsMobile();
   const [isHovered, setIsHovered] = useState(false);
   const isArticle = post.type === 'ARTICLE';
   const PostTypeIcon = POST_TYPE_INFO[post.type].icon;
@@ -78,31 +76,28 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         className,
       )}
     >
-      {/* Mobile Header */}
-      {isMobile && (
-        <a
-          className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'
-          href={href}
-        >
-          <div className='flex items-center gap-2'>
-            <div className='size-9 bg-muted rounded-full flex justify-center items-center'>
-              <PostTypeIcon className='size-4.5!' />
-            </div>
-            <span className='block text-sm font-medium whitespace-nowrap'>
-              {postTypeDisplayString}
-            </span>
+      {/* Mobile Header - Pure CSS responsive md:hidden */}
+      <a
+        className='p-3 pt-6 md:hidden flex gap-2 items-center justify-between'
+        href={href}
+      >
+        <div className='flex items-center gap-2'>
+          <div className='size-9 bg-muted rounded-full flex justify-center items-center'>
+            <PostTypeIcon className='size-4.5!' />
           </div>
-          {/* <Author size='sm' /> */}
-          <p className='text-xs uppercase text-muted-foreground font-mono'>
-            {formatRelativeCustom(post.createdAt)}
-          </p>
-        </a>
-      )}
+          <span className='block text-sm font-medium whitespace-nowrap'>
+            {postTypeDisplayString}
+          </span>
+        </div>
+        <p className='text-xs uppercase text-muted-foreground font-mono'>
+          {formatRelativeCustom(post.createdAt)}
+        </p>
+      </a>
 
       <div
         className={cn(
           'relative aspect-[0.8]',
-          isArticle && isMobile && 'aspect-[1.25]',
+          isArticle && 'aspect-[1.25] md:aspect-[0.8]',
         )}
       >
         {/* Open Badge */}
@@ -144,7 +139,6 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <MediaContent
             post={post}
             href={href}
-            isMobile={isMobile}
             priority={isPriority}
             isHovered={isHovered}
             setIsHovered={setIsHovered}
@@ -153,7 +147,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       </div>
 
       {/* Mobile Footer Non Article */}
-      {isMobile && !isArticle && (
+      {!isArticle && (
         <div className='p-3 pt-5 pb-6 md:hidden flex gap-2 flex-col w-full'>
           <div className='flex items-center justify-between gap-4'>
             <p className='text-sm line-clamp-3 block max-w-xl pr-2 flex-1'>
@@ -173,8 +167,9 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           </a>
         </div>
       )}
+
       {/* Mobile Footer Article */}
-      {isMobile && isArticle && (
+      {isArticle && (
         <div className='p-3 pb-6 md:hidden flex gap-2 flex-col w-full '>
           <p className='text-lg tracking-tight leading-snug font-medium block max-w-xl'>
             {post.title}
@@ -229,14 +224,12 @@ const ArticleContent = ({
 const MediaContent = ({
   post,
   href,
-  isMobile,
   priority,
   isHovered,
   setIsHovered,
 }: {
   post: PostWithPhotos;
   href: string;
-  isMobile: boolean;
   priority: boolean;
   isHovered: boolean;
   setIsHovered: (value: boolean) => void;
@@ -289,8 +282,6 @@ const MediaContent = ({
   const [showHeart, setShowHeart] = useState(false);
 
   const handleDoubleTap = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isMobile) return;
-
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
 
@@ -314,7 +305,6 @@ const MediaContent = ({
 
   // Use the server-provided coverIndex if available, otherwise use 0
   const coverIndex = post.coverIndex ?? 0;
-
   const coverPhoto = photos[coverIndex]?.photo || photos[0]?.photo;
 
   const [shouldRenderSwiper, setShouldRenderSwiper] = useState(false);
@@ -327,7 +317,7 @@ const MediaContent = ({
   const paginationId = `swiper-pagination-${uniqueId}`;
 
   useEffect(() => {
-    if (!isMobile || post.type !== 'ALBUM' || photos.length <= 1) return;
+    if (post.type !== 'ALBUM' || photos.length <= 1) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -350,7 +340,7 @@ const MediaContent = ({
     return () => {
       observer.disconnect();
     };
-  }, [isMobile, post.type, photos.length]);
+  }, [post.type, photos.length]);
 
   if (!coverPhoto && !post.coverImage) return null;
 
@@ -358,34 +348,12 @@ const MediaContent = ({
     '(max-width: 768px) calc(100vw - 1.5rem), (max-width: 1024px) calc(50vw - 1.5rem), calc(33vw - 1.5rem)';
 
   if (!coverPhoto && post.coverImage) {
-    if (isMobile) {
-      return (
-        <div
-          className='h-full w-full p-3 relative block'
-          onClick={handleDoubleTap}
-        >
-          <BlurImage
-            src={keyToUrl(post.coverImage)}
-            alt={post.title}
-            fill
-            priority={priority}
-            sizes={sizes}
-            className='object-contain p-3'
-          />
-          {showHeart && (
-            <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
-              <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
-            </div>
-          )}
-        </div>
-      );
-    }
-
     return (
       <>
         <Link
           className='block h-full p-3 relative group'
           href={href}
+          onClick={handleDoubleTap}
           onMouseEnter={() => setIsHovered(true)}
         >
           <BlurImage
@@ -396,6 +364,11 @@ const MediaContent = ({
             sizes={sizes}
             className='object-contain p-3 bg-background'
           />
+          {showHeart && (
+            <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
+              <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
+            </div>
+          )}
         </Link>
         <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
           <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
@@ -406,12 +379,16 @@ const MediaContent = ({
     );
   }
 
-  if (isMobile) {
-    if (post.type === 'ALBUM' && photos.length > 1) {
-      return (
+  const isAlbum = post.type === 'ALBUM' && photos.length > 1;
+  const isSamePhoto = firstPhoto?.id === coverPhoto.id;
+
+  if (isAlbum) {
+    return (
+      <>
+        {/* Mobile Album Swiper - Responsive md:hidden */}
         <div
           ref={containerRef}
-          className='album-swiper-mobile-feed absolute inset-0'
+          className='album-swiper-mobile-feed absolute inset-0 md:hidden'
         >
           {shouldRenderSwiper ? (
             <>
@@ -458,7 +435,7 @@ const MediaContent = ({
                 <Button
                   id={prevElId}
                   size='icon-sm'
-                  className='absolute top-1/2 left-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
+                  className='absolute top-1/2 left-1 -translate-y-1/2 z-10 cursor-pointer bg-background/50 backdrop-blur-sm border-none'
                   variant='outline'
                   aria-label='Vorheriges Foto'
                 >
@@ -467,7 +444,7 @@ const MediaContent = ({
                 <Button
                   id={nextElId}
                   size='icon-sm'
-                  className='absolute top-1/2 right-1 -translate-y-1/2  z-10 cursor-pointer bg-background/50  backdrop-blur-sm border-none'
+                  className='absolute top-1/2 right-1 -translate-y-1/2 z-10 cursor-pointer bg-background/50 backdrop-blur-sm border-none'
                   variant='outline'
                   aria-label='Nächstes Foto'
                 >
@@ -477,7 +454,10 @@ const MediaContent = ({
               <div id={paginationId} className='album-swiper-pagination' />
             </>
           ) : (
-            <div className='h-full w-full p-3 relative'>
+            <div
+              className='h-full w-full p-3 relative'
+              onClick={handleDoubleTap}
+            >
               <BlurImage
                 src={keyToUrl(coverPhoto.url)}
                 alt={coverPhoto.title ?? post.title}
@@ -488,16 +468,67 @@ const MediaContent = ({
                 aspectRatio={coverPhoto.aspectRatio ?? undefined}
                 className='object-contain p-3'
               />
+              {showHeart && (
+                <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
+                  <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
+                </div>
+              )}
             </div>
           )}
         </div>
-      );
-    }
 
-    return (
-      <div
-        className='h-full w-full p-3 relative block'
+        {/* Desktop Album Link with Hover Preview - Responsive hidden md:block */}
+        <div className='hidden md:block h-full w-full'>
+          <Link
+            className='block h-full p-3 relative group'
+            href={href}
+            onMouseEnter={() => setIsHovered(true)}
+          >
+            {isHovered && !isSamePhoto && firstPhoto && (
+              <BlurImage
+                src={keyToUrl(firstPhoto.url)}
+                alt={firstPhoto.title ?? post.title}
+                fill
+                priority={false}
+                sizes={sizes}
+                blurhash={firstPhoto.blurData}
+                aspectRatio={firstPhoto.aspectRatio ?? undefined}
+                className='object-contain p-3'
+              />
+            )}
+            <BlurImage
+              src={keyToUrl(coverPhoto.url)}
+              alt={coverPhoto.title ?? post.title}
+              fill
+              priority={priority}
+              sizes={sizes}
+              blurhash={coverPhoto.blurData}
+              aspectRatio={coverPhoto.aspectRatio ?? undefined}
+              className={cn(
+                'object-contain p-3 bg-background',
+                !isSamePhoto &&
+                  'group-hover:opacity-0 transition-opacity duration-500',
+              )}
+            />
+          </Link>
+          <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
+            <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
+              <SocialInteractions postId={post.id} variant='compact' />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Single Photo View (Both Mobile & Desktop)
+  return (
+    <>
+      <Link
+        className='block h-full p-3 relative group'
+        href={href}
         onClick={handleDoubleTap}
+        onMouseEnter={() => setIsHovered(true)}
       >
         <BlurImage
           src={keyToUrl(coverPhoto.url)}
@@ -507,53 +538,13 @@ const MediaContent = ({
           sizes={sizes}
           blurhash={coverPhoto.blurData}
           aspectRatio={coverPhoto.aspectRatio ?? undefined}
-          className='object-contain p-3'
+          className='object-contain p-3 bg-background'
         />
         {showHeart && (
           <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
             <IconHeartFilled className='size-24 text-white/90 drop-shadow-2xl' />
           </div>
         )}
-      </div>
-    );
-  }
-
-  // Desktop view: Link to modal with hover preview for albums
-  const isSamePhoto = firstPhoto?.id === coverPhoto.id;
-
-  return (
-    <>
-      <Link
-        className='block h-full p-3 relative group'
-        href={href}
-        onMouseEnter={() => setIsHovered(true)}
-      >
-        {isHovered && !isSamePhoto && firstPhoto && (
-          <BlurImage
-            src={keyToUrl(firstPhoto.url)}
-            alt={firstPhoto.title ?? post.title}
-            fill
-            priority={false}
-            sizes={sizes}
-            blurhash={firstPhoto.blurData}
-            aspectRatio={firstPhoto.aspectRatio ?? undefined}
-            className='object-contain p-3'
-          />
-        )}
-        <BlurImage
-          src={keyToUrl(coverPhoto.url)}
-          alt={coverPhoto.title ?? post.title}
-          fill
-          priority={priority}
-          sizes={sizes}
-          blurhash={coverPhoto.blurData}
-          aspectRatio={coverPhoto.aspectRatio ?? undefined}
-          className={cn(
-            'object-contain p-3 bg-background',
-            !isSamePhoto &&
-              'group-hover:opacity-0 transition-opacity duration-500',
-          )}
-        />
       </Link>
       <div className='hidden md:block absolute bottom-6 right-6 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-auto'>
         <div className='bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border'>
