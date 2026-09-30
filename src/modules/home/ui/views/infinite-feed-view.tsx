@@ -70,7 +70,14 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
     }
 
     const result: Array<
-      | { type: 'divider'; key: string; label: string; count: number }
+      | {
+          type: 'divider';
+          key: string;
+          label: string;
+          month?: string;
+          year?: string;
+          count: number;
+        }
       | { type: 'post'; post: PostWithPhotos; index: number }
     > = [];
 
@@ -81,11 +88,15 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
         const monthKey = format(date, 'yyyy-MM');
         if (monthKey !== currentMonth) {
           currentMonth = monthKey;
-          const label = format(date, 'MMMM yyyy', { locale: de }).toUpperCase();
+          const monthName = format(date, 'MMMM', { locale: de });
+          const yearName = format(date, 'yyyy');
+          const label = `${monthName} ${yearName}`;
           result.push({
             type: 'divider',
             key: `divider-${monthKey}`,
             label,
+            month: monthName,
+            year: yearName,
             count: monthCounts[monthKey] || 1,
           });
         }
@@ -125,6 +136,8 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
                 <TimelineDivider
                   key={item.key}
                   label={item.label}
+                  month={item.month}
+                  year={item.year}
                   count={item.count}
                 />
               );
