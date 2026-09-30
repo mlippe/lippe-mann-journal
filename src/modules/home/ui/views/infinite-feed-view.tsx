@@ -112,7 +112,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   }
 
   return (
-    <div className='w-full space-y-8 md:py-8 py-4 max-w-420 mx-auto'>
+    <div className='w-full space-y-3 md:py-8 py-4 max-w-420 mx-auto'>
       <FeedViewSwitcher totalPosts={posts.length} />
 
       {view === 'zine' ? (
@@ -129,7 +129,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
         </div>
       ) : (
         /* Grid Mode: 3-column chronological grid with monthly timeline markers */
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem] border-muted border-y-12 md:border-y -mx-3 md:mx-0'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem]  -mx-3 md:mx-0'>
           {postsWithDividers.map((item) => {
             if (item.type === 'divider') {
               return (
@@ -173,7 +173,7 @@ export const InfiniteFeedViewLoadingStatus = ({
           ))}
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem] border-muted border-y-12 md:border-y -mx-3 md:mx-0'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 bg-muted gap-3 md:gap-[0.06rem] -mx-3 md:mx-0'>
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className='w-full relative'>
               <PostCardSkeleton />

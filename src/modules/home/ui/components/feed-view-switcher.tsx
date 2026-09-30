@@ -21,21 +21,10 @@ export const FeedViewSwitcher = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between pb-4 -mx-3 px-3 md:mx-0 md:px-0 border-b border-border/40',
+        'flex items-center justify-center pt-2 pb-6 -mx-3 px-3 md:mx-0 md:px-0 border-b border-border/40',
         className,
       )}
     >
-      <div className='flex items-center gap-2'>
-        <span className='text-[11px] uppercase tracking-widest font-mono text-muted-foreground'>
-          Ansicht
-        </span>
-        {totalPosts !== undefined && (
-          <span className='text-[10px] font-mono text-muted-foreground/60 hidden sm:inline'>
-            ({totalPosts} {totalPosts === 1 ? 'Eintrag' : 'Einträge'})
-          </span>
-        )}
-      </div>
-
       <div className='flex items-center gap-1 bg-muted/60 p-0.5 rounded-full border border-border/50'>
         <button
           onClick={() => setView('zine')}

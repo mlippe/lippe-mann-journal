@@ -17,7 +17,8 @@ export const TimelineDivider = ({
 }: TimelineDividerProps) => {
   const parts = label.trim().split(/\s+/);
   const rawMonth = month || parts[0] || label;
-  const displayYear = year || (parts.length > 1 ? parts.slice(1).join(' ') : '');
+  const displayYear =
+    year || (parts.length > 1 ? parts.slice(1).join(' ') : '');
   const formattedMonth =
     rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1).toLowerCase();
 
@@ -25,20 +26,13 @@ export const TimelineDivider = ({
     <div
       className={cn(
         'col-span-full bg-background select-none transition-colors',
-        'px-4 sm:px-6 md:px-8 py-7 sm:py-9 md:py-10',
-        'border-b border-border/40 border-t first:border-t-0',
+        'py-7 px-4 sm:px-0 sm:py-9 md:py-10',
         className,
       )}
     >
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4'>
         {/* Left: Editorial Chapter Title */}
         <div className='space-y-1.5'>
-          <div className='flex items-center gap-2 text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.22em] text-muted-foreground'>
-            <span>Chronik</span>
-            <span className='text-muted-foreground/40'>·</span>
-            <span>Journal</span>
-          </div>
-
           <div className='flex items-baseline gap-2.5 sm:gap-3.5'>
             <h3 className='font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-foreground'>
               {formattedMonth}
