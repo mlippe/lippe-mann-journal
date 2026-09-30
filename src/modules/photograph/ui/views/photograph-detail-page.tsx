@@ -1,8 +1,7 @@
-import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getQueryClient, trpc } from '@/trpc/server';
-import { PhotographView, LoadingState } from './photograph-view';
+import { PhotographView } from './photograph-view';
 import { FeedPreview } from '@/modules/home/ui/components/feed-preview';
 
 interface PhotographDetailPageProps {
@@ -33,16 +32,14 @@ export const PhotographDetailPage = async ({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<LoadingState isModal={isModal} />}>
-        <ErrorBoundary fallback={<p>Error loading post.</p>}>
-          <PhotographView post={post} isModal={isModal} />
-          {!isModal && (
-            <div className='mt-4'>
-              <FeedPreview excludeSlug={slug} />
-            </div>
-          )}
-        </ErrorBoundary>
-      </Suspense>
+      <ErrorBoundary fallback={<p>Error loading post.</p>}>
+        <PhotographView post={post} isModal={isModal} />
+        {!isModal && (
+          <div className='mt-4'>
+            <FeedPreview excludeSlug={slug} />
+          </div>
+        )}
+      </ErrorBoundary>
     </HydrationBoundary>
   );
 };

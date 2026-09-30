@@ -5,7 +5,6 @@ import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-d
 import { LoadingState } from '@/modules/photograph/ui/views/photograph-view';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { Suspense } from 'react';
 
 type Props = {
@@ -62,33 +61,9 @@ const AlbumPage = async ({ params }: Props) => {
 
   return (
     <Suspense fallback={<LoadingState isModal={false} />}>
-      <AlbumSuspense slug={slug} />
+      <PhotographDetailPage slug={slug} isModal={false} />
     </Suspense>
   );
 };
-
-async function AlbumSuspense({ slug }: { slug: string }) {
-  const queryClient = getQueryClient();
-
-  const post = await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({ slug }),
-  );
-
-  if (post?.id) {
-    await queryClient.prefetchQuery(
-      trpc.social.getInteractions.queryOptions({ postId: post.id }),
-    );
-  }
-
-  await queryClient.prefetchQuery(
-    trpc.posts.getPublished.queryOptions({ limit: 4 }),
-  );
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <PhotographDetailPage slug={slug} isModal={false} />
-    </HydrationBoundary>
-  );
-}
 
 export default AlbumPage;

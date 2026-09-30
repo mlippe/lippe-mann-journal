@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
+import { LoadingState } from '@/modules/photograph/ui/views/photograph-view';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -6,6 +8,9 @@ type Props = {
 
 export default async function AlbumInterceptorPage({ params }: Props) {
   const { slug } = await params;
-  return <PhotographDetailPage slug={slug} isModal={true} />;
+  return (
+    <Suspense fallback={<LoadingState isModal={true} />}>
+      <PhotographDetailPage slug={slug} isModal={true} />
+    </Suspense>
+  );
 }
-

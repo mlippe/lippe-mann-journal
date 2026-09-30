@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, memo } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import Image, { ImageProps } from 'next/image';
 import { Blurhash } from 'react-blurhash';
+import { cn } from '@/lib/utils';
 
 interface BlurImageProps extends Omit<
   ImageProps,
@@ -10,6 +11,25 @@ interface BlurImageProps extends Omit<
 > {
   blurhash?: string | null;
   aspectRatio?: number;
+}
+
+const loadedImageUrls = new Set<string>();
+
+function getSrcString(src: ImageProps['src']): string {
+  if (typeof src === 'string') return src;
+  if (src && typeof src === 'object') {
+    if ('src' in src && typeof src.src === 'string') {
+      return src.src;
+    }
+    if (
+      'default' in src &&
+      src.default &&
+      typeof (src.default as { src: string }).src === 'string'
+    ) {
+      return (src.default as { src: string }).src;
+    }
+  }
+  return '';
 }
 
 /**
@@ -26,7 +46,7 @@ interface BlurImageProps extends Omit<
  * @param {number} aspectRatio - Optional aspect ratio of the image (width / height).
  * @returns {JSX.Element} - The BlurImage component.
  */
-const BlurImageInner = function BlurImageInner({
+const BlurImage = memo(function BlurImage({
   src,
   alt,
   width,
@@ -36,19 +56,39 @@ const BlurImageInner = function BlurImageInner({
   blurhash,
   priority,
   aspectRatio,
+  style,
   ...props
 }: BlurImageProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const srcString = getSrcString(src);
+  const isPreloaded = Boolean(
+    priority || (srcString ? loadedImageUrls.has(srcString) : false),
+  );
 
-  // Extract background classes to apply them only when loaded
-  const hasBackground = className?.includes('bg-background');
-  const baseClassName = className?.replace('bg-background', '').trim();
+  const [imageLoaded, setImageLoaded] = useState(isPreloaded);
+  const [showPlaceholder, setShowPlaceholder] = useState(!isPreloaded);
+  const [prevSrc, setPrevSrc] = useState(srcString);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const containerStyle = fill
-    ? 'absolute inset-0 flex items-center justify-center'
-    : 'relative w-full h-full flex justify-center items-center';
+  // Sync state if src changes on the same component instance
+  if (prevSrc !== srcString) {
+    setPrevSrc(srcString);
+    const alreadyLoaded = Boolean(
+      priority || (srcString ? loadedImageUrls.has(srcString) : false),
+    );
+    setImageLoaded(alreadyLoaded);
+    setShowPlaceholder(!alreadyLoaded);
+  }
 
+  // Check if image is already completed in browser cache on mount
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      if (srcString) loadedImageUrls.add(srcString);
+      setImageLoaded(true);
+      setShowPlaceholder(false);
+    }
+  }, [srcString]);
+
+  // Handle placeholder fade-out after image is loaded
   useEffect(() => {
     if (!imageLoaded) return;
 
@@ -59,10 +99,18 @@ const BlurImageInner = function BlurImageInner({
 
     const timeout = window.setTimeout(() => {
       setShowPlaceholder(false);
-    }, 550);
+    }, 350);
 
     return () => window.clearTimeout(timeout);
   }, [imageLoaded, priority]);
+
+  // Extract background classes to apply them only when loaded
+  const hasBackground = className?.includes('bg-background');
+  const baseClassName = className?.replace('bg-background', '').trim();
+
+  const containerStyle = fill
+    ? 'absolute inset-0 flex items-center justify-center'
+    : 'relative w-full h-full flex justify-center items-center';
 
   const showBlurhash = showPlaceholder && blurhash && blurhash.length >= 6;
 
@@ -70,9 +118,11 @@ const BlurImageInner = function BlurImageInner({
     <div className={containerStyle}>
       {showBlurhash && (
         <div
-          className={`absolute inset-0 flex items-center justify-center pointer-events-none ${
-            priority ? '' : 'transition-opacity duration-500 ease-in-out'
-          } ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+          className={cn(
+            'absolute inset-0 flex items-center justify-center pointer-events-none z-0',
+            !priority && 'transition-opacity duration-300 ease-in-out',
+            imageLoaded ? 'opacity-0' : 'opacity-100',
+          )}
         >
           <div
             className={baseClassName ?? ''}
@@ -104,23 +154,27 @@ const BlurImageInner = function BlurImageInner({
         </div>
       )}
       <Image
+        ref={imgRef}
         src={src}
         alt={alt}
         fill={fill}
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}
         priority={priority}
-        style={!fill ? { width: '100%', height: 'auto' } : undefined}
-        className={`${baseClassName ?? ''} ${
-          hasBackground && imageLoaded ? 'bg-background' : ''
-        } ${
-          priority
+        style={!fill ? { width: '100%', height: 'auto', ...style } : style}
+        className={cn(
+          baseClassName,
+          fill ? 'z-10' : 'relative z-10',
+          hasBackground && imageLoaded && 'bg-background',
+          priority || isPreloaded
             ? 'opacity-100'
-            : `transition-opacity duration-500 ease-in-out ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`
-        }`}
+            : cn(
+                'transition-opacity duration-300 ease-in-out',
+                imageLoaded ? 'opacity-100' : 'opacity-0',
+              ),
+        )}
         onLoad={() => {
+          if (srcString) loadedImageUrls.add(srcString);
           setImageLoaded(true);
         }}
         onError={() => {
@@ -131,25 +185,6 @@ const BlurImageInner = function BlurImageInner({
       />
     </div>
   );
-};
-
-const BlurImage = memo(function BlurImage(props: BlurImageProps) {
-  const srcKey = useMemo(() => {
-    const src = props.src;
-    if (typeof src === 'string') return src;
-
-    if ('src' in src && typeof src.src === 'string') {
-      return src.src;
-    }
-
-    if ('default' in src && src.default && 'src' in src.default) {
-      return src.default.src;
-    }
-
-    return String(src);
-  }, [props.src]);
-
-  return <BlurImageInner key={srcKey} {...props} />;
 });
 
 export default BlurImage;

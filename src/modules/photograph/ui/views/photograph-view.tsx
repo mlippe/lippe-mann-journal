@@ -154,7 +154,11 @@ const DesktopMedia = ({
             id='album-swiper-modal'
             modules={[Navigation, Pagination, Keyboard]}
             slidesPerView={1}
-            onSlideChange={(s) => onSlideChange(s.realIndex)}
+            onSlideChange={(s) => {
+              if (s.realIndex !== activeIndex) {
+                onSlideChange(s.realIndex);
+              }
+            }}
             loop
             className='w-full h-full'
             keyboard={{ enabled: true }}
@@ -281,7 +285,7 @@ const MobileMediaList = ({
               <Button
                 size='icon-sm'
                 asChild
-                className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7 z-10'
+                className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7 z-20'
                 variant='outline'
               >
                 <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
