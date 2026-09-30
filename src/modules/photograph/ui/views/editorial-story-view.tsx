@@ -51,7 +51,6 @@ interface EditorialStoryViewProps {
 type EditorialBlock =
   | { type: 'hero'; photo: Photo; index: number }
   | { type: 'diptych'; photos: [Photo, Photo]; startIndex: number }
-  | { type: 'contact-strip'; photos: Photo[]; startIndex: number }
   | { type: 'solo'; photo: Photo; index: number };
 
 export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
@@ -169,34 +168,83 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     ];
 
     let i = 0;
+    let lastWasPair = false;
+    let soloStreak = 0;
+
     while (i < remaining.length) {
       const left = remaining.length - i;
 
-      // When 4 or more photos remain, insert a contact strip
-      if (left >= 4 && (i % 4 === 1 || left === 4)) {
-        const stripCount = left >= 4 && left !== 5 ? 4 : 3;
-        result.push({
-          type: 'contact-strip',
-          photos: remaining.slice(i, i + stripCount),
-          startIndex: i + 1,
-        });
-        i += stripCount;
-      } else if (left >= 2 && left !== 3) {
-        // Diptych pair in visual dialogue
-        result.push({
-          type: 'diptych',
-          photos: [remaining[i], remaining[i + 1]],
-          startIndex: i + 1,
-        });
-        i += 2;
-      } else {
-        // Solo feature frame
+      if (lastWasPair) {
+        // STRICT RULE: Never add two images next to each other after each other.
+        // After any pair (diptych), the next block MUST be a full size single image (solo).
         result.push({
           type: 'solo',
           photo: remaining[i],
           index: i + 1,
         });
         i += 1;
+        lastWasPair = false;
+        soloStreak = 1;
+      } else {
+        // Previous was NOT a pair (it was hero or solo).
+        if (left >= 2) {
+          const photoA = remaining[i];
+          const photoB = remaining[i + 1];
+          const ratioA =
+            photoA.aspectRatio ||
+            (photoA.width && photoA.height
+              ? photoA.width / photoA.height
+              : 1);
+          const ratioB =
+            photoB.aspectRatio ||
+            (photoB.width && photoB.height
+              ? photoB.width / photoB.height
+              : 1);
+
+          // We pair when:
+          // 1) Exactly 2 photos remain (fits cleanly as a closing pair)
+          // 2) Exactly 3 photos remain (pair then single)
+          // 3) Both photos are vertical (ratio < 1.15)
+          // 4) Or we already had 1+ single images and want to mix it up
+          const bothVertical = ratioA < 1.15 && ratioB < 1.15;
+          const shouldPair =
+            left === 2 ||
+            left === 3 ||
+            bothVertical ||
+            soloStreak >= 1 ||
+            i % 3 === 0;
+
+          if (shouldPair) {
+            result.push({
+              type: 'diptych',
+              photos: [photoA, photoB],
+              startIndex: i + 1,
+            });
+            i += 2;
+            lastWasPair = true;
+            soloStreak = 0;
+          } else {
+            // Full size single image
+            result.push({
+              type: 'solo',
+              photo: photoA,
+              index: i + 1,
+            });
+            i += 1;
+            lastWasPair = false;
+            soloStreak += 1;
+          }
+        } else {
+          // Exactly 1 photo remaining -> solo full size single image
+          result.push({
+            type: 'solo',
+            photo: remaining[i],
+            index: i + 1,
+          });
+          i += 1;
+          lastWasPair = false;
+          soloStreak += 1;
+        }
       }
     }
 
@@ -574,27 +622,27 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                           .join(' · ')}
                       </div>
                     )}
+
+                    {/* Frame index number (Bottom Right) */}
+                    <div className='absolute bottom-3 right-3 px-2 py-0.5 rounded-sm bg-black/60 backdrop-blur-md text-[11px] font-mono tracking-widest text-white/90 select-none pointer-events-none z-20'>
+                      {String(block.index + 1).padStart(2, '0')}
+                    </div>
                   </div>
                 </div>
 
                 {/* ─────────────────────────────────────────────────────────
                  * BUILDING BLOCK 2: [ FIELD NOTE ]
-                 * Positioned immediately under the hero bleed anchor
+                 * Positioned immediately under the hero bleed anchor if provided
                  * ───────────────────────────────────────────────────────── */}
-                <div className='max-w-2xl mx-auto pt-6 md:pt-10'>
-                  {post.content ? (
+                {post.content && post.content.trim().length > 0 && (
+                  <div className='max-w-2xl mx-auto pt-6 md:pt-10'>
                     <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                       <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
-                        {post.content}
+                        {post.content.trim()}
                       </p>
                     </div>
-                  ) : (
-                    <div className='border-l-2 border-border/50 pl-6 py-2 my-2 text-muted-foreground font-serif italic text-sm md:text-base'>
-                      Feldnotizen aus dem Journal. Eine visuelle Aufnahmeserie
-                      von Manuel Lippmann.
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </section>
             );
           }
@@ -662,6 +710,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                           <IconArrowsMaximize className='size-3.5' />
                         </button>
                       </div>
+
+                      {/* Frame index number (Bottom Right) */}
+                      <div className='absolute bottom-2.5 right-2.5 px-1.5 py-0.5 rounded-sm bg-black/60 backdrop-blur-md text-[10px] sm:text-[11px] font-mono tracking-widest text-white/90 select-none pointer-events-none z-20'>
+                        {String(block.startIndex + 1).padStart(2, '0')}
+                      </div>
                     </div>
                   </div>
 
@@ -704,90 +757,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                           <IconArrowsMaximize className='size-3.5' />
                         </button>
                       </div>
+
+                      {/* Frame index number (Bottom Right) */}
+                      <div className='absolute bottom-2.5 right-2.5 px-1.5 py-0.5 rounded-sm bg-black/60 backdrop-blur-md text-[10px] sm:text-[11px] font-mono tracking-widest text-white/90 select-none pointer-events-none z-20'>
+                        {String(block.startIndex + 2).padStart(2, '0')}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
-            );
-          }
-
-          /* ─────────────────────────────────────────────────────────────
-           * BUILDING BLOCK 4: [ CONTACT STRIP / SEQUENCE FRAMES ]
-           * Film frame strip aesthetic with frame numbers [01], [02], [03]
-           * Mobile: smooth horizontal swipe strip with scroll-snap
-           * Desktop: rhythmic multi-column contact gallery
-           * ───────────────────────────────────────────────────────────── */
-          if (block.type === 'contact-strip') {
-            return (
-              <section
-                key={`contact-strip-${bIdx}`}
-                className='w-full space-y-3'
-              >
-                <div className='flex items-center gap-2 text-[11px] font-mono tracking-widest uppercase text-muted-foreground/70 border-b border-border/30 pb-1.5'>
-                  <span>Sequenz</span>
-                  <span>•</span>
-                  <span>
-                    Frames #{block.startIndex + 1}–
-                    {block.startIndex + block.photos.length}
-                  </span>
-                </div>
-
-                {/* Mobile scroll-snap strip / Desktop grid */}
-                <div className='flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory pb-3 no-scrollbar -mx-3 px-3 md:mx-0 md:px-0'>
-                  {block.photos.map((photo, pIdx) => {
-                    const actualIndex = block.startIndex + pIdx;
-                    const ratio =
-                      photo.aspectRatio ||
-                      (photo.width && photo.height
-                        ? photo.width / photo.height
-                        : 3 / 2);
-
-                    return (
-                      <div
-                        key={photo.id}
-                        className='shrink-0 w-[78vw] sm:w-[50vw] md:w-auto snap-center space-y-2'
-                      >
-                        <div
-                          onClick={() => setLightboxIndex(actualIndex)}
-                          className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-zoom-in'
-                          style={{
-                            aspectRatio: `${ratio}`,
-                            maxHeight: 'min(70vh, calc(100dvh - 8rem))',
-                          }}
-                        >
-                          <BlurImage
-                            src={keyToUrl(photo.url)}
-                            alt={photo.title || `Frame #${actualIndex + 1}`}
-                            fill
-                            blurhash={photo.blurData}
-                            aspectRatio={ratio}
-                            className='object-contain w-full h-full'
-                            sizes='(max-width: 768px) 80vw, 300px'
-                          />
-                          <div className='absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setLightboxIndex(actualIndex);
-                              }}
-                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
-                              aria-label='Foto vergrößern'
-                            >
-                              <IconArrowsMaximize className='size-3' />
-                            </button>
-                          </div>
-                        </div>
-                        <div className='flex items-center justify-between text-[10px] font-mono text-muted-foreground'>
-                          <span>
-                            [{String(actualIndex + 1).padStart(2, '0')}]
-                          </span>
-                          {photo.focalLength && (
-                            <span>{photo.focalLength}mm</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </section>
             );
@@ -808,7 +784,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`solo-${photo.id}`}
-                className='max-w-4xl mx-auto space-y-3'
+                className='w-full max-w-5xl mx-auto space-y-3'
               >
                 <div className='flex items-center justify-center w-full'>
                   <div
@@ -841,6 +817,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       >
                         <IconArrowsMaximize className='size-3.5' />
                       </button>
+                    </div>
+
+                    {/* Frame index number (Bottom Right) */}
+                    <div className='absolute bottom-3 right-3 px-2 py-0.5 rounded-sm bg-black/60 backdrop-blur-md text-[11px] font-mono tracking-widest text-white/90 select-none pointer-events-none z-20'>
+                      {String(block.index + 1).padStart(2, '0')}
                     </div>
                   </div>
                 </div>
