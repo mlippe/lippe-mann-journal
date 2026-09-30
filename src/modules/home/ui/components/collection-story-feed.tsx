@@ -23,7 +23,7 @@ export const CollectionStoryFeed = () => {
   }
 
   return (
-    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-6 sm:mb-8 px-1'>
+    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-4 sm:mb-5 px-1'>
       <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1 -my-1'>
 
         {collections.map((collection) => {
@@ -84,7 +84,7 @@ export const CollectionStoryFeed = () => {
 
 export const CollectionStorySkeleton = () => {
   return (
-    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-6 sm:mb-8 px-1'>
+    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-4 sm:mb-5 px-1'>
       <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1'>
         {Array.from({ length: 5 }).map((_, i) => (
           <div

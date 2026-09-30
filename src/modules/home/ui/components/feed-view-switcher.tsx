@@ -21,7 +21,7 @@ export const FeedViewSwitcher = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-center pt-2 pb-6 -mx-3 px-3 md:mx-0 md:px-0 border-b border-border/40',
+        'w-full max-w-5xl lg:max-w-6xl mx-auto flex items-center justify-end px-1 sm:px-2 pb-2 sm:pb-3',
         className,
       )}
     >

@@ -31,6 +31,11 @@ const page = () => {
           <CollectionStoryFeed />
         </Suspense>
 
+        {/* SEPARATOR LINE BETWEEN TOP SECTION & FEED */}
+        <div className='w-full max-w-5xl lg:max-w-6xl mx-auto px-1 sm:px-2 mb-4 sm:mb-6'>
+          <div className='w-full border-t border-border/40' />
+        </div>
+
         {/* INFINITE FEED  */}
         <Suspense fallback={<InfiniteFeedViewLoadingStatus />}>
           <ErrorBoundary

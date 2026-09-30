@@ -112,7 +112,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
   }
 
   return (
-    <div className='w-full space-y-3 md:py-8 py-4 max-w-420 mx-auto'>
+    <div className='w-full space-y-3 pt-1 pb-8 md:pb-12 max-w-420 mx-auto'>
       <FeedViewSwitcher totalPosts={posts.length} />
 
       {view === 'zine' ? (
@@ -165,7 +165,7 @@ export const InfiniteFeedViewLoadingStatus = ({
   view?: string;
 } = {}) => {
   return (
-    <div className='w-full space-y-8 md:py-8 py-4 max-w-420 mx-auto'>
+    <div className='w-full space-y-8 pt-1 pb-8 md:pb-12 max-w-420 mx-auto'>
       {view === 'zine' ? (
         <div className='max-w-4xl mx-auto'>
           {Array.from({ length: 3 }).map((_, index) => (
