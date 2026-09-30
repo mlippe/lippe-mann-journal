@@ -27,7 +27,7 @@ export const FeedViewSwitcher = ({
     >
       <div className='flex items-center gap-2'>
         <span className='text-[11px] uppercase tracking-widest font-mono text-muted-foreground'>
-          Ausgaben
+          Ansicht
         </span>
         {totalPosts !== undefined && (
           <span className='text-[10px] font-mono text-muted-foreground/60 hidden sm:inline'>
