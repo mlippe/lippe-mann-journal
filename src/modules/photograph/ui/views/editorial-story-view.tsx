@@ -71,6 +71,13 @@ function getBlockSeed(postSeed: number, idx: number): number {
   return (h ^ (h >>> 16)) >>> 0;
 }
 
+function getEditorialBlockId(block: EditorialBlock): string {
+  if (block.type === 'diptych') {
+    return `${block.photos[0].id}-${block.photos[1].id}`;
+  }
+  return block.photo.id;
+}
+
 export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const router = useRouter();
   const trpc = useTRPC();
@@ -307,23 +314,329 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return pins;
   }, [blocks, postSeed]);
 
-  const isStickyPin = useCallback(
-    (bIdx: number) => stickyPinIndices.has(bIdx),
-    [stickyPinIndices],
-  );
-
-  const isOverlayBlock = useCallback(
-    (bIdx: number) => {
-      if (bIdx === 0) return false;
-      if (bIdx === 1) {
-        // If there's a field note, that already overlayed the pinned hero;
-        // if no field note, block 1 directly overlays the hero!
-        return isStickyPin(0) && !hasFieldNote;
+  type StoryUnit =
+    | {
+        type: 'pinned-hero-unit';
+        heroBlock: EditorialBlock & { type: 'hero' };
+        overlayBlock: EditorialBlock;
+        hasFieldNote: boolean;
       }
-      return isStickyPin(bIdx - 1);
-    },
-    [isStickyPin, hasFieldNote],
-  );
+    | {
+        type: 'pinned-unit';
+        pinnedBlock: EditorialBlock;
+        overlayBlock: EditorialBlock;
+      }
+    | {
+        type: 'standard-unit';
+        block: EditorialBlock;
+        hasFieldNote?: boolean;
+      };
+
+  const storyUnits = useMemo(() => {
+    const units: StoryUnit[] = [];
+    let i = 0;
+    while (i < blocks.length) {
+      if (i === 0 && blocks[0].type === 'hero') {
+        if (stickyPinIndices.has(0) && blocks.length > 1) {
+          units.push({
+            type: 'pinned-hero-unit',
+            heroBlock: blocks[0] as EditorialBlock & { type: 'hero' },
+            overlayBlock: blocks[1],
+            hasFieldNote,
+          });
+          i = 2;
+        } else {
+          units.push({
+            type: 'standard-unit',
+            block: blocks[0],
+            hasFieldNote,
+          });
+          i = 1;
+        }
+      } else {
+        if (stickyPinIndices.has(i) && i + 1 < blocks.length) {
+          units.push({
+            type: 'pinned-unit',
+            pinnedBlock: blocks[i],
+            overlayBlock: blocks[i + 1],
+          });
+          i += 2;
+        } else {
+          units.push({
+            type: 'standard-unit',
+            block: blocks[i],
+          });
+          i += 1;
+        }
+      }
+    }
+    return units;
+  }, [blocks, stickyPinIndices, hasFieldNote]);
+
+  const renderHeroContent = (block: EditorialBlock & { type: 'hero' }) => {
+    const photo = block.photo;
+    const ratio =
+      photo.aspectRatio ||
+      (photo.width && photo.height ? photo.width / photo.height : 3 / 2);
+
+    return (
+      <div className='flex justify-center w-full'>
+        <div
+          className='group/plate flex flex-col items-end'
+          style={{
+            width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+            maxWidth: '100%',
+          }}
+        >
+          <div
+            onClick={() => setLightboxIndex(block.index)}
+            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            style={{
+              aspectRatio: `${ratio}`,
+              maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photo.url)}
+              alt={photo.title || post.title}
+              fill
+              blurhash={photo.blurData}
+              aspectRatio={ratio}
+              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              priority
+              sizes='(max-width: 1024px) 100vw, 1200px'
+            />
+
+            {/* Actions overlay (Top Right) */}
+            <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.index);
+                }}
+                className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-4' />
+              </button>
+            </div>
+          </div>
+
+          {/* Frame number outside image (Bottom Right) */}
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span>{String(block.index + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSoloContent = (block: EditorialBlock & { type: 'solo' }) => {
+    const photo = block.photo;
+    const ratio =
+      photo.aspectRatio ||
+      (photo.width && photo.height ? photo.width / photo.height : 3 / 2);
+
+    return (
+      <div className='flex justify-center w-full max-w-5xl mx-auto'>
+        <div
+          className='group/plate flex flex-col items-end'
+          style={{
+            width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+            maxWidth: '100%',
+          }}
+        >
+          <div
+            onClick={() => setLightboxIndex(block.index)}
+            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            style={{
+              aspectRatio: `${ratio}`,
+              maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photo.url)}
+              alt={photo.title || post.title}
+              fill
+              blurhash={photo.blurData}
+              aspectRatio={ratio}
+              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              sizes='(max-width: 1024px) 100vw, 900px'
+            />
+            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.index);
+                }}
+                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-3.5' />
+              </button>
+            </div>
+          </div>
+
+          {/* Frame number outside Solo image (Bottom Right) */}
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span>{String(block.index + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDiptychContent = (
+    block: EditorialBlock & { type: 'diptych' },
+  ) => {
+    const [photoA, photoB] = block.photos;
+    const ratioA =
+      photoA.aspectRatio ||
+      (photoA.width && photoA.height ? photoA.width / photoA.height : 1);
+    const ratioB =
+      photoB.aspectRatio ||
+      (photoB.width && photoB.height ? photoB.width / photoB.height : 1);
+
+    const bSeed = getBlockSeed(postSeed, block.startIndex);
+    const bothVertical = ratioA < 1.25 && ratioB < 1.25;
+    const isMobileSideBySide = bothVertical
+      ? bSeed % 3 !== 0 // ~66% of vertical pairs sit side-by-side on mobile
+      : bSeed % 4 === 0; // ~25% of other pairs sit side-by-side on mobile
+
+    return (
+      <div
+        className={cn(
+          'flex items-center md:items-start justify-center w-full',
+          isMobileSideBySide
+            ? 'flex-row gap-2.5 sm:gap-4 md:gap-8 items-start'
+            : 'flex-col md:flex-row gap-8',
+        )}
+      >
+        {/* Photo A */}
+        <div
+          className={cn(
+            'flex flex-col items-end group/plate',
+            isMobileSideBySide
+              ? 'flex-[var(--ratio-a)_1_0%]'
+              : 'w-full md:w-auto md:flex-[var(--ratio-a)_1_0%]',
+          )}
+          style={
+            {
+              '--ratio-a': ratioA,
+              maxWidth: isMobileSideBySide
+                ? undefined
+                : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
+            } as React.CSSProperties
+          }
+        >
+          <div
+            onClick={() => setLightboxIndex(block.startIndex)}
+            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            style={{
+              aspectRatio: `${ratioA}`,
+              maxHeight: isMobileSideBySide
+                ? '70vh'
+                : 'min(82vh, calc(100dvh - 6rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photoA.url)}
+              alt={photoA.title || post.title}
+              fill
+              blurhash={photoA.blurData}
+              aspectRatio={ratioA}
+              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              sizes={
+                isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
+              }
+            />
+            <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.startIndex);
+                }}
+                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-3.5' />
+              </button>
+            </div>
+          </div>
+
+          {/* Frame index number outside Photo A (Bottom Right) */}
+          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span>{String(block.startIndex + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+
+        {/* Photo B */}
+        <div
+          className={cn(
+            'flex flex-col items-end group/plate',
+            isMobileSideBySide
+              ? 'flex-[var(--ratio-b)_1_0%]'
+              : 'w-full md:w-auto md:flex-[var(--ratio-b)_1_0%]',
+          )}
+          style={
+            {
+              '--ratio-b': ratioB,
+              maxWidth: isMobileSideBySide
+                ? undefined
+                : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
+            } as React.CSSProperties
+          }
+        >
+          <div
+            onClick={() => setLightboxIndex(block.startIndex + 1)}
+            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
+            style={{
+              aspectRatio: `${ratioB}`,
+              maxHeight: isMobileSideBySide
+                ? '70vh'
+                : 'min(82vh, calc(100dvh - 6rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photoB.url)}
+              alt={photoB.title || post.title}
+              fill
+              blurhash={photoB.blurData}
+              aspectRatio={ratioB}
+              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              sizes={
+                isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
+              }
+            />
+            <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.startIndex + 1);
+                }}
+                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-3.5' />
+              </button>
+            </div>
+          </div>
+
+          {/* Frame index number outside Photo B (Bottom Right) */}
+          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span>{String(block.startIndex + 2).padStart(2, '0')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderBlockContent = (block: EditorialBlock) => {
+    if (block.type === 'hero') return renderHeroContent(block);
+    if (block.type === 'solo') return renderSoloContent(block);
+    if (block.type === 'diptych') return renderDiptychContent(block);
+    return null;
+  };
 
   const handleShare = () => {
     if (typeof window !== 'undefined') {
@@ -590,377 +903,92 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
       {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Mixed Sticky & Reveal) */}
       <div className='w-full'>
-        {blocks.map((block, bIdx) => {
-          /* ─────────────────────────────────────────────────────────────
-           * BUILDING BLOCK 1: [ HERO BLEED ]
-           * Strictly never taller than viewport height, never wider than width,
-           * 100% native aspect ratio preserved. Opens lightbox on click!
-           * Pinned anchor when randomized sticky is active for this post.
-           * ───────────────────────────────────────────────────────────── */
-          if (block.type === 'hero') {
-            const photo = block.photo;
-            const ratio =
-              photo.aspectRatio ||
-              (photo.width && photo.height
-                ? photo.width / photo.height
-                : 3 / 2);
-            const isHeroSticky = isStickyPin(0);
-
-            const heroContent = (
-              <div className='flex justify-center w-full'>
-                <div
-                  className='group/plate flex flex-col items-end'
-                  style={{
-                    width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
-                    maxWidth: '100%',
-                  }}
-                >
-                  <div
-                    onClick={() => setLightboxIndex(block.index)}
-                    className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
-                    style={{
-                      aspectRatio: `${ratio}`,
-                      maxHeight: 'min(86vh, calc(100dvh - 5rem))',
-                    }}
-                  >
-                    <BlurImage
-                      src={keyToUrl(photo.url)}
-                      alt={photo.title || post.title}
-                      fill
-                      blurhash={photo.blurData}
-                      aspectRatio={ratio}
-                      className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
-                      priority
-                      sizes='(max-width: 1024px) 100vw, 1200px'
-                    />
-
-                    {/* Actions overlay (Top Right) */}
-                    <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLightboxIndex(block.index);
-                        }}
-                        className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
-                        aria-label='Foto vergrößern'
-                      >
-                        <IconArrowsMaximize className='size-4' />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Frame number outside image (Bottom Right) */}
-                  <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                    <span>{String(block.index + 1).padStart(2, '0')}</span>
-                  </div>
-                </div>
-              </div>
-            );
-
+        {storyUnits.map((unit) => {
+          if (unit.type === 'pinned-hero-unit') {
             return (
               <section
-                key={`hero-${photo.id}`}
-                className={cn(
-                  'relative w-full',
-                  isHeroSticky && 'pb-16 md:pb-28',
-                )}
+                key={`pinned-hero-${unit.heroBlock.photo.id}`}
+                className='relative w-full'
               >
-                {isHeroSticky ? (
-                  <div className='sticky top-14 md:top-20 z-0'>
-                    {heroContent}
-                  </div>
-                ) : (
-                  <ScrollReveal>{heroContent}</ScrollReveal>
-                )}
+                {/* 1. HERO PINNED FRAME */}
+                <div className='sticky top-14 md:top-20 z-0'>
+                  {renderHeroContent(unit.heroBlock)}
+                </div>
 
-                {/* ─────────────────────────────────────────────────────────
-                 * BUILDING BLOCK 2: [ FIELD NOTE ]
-                 * Positioned immediately under the hero bleed anchor if provided.
-                 * Glides smoothly over the hero photo if hero was pinned!
-                 * ───────────────────────────────────────────────────────── */}
-                {hasFieldNote && (
-                  <div
-                    className={cn(
-                      'max-w-2xl mx-auto px-4',
-                      isHeroSticky
-                        ? 'relative z-10 bg-background pt-10 pb-6 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.10)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)]'
-                        : 'pt-8 md:pt-14',
-                    )}
-                  >
-                    <ScrollReveal>
+                {/* 2. OVERLAY CONTAINER (Field note if present + Next Block) */}
+                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
+                  {unit.hasFieldNote && (
+                    <div className='max-w-2xl mx-auto px-4 pb-12 md:pb-20'>
                       <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                         <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
                           {post.content!.trim()}
                         </p>
                       </div>
-                    </ScrollReveal>
-                  </div>
-                )}
-              </section>
-            );
-          }
-
-          /* ─────────────────────────────────────────────────────────────
-           * BUILDING BLOCK 3: [ DIPTYCH (PAIR) ]
-           * Strict zero-crop proportional flexbox: both images share equal
-           * height, never exceed viewport height or width.
-           * Plate numbers placed directly below each photo (Bottom Right).
-           * Randomized mobile side-by-side layout ("here and there, random")!
-           * ───────────────────────────────────────────────────────────── */
-          if (block.type === 'diptych') {
-            const [photoA, photoB] = block.photos;
-            const ratioA =
-              photoA.aspectRatio ||
-              (photoA.width && photoA.height
-                ? photoA.width / photoA.height
-                : 1);
-            const ratioB =
-              photoB.aspectRatio ||
-              (photoB.width && photoB.height
-                ? photoB.width / photoB.height
-                : 1);
-
-            const isPin = isStickyPin(bIdx);
-            const isOverlay = isOverlayBlock(bIdx);
-
-            const bSeed = getBlockSeed(postSeed, bIdx);
-            // Include some photos next to each other on mobile (only here and there, also random)
-            const bothVertical = ratioA < 1.25 && ratioB < 1.25;
-            const isMobileSideBySide = bothVertical
-              ? bSeed % 3 !== 0 // ~66% of vertical pairs sit side-by-side on mobile
-              : bSeed % 4 === 0; // ~25% of other pairs sit side-by-side on mobile
-
-            return (
-              <section
-                key={`diptych-${photoA.id}-${photoB.id}`}
-                className={cn(
-                  'w-full',
-                  isPin && 'relative pb-16 md:pb-28 mt-16 md:mt-28',
-                  isOverlay &&
-                    'relative z-10 bg-background pt-10 md:pt-16 pb-4 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)]',
-                  !isPin && !isOverlay && 'mt-16 md:mt-28',
-                )}
-              >
-                <div className={cn(isPin && 'sticky top-14 md:top-20 z-0')}>
-                  <ScrollReveal>
-                    <div
-                      className={cn(
-                        'flex items-center md:items-start justify-center w-full',
-                        isMobileSideBySide
-                          ? 'flex-row gap-2.5 sm:gap-4 md:gap-8 items-start'
-                          : 'flex-col md:flex-row gap-8',
-                      )}
-                    >
-                      {/* Photo A */}
-                      <div
-                        className={cn(
-                          'flex flex-col items-end group/plate',
-                          isMobileSideBySide
-                            ? 'flex-[var(--ratio-a)_1_0%]'
-                            : 'w-full md:w-auto md:flex-[var(--ratio-a)_1_0%]',
-                        )}
-                        style={
-                          {
-                            '--ratio-a': ratioA,
-                            maxWidth: isMobileSideBySide
-                              ? undefined
-                              : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
-                          } as React.CSSProperties
-                        }
-                      >
-                        <div
-                          onClick={() => setLightboxIndex(block.startIndex)}
-                          className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
-                          style={{
-                            aspectRatio: `${ratioA}`,
-                            maxHeight: isMobileSideBySide
-                              ? '70vh'
-                              : 'min(82vh, calc(100dvh - 6rem))',
-                          }}
-                        >
-                          <BlurImage
-                            src={keyToUrl(photoA.url)}
-                            alt={photoA.title || post.title}
-                            fill
-                            blurhash={photoA.blurData}
-                            aspectRatio={ratioA}
-                            className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
-                            sizes={
-                              isMobileSideBySide
-                                ? '50vw'
-                                : '(max-width: 768px) 100vw, 50vw'
-                            }
-                          />
-                          <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setLightboxIndex(block.startIndex);
-                              }}
-                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
-                              aria-label='Foto vergrößern'
-                            >
-                              <IconArrowsMaximize className='size-3.5' />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Frame index number outside Photo A (Bottom Right) */}
-                        <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>
-                            {String(block.startIndex + 1).padStart(2, '0')}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Photo B */}
-                      <div
-                        className={cn(
-                          'flex flex-col items-end group/plate',
-                          isMobileSideBySide
-                            ? 'flex-[var(--ratio-b)_1_0%]'
-                            : 'w-full md:w-auto md:flex-[var(--ratio-b)_1_0%]',
-                        )}
-                        style={
-                          {
-                            '--ratio-b': ratioB,
-                            maxWidth: isMobileSideBySide
-                              ? undefined
-                              : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
-                          } as React.CSSProperties
-                        }
-                      >
-                        <div
-                          onClick={() => setLightboxIndex(block.startIndex + 1)}
-                          className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
-                          style={{
-                            aspectRatio: `${ratioB}`,
-                            maxHeight: isMobileSideBySide
-                              ? '70vh'
-                              : 'min(82vh, calc(100dvh - 6rem))',
-                          }}
-                        >
-                          <BlurImage
-                            src={keyToUrl(photoB.url)}
-                            alt={photoB.title || post.title}
-                            fill
-                            blurhash={photoB.blurData}
-                            aspectRatio={ratioB}
-                            className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
-                            sizes={
-                              isMobileSideBySide
-                                ? '50vw'
-                                : '(max-width: 768px) 100vw, 50vw'
-                            }
-                          />
-                          <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setLightboxIndex(block.startIndex + 1);
-                              }}
-                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
-                              aria-label='Foto vergrößern'
-                            >
-                              <IconArrowsMaximize className='size-3.5' />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Frame index number outside Photo B (Bottom Right) */}
-                        <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>
-                            {String(block.startIndex + 2).padStart(2, '0')}
-                          </span>
-                        </div>
-                      </div>
                     </div>
-                  </ScrollReveal>
+                  )}
+
+                  {renderBlockContent(unit.overlayBlock)}
                 </div>
               </section>
             );
           }
 
-          /* ─────────────────────────────────────────────────────────────
-           * SOLO FEATURE FRAME
-           * Breathing room / detail highlight, viewport-fitted!
-           * Plate number placed directly below photo (Bottom Right).
-           * Sticky pin if isStickyPin(bIdx), or overlay if isOverlayBlock(bIdx),
-           * or clean normal flow with ScrollReveal!
-           * ───────────────────────────────────────────────────────────── */
-          if (block.type === 'solo') {
-            const photo = block.photo;
-            const ratio =
-              photo.aspectRatio ||
-              (photo.width && photo.height
-                ? photo.width / photo.height
-                : 3 / 2);
-
-            const isPin = isStickyPin(bIdx);
-            const isOverlay = isOverlayBlock(bIdx);
+          if (unit.type === 'pinned-unit') {
+            const blockId = getEditorialBlockId(unit.pinnedBlock);
 
             return (
               <section
-                key={`solo-${photo.id}`}
-                className={cn(
-                  'w-full',
-                  isPin && 'relative pb-16 md:pb-28 mt-16 md:mt-28',
-                  isOverlay &&
-                    'relative z-10 bg-background pt-10 md:pt-16 pb-4 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)]',
-                  !isPin && !isOverlay && 'mt-16 md:mt-28',
-                )}
+                key={`pinned-pair-${blockId}`}
+                className='relative w-full mt-16 md:mt-28'
               >
-                <div className={cn(isPin && 'sticky top-14 md:top-20 z-0')}>
-                  <ScrollReveal>
-                    <div className='flex justify-center w-full max-w-5xl mx-auto'>
-                      <div
-                        className='group/plate flex flex-col items-end'
-                        style={{
-                          width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
-                          maxWidth: '100%',
-                        }}
-                      >
-                        <div
-                          onClick={() => setLightboxIndex(block.index)}
-                          className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
-                          style={{
-                            aspectRatio: `${ratio}`,
-                            maxHeight: 'min(86vh, calc(100dvh - 5rem))',
-                          }}
-                        >
-                          <BlurImage
-                            src={keyToUrl(photo.url)}
-                            alt={photo.title || post.title}
-                            fill
-                            blurhash={photo.blurData}
-                            aspectRatio={ratio}
-                            className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
-                            sizes='(max-width: 1024px) 100vw, 900px'
-                          />
-                          <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setLightboxIndex(block.index);
-                              }}
-                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
-                              aria-label='Foto vergrößern'
-                            >
-                              <IconArrowsMaximize className='size-3.5' />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Frame number outside Solo image (Bottom Right) */}
-                        <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                          <span>
-                            {String(block.index + 1).padStart(2, '0')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </ScrollReveal>
+                {/* 1. PINNED FRAME */}
+                <div className='sticky top-14 md:top-20 z-0'>
+                  {renderBlockContent(unit.pinnedBlock)}
                 </div>
+
+                {/* 2. OVERLAY FRAME */}
+                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
+                  {renderBlockContent(unit.overlayBlock)}
+                </div>
+              </section>
+            );
+          }
+
+          if (unit.type === 'standard-unit') {
+            const block = unit.block;
+            if (block.type === 'hero') {
+              return (
+                <section
+                  key={`hero-${block.photo.id}`}
+                  className='relative w-full'
+                >
+                  <ScrollReveal>{renderHeroContent(block)}</ScrollReveal>
+
+                  {unit.hasFieldNote && (
+                    <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
+                      <ScrollReveal>
+                        <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
+                          <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                            {post.content!.trim()}
+                          </p>
+                        </div>
+                      </ScrollReveal>
+                    </div>
+                  )}
+                </section>
+              );
+            }
+
+            const blockId = getEditorialBlockId(block);
+
+            return (
+              <section
+                key={`standard-${blockId}`}
+                className='w-full mt-16 md:mt-28'
+              >
+                <ScrollReveal>
+                  {renderBlockContent(block)}
+                </ScrollReveal>
               </section>
             );
           }
