@@ -148,7 +148,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   }, [hasMultiplePhotos, photos.length, seed]);
 
   return (
-    <article className='w-full py-10 md:py-18 border-b border-border/40 last:border-b-0'>
+    <article className='w-full py-14 md:py-24 border-b border-border/40 last:border-b-0'>
       {/* Editorial Header */}
       <header className='mb-6 md:mb-8 space-y-2 max-w-3xl'>
         <div className='flex items-center gap-2 text-[11px] uppercase font-mono tracking-widest text-muted-foreground'>
@@ -204,7 +204,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     <Link
                       key={ptp.photo.id}
                       href={href}
-                      className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                      className='relative block group overflow-hidden bg-muted/20 rounded-xs cursor-ansehen'
                       style={{ flex: `${ratio} 1 0%` }}
                     >
                       <div
@@ -219,7 +219,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
                           sizes='(max-width: 1400px) 50vw, 650px'
-                          className='object-contain group-hover:scale-[1.01] transition-transform duration-500'
+                          className='object-contain '
                         />
                       </div>
                     </Link>
@@ -241,7 +241,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 return (
                   <Link
                     href={href}
-                    className='relative block group overflow-hidden bg-muted/20 sticky top-20 self-start rounded-xs transition-shadow hover:shadow-lg'
+                    className='relative block group overflow-hidden bg-muted/20 sticky top-20 self-start rounded-xs transition-shadow hover:shadow-lg cursor-ansehen'
                     style={{ flex: `${r1 * 1.8} 1 0%` }}
                   >
                     <div
@@ -256,7 +256,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                         blurhash={p1.blurData}
                         aspectRatio={r1}
                         sizes='(max-width: 1400px) 65vw, 800px'
-                        className='object-contain group-hover:scale-[1.01] transition-transform duration-500'
+                        className='object-contain '
                       />
                     </div>
                   </Link>
@@ -275,7 +275,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     <Link
                       key={ptp.photo.id}
                       href={href}
-                      className='relative block group overflow-hidden bg-muted/20 flex-1 rounded-xs'
+                      className='relative block group overflow-hidden bg-muted/20 flex-1 rounded-xs cursor-ansehen'
                     >
                       <div
                         style={{ aspectRatio: `${ratio}` }}
@@ -288,7 +288,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
                           sizes='(max-width: 1400px) 35vw, 450px'
-                          className='object-contain group-hover:scale-[1.01] transition-transform duration-500'
+                          className='object-contain '
                         />
                       </div>
                     </Link>
@@ -306,7 +306,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 <div className='sticky top-20 z-0'>
                   <Link
                     href={href}
-                    className='block relative group overflow-hidden max-h-[80vh] rounded-xs'
+                    className='block relative group overflow-hidden max-h-[80vh] rounded-xs cursor-ansehen'
                     style={{
                       aspectRatio: coverPhoto?.aspectRatio
                         ? `${coverPhoto.aspectRatio}`
@@ -321,7 +321,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       blurhash={coverPhoto?.blurData}
                       aspectRatio={coverPhoto?.aspectRatio}
                       sizes='(max-width: 1400px) 100vw, 1200px'
-                      className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
+                      className='object-contain bg-muted/20 '
                     />
                   </Link>
                 </div>
@@ -337,7 +337,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       <Link
                         key={ptp.photo.id}
                         href={href}
-                        className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                        className='relative block group overflow-hidden bg-muted/20 rounded-xs cursor-ansehen'
                         style={{ flex: `${ratio} 1 0%` }}
                       >
                         <div
@@ -351,7 +351,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             blurhash={ptp.photo.blurData}
                             aspectRatio={ratio}
                             sizes='(max-width: 1400px) 50vw, 600px'
-                            className='object-contain bg-muted/20 group-hover:scale-[1.01] transition-transform duration-500'
+                            className='object-contain bg-muted/20 '
                           />
                         </div>
                       </Link>
@@ -364,7 +364,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <ScrollReveal className='space-y-4 lg:space-y-6 w-full'>
                 <Link
                   href={href}
-                  className='block relative group overflow-hidden max-h-[80vh] rounded-xs'
+                  className='block relative group overflow-hidden max-h-[80vh] rounded-xs cursor-ansehen'
                   style={{
                     aspectRatio: coverPhoto?.aspectRatio
                       ? `${coverPhoto.aspectRatio}`
@@ -379,7 +379,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     blurhash={coverPhoto?.blurData}
                     aspectRatio={coverPhoto?.aspectRatio}
                     sizes='(max-width: 1400px) 100vw, 1200px'
-                    className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
+                    className='object-contain bg-muted/20 '
                   />
                 </Link>
 
@@ -394,7 +394,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       <Link
                         key={ptp.photo.id}
                         href={href}
-                        className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                        className='relative block group overflow-hidden bg-muted/20 rounded-xs cursor-ansehen'
                         style={{ flex: `${ratio} 1 0%` }}
                       >
                         <div
@@ -408,7 +408,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             blurhash={ptp.photo.blurData}
                             aspectRatio={ratio}
                             sizes='(max-width: 1400px) 50vw, 600px'
-                            className='object-contain bg-muted/20 group-hover:scale-[1.01] transition-transform duration-500'
+                            className='object-contain bg-muted/20 '
                           />
                         </div>
                       </Link>
@@ -424,7 +424,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             <ScrollReveal className='w-full'>
               <Link
                 href={href}
-                className='block relative group overflow-hidden max-h-[85vh] w-full rounded-xs'
+                className='block relative group overflow-hidden max-h-[85vh] w-full rounded-xs cursor-ansehen'
                 style={{
                   aspectRatio: coverPhoto?.aspectRatio
                     ? `${coverPhoto.aspectRatio}`
@@ -439,7 +439,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   blurhash={coverPhoto?.blurData}
                   aspectRatio={coverPhoto?.aspectRatio}
                   sizes='(max-width: 1400px) 100vw, 1200px'
-                  className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
+                  className='object-contain bg-muted/20 '
                 />
               </Link>
             </ScrollReveal>
@@ -457,7 +457,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <div className='sticky top-16 z-0'>
                 <Link
                   href={href}
-                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20'
+                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20 cursor-ansehen'
                   style={{
                     aspectRatio: photos[0].photo.aspectRatio
                       ? `${photos[0].photo.aspectRatio}`
@@ -484,7 +484,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <div className='relative z-10 bg-background mt-4 pt-3 pb-1 -mx-1 px-1 shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.18)] dark:shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.45)]'>
                 <Link
                   href={href}
-                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20'
+                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20 cursor-ansehen'
                   style={{
                     aspectRatio: photos[1].photo.aspectRatio
                       ? `${photos[1].photo.aspectRatio}`
@@ -520,7 +520,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     <Link
                       key={ptp.photo.id}
                       href={href}
-                      className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                      className='relative block group overflow-hidden bg-muted/20 rounded-xs cursor-ansehen'
                       style={{ flex: `${ratio} 1 0%` }}
                     >
                       <div
@@ -548,7 +548,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             <ScrollReveal className='w-full'>
               <Link
                 href={href}
-                className='block relative w-full overflow-hidden rounded-xs bg-muted/20'
+                className='block relative w-full overflow-hidden rounded-xs bg-muted/20 cursor-ansehen'
                 style={{
                   aspectRatio: coverPhoto?.aspectRatio
                     ? `${coverPhoto.aspectRatio}`

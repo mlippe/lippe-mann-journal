@@ -18,7 +18,7 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
       : null;
 
   return (
-    <Link href={`/collections/${collection.slug}`} className='group'>
+    <Link href={`/collections/${collection.slug}`} className='group cursor-ansehen'>
       <Card className='overflow-hidden border-none bg-muted/30 transition-all hover:bg-muted/50 rounded-2xl py-0 h-full'>
         <CardContent className='p-0 relative'>
           <div className='relative aspect-[1] w-full'>
@@ -28,13 +28,13 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
                   src={imageUrl}
                   alt={collection.name}
                   fill
-                  className='inset-0 object-contain blur-2xl transition-transform duration-500 group-hover:scale-130 scale-110 opacity-'
+                  className='inset-0 object-contain blur-2xl opacity-60'
                 />
                 <Image
                   src={imageUrl}
                   alt={collection.name}
                   fill
-                  className='object-contain object-top transition-transform duration-500 group-hover:scale-105'
+                  className='object-contain object-top'
                 />
               </>
             ) : (

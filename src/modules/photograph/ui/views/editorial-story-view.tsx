@@ -402,7 +402,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               fill
               blurhash={photo.blurData}
               aspectRatio={ratio}
-              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              className='object-contain w-full h-full'
               priority
               sizes='(max-width: 1024px) 100vw, 1200px'
             />
@@ -460,7 +460,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               fill
               blurhash={photo.blurData}
               aspectRatio={ratio}
-              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              className='object-contain w-full h-full'
               sizes='(max-width: 1024px) 100vw, 900px'
             />
             <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
@@ -545,7 +545,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               fill
               blurhash={photoA.blurData}
               aspectRatio={ratioA}
-              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              className='object-contain w-full h-full'
               sizes={
                 isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
               }
@@ -603,7 +603,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               fill
               blurhash={photoB.blurData}
               aspectRatio={ratioB}
-              className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+              className='object-contain w-full h-full'
               sizes={
                 isMobileSideBySide ? '50vw' : '(max-width: 768px) 100vw, 50vw'
               }

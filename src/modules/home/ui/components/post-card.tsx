@@ -351,7 +351,7 @@ const MediaContent = ({
     return (
       <>
         <Link
-          className='block h-full p-3 relative group'
+          className='block h-full p-3 relative group cursor-ansehen'
           href={href}
           onClick={handleDoubleTap}
           onMouseEnter={() => setIsHovered(true)}
@@ -480,7 +480,7 @@ const MediaContent = ({
         {/* Desktop Album Link with Hover Preview - Responsive hidden md:block */}
         <div className='hidden md:block h-full w-full'>
           <Link
-            className='block h-full p-3 relative group'
+            className='block h-full p-3 relative group cursor-ansehen'
             href={href}
             onMouseEnter={() => setIsHovered(true)}
           >
@@ -525,7 +525,7 @@ const MediaContent = ({
   return (
     <>
       <Link
-        className='block h-full p-3 relative group'
+        className='block h-full p-3 relative group cursor-ansehen'
         href={href}
         onClick={handleDoubleTap}
         onMouseEnter={() => setIsHovered(true)}

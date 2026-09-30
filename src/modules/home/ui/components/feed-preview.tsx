@@ -72,7 +72,7 @@ const ZineCardCollage = ({
 
     return (
       <div
-        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-all duration-500 ease-out group-hover:-translate-y-0.5'
+        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
         style={{ aspectRatio: `${clampedR}` }}
       >
         <BlurImage
@@ -83,7 +83,7 @@ const ZineCardCollage = ({
           aspectRatio={r}
           priority={priority}
           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px'
-          className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+          className='object-cover w-full h-full '
         />
         <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.16em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
           01 FOTO
@@ -104,7 +104,7 @@ const ZineCardCollage = ({
 
     return (
       <div
-        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-all duration-500 ease-out group-hover:-translate-y-0.5'
+        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
         style={{ aspectRatio: `${clampedRatio}` }}
       >
         {isSide ? (
@@ -121,7 +121,7 @@ const ZineCardCollage = ({
                 aspectRatio={r1}
                 priority={priority}
                 sizes='(max-width: 768px) 50vw, (max-width: 1200px) 18vw, 190px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
             <div
@@ -135,7 +135,7 @@ const ZineCardCollage = ({
                 blurhash={photos[1].blurData}
                 aspectRatio={r2}
                 sizes='(max-width: 768px) 50vw, (max-width: 1200px) 18vw, 190px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
           </div>
@@ -153,7 +153,7 @@ const ZineCardCollage = ({
                 aspectRatio={r1}
                 priority={priority}
                 sizes='(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
             <div
@@ -167,7 +167,7 @@ const ZineCardCollage = ({
                 blurhash={photos[1].blurData}
                 aspectRatio={r2}
                 sizes='(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
           </div>
@@ -203,7 +203,7 @@ const ZineCardCollage = ({
 
   return (
     <div
-      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-all duration-500 ease-out group-hover:-translate-y-0.5'
+      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group-hover:border-foreground/30 rounded-xs transition-colors duration-300 cursor-ansehen'
       style={{ aspectRatio: `${clampedRatio}` }}
     >
       {isHeroLeft ? (
@@ -221,7 +221,7 @@ const ZineCardCollage = ({
               aspectRatio={r1}
               priority={priority}
               sizes='(max-width: 768px) 60vw, (max-width: 1200px) 22vw, 240px'
-              className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+              className='object-cover w-full h-full '
             />
           </div>
 
@@ -241,7 +241,7 @@ const ZineCardCollage = ({
                 blurhash={photos[1].blurData}
                 aspectRatio={r2}
                 sizes='(max-width: 768px) 40vw, (max-width: 1200px) 14vw, 150px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
             <div
@@ -255,7 +255,7 @@ const ZineCardCollage = ({
                 blurhash={photos[2].blurData}
                 aspectRatio={r3}
                 sizes='(max-width: 768px) 40vw, (max-width: 1200px) 14vw, 150px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
           </div>
@@ -275,7 +275,7 @@ const ZineCardCollage = ({
               aspectRatio={r1}
               priority={priority}
               sizes='(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px'
-              className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+              className='object-cover w-full h-full '
             />
           </div>
 
@@ -295,7 +295,7 @@ const ZineCardCollage = ({
                 blurhash={photos[1].blurData}
                 aspectRatio={r2}
                 sizes='(max-width: 768px) 50vw, (max-width: 1200px) 18vw, 190px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
             <div
@@ -309,7 +309,7 @@ const ZineCardCollage = ({
                 blurhash={photos[2].blurData}
                 aspectRatio={r3}
                 sizes='(max-width: 768px) 50vw, (max-width: 1200px) 18vw, 190px'
-                className='object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.025]'
+                className='object-cover w-full h-full '
               />
             </div>
           </div>
@@ -400,7 +400,7 @@ export const ZinePreviewCard = ({ post, priority = false }: ZinePreviewCardProps
         />
 
         {/* 2. EDITORIAL METADATA & HEADLINE */}
-        <div className='pt-3.5 space-y-2 flex-1'>
+        <div className='pt-4 space-y-2.5 flex-1'>
           {/* Eyebrow: Date & Primary Tag */}
           <div className='flex items-center gap-1.5 text-[10px] sm:text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground/75 font-medium'>
             <time dateTime={post.createdAt ? new Date(post.createdAt).toISOString() : undefined}>
@@ -438,9 +438,9 @@ export const ZinePreviewCard = ({ post, priority = false }: ZinePreviewCardProps
 };
 
 export const FeedPreviewSkeleton = ({ limit = 3 }: { limit?: number }) => (
-  <section className='w-full max-w-6xl mx-auto pt-14 md:pt-20 border-t border-border/40'>
+  <section className='w-full max-w-6xl mx-auto pt-16 md:pt-24 border-t border-border/40'>
     {/* Section Header Skeleton */}
-    <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12'>
+    <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 md:mb-14'>
       <div className='space-y-2'>
         <div className='h-3 w-28 bg-muted/60 rounded-xs animate-pulse' />
         <div className='h-7 w-64 bg-muted/60 rounded-xs animate-pulse' />
@@ -519,7 +519,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
       </div>
 
       {/* Responsive 3-Card Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start'>
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-12 md:gap-8 lg:gap-10 xl:gap-14 items-start'>
         {filteredPosts.map((post, i) => (
           <ZinePreviewCard key={post.id} post={post} priority={i === 0} />
         ))}
