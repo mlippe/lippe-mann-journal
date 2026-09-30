@@ -551,9 +551,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             </div>
           </div>
 
-          {/* Understated Highlight Indicator */}
-          <div className='pt-2 flex items-center justify-between w-full text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-            <span className='text-amber-500/90 font-medium tracking-wider'>★ HIGHLIGHT</span>
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
