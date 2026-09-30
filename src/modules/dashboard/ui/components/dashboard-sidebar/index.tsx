@@ -38,6 +38,11 @@ const data = {
       icon: 'post',
     },
     {
+      title: 'Substanz-Checkliste',
+      url: '/dashboard/substanz-checklist',
+      icon: 'checklist',
+    },
+    {
       title: 'Profile',
       url: '/dashboard/profile',
       icon: 'user',

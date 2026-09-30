@@ -17,12 +17,15 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export function SiteHeader() {
   const pathname = usePathname();
   const rawSegments = pathname.split("/").filter(Boolean).slice(1);
+
+  const formatTitle = (segment: string) => {
+    if (segment === "substanz-checklist") return "Substanz-Checkliste";
+    return segment.charAt(0).toUpperCase() + segment.slice(1);
+  };
+
   const currentTitle =
     rawSegments.length > 0
-      ? (() => {
-          const last = decodeURIComponent(rawSegments[rawSegments.length - 1]);
-          return last.charAt(0).toUpperCase() + last.slice(1);
-        })()
+      ? formatTitle(decodeURIComponent(rawSegments[rawSegments.length - 1]))
       : "Dashboard";
 
   return (
@@ -52,9 +55,7 @@ export function SiteHeader() {
                 .slice(0, index + 1)
                 .join("/")}`;
               const decodedSegment = decodeURIComponent(segment);
-              const formattedSegment =
-                decodedSegment.charAt(0).toUpperCase() +
-                decodedSegment.slice(1);
+              const formattedSegment = formatTitle(decodedSegment);
 
               return (
                 <React.Fragment key={segmentPath}>

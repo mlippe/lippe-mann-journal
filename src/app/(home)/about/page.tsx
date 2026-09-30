@@ -20,12 +20,12 @@ const AboutPage = () => {
             <h1 className='text-3xl'>Hallo! Moin! Servus! Grüzi!</h1>
             <div className='flex flex-col gap-4 font-light'>
               <p className='md:text-lg'>
-                In diesem Journal gibt es Einblicke in meine{' '}
+                Das hier ist mein Journal:{' '}
                 <b>
-                  aktuellen Projekte, Gedankenfetzen zu Themen, die mich
-                  beschäftigen
+                  eine visuelle Chronik aus Fragmenten, Begegnungen und Momenten
+                  des Alltags.
                 </b>{' '}
-                und <b>Bilder aus meinem täglichen Leben.</b>
+                Vor allem in Bildern, manchmal mit einem Gedanken dazu.
               </p>
             </div>
           </div>
@@ -70,9 +70,18 @@ const AboutPage = () => {
                 sondern den Prozess, Ausschnitte, Gedanken.
               </p>
               <p className='md:text-lg'>
-                In diesem Journal tue ich genau das: eine Plattform für meine
-                Arbeiten und Gedanken. Still mitlesen, liken, ignorieren oder
-                mitdiskutieren.
+                Genau das tue ich hier, nur dass es bei mir hauptsächlich Bilder
+                geworden sind:
+                <br />
+                <br />
+                Ich fotografiere, was mir im Alltag auffällt: das Licht an einer
+                Hauswand, eine Farbe, die plötzlich zusammenpasst, ein Moment,
+                der ohne Kamera einfach vorbeigegangen wäre. Ich bin dankbar für
+                die kleinen schönen Dinge, und nichts bleibt, wie es ist. Also
+                halte ich sie fest, solange sie da sind, und zeige, wie ich die
+                Welt sehe und wo ich Schönheit finde.
+                <br />
+                <br />
               </p>
             </div>
           </div>
@@ -86,61 +95,17 @@ const AboutPage = () => {
                 Folgende Themen sind in diesem Journal zu finden:
               </p>
               <p className='md:text-lg'>
-                <b className='font-medium '>Persönliche Projekte</b>
-                <br />
-                Einzelheiten zu den Dingen, mit denen ich mir meine Freizeit und
-                mein Leben vertreibe.
+                <b className='font-medium '>
+                  Fotoserien aus dem Alltag, oft mit ein paar Sätzen dazu
+                </b>
               </p>
               <p className='md:text-lg'>
-                <b className='font-medium '>Fotos und Drohnenvideos</b>
-                <br />
-                Einst habe ich viel davon auf{' '}
-                <Link
-                  href='https://www.instagram.com/lippe.mann'
-                  target='_blank'
-                  className='underline hover:no-underline'
-                >
-                  meinem Instagram
-                </Link>{' '}
-                gepostet. Möchte ich nicht mehr. Ich möchte allerdings eine
-                öffentliche Bühne für diese Inhalte.
-              </p>
-              <div className='md:text-lg'>
                 <b className='font-medium '>
-                  Gedanken zu Themen, die mich beschäftigen, die ich interessant
-                  finde:
-                </b>
-                <br />
-                <ul className='list-disc pl-6 my-4'>
-                  <li className='mb-2'>
-                    Entrepreneurship in der digitalen Welt
-                  </li>
-                  <li className='mb-2'>Lebensphilosophien und -entwürfe</li>
-                  <li className='mb-2'>
-                    <Link
-                      href='https://de.wikipedia.org/wiki/Open_Source_Intelligence'
-                      target='_blank'
-                      className='underline hover:no-underline'
-                    >
-                      OSINT
-                    </Link>
-                  </li>
-                  <li className='mb-2'>
-                    <Link
-                      href='https://meshtastic.org/docs/introduction'
-                      target='_blank'
-                      className='underline hover:no-underline'
-                    >
-                      Meshtastic - Alternative Kommunikationshardware
-                    </Link>
-                  </li>
-                  <li>
-                    Die Interaktion / Beziehung der Menschen mit Smartphones im
-                    Alltag (Brainrot / Doomscrolling)
-                  </li>
-                </ul>
-                Wie häufig was zu den Themen kommt, wird sich zeigen.
-              </div>
+                  Gelegentlich Gedanken und Einblicke
+                </b>{' '}
+                in Projekte, zum Beispiel zu Lebensphilosophien, Meshtastic oder
+                dem Leben mit dem Smartphone
+              </p>
             </div>
           </div>
         </CardContainer>

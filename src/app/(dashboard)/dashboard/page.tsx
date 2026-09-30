@@ -13,7 +13,14 @@ import {
 } from '@/modules/dashboard/ui/views/section-cards-view';
 import { NewPostView } from '@/modules/dashboard/ui/views/new-post-view';
 
-import { IconChartLine, IconFolder, IconPlus } from '@tabler/icons-react';
+import {
+  IconArrowUpRight,
+  IconChartLine,
+  IconChecklist,
+  IconFolder,
+  IconPlus,
+} from '@tabler/icons-react';
+import Link from 'next/link';
 
 const page = async () => {
   const queryClient = getQueryClient();
@@ -60,6 +67,38 @@ const page = async () => {
                 <SectionCardsView />
               </Suspense>
             </section>
+
+            {/* 3. SUBSTANZ-CHECKLISTE COMPANION BANNER */}
+            <Link
+              href='/dashboard/substanz-checklist'
+              className='group block active:scale-[0.99] transition-all'
+            >
+              <div className='p-3.5 sm:p-4 rounded-lg border border-border/70 bg-muted/20 hover:bg-muted/40 hover:border-primary/40 transition-all flex items-center justify-between gap-3 shadow-2xs'>
+                <div className='flex items-center gap-2.5 sm:gap-3 min-w-0'>
+                  <div className='p-2 rounded-md bg-primary/10 text-primary shrink-0'>
+                    <IconChecklist className='size-4 sm:size-5' />
+                  </div>
+                  <div className='space-y-0.5 min-w-0'>
+                    <div className='flex items-center gap-2'>
+                      <span className='text-xs sm:text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate'>
+                        Substanz-Checkliste
+                      </span>
+                      <span className='text-[10px] font-mono uppercase bg-primary/10 text-primary px-1.5 py-0.2 rounded-xs font-semibold'>
+                        Leitfaden
+                      </span>
+                    </div>
+                    <p className='text-xs font-serif italic text-muted-foreground truncate'>
+                      Hinsehen, solange es da ist. Zeigen, was ich festhalten konnte.
+                    </p>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-1 text-xs font-mono text-muted-foreground group-hover:text-primary shrink-0'>
+                  <span className='hidden sm:inline'>Öffnen</span>
+                  <IconArrowUpRight className='size-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
+                </div>
+              </div>
+            </Link>
 
             {/* 3. ACTIVITY SECTION */}
             <section className='space-y-2.5'>

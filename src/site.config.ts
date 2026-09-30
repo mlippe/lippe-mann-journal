@@ -24,7 +24,7 @@ export const siteConfig = {
   role: 'Digital Product Engineer',
 
   /** Short bio shown on the home page profile card */
-  bio: 'Visuelle Chronik. Fragmente, Begegnungen und Momente des Alltags.',
+  bio: 'Hinsehen, solange es da ist. Zeigen, was festgehalten wurde.',
 
   /** Avatar image path (place your avatar in /public/avatar.jpg) */
   avatar: '/avatar.jpg',
