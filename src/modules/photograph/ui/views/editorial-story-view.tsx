@@ -38,6 +38,11 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useIdentity } from '@/hooks/use-identity';
 import { type SocialInteractionsData } from '@/modules/social/types';
+import {
+  TransformWrapper,
+  TransformComponent,
+  type ReactZoomPanPinchRef,
+} from 'react-zoom-pan-pinch';
 
 interface EditorialStoryViewProps {
   post: PostGetOne;
@@ -57,12 +62,17 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   const [copied, setCopied] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+  const [currentScale, setCurrentScale] = useState(1);
+  const [isCurrentlyDragging, setIsCurrentlyDragging] = useState(false);
 
-  // Touch swipe tracking refs
+  const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
+  const isPanningRef = useRef(false);
+  const ignoreClickRef = useRef(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const hasTouchMoved = useRef(false);
+
+  const isZoomed = currentScale > 1.05;
 
   // Social query & mutation setup
   const interactionParams = {
@@ -214,19 +224,24 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     setLightboxIndex((prev) =>
       prev !== null ? (prev + 1) % photos.length : null,
     );
-    setIsZoomed(false);
+    setCurrentScale(1);
   }, [photos.length]);
 
   const handlePrevPhoto = useCallback(() => {
     setLightboxIndex((prev) =>
       prev !== null ? (prev - 1 + photos.length) % photos.length : null,
     );
-    setIsZoomed(false);
+    setCurrentScale(1);
   }, [photos.length]);
 
-  // Reset zoom on slide change
+  // Reset scale and gesture tracking on slide change
   useEffect(() => {
-    setIsZoomed(false);
+    setCurrentScale(1);
+    isPanningRef.current = false;
+    ignoreClickRef.current = false;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    hasTouchMoved.current = false;
   }, [lightboxIndex]);
 
   // Keyboard navigation for lightbox
@@ -239,7 +254,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         handlePrevPhoto();
       } else if (e.key === 'Escape') {
         setLightboxIndex(null);
-        setIsZoomed(false);
+        setCurrentScale(1);
       }
     },
     [lightboxIndex, handleNextPhoto, handlePrevPhoto],
@@ -250,16 +265,48 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Touch swipe support in lightbox
+  // Touch gesture support in lightbox: single-finger horizontal swipe navigates when fitted
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isZoomed) return;
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
+    if (e.touches.length === 1) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      hasTouchMoved.current = false;
+    } else {
+      touchStartX.current = null;
+      touchStartY.current = null;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    if (e.touches.length === 1) {
+      const deltaX = Math.abs(e.touches[0].clientX - touchStartX.current);
+      const deltaY = Math.abs(e.touches[0].clientY - touchStartY.current);
+      if (deltaX > 10 || deltaY > 10) {
+        hasTouchMoved.current = true;
+      }
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isZoomed || touchStartX.current === null || touchStartY.current === null)
+    if (hasTouchMoved.current) {
+      ignoreClickRef.current = true;
+      setTimeout(() => {
+        ignoreClickRef.current = false;
+      }, 200);
+    }
+
+    if (
+      isZoomed ||
+      touchStartX.current === null ||
+      touchStartY.current === null
+    ) {
+      touchStartX.current = null;
+      touchStartY.current = null;
       return;
+    }
+
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
     const deltaY = e.changedTouches[0].clientY - touchStartY.current;
 
@@ -275,16 +322,28 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     touchStartY.current = null;
   };
 
-  // Click/Tap to zoom in lightbox
-  const handleImageZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Click/Tap to zoom in at point or reset to fit
+  const handleStageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isPanningRef.current || ignoreClickRef.current) return;
+
     if (!isZoomed) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setZoomOrigin({ x, y });
-      setIsZoomed(true);
+      transformComponentRef.current?.zoomToPoint(
+        2.5,
+        e.clientX,
+        e.clientY,
+        300,
+        'easeOut',
+      );
     } else {
-      setIsZoomed(false);
+      transformComponentRef.current?.resetTransform(300, 'easeOut');
+    }
+  };
+
+  const handleToggleZoomButton = () => {
+    if (!isZoomed) {
+      transformComponentRef.current?.centerView(2.5, 300, 'easeOut');
+    } else {
+      transformComponentRef.current?.resetTransform(300, 'easeOut');
     }
   };
 
@@ -838,13 +897,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
       </footer>
 
-      {/* 4. FULLSCREEN LIGHTBOX DIALOG (100% Zoom, Swipes, Cycling & Full EXIF) */}
+      {/* 4. FULLSCREEN LIGHTBOX DIALOG (100% Zoom, Drag/Pan, Pinch & Full EXIF) */}
       <Dialog
         open={lightboxIndex !== null}
         onOpenChange={(open) => {
           if (!open) {
             setLightboxIndex(null);
-            setIsZoomed(false);
+            setCurrentScale(1);
           }
         }}
       >
@@ -856,8 +915,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
             <div
-              className='relative w-full h-full flex flex-col justify-between select-none overflow-hidden'
+              className='relative w-full h-full flex flex-col justify-between select-none overflow-hidden touch-none'
               onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Top Controls Bar */}
@@ -875,7 +935,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 {/* Actions & Zoom Toggle */}
                 <div className='flex items-center gap-2 sm:gap-3'>
                   <button
-                    onClick={() => setIsZoomed((prev) => !prev)}
+                    onClick={handleToggleZoomButton}
                     className={cn(
                       'px-2.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer',
                       isZoomed
@@ -933,7 +993,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   <button
                     onClick={() => {
                       setLightboxIndex(null);
-                      setIsZoomed(false);
+                      setCurrentScale(1);
                     }}
                     className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
                     aria-label='Schließen (Esc)'
@@ -943,35 +1003,86 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </div>
               </div>
 
-              {/* Main Image Stage (100% Zoomable on Click / Tap) */}
+              {/* Main Image Stage (Drag/Pan, Pinch & 100% Zoomable) */}
               <div
-                className='relative grow flex items-center justify-center min-h-0 w-full overflow-hidden'
-                onClick={handleImageZoomClick}
+                className={cn(
+                  'relative grow flex items-center justify-center min-h-0 w-full overflow-hidden select-none',
+                  isZoomed
+                    ? isCurrentlyDragging
+                      ? 'cursor-grabbing'
+                      : 'cursor-grab'
+                    : 'cursor-zoom-in',
+                )}
+                onClick={handleStageClick}
               >
-                <div
-                  className={cn(
-                    'relative max-w-full max-h-full flex items-center justify-center transition-transform duration-300 ease-out',
-                    isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in',
-                  )}
-                  style={{
-                    transform: isZoomed ? 'scale(2.5)' : 'scale(1)',
-                    transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                <TransformWrapper
+                  ref={transformComponentRef}
+                  key={lightboxIndex}
+                  initialScale={1}
+                  minScale={1}
+                  maxScale={5}
+                  centerOnInit
+                  limitToBounds
+                  panning={{
+                    disabled: !isZoomed,
+                    velocityDisabled: false,
+                    allowLeftClickPan: true,
+                  }}
+                  pinch={{
+                    disabled: false,
+                    step: 5,
+                  }}
+                  doubleClick={{
+                    disabled: false,
+                    mode: 'toggle',
+                    step: 2.5,
+                    animationTime: 250,
+                  }}
+                  wheel={{
+                    step: 0.15,
+                    disabled: false,
+                  }}
+                  onPanningStart={() => {
+                    isPanningRef.current = true;
+                    setIsCurrentlyDragging(true);
+                  }}
+                  onPanningStop={() => {
+                    setIsCurrentlyDragging(false);
+                    setTimeout(() => {
+                      isPanningRef.current = false;
+                    }, 100);
+                  }}
+                  onTransform={(_ref, state) => {
+                    setCurrentScale(state.scale);
                   }}
                 >
-                  <BlurImage
-                    src={keyToUrl(photos[lightboxIndex].url)}
-                    alt={photos[lightboxIndex].title || post.title}
-                    width={photos[lightboxIndex].width}
-                    height={photos[lightboxIndex].height}
-                    blurhash={photos[lightboxIndex].blurData}
-                    aspectRatio={photos[lightboxIndex].aspectRatio}
-                    className='max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] object-contain select-none pointer-events-none'
-                    sizes='100vw'
-                    priority
-                  />
-                </div>
+                  <TransformComponent
+                    wrapperClass='w-full h-full flex items-center justify-center'
+                    contentClass='w-full h-full flex items-center justify-center'
+                    wrapperStyle={{ width: '100%', height: '100%' }}
+                    contentStyle={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <BlurImage
+                      src={keyToUrl(photos[lightboxIndex].url)}
+                      alt={photos[lightboxIndex].title || post.title}
+                      width={photos[lightboxIndex].width}
+                      height={photos[lightboxIndex].height}
+                      blurhash={photos[lightboxIndex].blurData}
+                      aspectRatio={photos[lightboxIndex].aspectRatio}
+                      className='max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] object-contain select-none pointer-events-none'
+                      sizes='100vw'
+                      priority
+                    />
+                  </TransformComponent>
+                </TransformWrapper>
 
-                {/* Left/Right Prev/Next Buttons (Visible when not zoomed) */}
+                {/* Left/Right Prev/Next Buttons (Visible when not zoomed in) */}
                 {photos.length > 1 && !isZoomed && (
                   <>
                     <button
