@@ -29,6 +29,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useErrorBoundary } from 'react-error-boundary';
 import { useModal } from '@/hooks/use-modal';
 
+import { PhotoCardMobile } from '../components/photo-card-mobile';
+
 export const DashboardPhotosView = () => {
   const trpc = useTRPC();
   const [filters, setFilters] = usePhotosFilters();
@@ -42,7 +44,18 @@ export const DashboardPhotosView = () => {
         <EmptyStatus />
       ) : (
         <>
-          <DataTable data={data.items} columns={columns} />
+          {/* Mobile Touch Cards (< md) */}
+          <div className='md:hidden space-y-2.5'>
+            {data.items.map((photo) => (
+              <PhotoCardMobile key={photo.id} photo={photo} />
+            ))}
+          </div>
+
+          {/* Desktop Data Table (>= md) */}
+          <div className='hidden md:block'>
+            <DataTable data={data.items} columns={columns} />
+          </div>
+
           <DataPagination
             page={filters.page}
             totalPages={data.totalPages}
@@ -104,49 +117,49 @@ export const ErrorStatus = () => {
 
 export const LoadingStatus = () => {
   return (
-    <div className='px-4 md:px-8'>
-      <div className='rounded-md border'>
+    <div className='space-y-4'>
+      {/* Mobile Loading Skeleton */}
+      <div className='md:hidden space-y-2.5'>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className='flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card'
+          >
+            <Skeleton className='size-14 rounded-lg shrink-0' />
+            <div className='flex-1 min-w-0 space-y-2'>
+              <Skeleton className='h-4 w-2/3' />
+              <Skeleton className='h-3 w-28' />
+            </div>
+            <Skeleton className='size-8 rounded-md shrink-0' />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Loading Skeleton */}
+      <div className='hidden md:block rounded-md border'>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='pl-6 w-127.5'>Photos</TableHead>
-              <TableHead>Visibility</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className='text-right'>Views</TableHead>
-              <TableHead className='text-right'>Comments</TableHead>
-              <TableHead className='text-right pr-6'>Likes</TableHead>
+              <TableHead className='pl-6 w-20'>Image</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Taken At</TableHead>
+              <TableHead className='text-right pr-6'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 10 }).map((_, i) => (
               <TableRow key={i}>
                 <TableCell className='pl-6'>
-                  <div className='flex items-center gap-4'>
-                    <Skeleton className='h-20 w-36' />
-                    <div className='flex flex-col gap-2'>
-                      <Skeleton className='h-4 w-25' />
-                      <Skeleton className='h-3 w-45' />
-                    </div>
-                  </div>
+                  <Skeleton className='size-14 rounded-md' />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className='h-4 w-20' />
+                  <Skeleton className='h-4 w-48' />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className='h-4 w-20' />
-                </TableCell>
-                <TableCell className='text-xs truncate'>
-                  <Skeleton className='h-4 w-24' />
-                </TableCell>
-                <TableCell className='text-right'>
-                  <Skeleton className='h-4 w-16' />
-                </TableCell>
-                <TableCell className='text-right'>
-                  <Skeleton className='h-4 w-20' />
+                  <Skeleton className='h-4 w-32' />
                 </TableCell>
                 <TableCell className='text-right pr-6'>
-                  <Skeleton className='h-4 w-16' />
+                  <Skeleton className='size-8 rounded-md ml-auto' />
                 </TableCell>
               </TableRow>
             ))}

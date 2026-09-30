@@ -22,6 +22,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { CollectionCardMobile } from './collection-card-mobile';
+
 export const CollectionsList = () => {
   const trpc = useTRPC();
   const { data, isLoading } = useQuery(
@@ -50,7 +52,17 @@ export const CollectionsList = () => {
 
   return (
     <div className='flex-1 pb-4 flex flex-col gap-y-4'>
-      <DataTable columns={columns} data={data} />
+      {/* Mobile Touch Cards (< md) */}
+      <div className='md:hidden space-y-2.5'>
+        {data.map((collection) => (
+          <CollectionCardMobile key={collection.id} collection={collection} />
+        ))}
+      </div>
+
+      {/* Desktop Data Table (>= md) */}
+      <div className='hidden md:block'>
+        <DataTable columns={columns} data={data} />
+      </div>
     </div>
   );
 };
@@ -58,7 +70,28 @@ export const CollectionsList = () => {
 const LoadingStatus = () => {
   return (
     <div className='flex-1 pb-4 flex flex-col gap-y-4'>
-      <div className='rounded-md border'>
+      {/* Mobile Loading Skeleton */}
+      <div className='md:hidden space-y-2.5'>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className='flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card'
+          >
+            <Skeleton className='size-14 rounded-lg shrink-0' />
+            <div className='flex-1 min-w-0 space-y-2'>
+              <Skeleton className='h-4 w-3/4' />
+              <div className='flex gap-2'>
+                <Skeleton className='h-3 w-16 rounded' />
+                <Skeleton className='h-3 w-20' />
+              </div>
+            </div>
+            <Skeleton className='size-8 rounded-md shrink-0' />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Loading Skeleton */}
+      <div className='hidden md:block rounded-md border'>
         <Table>
           <TableHeader>
             <TableRow>
@@ -72,19 +105,19 @@ const LoadingStatus = () => {
             {Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
                 <TableCell className='pl-6'>
-                  <div className='flex flex-col gap-2'>
+                  <div className='flex flex-col gap-1.5'>
                     <Skeleton className='h-4 w-40' />
-                    <Skeleton className='h-3 w-32' />
+                    <Skeleton className='h-3 w-24' />
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Skeleton className='h-6 w-20 rounded-full' />
+                  <Skeleton className='h-5 w-20 rounded-full' />
                 </TableCell>
                 <TableCell>
                   <Skeleton className='h-4 w-24' />
                 </TableCell>
                 <TableCell className='text-right pr-6'>
-                  <Skeleton className='ml-auto h-8 w-8 rounded-full' />
+                  <Skeleton className='ml-auto size-8 rounded-md' />
                 </TableCell>
               </TableRow>
             ))}

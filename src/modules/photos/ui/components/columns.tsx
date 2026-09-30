@@ -5,10 +5,8 @@ import { photoGetMany } from '../../types';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import BlurImage from '@/components/blur-image';
 import { formatExifDate } from '../../lib/utils';
-import { DeletePhotoButton } from './delete-photo-button';
+import { PhotoActions } from './photo-actions';
 import Link from 'next/link';
-import { PenBoxIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export const columns: ColumnDef<photoGetMany[number]>[] = [
   {
@@ -19,14 +17,14 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
       const imageUrl = keyToUrl(url);
 
       return (
-        <div className='w-16 h-16 overflow-hidden'>
+        <div className='w-14 h-14 relative rounded-md overflow-hidden bg-muted border border-border/40'>
           <BlurImage
             src={imageUrl}
-            alt={row.original.title}
-            width={64}
-            height={64}
+            alt={row.original.title || 'Photo'}
+            fill
             blurhash={row.original.blurData}
-            className='w-16 h-16 object-cover'
+            className='object-cover'
+            sizes='56px'
           />
         </div>
       );
@@ -35,38 +33,41 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
   {
     accessorKey: 'title',
     header: 'Title',
+    cell: ({ row }) => {
+      const editPath = `/dashboard/photos/${row.original.id}`;
+      return (
+        <Link
+          href={editPath}
+          className='font-medium hover:underline block truncate max-w-xs md:max-w-md'
+        >
+          {row.original.title || 'Ohne Titel'}
+        </Link>
+      );
+    },
   },
   {
     accessorKey: 'dateTimeOriginal',
     header: 'Taken At',
     cell: ({ row }) => {
       const takenAt = row.original.dateTimeOriginal;
-      if (!takenAt) return <span>-</span>;
+      if (!takenAt) return <span className='text-muted-foreground'>-</span>;
 
       // Use formatExifDate for consistent formatting without timezone shifts
       const formatted = formatExifDate(takenAt, 'MMM d, yyyy HH:mm');
 
-      return <span suppressHydrationWarning>{formatted}</span>;
+      return <span suppressHydrationWarning className='text-sm text-muted-foreground'>{formatted}</span>;
     },
   },
   {
     id: 'actions',
-    header: 'Actions',
+    header: () => <span className='sr-only'>Actions</span>,
     cell: ({ row }) => {
       return (
-        <div className='flex items-center gap-2'>
-          <DeletePhotoButton
-            photoId={row.original.id}
-            photoTitle={row.original.title}
-          />
-
-          <Button variant='ghost' size='icon' asChild>
-            <Link href={`/dashboard/photos/${row.original.id}`}>
-              <PenBoxIcon className='h-4 w-4' />
-            </Link>
-          </Button>
+        <div className='flex justify-end'>
+          <PhotoActions photo={row.original} />
         </div>
       );
     },
   },
 ];
+

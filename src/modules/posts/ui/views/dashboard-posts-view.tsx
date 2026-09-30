@@ -19,7 +19,7 @@ export const DashboardPostsView = () => {
   return (
     <div className='flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4'>
       <div className='flex items-center justify-between'>
-        <div className='relative w-full max-w-sm'>
+        <div className='relative w-full sm:max-w-sm'>
           <IconSearch className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             placeholder='Search posts...'
@@ -37,7 +37,7 @@ export const DashboardPostsView = () => {
         }
         className='w-full'
       >
-        <TabsList>
+        <TabsList className='w-full grid grid-cols-3 sm:w-auto sm:inline-flex'>
           <TabsTrigger value='PHOTO'>Photos</TabsTrigger>
           <TabsTrigger value='ALBUM'>Albums</TabsTrigger>
           <TabsTrigger value='ARTICLE'>Articles</TabsTrigger>

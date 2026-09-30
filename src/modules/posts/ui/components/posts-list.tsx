@@ -25,6 +25,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePostsFilters } from '../../hooks/use-posts-filters';
 
+import { PostCardMobile } from './post-card-mobile';
+
 interface PostsListProps {
   type?: 'ARTICLE' | 'PHOTO' | 'ALBUM';
 }
@@ -47,7 +49,18 @@ export const PostsList = ({ type }: PostsListProps) => {
           <EmptyStatus type={type} />
         ) : (
           <>
-            <DataTable columns={columns} data={data.items} />
+            {/* Mobile Touch Cards (< md) */}
+            <div className='md:hidden space-y-2.5'>
+              {data.items.map((post) => (
+                <PostCardMobile key={post.id} post={post} />
+              ))}
+            </div>
+
+            {/* Desktop Data Table (>= md) */}
+            <div className='hidden md:block'>
+              <DataTable columns={columns} data={data.items} />
+            </div>
+
             <DataPagination
               page={filters.page}
               totalPages={data.totalPages}
@@ -87,11 +100,33 @@ export const ErrorStatus = () => {
 export const LoadingStatus = () => {
   return (
     <div className='flex-1 pb-4 flex flex-col gap-y-4'>
-      <div className='rounded-md border'>
+      {/* Mobile Loading Skeleton */}
+      <div className='md:hidden space-y-2.5'>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className='flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card'
+          >
+            <Skeleton className='size-14 rounded-lg shrink-0' />
+            <div className='flex-1 min-w-0 space-y-2'>
+              <Skeleton className='h-4 w-3/4' />
+              <div className='flex gap-2'>
+                <Skeleton className='h-3 w-12 rounded' />
+                <Skeleton className='h-3 w-16' />
+              </div>
+            </div>
+            <Skeleton className='size-8 rounded-md shrink-0' />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Loading Skeleton */}
+      <div className='hidden md:block rounded-md border'>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className='pl-6'>Title</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Visibility</TableHead>
               <TableHead className='text-right pr-6'>Actions</TableHead>
             </TableRow>
@@ -100,19 +135,16 @@ export const LoadingStatus = () => {
             {Array.from({ length: 10 }).map((_, i) => (
               <TableRow key={i}>
                 <TableCell className='pl-6'>
-                  <div className='flex flex-col gap-2'>
-                    <Skeleton className='h-4 w-45' />
-                    <Skeleton className='h-3 w-65' />
-                  </div>
+                  <Skeleton className='h-4 w-48' />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className='h-6 w-24 rounded-full' />
+                  <Skeleton className='h-5 w-16 rounded' />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className='h-5 w-20 rounded-full' />
                 </TableCell>
                 <TableCell className='text-right pr-6'>
-                  <div className='flex justify-end gap-2'>
-                    <Skeleton className='h-8 w-8 rounded-full' />
-                    <Skeleton className='h-8 w-8 rounded-full' />
-                  </div>
+                  <Skeleton className='size-8 rounded-md ml-auto' />
                 </TableCell>
               </TableRow>
             ))}

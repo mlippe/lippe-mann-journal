@@ -23,12 +23,14 @@ export function SectionCardsView() {
   ];
 
   return (
-    <div className='grid grid-cols-1 gap-4 @xl/main:grid-cols-3'>
+    <div className='grid grid-cols-3 gap-2 sm:gap-4'>
       {cardData.map((card) => (
-        <Card key={card.title} className='@container/card'>
-          <CardHeader>
-            <CardDescription>{card.title}</CardDescription>
-            <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+        <Card key={card.title} className='p-3 sm:p-5 border-border/70'>
+          <CardHeader className='p-0 space-y-1'>
+            <CardDescription className='text-[11px] sm:text-xs text-muted-foreground truncate'>
+              {card.title}
+            </CardDescription>
+            <CardTitle className='text-lg sm:text-2xl md:text-3xl font-semibold tabular-nums leading-none sm:leading-normal'>
               {card.value.toLocaleString()}
             </CardTitle>
           </CardHeader>
@@ -40,15 +42,15 @@ export function SectionCardsView() {
 
 export const SectionCardsLoading = () => {
   return (
-    <div className='grid grid-cols-1 gap-4 @xl/main:grid-cols-3'>
+    <div className='grid grid-cols-3 gap-2 sm:gap-4'>
       {[1, 2, 3].map((i) => (
-        <Card key={i} className='@container/card'>
-          <CardHeader>
+        <Card key={i} className='p-3 sm:p-5 border-border/70'>
+          <CardHeader className='p-0 space-y-1.5'>
             <CardDescription>
-              <Skeleton className='h-4 w-20' />
+              <Skeleton className='h-3 w-16' />
             </CardDescription>
-            <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              <Skeleton className='h-8 w-16 mt-2' />
+            <CardTitle>
+              <Skeleton className='h-6 sm:h-8 w-12 sm:w-16 mt-1' />
             </CardTitle>
           </CardHeader>
         </Card>

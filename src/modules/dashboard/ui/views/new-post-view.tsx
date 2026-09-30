@@ -12,30 +12,36 @@ import Link from 'next/link';
 export const NewPostView = () => {
   return (
     <div>
-      <div className='flex flex-col md:flex-row md:flex-wrap gap-5'>
-        <Link href='/dashboard/new/photo'>
-          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
-            <CardContent className='flex gap-2 items-center'>
-              <IconPhotoPlus />
-              <CardTitle className='text-lg'>New Photo</CardTitle>
+      <div className='grid grid-cols-3 gap-2 sm:gap-3 md:flex md:flex-row md:flex-wrap md:gap-4'>
+        <Link href='/dashboard/new/photo' className='block'>
+          <Card className='h-full hover:bg-accent/50 active:scale-[0.98] transition-all cursor-pointer border-border/70 p-3 sm:p-4'>
+            <CardContent className='p-0 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 text-center sm:text-left'>
+              <IconPhotoPlus className='size-5 text-primary shrink-0' />
+              <CardTitle className='text-xs sm:text-sm font-semibold'>
+                Foto
+              </CardTitle>
             </CardContent>
           </Card>
         </Link>
 
-        <Link href='/dashboard/new/album'>
-          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
-            <CardContent className='flex gap-2 items-center'>
-              <IconPhotoVideo />
-              <CardTitle className='text-lg'>New Photo Album</CardTitle>
+        <Link href='/dashboard/new/album' className='block'>
+          <Card className='h-full hover:bg-accent/50 active:scale-[0.98] transition-all cursor-pointer border-border/70 p-3 sm:p-4'>
+            <CardContent className='p-0 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 text-center sm:text-left'>
+              <IconPhotoVideo className='size-5 text-primary shrink-0' />
+              <CardTitle className='text-xs sm:text-sm font-semibold'>
+                Album
+              </CardTitle>
             </CardContent>
           </Card>
         </Link>
 
-        <Link href='/dashboard/new/article'>
-          <Card className='w-full md:w-fit cursor-pointer hover:bg-white'>
-            <CardContent className='flex gap-2 items-center'>
-              <IconNotebook />
-              <CardTitle className='text-lg'>New Article</CardTitle>
+        <Link href='/dashboard/new/article' className='block'>
+          <Card className='h-full hover:bg-accent/50 active:scale-[0.98] transition-all cursor-pointer border-border/70 p-3 sm:p-4'>
+            <CardContent className='p-0 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 text-center sm:text-left'>
+              <IconNotebook className='size-5 text-primary shrink-0' />
+              <CardTitle className='text-xs sm:text-sm font-semibold'>
+                Artikel
+              </CardTitle>
             </CardContent>
           </Card>
         </Link>
