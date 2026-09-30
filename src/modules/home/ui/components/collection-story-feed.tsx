@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useTRPC } from '@/trpc/client';
 import { useQuery } from '@tanstack/react-query';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
-import { GalleryVerticalEnd } from 'lucide-react';
+import { ArrowRight, GalleryVerticalEnd } from 'lucide-react';
+import BlurImage from '@/components/blur-image';
 
 export const CollectionStoryFeed = () => {
   const trpc = useTRPC();
@@ -23,87 +23,77 @@ export const CollectionStoryFeed = () => {
   }
 
   return (
-    <div className='w-full max-w-2xl mx-auto mb-6 md:mb-12'>
-      <ScrollArea className='w-full whitespace-nowrap rounded-lg'>
-        <div className='flex w-max gap-3 sm:gap-4 px-1 py-2'>
-          {collections.map((collection) => {
-            const imageUrl = collection.coverImageUrl
-              ? keyToUrl(collection.coverImageUrl)
-              : collection.latestPostImage
-                ? keyToUrl(collection.latestPostImage)
-                : null;
+    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-6 sm:mb-8 px-1'>
+      <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1 -my-1'>
 
-            return (
-              <Link
-                key={collection.id}
-                href={`/collections/${collection.slug}`}
-                className='flex flex-col items-center gap-2 group w-20 sm:w-24 select-none'
-              >
-                {/* Rectangular 3:4 Monochrome Print Card */}
-                <div className='relative w-20 sm:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-muted/40 border border-border/50 group-hover:border-foreground/50 transition-colors shadow-2xs'>
-                  {imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={imageUrl}
-                      alt={collection.name}
-                      className='w-full h-full object-cover grayscale contrast-[1.05] group-hover:grayscale-0 group-hover:scale-105 transition-[filter,transform] duration-500'
-                    />
-                  ) : (
-                    <div className='w-full h-full flex items-center justify-center font-mono text-xs text-muted-foreground'>
-                      {collection.name.substring(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
+        {collections.map((collection) => {
+          const imageUrl = collection.coverImageUrl
+            ? keyToUrl(collection.coverImageUrl)
+            : collection.latestPostImage
+              ? keyToUrl(collection.latestPostImage)
+              : null;
 
-                <div className='flex flex-col items-center w-full text-center'>
-                  <span className='text-[11px] sm:text-xs font-medium max-w-full truncate text-foreground group-hover:text-foreground transition-colors'>
-                    {collection.name}
-                  </span>
-                  <span className='text-[10px] font-mono text-muted-foreground'>
-                    {collection.postCount} {collection.postCount === 1 ? 'Eintrag' : 'Einträge'}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
+          return (
+            <Link
+              key={collection.id}
+              href={`/collections/${collection.slug}`}
+              className='group inline-flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border/40 hover:border-foreground/30 bg-muted/15 hover:bg-muted/35 transition-all duration-200 select-none shrink-0 cursor-pointer shadow-2xs'
+            >
+              {/* Micro Thumbnail */}
+              <div className='relative size-5 sm:size-5.5 rounded-full overflow-hidden bg-muted/40 shrink-0 ring-1 ring-border/30'>
+                {imageUrl ? (
+                  <BlurImage
+                    src={imageUrl}
+                    alt={collection.name}
+                    fill
+                    sizes='28px'
+                    quality={75}
+                    className='object-cover grayscale contrast-[1.05] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-300'
+                  />
+                ) : (
+                  <div className='w-full h-full flex items-center justify-center font-mono text-[9px] text-muted-foreground'>
+                    {collection.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+              </div>
 
-          {/* "Alle Sammlungen" Card */}
-          <Link
-            href='/collections/'
-            className='flex flex-col items-center gap-2 group w-20 sm:w-24 select-none'
-          >
-            <div className='relative w-20 sm:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-muted/20 border border-dashed border-border/60 group-hover:border-foreground/50 group-hover:bg-muted/40 transition-all flex flex-col items-center justify-center gap-1.5 text-muted-foreground group-hover:text-foreground'>
-              <GalleryVerticalEnd className='size-5 transition-transform group-hover:scale-110' />
-              <span className='text-[9px] font-mono uppercase tracking-wider'>Alle</span>
-            </div>
-            <div className='flex flex-col items-center w-full text-center'>
-              <span className='text-[11px] sm:text-xs font-medium max-w-full truncate text-foreground'>
-                Übersicht
+              {/* Title & Count */}
+              <span className='text-xs font-medium text-foreground/85 group-hover:text-foreground transition-colors whitespace-nowrap'>
+                {collection.name}
               </span>
-              <span className='text-[10px] font-mono text-muted-foreground'>
-                Katalog
+              <span className='text-[10px] font-mono text-muted-foreground/60 group-hover:text-muted-foreground transition-colors'>
+                {collection.postCount}
               </span>
-            </div>
-          </Link>
-        </div>
-        <ScrollBar orientation='horizontal' />
-      </ScrollArea>
+            </Link>
+          );
+        })}
+
+        {/* "Alle Sammlungen" Chip */}
+        <Link
+          href='/collections/'
+          className='group inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-dashed border-border/60 hover:border-foreground/40 bg-transparent hover:bg-muted/25 transition-all duration-200 text-xs font-mono text-muted-foreground hover:text-foreground select-none shrink-0'
+        >
+          <GalleryVerticalEnd className='size-3.5 transition-transform group-hover:scale-110' />
+          <span>Katalog</span>
+          <ArrowRight className='size-3 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all' />
+        </Link>
+      </div>
     </div>
   );
 };
 
 export const CollectionStorySkeleton = () => {
   return (
-    <div className='w-full max-w-2xl mx-auto pb-4 pt-1 md:pb-12 overflow-hidden'>
-      <div className='flex w-max gap-3 sm:gap-4 px-1 py-2'>
-        {Array.from({ length: 6 }).map((_, i) => (
+    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-6 sm:mb-8 px-1'>
+      <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1'>
+        {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='flex flex-col items-center gap-2 w-20 sm:w-24 animate-pulse'
+            className='inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-border/30 bg-muted/10 shrink-0 animate-pulse'
           >
-            <Skeleton className='w-20 sm:w-24 aspect-[3/4] rounded-sm' />
-            <Skeleton className='h-3 w-16' />
-            <Skeleton className='h-2 w-10' />
+            <Skeleton className='size-5 sm:size-5.5 rounded-full' />
+            <Skeleton className='h-3 w-14 rounded-full' />
+            <Skeleton className='h-2.5 w-4 rounded-full' />
           </div>
         ))}
       </div>

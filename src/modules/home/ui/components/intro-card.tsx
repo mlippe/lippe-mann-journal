@@ -2,44 +2,51 @@
 import Link from 'next/link';
 
 // Internal dependencies - UI Components
-import { PiArrowUpRight } from 'react-icons/pi';
+import { ArrowUpRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { siteConfig } from '@/site.config';
 
 const IntroCard = () => {
   return (
-    <div className='flex justify-center -mx-3 mb-2 md:mb-4'>
+    <div className='w-full max-w-xl mx-auto mb-4 sm:mb-5'>
       <Link
         href='/about'
-        className='flex flex-col gap-2.5 p-3.5 sm:p-4 hover:bg-muted-foreground/5 transition-all rounded-xl duration-150 font-light relative group max-w-xl w-full'
+        className='group relative flex flex-col justify-between p-4 sm:p-5 rounded-xl border border-border/40 hover:border-border/80 bg-muted/10 hover:bg-muted/25 transition-all duration-200 select-none'
       >
-        <div className='flex items-center gap-3.5'>
-          {/* AVATAR LEFT */}
-          <Avatar className='size-11 sm:size-12 shrink-0'>
-            <AvatarImage src={siteConfig.avatar} alt='Avatar' />
-            <AvatarFallback>{siteConfig.initials}</AvatarFallback>
-          </Avatar>
+        <div className='flex flex-col gap-3'>
+          {/* Top: Avatar + Name / Role + Arrow */}
+          <div className='flex items-center gap-3.5'>
+            <Avatar className='size-11 sm:size-12 shrink-0 ring-1 ring-border/50 group-hover:ring-foreground/30 transition-all'>
+              <AvatarImage src={siteConfig.avatar} alt={siteConfig.name} />
+              <AvatarFallback className='text-xs font-mono font-medium'>
+                {siteConfig.initials}
+              </AvatarFallback>
+            </Avatar>
 
-          {/* NAME RIGHT */}
-          <div className='flex flex-col min-w-0 grow'>
-            <div className='flex items-center justify-between'>
-              <h1 className='text-sm sm:text-base font-medium tracking-tight text-foreground'>
-                {siteConfig.name}
-              </h1>
-              <div className='opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-muted-foreground'>
-                <PiArrowUpRight size={16} />
+            <div className='flex flex-col min-w-0 grow'>
+              <div className='flex items-center justify-between gap-1'>
+                <h1 className='text-sm sm:text-base font-semibold tracking-tight text-foreground truncate'>
+                  {siteConfig.name}
+                </h1>
+                <ArrowUpRight className='size-4 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 shrink-0' />
               </div>
+              <p className='text-[11px] sm:text-xs text-muted-foreground font-mono truncate'>
+                {siteConfig.role}
+              </p>
             </div>
-            <p className='-mt-0.5 text-[11px] sm:text-xs text-foreground/60 font-mono'>
-              {siteConfig.role}
-            </p>
           </div>
+
+          {/* Bio */}
+          <p className='text-xs sm:text-[13px] text-foreground/80 leading-relaxed font-sans'>
+            {siteConfig.bio}
+          </p>
         </div>
 
-        {/* BIO BELOW */}
-        <p className='text-xs sm:text-sm text-foreground/80 leading-relaxed font-sans'>
-          {siteConfig.bio}
-        </p>
+        {/* Subtle bottom meta */}
+        <div className='pt-3 mt-2 border-t border-border/25 flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-muted-foreground/70 group-hover:text-muted-foreground transition-colors'>
+          <span>Journal & Archiv</span>
+          <span className='group-hover:translate-x-0.5 transition-transform'>Über mich →</span>
+        </div>
       </Link>
     </div>
   );
