@@ -48,6 +48,7 @@ const CreatePhotoAlbum = () => {
       {
         postTitle: data.postTitle,
         postVisibility: data.postVisibility,
+        content: data.content,
         photos: finalPhotos,
         collectionIds: data.collectionIds,
       },

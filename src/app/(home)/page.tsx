@@ -55,7 +55,7 @@ async function InfiniteFeedSuspense() {
   const queryClient = getQueryClient();
 
   await queryClient.prefetchInfiniteQuery({
-    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 5 }),
+    ...trpc.posts.getPublished.infiniteQueryOptions({ limit: 6 }),
     getNextPageParam: (lastPage: PostGetPublished) => lastPage.nextCursor,
     initialPageParam: 1,
   });

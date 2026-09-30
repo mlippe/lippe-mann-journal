@@ -28,14 +28,17 @@ interface SocialInteractionsProps {
   postId: string;
   variant?: 'compact' | 'full';
   commentHref?: string;
+  showActions?: boolean;
 }
 
 export const SocialInteractionsSkeleton = ({
   variant = 'full',
   showMockComments = false,
+  showActions = true,
 }: {
   variant?: 'compact' | 'full';
   showMockComments?: boolean;
+  showActions?: boolean;
 }) => {
   if (variant === 'compact') {
     return (
@@ -55,16 +58,18 @@ export const SocialInteractionsSkeleton = ({
   return (
     <div className='flex flex-col h-full gap-4'>
       {/* Actions Skeleton */}
-      <div className='flex items-center gap-4'>
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-6 rounded-full' />
-          <Skeleton className='h-4 w-6 rounded-xs' />
+      {showActions && (
+        <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <Skeleton className='size-6 rounded-full' />
+            <Skeleton className='h-4 w-6 rounded-xs' />
+          </div>
         </div>
-        <div className='flex items-center gap-1.5'>
-          <Skeleton className='size-6 rounded-full' />
-          <Skeleton className='h-4 w-6 rounded-xs' />
-        </div>
-      </div>
+      )}
 
       {/* Comments List Skeleton */}
       {showMockComments && (
@@ -101,6 +106,7 @@ export const SocialInteractions = ({
   postId,
   variant = 'full',
   commentHref,
+  showActions = true,
 }: SocialInteractionsProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -212,6 +218,7 @@ export const SocialInteractions = ({
       <SocialInteractionsSkeleton
         variant={variant}
         showMockComments={false}
+        showActions={showActions}
       />
     );
   }
@@ -257,47 +264,57 @@ export const SocialInteractions = ({
   return (
     <div className='flex flex-col h-full gap-4'>
       {/* Actions */}
-      <div className='flex items-center gap-4'>
-        <button
-          onClick={handleLike}
-          className='flex items-center gap-1.5 group transition-colors'
-        >
-          {interactions?.hasLiked ? (
-            <IconHeartFilled className='size-6 text-red-500' />
-          ) : (
-            <IconHeart className='size-6 group-hover:text-red-500' />
-          )}
-          <span className='text-sm font-semibold'>
-            {interactions?.likeCount || 0}
-          </span>
-        </button>
-        <div className='flex items-center gap-1.5'>
-          <IconMessageCircle className='size-6' />
-          <span className='text-sm font-semibold'>
-            {interactions?.comments.length || 0}
-          </span>
+      {showActions && (
+        <div className='flex items-center gap-4'>
+          <button
+            onClick={handleLike}
+            className='flex items-center gap-1.5 group transition-colors'
+          >
+            {interactions?.hasLiked ? (
+              <IconHeartFilled className='size-6 text-red-500' />
+            ) : (
+              <IconHeart className='size-6 group-hover:text-red-500' />
+            )}
+            <span className='text-sm font-semibold'>
+              {interactions?.likeCount || 0}
+            </span>
+          </button>
+          <div className='flex items-center gap-1.5'>
+            <IconMessageCircle className='size-6' />
+            <span className='text-sm font-semibold'>
+              {interactions?.comments.length || 0}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Comments List */}
       <div className='flex-1 pr-4 -mr-4 overflow-y-auto'>
         <div className='space-y-4'>
-          {interactions?.comments.map((comment) => (
-            <div key={comment.id} className='flex flex-col gap-1'>
-              <div className='flex items-center justify-between'>
-                <span className='text-sm font-bold'>{comment.username}</span>
-                <span className='text-[10px] uppercase tracking-tighter text-muted-foreground'>
-                  {formatDistanceToNow(new Date(comment.createdAt), {
-                    addSuffix: true,
-                    locale: de,
-                  })}
-                </span>
+          {interactions?.comments.length === 0 ? (
+            <p className='text-xs text-muted-foreground italic py-3'>
+              Noch keine Einträge im Gästebuch. Hinterlasse als Erster einen Gedanken.
+            </p>
+          ) : (
+            interactions?.comments.map((comment) => (
+              <div key={comment.id} className='flex flex-col gap-1 border-b border-border/20 pb-3 last:border-none'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-xs font-mono font-medium tracking-tight text-foreground'>
+                    {comment.username}
+                  </span>
+                  <span className='text-[10px] uppercase font-mono tracking-wider text-muted-foreground'>
+                    {formatDistanceToNow(new Date(comment.createdAt), {
+                      addSuffix: true,
+                      locale: de,
+                    })}
+                  </span>
+                </div>
+                <p className='text-sm text-foreground/85 leading-relaxed font-serif'>
+                  {comment.content}
+                </p>
               </div>
-              <p className='text-sm text-foreground/80 leading-snug'>
-                {comment.content}
-              </p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -306,10 +323,9 @@ export const SocialInteractions = ({
         <div className='flex items-center justify-between px-1'>
           <button
             onClick={startEditingUsername}
-            className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest font-medium text-left'
+            className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase font-mono tracking-widest text-left'
           >
-            Als <span className='underline decoration-dotted'>{username}</span>{' '}
-            kommentieren:
+            Im Gästebuch als <span className='underline decoration-dotted text-foreground'>{username}</span> eintragen:
           </button>
         </div>
 
@@ -317,7 +333,7 @@ export const SocialInteractions = ({
           <form onSubmit={handleUpdateUsername} className='flex flex-col gap-2'>
             <Input
               autoFocus
-              placeholder='Neuer Name...'
+              placeholder='Dein Name / Alias...'
               value={tempUsername}
               onChange={(e) => setTempUsername(e.target.value)}
               className='bg-muted/50 border-none h-10 text-sm'
@@ -344,12 +360,12 @@ export const SocialInteractions = ({
           >
             <div className='relative flex-1'>
               <Textarea
-                placeholder='Dein Kommentar...'
+                placeholder='Eindruck oder Gedanken im Gästebuch hinterlassen...'
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 initialSize='sm'
                 className={cn(
-                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300  py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30',
+                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300 py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30 font-serif',
                   commentContent.length > 0 && 'min-h-15',
                 )}
               />

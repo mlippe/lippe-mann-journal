@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -85,6 +86,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       postTitle: post.title,
+      content: post.content || '',
       postVisibility: post.visibility,
       tags: post.tags || [],
       collectionIds:
@@ -122,6 +124,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
 
       form.reset({
         postTitle: post.title,
+        content: post.content || '',
         postVisibility: post.visibility,
         tags: post.tags || [],
         collectionIds:
@@ -228,6 +231,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       await updatePost.mutateAsync({
         id: post.id,
         title: values.postTitle,
+        content: values.content,
         visibility: values.postVisibility,
         tags: values.tags,
         collectionIds: values.collectionIds,
@@ -297,6 +301,25 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                   <FormLabel>Album Title</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='content'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Story & Feldnotizen (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder='Ein paar Zeilen Kontext, Gedanken oder Notizen zu dieser Serie...'
+                      className='min-h-[100px] resize-y'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

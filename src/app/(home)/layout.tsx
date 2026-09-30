@@ -11,7 +11,7 @@ const HomeLayout = async ({ children, modals }: HomeLayoutProps) => {
   return (
     <>
       <Header />
-      <main className='h-screen p-3'>{children}</main>
+      <main className='min-h-screen p-3 md:p-6 pb-24'>{children}</main>
       {modals}
     </>
   );

@@ -143,7 +143,7 @@ async function InfiniteFeedSuspense({
   await queryClient.prefetchInfiniteQuery({
     ...trpc.collections.getPostsInCollection.infiniteQueryOptions({
       collectionSlug,
-      limit: 5,
+      limit: 6,
     }),
     getNextPageParam: (lastPage: CollectionGetPostsInCollection) =>
       lastPage.nextCursor,

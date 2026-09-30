@@ -60,12 +60,10 @@ const BlurImage = memo(function BlurImage({
   ...props
 }: BlurImageProps) {
   const srcString = getSrcString(src);
-  const isPreloaded = Boolean(
-    priority || (srcString ? loadedImageUrls.has(srcString) : false),
-  );
+  const isCached = Boolean(srcString ? loadedImageUrls.has(srcString) : false);
 
-  const [imageLoaded, setImageLoaded] = useState(isPreloaded);
-  const [showPlaceholder, setShowPlaceholder] = useState(!isPreloaded);
+  const [imageLoaded, setImageLoaded] = useState(isCached);
+  const [showPlaceholder, setShowPlaceholder] = useState(!isCached);
   const [prevSrc, setPrevSrc] = useState(srcString);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -73,7 +71,7 @@ const BlurImage = memo(function BlurImage({
   if (prevSrc !== srcString) {
     setPrevSrc(srcString);
     const alreadyLoaded = Boolean(
-      priority || (srcString ? loadedImageUrls.has(srcString) : false),
+      srcString ? loadedImageUrls.has(srcString) : false,
     );
     setImageLoaded(alreadyLoaded);
     setShowPlaceholder(!alreadyLoaded);
@@ -113,6 +111,7 @@ const BlurImage = memo(function BlurImage({
     : 'relative w-full h-full flex justify-center items-center';
 
   const showBlurhash = showPlaceholder && blurhash && blurhash.length >= 6;
+  const isObjectCover = className?.includes('object-cover');
 
   return (
     <div className={containerStyle}>
@@ -125,19 +124,23 @@ const BlurImage = memo(function BlurImage({
           )}
         >
           <div
-            className={baseClassName ?? ''}
+            className={cn('overflow-hidden', baseClassName)}
             style={{
-              aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
-              width: aspectRatio
-                ? aspectRatio > 0.8
-                  ? '100%'
-                  : 'auto'
-                : '100%',
-              height: aspectRatio
-                ? aspectRatio > 0.8
-                  ? 'auto'
-                  : '100%'
-                : '100%',
+              aspectRatio: !isObjectCover && aspectRatio ? `${aspectRatio}` : undefined,
+              width: isObjectCover
+                ? '100%'
+                : aspectRatio
+                  ? aspectRatio > 0.8
+                    ? '100%'
+                    : 'auto'
+                  : '100%',
+              height: isObjectCover
+                ? '100%'
+                : aspectRatio
+                  ? aspectRatio > 0.8
+                    ? 'auto'
+                    : '100%'
+                  : '100%',
               maxHeight: '100%',
               maxWidth: '100%',
             }}
@@ -166,7 +169,7 @@ const BlurImage = memo(function BlurImage({
           baseClassName,
           fill ? 'z-10' : 'relative z-10',
           hasBackground && imageLoaded && 'bg-background',
-          priority || isPreloaded
+          priority || isCached
             ? 'opacity-100'
             : cn(
                 'transition-opacity duration-300 ease-in-out',

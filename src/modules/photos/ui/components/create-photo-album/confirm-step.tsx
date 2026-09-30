@@ -126,6 +126,7 @@ const ConfirmStep = ({
     resolver: zodResolver(confirmStepSchema) as any,
     defaultValues: {
       postTitle: '',
+      content: '',
       postVisibility: 'public',
       collectionIds: [],
       photos: sanitizedInitialPhotos,
@@ -193,6 +194,25 @@ const ConfirmStep = ({
                   <FormLabel>Album Title</FormLabel>
                   <FormControl>
                     <Textarea {...field} placeholder='Enter album title' />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='content'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Story & Feldnotizen (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder='Ein paar Zeilen Kontext, Gedanken oder Notizen zu dieser Serie...'
+                      className='min-h-[90px] resize-y'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
