@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
@@ -16,6 +16,9 @@ import {
   IconChevronRight,
   IconX,
   IconMessageCircle,
+  IconHeart,
+  IconHeartFilled,
+  IconMail,
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
@@ -29,6 +32,10 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import Author from '@/components/author';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIdentity } from '@/hooks/use-identity';
+import { type SocialInteractionsData } from '@/modules/social/types';
 
 interface EditorialStoryViewProps {
   post: PostGetOne;
@@ -42,8 +49,55 @@ type EditorialBlock =
 
 export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const router = useRouter();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { fingerprint, isLoaded } = useIdentity();
+
   const [copied, setCopied] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [activeHeartPhotoId, setActiveHeartPhotoId] = useState<string | null>(null);
+  const lastTap = useRef<number>(0);
+
+  // Social query & mutation setup
+  const interactionParams = {
+    postId: post.id,
+    userFingerprint: fingerprint ?? undefined,
+  };
+  const queryOptions =
+    trpc.social.getInteractions.queryOptions(interactionParams);
+
+  const toggleLike = useMutation(
+    trpc.social.toggleLike.mutationOptions({
+      onMutate: async () => {
+        await queryClient.cancelQueries({ queryKey: queryOptions.queryKey });
+        const previous = queryClient.getQueryData<SocialInteractionsData>(
+          queryOptions.queryKey,
+        );
+
+        if (previous) {
+          queryClient.setQueryData<SocialInteractionsData>(
+            queryOptions.queryKey,
+            {
+              ...previous,
+              likeCount: previous.hasLiked
+                ? previous.likeCount - 1
+                : previous.likeCount + 1,
+              hasLiked: !previous.hasLiked,
+            },
+          );
+        }
+        return { previous };
+      },
+      onError: (err, newLike, context) => {
+        if (context?.previous) {
+          queryClient.setQueryData(queryOptions.queryKey, context.previous);
+        }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: queryOptions.queryKey });
+      },
+    }),
+  );
 
   // Extract all photos sorted
   const photos: Photo[] = useMemo(() => {
@@ -138,6 +192,35 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
   };
 
+  const handleDoubleTap = (photoId: string) => (e: React.MouseEvent | React.TouchEvent) => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      e.preventDefault();
+      const interactions = queryClient.getQueryData<SocialInteractionsData>(
+        queryOptions.queryKey,
+      );
+      if (fingerprint && isLoaded && !interactions?.hasLiked) {
+        toggleLike.mutate({ postId: post.id, userFingerprint: fingerprint });
+      }
+      setActiveHeartPhotoId(photoId);
+      setTimeout(() => setActiveHeartPhotoId(null), 850);
+    }
+    lastTap.current = now;
+  };
+
+  const createPrintInquiryUrl = (photo: Photo) => {
+    const photoTitle = photo.title || 'Aufnahme';
+    const subject = encodeURIComponent(
+      `Print-Anfrage: ${photoTitle} (aus „${post.title}“)`,
+    );
+    const body = encodeURIComponent(
+      `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print von dieser Aufnahme:\n\n• Serie: ${post.title}\n• Foto: ${photoTitle}\n• Bild-Link: ${keyToUrl(photo.url)}\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
+    );
+    return `mailto:manuel@lippe-mann.de?subject=${subject}&body=${body}`;
+  };
+
   // Keyboard navigation for lightbox
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -168,6 +251,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   }, [post.createdAt]);
 
   const collections = post.postsToCollections?.map((ptc) => ptc.collection) || [];
+  const currentInteractions = queryClient.getQueryData<SocialInteractionsData>(
+    queryOptions.queryKey,
+  );
 
   return (
     <article className='w-full max-w-6xl mx-auto px-3 sm:px-6 md:px-8 py-6 md:py-12'>
@@ -200,11 +286,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               )}
             </button>
             <a
-              href='#discussion'
+              href='#guestbook'
               className='inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors'
             >
               <IconMessageCircle className='size-3.5' />
-              <span>Kommentare</span>
+              <span>Gästebuch</span>
             </a>
           </div>
         </div>
@@ -255,7 +341,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section key={`hero-${photo.id}`} className='space-y-4'>
                 <div
-                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group'
+                  onClick={handleDoubleTap(photo.id)}
+                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
                   style={{ aspectRatio: `${ratio}` }}
                 >
                   <BlurImage
@@ -270,14 +357,35 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     sizes='(max-width: 1024px) 100vw, 1200px'
                   />
 
-                  {/* Fullscreen Inspector Button */}
-                  <button
-                    onClick={() => setLightboxIndex(block.index)}
-                    className='absolute top-3 right-3 p-2 rounded-full bg-background/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background text-foreground shadow-sm cursor-pointer'
-                    aria-label='Foto vergrößern'
-                  >
-                    <IconArrowsMaximize className='size-4' />
-                  </button>
+                  {/* Double tap heart feedback animation */}
+                  {activeHeartPhotoId === photo.id && (
+                    <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+                      <IconHeartFilled className='size-20 sm:size-28 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                    </div>
+                  )}
+
+                  {/* Actions overlay (Top Right) */}
+                  <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                    <a
+                      href={createPrintInquiryUrl(photo)}
+                      onClick={(e) => e.stopPropagation()}
+                      className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                      title='Print anfragen'
+                      aria-label='Print dieser Aufnahme anfragen'
+                    >
+                      <IconMail className='size-4' />
+                    </a>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightboxIndex(block.index);
+                      }}
+                      className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                      aria-label='Foto vergrößern'
+                    >
+                      <IconArrowsMaximize className='size-4' />
+                    </button>
+                  </div>
 
                   {/* Discrete bottom technical provenance badge */}
                   {(photo.make || photo.lensModel || photo.focalLength) && (
@@ -345,7 +453,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 <div className='flex flex-col md:flex-row items-stretch justify-center gap-4 md:gap-8 w-full'>
                   {/* Photo A */}
                   <div
-                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40'
+                    onClick={handleDoubleTap(photoA.id)}
+                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-pointer'
                     style={{ flex: `${ratioA} 1 0%` }}
                   >
                     <div
@@ -362,19 +471,39 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         className='object-contain w-full h-full'
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
-                      <button
-                        onClick={() => setLightboxIndex(block.startIndex)}
-                        className='absolute top-3 right-3 p-1.5 rounded-full bg-background/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background text-foreground shadow-sm cursor-pointer'
-                        aria-label='Foto vergrößern'
-                      >
-                        <IconArrowsMaximize className='size-3.5' />
-                      </button>
+                      {activeHeartPhotoId === photoA.id && (
+                        <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+                          <IconHeartFilled className='size-16 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                        </div>
+                      )}
+                      <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                        <a
+                          href={createPrintInquiryUrl(photoA)}
+                          onClick={(e) => e.stopPropagation()}
+                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                          title='Print anfragen'
+                          aria-label='Print anfragen'
+                        >
+                          <IconMail className='size-3.5' />
+                        </a>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxIndex(block.startIndex);
+                          }}
+                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                          aria-label='Foto vergrößern'
+                        >
+                          <IconArrowsMaximize className='size-3.5' />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Photo B */}
                   <div
-                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40'
+                    onClick={handleDoubleTap(photoB.id)}
+                    className='w-full md:w-auto relative group overflow-hidden bg-muted/20 border border-border/40 select-none cursor-pointer'
                     style={{ flex: `${ratioB} 1 0%` }}
                   >
                     <div
@@ -391,13 +520,32 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         className='object-contain w-full h-full'
                         sizes='(max-width: 768px) 100vw, 50vw'
                       />
-                      <button
-                        onClick={() => setLightboxIndex(block.startIndex + 1)}
-                        className='absolute top-3 right-3 p-1.5 rounded-full bg-background/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background text-foreground shadow-sm cursor-pointer'
-                        aria-label='Foto vergrößern'
-                      >
-                        <IconArrowsMaximize className='size-3.5' />
-                      </button>
+                      {activeHeartPhotoId === photoB.id && (
+                        <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+                          <IconHeartFilled className='size-16 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                        </div>
+                      )}
+                      <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                        <a
+                          href={createPrintInquiryUrl(photoB)}
+                          onClick={(e) => e.stopPropagation()}
+                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                          title='Print anfragen'
+                          aria-label='Print anfragen'
+                        >
+                          <IconMail className='size-3.5' />
+                        </a>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxIndex(block.startIndex + 1);
+                          }}
+                          className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                          aria-label='Foto vergrößern'
+                        >
+                          <IconArrowsMaximize className='size-3.5' />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -442,7 +590,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         className='shrink-0 w-[78vw] sm:w-[50vw] md:w-auto snap-center space-y-2'
                       >
                         <div
-                          className='relative overflow-hidden bg-muted/20 border border-border/40 group'
+                          onClick={handleDoubleTap(photo.id)}
+                          className='relative overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
                           style={{ aspectRatio: `${ratio}` }}
                         >
                           <BlurImage
@@ -455,13 +604,32 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                             className='object-contain w-full h-full'
                             sizes='(max-width: 768px) 80vw, 300px'
                           />
-                          <button
-                            onClick={() => setLightboxIndex(actualIndex)}
-                            className='absolute top-2 right-2 p-1.5 rounded-full bg-background/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background text-foreground shadow-sm cursor-pointer'
-                            aria-label='Foto vergrößern'
-                          >
-                            <IconArrowsMaximize className='size-3.5' />
-                          </button>
+                          {activeHeartPhotoId === photo.id && (
+                            <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+                              <IconHeartFilled className='size-14 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                            </div>
+                          )}
+                          <div className='absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                            <a
+                              href={createPrintInquiryUrl(photo)}
+                              onClick={(e) => e.stopPropagation()}
+                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                              title='Print anfragen'
+                              aria-label='Print anfragen'
+                            >
+                              <IconMail className='size-3' />
+                            </a>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxIndex(actualIndex);
+                              }}
+                              className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                              aria-label='Foto vergrößern'
+                            >
+                              <IconArrowsMaximize className='size-3' />
+                            </button>
+                          </div>
                         </div>
                         <div className='flex items-center justify-between text-[10px] font-mono text-muted-foreground'>
                           <span>[{String(actualIndex + 1).padStart(2, '0')}]</span>
@@ -495,7 +663,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 className='max-w-4xl mx-auto space-y-3'
               >
                 <div
-                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group'
+                  onClick={handleDoubleTap(photo.id)}
+                  className='relative w-full overflow-hidden bg-muted/20 border border-border/40 group select-none cursor-pointer'
                   style={{ aspectRatio: `${ratio}` }}
                 >
                   <BlurImage
@@ -508,13 +677,32 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     className='object-contain w-full h-full'
                     sizes='(max-width: 1024px) 100vw, 900px'
                   />
-                  <button
-                    onClick={() => setLightboxIndex(block.index)}
-                    className='absolute top-3 right-3 p-1.5 rounded-full bg-background/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background text-foreground shadow-sm cursor-pointer'
-                    aria-label='Foto vergrößern'
-                  >
-                    <IconArrowsMaximize className='size-3.5' />
-                  </button>
+                  {activeHeartPhotoId === photo.id && (
+                    <div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+                      <IconHeartFilled className='size-20 sm:size-24 text-white fill-white drop-shadow-2xl animate-in zoom-in-50 fade-in duration-250' />
+                    </div>
+                  )}
+                  <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20'>
+                    <a
+                      href={createPrintInquiryUrl(photo)}
+                      onClick={(e) => e.stopPropagation()}
+                      className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors'
+                      title='Print anfragen'
+                      aria-label='Print anfragen'
+                    >
+                      <IconMail className='size-3.5' />
+                    </a>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightboxIndex(block.index);
+                      }}
+                      className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-colors cursor-pointer'
+                      aria-label='Foto vergrößern'
+                    >
+                      <IconArrowsMaximize className='size-3.5' />
+                    </button>
+                  </div>
                 </div>
                 {(photo.make || photo.lensModel || photo.focalLength) && (
                   <p className='text-center text-[11px] font-mono text-muted-foreground'>
@@ -538,8 +726,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         })}
       </div>
 
-      {/* 3. EDITORIAL FOOTER & SOCIAL INTERACTIONS */}
-      <footer id='discussion' className='mt-20 md:mt-28 border-t border-border/60 pt-10 md:pt-14 space-y-12'>
+      {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
+      <footer id='guestbook' className='mt-20 md:mt-28 border-t border-border/60 pt-10 md:pt-14 space-y-12'>
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div>
             <Author size='md' />
@@ -547,29 +735,52 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               Dokumentation & Fotografie aus dem Alltag.
             </p>
           </div>
-          <button
-            onClick={handleShare}
-            className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors w-fit cursor-pointer'
-          >
-            {copied ? (
-              <>
-                <IconCheck className='size-4 text-emerald-500' />
-                <span className='text-emerald-500'>Link kopiert</span>
-              </>
-            ) : (
-              <>
-                <IconShare className='size-4' />
-                <span>Story teilen</span>
-              </>
-            )}
-          </button>
+          <div className='flex items-center gap-3'>
+            <button
+              onClick={() => {
+                if (fingerprint && isLoaded) {
+                  toggleLike.mutate({
+                    postId: post.id,
+                    userFingerprint: fingerprint,
+                  });
+                }
+              }}
+              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+            >
+              <IconHeartFilled
+                className={cn(
+                  'size-4 transition-colors',
+                  currentInteractions?.hasLiked
+                    ? 'text-red-500 fill-red-500'
+                    : 'text-muted-foreground',
+                )}
+              />
+              <span>{currentInteractions?.likeCount || 0} Gefällt mir</span>
+            </button>
+            <button
+              onClick={handleShare}
+              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+            >
+              {copied ? (
+                <>
+                  <IconCheck className='size-4 text-emerald-500' />
+                  <span className='text-emerald-500'>Kopiert</span>
+                </>
+              ) : (
+                <>
+                  <IconShare className='size-4' />
+                  <span>Teilen</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Discussion / Comments / Likes Area */}
+        {/* Curator's Guestbook (Gästebuch) */}
         <div className='bg-muted/30 border border-border/40 rounded-lg p-4 sm:p-6 md:p-8 max-w-3xl mx-auto'>
           <h3 className='text-lg font-medium tracking-tight mb-6 flex items-center gap-2'>
             <IconMessageCircle className='size-5 text-muted-foreground' />
-            <span>Reaktionen & Gedanken</span>
+            <span>Gästebuch der Serie</span>
           </h3>
           <SocialInteractions postId={post.id} variant='full' />
         </div>
@@ -595,13 +806,47 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 <span className='text-xs font-mono tracking-widest uppercase'>
                   {lightboxIndex + 1} / {photos.length}
                 </span>
-                <button
-                  onClick={() => setLightboxIndex(null)}
-                  className='p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
-                  aria-label='Schließen'
-                >
-                  <IconX className='size-5' />
-                </button>
+
+                <div className='flex items-center gap-3'>
+                  <a
+                    href={createPrintInquiryUrl(photos[lightboxIndex])}
+                    className='px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5'
+                  >
+                    <IconMail className='size-3.5' />
+                    <span className='hidden sm:inline'>Print anfragen</span>
+                  </a>
+                  <button
+                    onClick={() => {
+                      if (fingerprint && isLoaded) {
+                        toggleLike.mutate({
+                          postId: post.id,
+                          userFingerprint: fingerprint,
+                        });
+                      }
+                    }}
+                    className='p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1.5'
+                    aria-label='Serie liken'
+                  >
+                    <IconHeartFilled
+                      className={cn(
+                        'size-4 transition-colors',
+                        currentInteractions?.hasLiked
+                          ? 'text-red-500 fill-red-500'
+                          : 'text-white',
+                      )}
+                    />
+                    <span className='text-xs font-mono'>
+                      {currentInteractions?.likeCount || 0}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setLightboxIndex(null)}
+                    className='p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
+                    aria-label='Schließen'
+                  >
+                    <IconX className='size-5' />
+                  </button>
+                </div>
               </div>
 
               {/* Main Image View (100% Native Aspect Ratio Guarantee) */}

@@ -282,22 +282,30 @@ export const SocialInteractions = ({
       {/* Comments List */}
       <div className='flex-1 pr-4 -mr-4 overflow-y-auto'>
         <div className='space-y-4'>
-          {interactions?.comments.map((comment) => (
-            <div key={comment.id} className='flex flex-col gap-1'>
-              <div className='flex items-center justify-between'>
-                <span className='text-sm font-bold'>{comment.username}</span>
-                <span className='text-[10px] uppercase tracking-tighter text-muted-foreground'>
-                  {formatDistanceToNow(new Date(comment.createdAt), {
-                    addSuffix: true,
-                    locale: de,
-                  })}
-                </span>
+          {interactions?.comments.length === 0 ? (
+            <p className='text-xs text-muted-foreground italic py-3'>
+              Noch keine Einträge im Gästebuch. Hinterlasse als Erster einen Gedanken.
+            </p>
+          ) : (
+            interactions?.comments.map((comment) => (
+              <div key={comment.id} className='flex flex-col gap-1 border-b border-border/20 pb-3 last:border-none'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-xs font-mono font-medium tracking-tight text-foreground'>
+                    {comment.username}
+                  </span>
+                  <span className='text-[10px] uppercase font-mono tracking-wider text-muted-foreground'>
+                    {formatDistanceToNow(new Date(comment.createdAt), {
+                      addSuffix: true,
+                      locale: de,
+                    })}
+                  </span>
+                </div>
+                <p className='text-sm text-foreground/85 leading-relaxed font-serif'>
+                  {comment.content}
+                </p>
               </div>
-              <p className='text-sm text-foreground/80 leading-snug'>
-                {comment.content}
-              </p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -306,10 +314,9 @@ export const SocialInteractions = ({
         <div className='flex items-center justify-between px-1'>
           <button
             onClick={startEditingUsername}
-            className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest font-medium text-left'
+            className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase font-mono tracking-widest text-left'
           >
-            Als <span className='underline decoration-dotted'>{username}</span>{' '}
-            kommentieren:
+            Im Gästebuch als <span className='underline decoration-dotted text-foreground'>{username}</span> eintragen:
           </button>
         </div>
 
@@ -317,7 +324,7 @@ export const SocialInteractions = ({
           <form onSubmit={handleUpdateUsername} className='flex flex-col gap-2'>
             <Input
               autoFocus
-              placeholder='Neuer Name...'
+              placeholder='Dein Name / Alias...'
               value={tempUsername}
               onChange={(e) => setTempUsername(e.target.value)}
               className='bg-muted/50 border-none h-10 text-sm'
@@ -344,12 +351,12 @@ export const SocialInteractions = ({
           >
             <div className='relative flex-1'>
               <Textarea
-                placeholder='Dein Kommentar...'
+                placeholder='Eindruck oder Gedanken im Gästebuch hinterlassen...'
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 initialSize='sm'
                 className={cn(
-                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300  py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30',
+                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300 py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30 font-serif',
                   commentContent.length > 0 && 'min-h-15',
                 )}
               />
