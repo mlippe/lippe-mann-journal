@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useTRPC } from '@/trpc/client';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
@@ -24,9 +23,9 @@ export const CollectionStoryFeed = () => {
   }
 
   return (
-    <div className='w-full max-w-xl mx-auto -mt-3 md:mb-12'>
-      <ScrollArea className='w-full whitespace-nowrap rounded-md'>
-        <div className='flex w-max '>
+    <div className='w-full max-w-2xl mx-auto mb-6 md:mb-12'>
+      <ScrollArea className='w-full whitespace-nowrap rounded-lg'>
+        <div className='flex w-max gap-3 sm:gap-4 px-1 py-2'>
           {collections.map((collection) => {
             const imageUrl = collection.coverImageUrl
               ? keyToUrl(collection.coverImageUrl)
@@ -38,51 +37,51 @@ export const CollectionStoryFeed = () => {
               <Link
                 key={collection.id}
                 href={`/collections/${collection.slug}`}
-                className='flex flex-col items-center gap-2 group hover:bg-muted-foreground/10 p-4 rounded-lg w-26 md:w-30'
+                className='flex flex-col items-center gap-2 group w-20 sm:w-24 select-none'
               >
-                <div className='p-0.5 rounded-full bg-linear-to-tr from-muted to-[#be3e62] transition-transform group-hover:scale-105 active:scale-95'>
-                  <div className='p-0.5 rounded-full bg-background'>
-                    <Avatar className='size-14 md:size-16'>
-                      {imageUrl && (
-                        <AvatarImage
-                          src={imageUrl}
-                          alt={collection.name}
-                          className='object-cover'
-                        />
-                      )}
-                      <AvatarFallback className='text-xs'>
-                        {collection.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
+                {/* Rectangular 3:4 Monochrome Print Card */}
+                <div className='relative w-20 sm:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-muted/40 border border-border/50 group-hover:border-foreground/50 transition-colors shadow-2xs'>
+                  {imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrl}
+                      alt={collection.name}
+                      className='w-full h-full object-cover grayscale contrast-[1.05] group-hover:grayscale-0 group-hover:scale-105 transition-[filter,transform] duration-500'
+                    />
+                  ) : (
+                    <div className='w-full h-full flex items-center justify-center font-mono text-xs text-muted-foreground'>
+                      {collection.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
                 </div>
-                <div className='flex flex-col items-center'>
-                  <span className='text-xs font-medium max-w-24 md:max-w-28 truncate'>
+
+                <div className='flex flex-col items-center w-full text-center'>
+                  <span className='text-[11px] sm:text-xs font-medium max-w-full truncate text-foreground group-hover:text-foreground transition-colors'>
                     {collection.name}
                   </span>
-                  <span className='text-[10px] text-muted-foreground'>
-                    {collection.postCount} Einträge
+                  <span className='text-[10px] font-mono text-muted-foreground'>
+                    {collection.postCount} {collection.postCount === 1 ? 'Eintrag' : 'Einträge'}
                   </span>
                 </div>
               </Link>
             );
           })}
+
+          {/* "Alle Sammlungen" Card */}
           <Link
             href='/collections/'
-            className='flex flex-col items-center gap-2 group hover:bg-muted-foreground/10 p-4 rounded-lg  w-26 md:w-30'
+            className='flex flex-col items-center gap-2 group w-20 sm:w-24 select-none'
           >
-            <div className='p-0.5 rounded-full bg-linear-to-tr from-muted to-foreground/15 transition-transform group-hover:scale-105 active:scale-95'>
-              <div className='p-0.5 rounded-full bg-background'>
-                <Avatar className='size-14 md:size-16 '>
-                  <AvatarFallback className='text-foreground/60'>
-                    <GalleryVerticalEnd />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+            <div className='relative w-20 sm:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-muted/20 border border-dashed border-border/60 group-hover:border-foreground/50 group-hover:bg-muted/40 transition-all flex flex-col items-center justify-center gap-1.5 text-muted-foreground group-hover:text-foreground'>
+              <GalleryVerticalEnd className='size-5 transition-transform group-hover:scale-110' />
+              <span className='text-[9px] font-mono uppercase tracking-wider'>Alle</span>
             </div>
-            <div className='flex flex-col items-center'>
-              <span className='text-xs font-medium max-w-27 truncate'>
-                Alle Sammlungen
+            <div className='flex flex-col items-center w-full text-center'>
+              <span className='text-[11px] sm:text-xs font-medium max-w-full truncate text-foreground'>
+                Übersicht
+              </span>
+              <span className='text-[10px] font-mono text-muted-foreground'>
+                Katalog
               </span>
             </div>
           </Link>
@@ -95,16 +94,16 @@ export const CollectionStoryFeed = () => {
 
 export const CollectionStorySkeleton = () => {
   return (
-    <div className='w-full max-w-xl mx-auto  pb-3.5 pt-1   md:pb-16.5 overflow-hidden'>
-      <div className='flex w-max space-x-10 md:space-x-12 md:px-6 px-5'>
-        {Array.from({ length: 5 }).map((_, i) => (
+    <div className='w-full max-w-2xl mx-auto pb-4 pt-1 md:pb-12 overflow-hidden'>
+      <div className='flex w-max gap-3 sm:gap-4 px-1 py-2'>
+        {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className='flex flex-col items-center gap-2.5 md:gap-2 animate-pulse'
+            className='flex flex-col items-center gap-2 w-20 sm:w-24 animate-pulse'
           >
-            <Skeleton className='md:size-18 size-16 rounded-full ' />
-            <Skeleton className='h-3 w-12 ' />
-            <Skeleton className='h-2 w-8 ' />
+            <Skeleton className='w-20 sm:w-24 aspect-[3/4] rounded-sm' />
+            <Skeleton className='h-3 w-16' />
+            <Skeleton className='h-2 w-10' />
           </div>
         ))}
       </div>

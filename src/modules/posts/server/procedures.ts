@@ -395,22 +395,39 @@ export const postsRouter = createTRPCRouter({
     .input(
       z.object({
         postId: z.string().uuid(),
-        photoIds: z.array(z.string().uuid()),
+        photos: z
+          .array(
+            z.object({
+              photoId: z.string().uuid(),
+              isHighlight: z.boolean().optional(),
+            }),
+          )
+          .optional(),
+        photoIds: z.array(z.string().uuid()).optional(),
+        highlightPhotoIds: z.array(z.string().uuid()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { postId, photoIds } = input;
+      const { postId } = input;
+      const photoEntries =
+        input.photos ??
+        input.photoIds?.map((id) => ({
+          photoId: id,
+          isHighlight: input.highlightPhotoIds?.includes(id) ?? false,
+        })) ??
+        [];
 
       await ctx.db.transaction(async (tx) => {
         // Remove existing links
         await tx.delete(postsToPhotos).where(eq(postsToPhotos.postId, postId));
 
-        // Insert new links with correct sort order
-        if (photoIds.length > 0) {
-          const newLinks = photoIds.map((photoId, index) => ({
+        // Insert new links with correct sort order and highlight status
+        if (photoEntries.length > 0) {
+          const newLinks = photoEntries.map((entry, index) => ({
             postId,
-            photoId,
+            photoId: entry.photoId,
             sortOrder: index,
+            isHighlight: entry.isHighlight ?? false,
           }));
           await tx.insert(postsToPhotos).values(newLinks);
         }

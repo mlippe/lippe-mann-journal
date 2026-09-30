@@ -24,7 +24,7 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { Button } from '@/components/ui/button';
 import { ExifPreview } from '../exif-preview';
 import { ConfirmStepData, confirmStepSchema, AlbumPhoto } from './types';
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Star, Trash2 } from 'lucide-react';
 import { CollectionSelect } from '@/modules/posts/ui/components/collection-select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -50,6 +50,7 @@ const ConfirmStep = ({
   const sanitizedInitialPhotos: AlbumPhoto[] = initialPhotos.map((photo) => ({
     ...photo,
     title: photo.title?.trim() || 'Untitled.jpg',
+    isHighlight: photo.isHighlight ?? false,
     aspectRatio:
       typeof photo.aspectRatio === 'number' &&
       Number.isFinite(photo.aspectRatio) &&
@@ -275,11 +276,19 @@ const ConfirmStep = ({
               className={cn(
                 'relative overflow-hidden transition-all',
                 index === 0 && 'border-primary shadow-sm',
+                form.watch(`photos.${index}.isHighlight`) &&
+                  'border-amber-500/60 shadow-xs ring-1 ring-amber-500/20',
               )}
             >
               {index === 0 && (
                 <div className='absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold z-10'>
                   Cover Photo
+                </div>
+              )}
+              {form.watch(`photos.${index}.isHighlight`) && index !== 0 && (
+                <div className='absolute top-0 right-0 bg-amber-500 text-black text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold font-mono z-10 flex items-center gap-1'>
+                  <Star className='size-2.5 fill-black' />
+                  Highlight
                 </div>
               )}
               <CardContent className='px-4'>
@@ -355,6 +364,53 @@ const ConfirmStep = ({
 
                   {/* Photo Details */}
                   <div className='flex-1 space-y-4 w-full'>
+                    <div className='flex items-center justify-between gap-2 flex-wrap'>
+                      <FormField
+                        control={form.control}
+                        name={`photos.${index}.isHighlight`}
+                        render={({ field: highlightField }) => (
+                          <Button
+                            type='button'
+                            size='sm'
+                            variant={highlightField.value ? 'default' : 'outline'}
+                            onClick={() => {
+                              const nextVal = !highlightField.value;
+                              highlightField.onChange(nextVal);
+                              setPhotos((prev) => {
+                                const updated = [...prev];
+                                if (updated[index]) {
+                                  updated[index] = {
+                                    ...updated[index],
+                                    isHighlight: nextVal,
+                                  };
+                                }
+                                return updated;
+                              });
+                            }}
+                            className={cn(
+                              'text-xs font-mono gap-1.5 transition-all cursor-pointer h-8',
+                              highlightField.value
+                                ? 'bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow-xs border-amber-500'
+                                : 'text-muted-foreground hover:text-foreground',
+                            )}
+                          >
+                            <Star
+                              className={cn(
+                                'size-3.5',
+                                highlightField.value
+                                  ? 'fill-black text-black'
+                                  : 'text-muted-foreground',
+                              )}
+                            />
+                            <span>
+                              {highlightField.value
+                                ? '⭐ Highlight-Bild'
+                                : 'Als Highlight setzen'}
+                            </span>
+                          </Button>
+                        )}
+                      />
+                    </div>
                     <FormField
                       control={form.control}
                       name={`photos.${index}.title`}

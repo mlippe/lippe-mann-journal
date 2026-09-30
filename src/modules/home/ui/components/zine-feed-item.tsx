@@ -104,8 +104,9 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   };
 
   const photos = post.postsToPhotos || [];
+  const highlightEntry = photos.find((p: any) => p.isHighlight);
   const coverIndex = post.coverIndex ?? 0;
-  const coverPhoto = photos[coverIndex]?.photo || photos[0]?.photo;
+  const coverPhoto = highlightEntry?.photo || photos[coverIndex]?.photo || photos[0]?.photo;
   const hasMultiplePhotos = photos.length > 1;
 
   const formattedDate = post.createdAt

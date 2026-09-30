@@ -49,10 +49,14 @@ interface EditorialStoryViewProps {
   post: PostGetOne;
 }
 
+type StoryPhoto = Photo & { isHighlight?: boolean };
+
 type EditorialBlock =
-  | { type: 'hero'; photo: Photo; index: number }
-  | { type: 'diptych'; photos: [Photo, Photo]; startIndex: number }
-  | { type: 'solo'; photo: Photo; index: number };
+  | { type: 'hero'; photo: StoryPhoto; index: number }
+  | { type: 'highlight'; photo: StoryPhoto; index: number }
+  | { type: 'diptych'; photos: [StoryPhoto, StoryPhoto]; startIndex: number }
+  | { type: 'landscape'; photo: StoryPhoto; index: number }
+  | { type: 'solo'; photo: StoryPhoto; index: number };
 
 // Deterministic seed based on string hash for layout variety and SSR consistency
 function getPostSeed(id: string): number {
@@ -143,10 +147,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }),
   );
 
-  // Extract all photos sorted
-  const photos: Photo[] = useMemo(() => {
+  // Extract all photos sorted, preserving highlight flag
+  const photos: StoryPhoto[] = useMemo(() => {
     if (post.postsToPhotos && post.postsToPhotos.length > 0) {
-      return post.postsToPhotos.map((ptp) => ptp.photo);
+      return post.postsToPhotos.map((ptp) => ({
+        ...ptp.photo,
+        isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
+      }));
     }
     if (post.coverImage) {
       return [
@@ -158,6 +165,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           width: 1200,
           height: 800,
           blurData: '',
+          isHighlight: false,
           make: null,
           model: null,
           lensModel: null,
@@ -179,7 +187,21 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return [];
   }, [post]);
 
-  // Anti-template dynamic layout pacing
+  // Split single post content into paragraphs for dynamic story weaving
+  const paragraphs: string[] = useMemo(() => {
+    if (!post.content) return [];
+    return post.content
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+  }, [post.content]);
+
+  // Intelligent Portrait-First Layout Engine:
+  // - Hero: Opening plate (Photo 0)
+  // - Highlight: User-marked hero feature (always solo, dominant presence)
+  // - Landscape: Horizontal frames (aspect ratio >= 1.15) as cinematic breathers
+  // - Diptych: Consecutive 3:2 vertical frames paired into an editorial spread
+  // - Solo: Standalone vertical plate with balanced margins
   const blocks: EditorialBlock[] = useMemo(() => {
     if (photos.length === 0) return [];
     if (photos.length === 1) {
@@ -191,80 +213,78 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     const result: EditorialBlock[] = [{ type: 'hero', photo: hero, index: 0 }];
 
     let i = 0;
-    let lastWasPair = false;
-    let soloStreak = 0;
-
     while (i < remaining.length) {
-      const left = remaining.length - i;
+      const current = remaining[i];
+      const realIndex = i + 1;
+      const ratio =
+        current.aspectRatio ||
+        (current.width && current.height ? current.width / current.height : 2 / 3);
 
-      if (lastWasPair) {
-        // STRICT RULE: Never add two images next to each other after each other.
-        // After any pair (diptych), the next block MUST be a full size single image (solo).
+      const isVertical = ratio < 1.15;
+      const isLandscape = ratio >= 1.15;
+      const isHighlight = Boolean(current.isHighlight);
+
+      // Rule 1: User marked as Highlight -> Solo Feature Frame
+      if (isHighlight) {
         result.push({
-          type: 'solo',
-          photo: remaining[i],
-          index: i + 1,
+          type: 'highlight',
+          photo: current,
+          index: realIndex,
         });
         i += 1;
-        lastWasPair = false;
-        soloStreak = 1;
-      } else {
-        // Previous was NOT a pair (it was hero or solo).
-        if (left >= 2) {
-          const photoA = remaining[i];
-          const photoB = remaining[i + 1];
-          const ratioA =
-            photoA.aspectRatio ||
-            (photoA.width && photoA.height ? photoA.width / photoA.height : 1);
-          const ratioB =
-            photoB.aspectRatio ||
-            (photoB.width && photoB.height ? photoB.width / photoB.height : 1);
+        continue;
+      }
 
-          // We pair when:
-          // 1) Exactly 2 photos remain (fits cleanly as a closing pair)
-          // 2) Exactly 3 photos remain (pair then single)
-          // 3) Both photos are vertical (ratio < 1.15)
-          // 4) Or we already had 1+ single images and want to mix it up
-          const bothVertical = ratioA < 1.15 && ratioB < 1.15;
-          const shouldPair =
-            left === 2 ||
-            left === 3 ||
-            bothVertical ||
-            soloStreak >= 1 ||
-            i % 3 === 0;
+      // Rule 2: Landscape photo (Querformat) -> Cinematic Breather
+      if (isLandscape) {
+        result.push({
+          type: 'landscape',
+          photo: current,
+          index: realIndex,
+        });
+        i += 1;
+        continue;
+      }
 
-          if (shouldPair) {
+      // Rule 3: Vertical photo (Hochformat) -> Check if it pairs with next photo
+      if (isVertical) {
+        const next = remaining[i + 1];
+        if (next) {
+          const nextRatio =
+            next.aspectRatio ||
+            (next.width && next.height ? next.width / next.height : 2 / 3);
+          const nextIsVertical = nextRatio < 1.15;
+          const nextIsHighlight = Boolean(next.isHighlight);
+
+          // Pair into diptych if next is also vertical and not a highlight
+          if (nextIsVertical && !nextIsHighlight) {
             result.push({
               type: 'diptych',
-              photos: [photoA, photoB],
-              startIndex: i + 1,
+              photos: [current, next],
+              startIndex: realIndex,
             });
             i += 2;
-            lastWasPair = true;
-            soloStreak = 0;
-          } else {
-            // Full size single image
-            result.push({
-              type: 'solo',
-              photo: photoA,
-              index: i + 1,
-            });
-            i += 1;
-            lastWasPair = false;
-            soloStreak += 1;
+            continue;
           }
-        } else {
-          // Exactly 1 photo remaining -> solo full size single image
-          result.push({
-            type: 'solo',
-            photo: remaining[i],
-            index: i + 1,
-          });
-          i += 1;
-          lastWasPair = false;
-          soloStreak += 1;
         }
+
+        // Single vertical
+        result.push({
+          type: 'solo',
+          photo: current,
+          index: realIndex,
+        });
+        i += 1;
+        continue;
       }
+
+      // Fallback
+      result.push({
+        type: 'solo',
+        photo: current,
+        index: realIndex,
+      });
+      i += 1;
     }
 
     return result;
@@ -274,8 +294,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     () => getPostSeed(post.id || post.slug),
     [post.id, post.slug],
   );
-
-  const hasFieldNote = Boolean(post.content && post.content.trim().length > 0);
 
   // Randomize the mixing of sticky photo pinning and organic scroll reveal animations:
   // - Hero (block 0) pins in ~60% of posts that have multiple blocks
@@ -297,14 +315,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       const block = blocks[i];
       const bSeed = getBlockSeed(postSeed, i);
 
-      // Solo feature frames: ~40% chance of sticky pinning
-      if (block.type === 'solo' && bSeed % 10 < 4) {
+      // Solo & highlight feature frames: ~40% chance of sticky pinning
+      if ((block.type === 'solo' || block.type === 'highlight') && bSeed % 10 < 4) {
         pins.add(i);
       }
-      // Occasional diptych: ~20% chance of sticky pinning if followed by a solo frame
+      // Occasional diptych: ~20% chance of sticky pinning if followed by a solo/highlight frame
       else if (
         block.type === 'diptych' &&
-        blocks[i + 1]?.type === 'solo' &&
+        (blocks[i + 1]?.type === 'solo' || blocks[i + 1]?.type === 'highlight') &&
         bSeed % 10 < 2
       ) {
         pins.add(i);
@@ -319,50 +337,57 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         type: 'pinned-hero-unit';
         heroBlock: EditorialBlock & { type: 'hero' };
         overlayBlock: EditorialBlock;
-        hasFieldNote: boolean;
+        fieldNote?: string;
       }
     | {
         type: 'pinned-unit';
         pinnedBlock: EditorialBlock;
         overlayBlock: EditorialBlock;
+        fieldNote?: string;
       }
     | {
         type: 'standard-unit';
         block: EditorialBlock;
-        hasFieldNote?: boolean;
+        fieldNote?: string;
       };
 
   const storyUnits = useMemo(() => {
-    const units: StoryUnit[] = [];
+    const rawUnits: Array<{
+      type: 'pinned-hero-unit' | 'pinned-unit' | 'standard-unit';
+      heroBlock?: EditorialBlock & { type: 'hero' };
+      pinnedBlock?: EditorialBlock;
+      overlayBlock?: EditorialBlock;
+      block?: EditorialBlock;
+      fieldNote?: string;
+    }> = [];
+
     let i = 0;
     while (i < blocks.length) {
       if (i === 0 && blocks[0].type === 'hero') {
         if (stickyPinIndices.has(0) && blocks.length > 1) {
-          units.push({
+          rawUnits.push({
             type: 'pinned-hero-unit',
             heroBlock: blocks[0] as EditorialBlock & { type: 'hero' },
             overlayBlock: blocks[1],
-            hasFieldNote,
           });
           i = 2;
         } else {
-          units.push({
+          rawUnits.push({
             type: 'standard-unit',
             block: blocks[0],
-            hasFieldNote,
           });
           i = 1;
         }
       } else {
         if (stickyPinIndices.has(i) && i + 1 < blocks.length) {
-          units.push({
+          rawUnits.push({
             type: 'pinned-unit',
             pinnedBlock: blocks[i],
             overlayBlock: blocks[i + 1],
           });
           i += 2;
         } else {
-          units.push({
+          rawUnits.push({
             type: 'standard-unit',
             block: blocks[i],
           });
@@ -370,8 +395,40 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         }
       }
     }
-    return units;
-  }, [blocks, stickyPinIndices, hasFieldNote]);
+
+    // Dynamic Text Weaving: Distribute paragraphs across story units!
+    if (paragraphs.length === 1) {
+      if (rawUnits.length > 0) {
+        rawUnits[0].fieldNote = paragraphs[0];
+      }
+    } else if (paragraphs.length > 1 && rawUnits.length > 0) {
+      // Paragraph 0: Intro / Lead note after Hero
+      rawUnits[0].fieldNote = paragraphs[0];
+
+      const remainingPars = paragraphs.slice(1);
+      const remainingUnitsCount = rawUnits.length - 1;
+
+      if (remainingUnitsCount <= 0) {
+        rawUnits[0].fieldNote = paragraphs.join('\n\n');
+      } else {
+        remainingPars.forEach((para, pIdx) => {
+          const targetUnitIdx =
+            1 +
+            Math.min(
+              remainingUnitsCount - 1,
+              Math.floor((pIdx + 0.5) * (remainingUnitsCount / remainingPars.length)),
+            );
+          if (rawUnits[targetUnitIdx].fieldNote) {
+            rawUnits[targetUnitIdx].fieldNote += `\n\n${para}`;
+          } else {
+            rawUnits[targetUnitIdx].fieldNote = para;
+          }
+        });
+      }
+    }
+
+    return rawUnits as StoryUnit[];
+  }, [blocks, stickyPinIndices, paragraphs]);
 
   const renderHeroContent = (block: EditorialBlock & { type: 'hero' }) => {
     const photo = block.photo;
@@ -390,7 +447,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.index)}
-            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
               maxHeight: 'min(86vh, calc(100dvh - 5rem))',
@@ -431,6 +488,119 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     );
   };
 
+  const renderHighlightContent = (
+    block: EditorialBlock & { type: 'highlight' },
+  ) => {
+    const photo = block.photo;
+    const ratio =
+      photo.aspectRatio ||
+      (photo.width && photo.height ? photo.width / photo.height : 2 / 3);
+
+    return (
+      <div className='flex justify-center w-full max-w-5xl mx-auto py-2 sm:py-6'>
+        <div
+          className='group/plate flex flex-col items-end w-full'
+          style={{
+            width: `min(100%, calc(min(88vh, calc(100dvh - 4.5rem)) * ${ratio}))`,
+            maxWidth: '100%',
+          }}
+        >
+          <div
+            onClick={() => setLightboxIndex(block.index)}
+            className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            style={{
+              aspectRatio: `${ratio}`,
+              maxHeight: 'min(88vh, calc(100dvh - 4.5rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photo.url)}
+              alt={photo.title || post.title}
+              fill
+              blurhash={photo.blurData}
+              aspectRatio={ratio}
+              className='object-contain w-full h-full'
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1200px'
+            />
+            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.index);
+                }}
+                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-3.5' />
+              </button>
+            </div>
+          </div>
+
+          {/* Understated Highlight Indicator */}
+          <div className='pt-2 flex items-center justify-between w-full text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span className='text-amber-500/90 font-medium'>★ Highlight</span>
+            <span>{String(block.index + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderLandscapeContent = (
+    block: EditorialBlock & { type: 'landscape' },
+  ) => {
+    const photo = block.photo;
+    const ratio =
+      photo.aspectRatio ||
+      (photo.width && photo.height ? photo.width / photo.height : 3 / 2);
+
+    return (
+      <div className='flex justify-center w-full max-w-5xl mx-auto py-2 sm:py-4'>
+        <div
+          className='group/plate flex flex-col items-end w-full'
+          style={{
+            maxWidth: '100%',
+          }}
+        >
+          <div
+            onClick={() => setLightboxIndex(block.index)}
+            className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            style={{
+              aspectRatio: `${ratio}`,
+              maxHeight: 'min(80vh, calc(100dvh - 6rem))',
+            }}
+          >
+            <BlurImage
+              src={keyToUrl(photo.url)}
+              alt={photo.title || post.title}
+              fill
+              blurhash={photo.blurData}
+              aspectRatio={ratio}
+              className='object-contain w-full h-full'
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1100px'
+            />
+            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(block.index);
+                }}
+                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                aria-label='Foto vergrößern'
+              >
+                <IconArrowsMaximize className='size-3.5' />
+              </button>
+            </div>
+          </div>
+
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+            <span>{String(block.index + 1).padStart(2, '0')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderSoloContent = (block: EditorialBlock & { type: 'solo' }) => {
     const photo = block.photo;
     const ratio =
@@ -448,7 +618,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.index)}
-            className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
               maxHeight: 'min(86vh, calc(100dvh - 5rem))',
@@ -531,7 +701,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.startIndex)}
-            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            className='w-full relative group/photo overflow-hidden bg-muted/10 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratioA}`,
               maxHeight: isMobileSideBySide
@@ -591,7 +761,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <div
             onClick={() => setLightboxIndex(block.startIndex + 1)}
-            className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
+            className='w-full relative group/photo overflow-hidden bg-muted/10 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratioB}`,
               maxHeight: isMobileSideBySide
@@ -637,6 +807,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   const renderBlockContent = (block: EditorialBlock) => {
     if (block.type === 'hero') return renderHeroContent(block);
+    if (block.type === 'highlight') return renderHighlightContent(block);
+    if (block.type === 'landscape') return renderLandscapeContent(block);
     if (block.type === 'solo') return renderSoloContent(block);
     if (block.type === 'diptych') return renderDiptychContent(block);
     return null;
@@ -676,7 +848,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Reset scale and gesture tracking on slide change
   useEffect(() => {
-    setCurrentScale(1);
+    const timer = setTimeout(() => {
+      setCurrentScale(1);
+    }, 0);
     isPanningRef.current = false;
     ignoreClickRef.current = false;
     pointerDownPos.current = null;
@@ -684,6 +858,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     touchStartX.current = null;
     touchStartY.current = null;
     hasTouchMoved.current = false;
+    return () => clearTimeout(timer);
   }, [lightboxIndex]);
 
   // Pointer drag tracking to ensure drag releases never accidentally toggle zoom
@@ -921,11 +1096,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                 {/* 2. OVERLAY CONTAINER (Field note if present + Next Block) */}
                 <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
-                  {unit.hasFieldNote && (
+                  {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pb-12 md:pb-20'>
                       <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                         <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
-                          {post.content!.trim()}
+                          {unit.fieldNote}
                         </p>
                       </div>
                     </div>
@@ -960,6 +1135,15 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                 {/* 2. OVERLAY FRAME */}
                 <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
+                  {unit.fieldNote && (
+                    <div className='max-w-2xl mx-auto px-4 pb-10 md:pb-16'>
+                      <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
+                        <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                          {unit.fieldNote}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {renderBlockContent(unit.overlayBlock)}
                 </div>
               </section>
@@ -976,12 +1160,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 >
                   <ScrollReveal disabled>{renderHeroContent(block)}</ScrollReveal>
 
-                  {unit.hasFieldNote && (
+                  {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
                       <ScrollReveal>
                         <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                           <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
-                            {post.content!.trim()}
+                            {unit.fieldNote}
                           </p>
                         </div>
                       </ScrollReveal>
@@ -1007,6 +1191,17 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 }
               >
                 <ScrollReveal>{renderBlockContent(block)}</ScrollReveal>
+                {unit.fieldNote && (
+                  <div className='max-w-2xl mx-auto px-4 pt-10 md:pt-16'>
+                    <ScrollReveal>
+                      <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
+                        <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                          {unit.fieldNote}
+                        </p>
+                      </div>
+                    </ScrollReveal>
+                  </div>
+                )}
               </section>
             );
           }
@@ -1131,9 +1326,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   <span className='text-[11px] sm:text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
                     {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
                     {String(photos.length).padStart(2, '0')}
-                  </span>
-                  <span className='text-xs font-mono text-white/70 hidden sm:inline truncate max-w-xs'>
-                    {photos[lightboxIndex].title || post.title}
                   </span>
                 </div>
 

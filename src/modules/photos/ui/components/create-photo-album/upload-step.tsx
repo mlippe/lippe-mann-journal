@@ -35,6 +35,7 @@ const UploadStep = ({
       width,
       height,
       blurData: imageInfo.blurhash || '',
+      isHighlight: false,
       ...exif,
     };
     onPhotoUploaded(newPhoto);

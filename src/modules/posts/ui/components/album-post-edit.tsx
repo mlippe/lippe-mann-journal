@@ -39,7 +39,7 @@ import { ISOSelector } from '@/modules/photos/ui/components/iso-selector';
 import { ExposureCompensationSelector } from '@/modules/photos/ui/components/exposure-compensation-selector';
 import { TagsInput } from '@/modules/articles/ui/components/tags-input';
 import { CollectionSelect } from './collection-select';
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Star, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { confirmStepSchema } from '@/modules/photos/ui/components/create-photo-album/types';
 
@@ -65,6 +65,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
     aspectRatio: ptp.photo.aspectRatio,
     width: ptp.photo.width,
     height: ptp.photo.height,
+    isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
     make: ptp.photo.make,
     model: ptp.photo.model,
     lensModel: ptp.photo.lensModel,
@@ -105,6 +106,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         aspectRatio: ptp.photo.aspectRatio,
         width: ptp.photo.width,
         height: ptp.photo.height,
+        isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
         make: ptp.photo.make,
         model: ptp.photo.model,
         lensModel: ptp.photo.lensModel,
@@ -183,6 +185,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       width: imageInfo.width,
       height: imageInfo.height,
       blurData: imageInfo.blurhash || '',
+      isHighlight: false,
       make: exif?.make || null,
       model: exif?.model || null,
       lensModel: exif?.lensModel || null,
@@ -209,22 +212,26 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       const existingPhotos = values.photos.filter((p) => existingPhotoIds.has(p.id));
 
       // 2. Insert new photos and get their real database IDs
-      let insertedPhotos: any[] = [];
+      let insertedPhotos: Array<{ id: string }> = [];
       if (newPhotos.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const photosToInsert = newPhotos.map(({ id, ...rest }) => rest);
+        const photosToInsert = newPhotos.map(({ id, isHighlight, ...rest }) => rest);
         insertedPhotos = await createManyPhotos.mutateAsync(photosToInsert);
       }
 
-      // 3. Map new photos back to their inserted IDs to preserve sorting order
+      // 3. Map photos back to their IDs and highlights to preserve order & highlight status
       let newPhotoIndex = 0;
-      const finalPhotoIds = values.photos.map((p) => {
+      const finalPhotoEntries = values.photos.map((p) => {
+        let photoId = p.id;
         if (!existingPhotoIds.has(p.id)) {
           const inserted = insertedPhotos[newPhotoIndex];
           newPhotoIndex++;
-          return inserted.id;
+          photoId = inserted.id;
         }
-        return p.id;
+        return {
+          photoId,
+          isHighlight: Boolean(p.isHighlight),
+        };
       });
 
       // 4. Update post basic info
@@ -237,10 +244,10 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         collectionIds: values.collectionIds,
       });
 
-      // 5. Update post-to-photos relations (reordering/removal/additions)
+      // 5. Update post-to-photos relations (reordering/removal/additions/highlights)
       await updateAlbumPhotos.mutateAsync({
         postId: post.id,
-        photoIds: finalPhotoIds,
+        photos: finalPhotoEntries,
       });
 
       // 6. Update each photo's metadata (only for existing photos)
@@ -402,13 +409,21 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
             <Card
               key={field.id}
               className={cn(
-                'relative overflow-hidden',
+                'relative overflow-hidden transition-colors',
                 index === 0 && 'border-primary shadow-sm',
+                form.watch(`photos.${index}.isHighlight`) &&
+                  'border-amber-500/60 shadow-xs ring-1 ring-amber-500/20',
               )}
             >
               {index === 0 && (
                 <div className='absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold z-10'>
                   Cover Photo
+                </div>
+              )}
+              {form.watch(`photos.${index}.isHighlight`) && index !== 0 && (
+                <div className='absolute top-0 right-0 bg-amber-500 text-black text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold font-mono z-10 flex items-center gap-1'>
+                  <Star className='size-2.5 fill-black' />
+                  Highlight
                 </div>
               )}
               <CardContent className='p-4'>
@@ -460,6 +475,42 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                   </div>
 
                   <div className='flex-1 space-y-4 w-full'>
+                    <div className='flex items-center justify-between gap-2 flex-wrap'>
+                      <FormField
+                        control={form.control}
+                        name={`photos.${index}.isHighlight`}
+                        render={({ field: highlightField }) => (
+                          <Button
+                            type='button'
+                            size='sm'
+                            variant={highlightField.value ? 'default' : 'outline'}
+                            onClick={() =>
+                              highlightField.onChange(!highlightField.value)
+                            }
+                            className={cn(
+                              'text-xs font-mono gap-1.5 transition-all cursor-pointer h-8',
+                              highlightField.value
+                                ? 'bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow-xs border-amber-500'
+                                : 'text-muted-foreground hover:text-foreground',
+                            )}
+                          >
+                            <Star
+                              className={cn(
+                                'size-3.5',
+                                highlightField.value
+                                  ? 'fill-black text-black'
+                                  : 'text-muted-foreground',
+                              )}
+                            />
+                            <span>
+                              {highlightField.value
+                                ? '⭐ Highlight-Bild'
+                                : 'Als Highlight setzen'}
+                            </span>
+                          </Button>
+                        )}
+                      />
+                    </div>
                     <FormField
                       control={form.control}
                       name={`photos.${index}.title`}

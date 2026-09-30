@@ -20,6 +20,7 @@ export const albumPhotoSchema = z.object({
   width: z.number(),
   height: z.number(),
   blurData: z.string(),
+  isHighlight: z.boolean(),
 
   // EXIF Data
   make: z.string().optional().nullable(),

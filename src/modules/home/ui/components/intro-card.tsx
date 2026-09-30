@@ -8,36 +8,38 @@ import { siteConfig } from '@/site.config';
 
 const IntroCard = () => {
   return (
-    <div className='flex justify-center -mx-3'>
+    <div className='flex justify-center -mx-3 mb-2 md:mb-4'>
       <Link
         href='/about'
-        className='flex flex-col justify-between gap-6 p-6 hover:bg-muted-foreground/10 transition-all rounded-2xl duration-150 ease-[cubic-bezier(0.22, 1, 0.36, 1)] font-light relative group h-full max-w-3xl w-fit'
+        className='flex flex-col gap-2.5 p-3.5 sm:p-4 hover:bg-muted-foreground/5 transition-all rounded-xl duration-150 font-light relative group max-w-xl w-full'
       >
-        <div className='flex gap-3 items-center flex-col'>
-          {/* AVATAR  */}
-          <Avatar className='size-20'>
+        <div className='flex items-center gap-3.5'>
+          {/* AVATAR LEFT */}
+          <Avatar className='size-11 sm:size-12 shrink-0'>
             <AvatarImage src={siteConfig.avatar} alt='Avatar' />
             <AvatarFallback>{siteConfig.initials}</AvatarFallback>
           </Avatar>
 
-          {/* NAME  */}
-          <div className='flex flex-col items-center'>
-            <h1 className='text-base font-medium'>{siteConfig.name}</h1>
-            <p className='-mt-0.5 text-xs text-foreground/70 font-medium'>
+          {/* NAME RIGHT */}
+          <div className='flex flex-col min-w-0 grow'>
+            <div className='flex items-center justify-between'>
+              <h1 className='text-sm sm:text-base font-medium tracking-tight text-foreground'>
+                {siteConfig.name}
+              </h1>
+              <div className='opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-muted-foreground'>
+                <PiArrowUpRight size={16} />
+              </div>
+            </div>
+            <p className='-mt-0.5 text-[11px] sm:text-xs text-foreground/60 font-mono'>
               {siteConfig.role}
             </p>
           </div>
         </div>
 
-        <div className='xl:mt-0'>
-          <p className='text-center text-foreground text-sm  md:text-base'>
-            {siteConfig.bio}
-          </p>
-        </div>
-
-        <div className='absolute top-8 right-8 opacity-0 group-hover:top-6 group-hover:right-6 group-hover:opacity-100 transition-all duration-300 ease-in-out'>
-          <PiArrowUpRight size={18} />
-        </div>
+        {/* BIO BELOW */}
+        <p className='text-xs sm:text-sm text-foreground/80 leading-relaxed font-sans'>
+          {siteConfig.bio}
+        </p>
       </Link>
     </div>
   );

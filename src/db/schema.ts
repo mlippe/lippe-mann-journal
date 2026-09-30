@@ -197,6 +197,8 @@ export const postsWithPhotos = createSelectSchema(posts).extend({
     .array(
       z.object({
         photo: createSelectSchema(photos),
+        sortOrder: z.number().optional(),
+        isHighlight: z.boolean().optional(),
       }),
     )
     .optional(),
@@ -235,6 +237,7 @@ export const postsToPhotos = pgTable(
       .notNull()
       .references(() => photos.id, { onDelete: 'cascade' }),
     sortOrder: integer('sort_order').notNull().default(0),
+    isHighlight: boolean('is_highlight').notNull().default(false),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.postId, t.photoId] }),

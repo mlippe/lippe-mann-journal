@@ -98,7 +98,11 @@ export const photosRouter = createTRPCRouter({
       z.object({
         postTitle: z.string(),
         postVisibility: z.enum(['public', 'private']).default('private'),
-        photos: z.array(photosInsertSchema),
+        photos: z.array(
+          photosInsertSchema.extend({
+            isHighlight: z.boolean().optional(),
+          }),
+        ),
         collectionIds: z.array(z.string().uuid()).optional(),
         content: z.string().optional(),
       }),
@@ -107,10 +111,14 @@ export const photosRouter = createTRPCRouter({
       const { postTitle, postVisibility, photos: inputPhotos, collectionIds, content } = input;
       try {
         const [albumPost] = await ctx.db.transaction(async (tx) => {
-          // 1. Insert all photos
+          // 1. Insert all photos (omit isHighlight from photo entity)
+          const rawPhotosToInsert = inputPhotos.map(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            ({ isHighlight, ...p }) => p,
+          );
           const insertedPhotos = await tx
             .insert(photos)
-            .values(inputPhotos)
+            .values(rawPhotosToInsert)
             .returning();
 
           if (insertedPhotos.length === 0) {
@@ -137,11 +145,12 @@ export const photosRouter = createTRPCRouter({
             throw new Error('Failed to create album post');
           }
 
-          // 3. Link photos to album post
+          // 3. Link photos to album post with highlight status
           const links = insertedPhotos.map((photo, index) => ({
             postId: post.id,
             photoId: photo.id,
             sortOrder: index,
+            isHighlight: inputPhotos[index]?.isHighlight ?? false,
           }));
 
           await tx.insert(postsToPhotos).values(links);
