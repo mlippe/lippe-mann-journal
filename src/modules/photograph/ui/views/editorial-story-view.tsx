@@ -69,7 +69,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const isPanningRef = useRef(false);
   const ignoreClickRef = useRef(false);
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+  const pointerStartTime = useRef<number>(0);
   const didMovePointer = useRef(false);
+  const handledByPointerUp = useRef(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const hasTouchMoved = useRef(false);
@@ -250,7 +252,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Pointer drag tracking to ensure drag releases never accidentally toggle zoom
   const handlePointerDown = (e: React.PointerEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button') || target?.closest('a')) {
+      pointerDownPos.current = null;
+      return;
+    }
     pointerDownPos.current = { x: e.clientX, y: e.clientY };
+    pointerStartTime.current = Date.now();
     didMovePointer.current = false;
   };
 
@@ -265,17 +273,44 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
   };
 
-  const handlePointerUp = () => {
-    if (didMovePointer.current) {
-      ignoreClickRef.current = true;
-      setTimeout(() => {
-        ignoreClickRef.current = false;
-        pointerDownPos.current = null;
-        didMovePointer.current = false;
-      }, 150);
-    } else {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!pointerDownPos.current) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button') || target?.closest('a')) {
       pointerDownPos.current = null;
-      didMovePointer.current = false;
+      return;
+    }
+
+    const dist = Math.hypot(
+      e.clientX - pointerDownPos.current.x,
+      e.clientY - pointerDownPos.current.y,
+    );
+    const elapsed = Date.now() - pointerStartTime.current;
+    const wasTap = !didMovePointer.current && dist <= 8 && elapsed < 500;
+
+    pointerDownPos.current = null;
+    didMovePointer.current = false;
+
+    if (wasTap) {
+      handledByPointerUp.current = true;
+      setTimeout(() => {
+        handledByPointerUp.current = false;
+      }, 200);
+
+      if (isZoomed) {
+        // ONE SINGLE TAP / CLICK UNZOOMS TO FIT IMMEDIATELY
+        transformComponentRef.current?.resetTransform(300, 'easeOut');
+        setCurrentScale(1);
+      } else {
+        // SINGLE TAP / CLICK ZOOMS TO 100% AT TAP POSITION
+        transformComponentRef.current?.zoomToPoint(
+          2.5,
+          e.clientX,
+          e.clientY,
+          300,
+          'easeOut',
+        );
+      }
     }
   };
 
@@ -357,9 +392,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     touchStartY.current = null;
   };
 
-  // Single click/tap toggles between 100% zoom and fit (no double-click needed)
+  // Single click/tap fallback (when click is dispatched without pointerup or vice versa)
   const handleStageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (
+      handledByPointerUp.current ||
       isPanningRef.current ||
       ignoreClickRef.current ||
       didMovePointer.current
@@ -376,6 +412,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       );
     } else {
       transformComponentRef.current?.resetTransform(300, 'easeOut');
+      setCurrentScale(1);
     }
   };
 
@@ -384,6 +421,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       transformComponentRef.current?.centerView(2.5, 300, 'easeOut');
     } else {
       transformComponentRef.current?.resetTransform(300, 'easeOut');
+      setCurrentScale(1);
     }
   };
 
@@ -950,21 +988,33 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         <DialogContent
           showCloseButton={false}
           className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-black/95 border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden'
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            transform: 'none',
+            width: '100vw',
+            height: '100dvh',
+            maxHeight: '100dvh',
+          }}
         >
           <DialogTitle className='sr-only'>Foto Großansicht</DialogTitle>
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
             <div
               className='relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none'
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
+              style={{ height: '100dvh', maxHeight: '100dvh' }}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Top Controls Bar */}
-              <div className='shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent'>
+              <div
+                className='shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent'
+                style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+              >
                 <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
                   <span className='text-[11px] sm:text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
                     {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
@@ -1057,6 +1107,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       : 'cursor-grab'
                     : 'cursor-zoom-in',
                 )}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
                 onClick={handleStageClick}
               >
                 <TransformWrapper
@@ -1151,12 +1204,15 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               </div>
 
               {/* Bottom Full EXIF Information Bar */}
-              <div className='shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10'>
-                <div className='flex flex-wrap items-center justify-between gap-y-1 gap-x-3 max-w-6xl mx-auto text-[11px] sm:text-xs font-mono leading-tight'>
+              <div
+                className='shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10'
+                style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
+              >
+                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 max-w-6xl mx-auto text-[11px] sm:text-xs font-mono leading-tight'>
                   {/* Camera & Lens Details */}
                   <div className='flex items-center gap-1.5 flex-wrap min-w-0'>
                     <IconCamera className='size-3.5 text-white/50 shrink-0' />
-                    <span className='font-medium text-white truncate max-w-[180px] sm:max-w-none'>
+                    <span className='font-medium text-white truncate max-w-[200px] sm:max-w-none'>
                       {[
                         photos[lightboxIndex].make && photos[lightboxIndex].model
                           ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
@@ -1168,7 +1224,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     {photos[lightboxIndex].lensModel && (
                       <>
                         <span className='text-white/30'>·</span>
-                        <span className='text-white/80 truncate max-w-[160px] sm:max-w-none'>
+                        <span className='text-white/80 truncate max-w-[180px] sm:max-w-none'>
                           {photos[lightboxIndex].lensModel}
                         </span>
                       </>
