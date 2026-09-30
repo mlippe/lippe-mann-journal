@@ -106,6 +106,11 @@ const PhotoInfo = ({
           <p className='text-sm text-muted-foreground'>
             {format(post.createdAt, 'dd.MM.yyyy, p', { locale: de })}
           </p>
+          {post.content && (
+            <p className='text-xs md:text-sm text-muted-foreground/90 leading-relaxed mt-2.5 pt-2.5 border-t border-border/40 font-serif italic whitespace-pre-line'>
+              {post.content}
+            </p>
+          )}
         </div>
 
         {/* SOCIAL INTERACTIONS AREA */}

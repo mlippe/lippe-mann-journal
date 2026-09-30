@@ -42,6 +42,7 @@ export type AlbumPhoto = z.infer<typeof albumPhotoSchema>;
 export const confirmStepSchema = z.object({
   postVisibility: z.enum(['private', 'public']),
   postTitle: z.string().min(1, { message: 'Album title is required' }),
+  content: z.string().optional(),
   photos: z.array(albumPhotoSchema).min(1, { message: 'At least one photo is required' }),
   collectionIds: z.array(z.string().uuid()).default([]),
 });

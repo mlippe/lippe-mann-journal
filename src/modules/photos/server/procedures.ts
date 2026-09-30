@@ -32,10 +32,11 @@ export const photosRouter = createTRPCRouter({
         postTitle: z.string(),
         postVisibility: z.enum(['public', 'private']).default('private'),
         collectionIds: z.array(z.string().uuid()).optional(),
+        content: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { postTitle, postVisibility, collectionIds, ...photoData } = input;
+      const { postTitle, postVisibility, collectionIds, content, ...photoData } = input;
 
       try {
         const [result] = await ctx.db.transaction(async (tx) => {
@@ -56,6 +57,7 @@ export const photosRouter = createTRPCRouter({
               type: 'PHOTO',
               visibility: postVisibility,
               coverImage: photo.url,
+              content: content || null,
             })
             .returning();
 
@@ -98,10 +100,11 @@ export const photosRouter = createTRPCRouter({
         postVisibility: z.enum(['public', 'private']).default('private'),
         photos: z.array(photosInsertSchema),
         collectionIds: z.array(z.string().uuid()).optional(),
+        content: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { postTitle, postVisibility, photos: inputPhotos, collectionIds } = input;
+      const { postTitle, postVisibility, photos: inputPhotos, collectionIds, content } = input;
       try {
         const [albumPost] = await ctx.db.transaction(async (tx) => {
           // 1. Insert all photos
@@ -126,6 +129,7 @@ export const photosRouter = createTRPCRouter({
               type: 'ALBUM',
               visibility: postVisibility,
               coverImage: insertedPhotos[0].url,
+              content: content || null,
             })
             .returning();
 
