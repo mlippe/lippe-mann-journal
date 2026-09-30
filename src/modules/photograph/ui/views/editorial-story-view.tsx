@@ -68,6 +68,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
   const isPanningRef = useRef(false);
   const ignoreClickRef = useRef(false);
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+  const didMovePointer = useRef(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const hasTouchMoved = useRef(false);
@@ -239,10 +241,43 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     setCurrentScale(1);
     isPanningRef.current = false;
     ignoreClickRef.current = false;
+    pointerDownPos.current = null;
+    didMovePointer.current = false;
     touchStartX.current = null;
     touchStartY.current = null;
     hasTouchMoved.current = false;
   }, [lightboxIndex]);
+
+  // Pointer drag tracking to ensure drag releases never accidentally toggle zoom
+  const handlePointerDown = (e: React.PointerEvent) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+    didMovePointer.current = false;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!pointerDownPos.current) return;
+    const dist = Math.hypot(
+      e.clientX - pointerDownPos.current.x,
+      e.clientY - pointerDownPos.current.y,
+    );
+    if (dist > 8) {
+      didMovePointer.current = true;
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (didMovePointer.current) {
+      ignoreClickRef.current = true;
+      setTimeout(() => {
+        ignoreClickRef.current = false;
+        pointerDownPos.current = null;
+        didMovePointer.current = false;
+      }, 150);
+    } else {
+      pointerDownPos.current = null;
+      didMovePointer.current = false;
+    }
+  };
 
   // Keyboard navigation for lightbox
   const handleKeyDown = useCallback(
@@ -322,9 +357,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     touchStartY.current = null;
   };
 
-  // Click/Tap to zoom in at point or reset to fit
+  // Single click/tap toggles between 100% zoom and fit (no double-click needed)
   const handleStageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isPanningRef.current || ignoreClickRef.current) return;
+    if (
+      isPanningRef.current ||
+      ignoreClickRef.current ||
+      didMovePointer.current
+    )
+      return;
 
     if (!isZoomed) {
       transformComponentRef.current?.zoomToPoint(
@@ -909,37 +949,40 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       >
         <DialogContent
           showCloseButton={false}
-          className='bg-black/95 border-none max-w-screen! w-screen! h-screen! max-h-screen! p-0 m-0 rounded-none flex flex-col justify-between z-50 text-white overflow-hidden'
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-black/95 border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden'
         >
           <DialogTitle className='sr-only'>Foto Großansicht</DialogTitle>
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
             <div
-              className='relative w-full h-full flex flex-col justify-between select-none overflow-hidden touch-none'
+              className='relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none'
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Top Controls Bar */}
-              <div className='flex items-center justify-between z-20 text-white/80 p-3 sm:p-5 bg-linear-to-b from-black/80 to-transparent'>
-                <div className='flex items-center gap-2 sm:gap-3'>
-                  <span className='text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm'>
+              <div className='shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent'>
+                <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
+                  <span className='text-[11px] sm:text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
                     {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
                     {String(photos.length).padStart(2, '0')}
                   </span>
-                  <span className='text-xs font-mono text-white/60 hidden sm:inline truncate max-w-xs'>
+                  <span className='text-xs font-mono text-white/70 hidden sm:inline truncate max-w-xs'>
                     {photos[lightboxIndex].title || post.title}
                   </span>
                 </div>
 
                 {/* Actions & Zoom Toggle */}
-                <div className='flex items-center gap-2 sm:gap-3'>
+                <div className='flex items-center gap-1.5 sm:gap-2.5 shrink-0'>
                   <button
                     onClick={handleToggleZoomButton}
                     className={cn(
-                      'px-2.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer',
+                      'px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0',
                       isZoomed
-                        ? 'bg-white text-black'
+                        ? 'bg-white text-black font-semibold'
                         : 'bg-white/10 hover:bg-white/20 text-white',
                     )}
                     title={isZoomed ? 'Zoom zurücksetzen' : '100% Zoom'}
@@ -959,9 +1002,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                   <a
                     href={createPrintInquiryUrl(photos[lightboxIndex])}
-                    className='px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5'
+                    className='p-1.5 sm:px-3 sm:py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 shrink-0'
+                    title='Print anfragen'
                   >
-                    <IconMail className='size-3.5' />
+                    <IconMail className='size-4 sm:size-3.5' />
                     <span className='hidden sm:inline'>Print anfragen</span>
                   </a>
 
@@ -974,7 +1018,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         });
                       }
                     }}
-                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1'
+                    className='p-1.5 sm:px-2.5 sm:py-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0'
                     aria-label='Serie liken'
                   >
                     <IconHeartFilled
@@ -995,7 +1039,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       setLightboxIndex(null);
                       setCurrentScale(1);
                     }}
-                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
+                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0'
                     aria-label='Schließen (Esc)'
                   >
                     <IconX className='size-5' />
@@ -1003,10 +1047,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </div>
               </div>
 
-              {/* Main Image Stage (Drag/Pan, Pinch & 100% Zoomable) */}
+              {/* Main Image Stage (Drag/Pan, Pinch & Single Click/Tap 100% Zoomable) */}
               <div
                 className={cn(
-                  'relative grow flex items-center justify-center min-h-0 w-full overflow-hidden select-none',
+                  'relative grow min-h-0 w-full flex items-center justify-center overflow-hidden select-none',
                   isZoomed
                     ? isCurrentlyDragging
                       ? 'cursor-grabbing'
@@ -1033,10 +1077,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     step: 5,
                   }}
                   doubleClick={{
-                    disabled: false,
-                    mode: 'toggle',
-                    step: 2.5,
-                    animationTime: 250,
+                    disabled: true,
                   }}
                   wheel={{
                     step: 0.15,
@@ -1050,14 +1091,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     setIsCurrentlyDragging(false);
                     setTimeout(() => {
                       isPanningRef.current = false;
-                    }, 100);
+                    }, 120);
                   }}
                   onTransform={(_ref, state) => {
                     setCurrentScale(state.scale);
                   }}
                 >
                   <TransformComponent
-                    wrapperClass='w-full h-full flex items-center justify-center'
+                    wrapperClass='w-full h-full flex items-center justify-center overflow-hidden'
                     contentClass='w-full h-full flex items-center justify-center'
                     wrapperStyle={{ width: '100%', height: '100%' }}
                     contentStyle={{
@@ -1075,7 +1116,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       height={photos[lightboxIndex].height}
                       blurhash={photos[lightboxIndex].blurData}
                       aspectRatio={photos[lightboxIndex].aspectRatio}
-                      className='max-w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] object-contain select-none pointer-events-none'
+                      className='max-w-full max-h-full object-contain select-none pointer-events-none p-1 sm:p-2 md:p-4'
                       sizes='100vw'
                       priority
                     />
@@ -1110,12 +1151,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               </div>
 
               {/* Bottom Full EXIF Information Bar */}
-              <div className='z-20 text-white/80 p-3 sm:p-4 bg-linear-to-t from-black/90 to-transparent border-t border-white/10'>
-                <div className='flex flex-wrap items-center justify-between gap-y-2 gap-x-4 max-w-6xl mx-auto text-xs font-mono'>
+              <div className='shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10'>
+                <div className='flex flex-wrap items-center justify-between gap-y-1 gap-x-3 max-w-6xl mx-auto text-[11px] sm:text-xs font-mono leading-tight'>
                   {/* Camera & Lens Details */}
-                  <div className='flex items-center gap-2 flex-wrap'>
+                  <div className='flex items-center gap-1.5 flex-wrap min-w-0'>
                     <IconCamera className='size-3.5 text-white/50 shrink-0' />
-                    <span className='font-medium text-white'>
+                    <span className='font-medium text-white truncate max-w-[180px] sm:max-w-none'>
                       {[
                         photos[lightboxIndex].make && photos[lightboxIndex].model
                           ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
@@ -1127,7 +1168,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     {photos[lightboxIndex].lensModel && (
                       <>
                         <span className='text-white/30'>·</span>
-                        <span className='text-white/80'>
+                        <span className='text-white/80 truncate max-w-[160px] sm:max-w-none'>
                           {photos[lightboxIndex].lensModel}
                         </span>
                       </>
@@ -1135,7 +1176,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   </div>
 
                   {/* Exposure Parameters */}
-                  <div className='flex items-center gap-2 flex-wrap text-white/70'>
+                  <div className='flex items-center gap-1.5 flex-wrap text-white/70'>
                     {photos[lightboxIndex].focalLength && (
                       <span>{photos[lightboxIndex].focalLength}mm</span>
                     )}
