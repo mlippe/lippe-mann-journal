@@ -86,6 +86,26 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const [currentScale, setCurrentScale] = useState(1);
   const [isCurrentlyDragging, setIsCurrentlyDragging] = useState(false);
 
+  // Auto-hide controls after 2s of inactivity
+  const [areControlsVisible, setAreControlsVisible] = useState(true);
+  const areControlsVisibleRef = useRef(true);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const wereControlsHiddenOnDown = useRef(false);
+
+  const showControls = useCallback(() => {
+    if (!areControlsVisibleRef.current) {
+      areControlsVisibleRef.current = true;
+      setAreControlsVisible(true);
+    }
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      areControlsVisibleRef.current = false;
+      setAreControlsVisible(false);
+    }, 2000);
+  }, []);
+
   const transformComponentRef = useRef<ReactZoomPanPinchRef>(null);
   const isPanningRef = useRef(false);
   const ignoreClickRef = useRef(false);
@@ -857,18 +877,20 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Cycling photos in lightbox
   const handleNextPhoto = useCallback(() => {
+    showControls();
     setLightboxIndex((prev) =>
       prev !== null ? (prev + 1) % photos.length : null,
     );
     setCurrentScale(1);
-  }, [photos.length]);
+  }, [photos.length, showControls]);
 
   const handlePrevPhoto = useCallback(() => {
+    showControls();
     setLightboxIndex((prev) =>
       prev !== null ? (prev - 1 + photos.length) % photos.length : null,
     );
     setCurrentScale(1);
-  }, [photos.length]);
+  }, [photos.length, showControls]);
 
   // Reset scale and gesture tracking on slide change
   useEffect(() => {
@@ -885,8 +907,47 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return () => clearTimeout(timer);
   }, [lightboxIndex]);
 
+  // Manage 2s inactivity auto-hiding of lightbox controls
+  useEffect(() => {
+    if (lightboxIndex === null) {
+      areControlsVisibleRef.current = true;
+      setAreControlsVisible(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+        controlsTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    // Immediately show controls when lightbox opens or photo changes, and start 2s timer
+    showControls();
+
+    const handleUserActivity = () => {
+      showControls();
+    };
+
+    window.addEventListener('mousemove', handleUserActivity, { passive: true });
+    window.addEventListener('pointermove', handleUserActivity, { passive: true });
+    window.addEventListener('wheel', handleUserActivity, { passive: true });
+    window.addEventListener('keydown', handleUserActivity, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('pointermove', handleUserActivity);
+      window.removeEventListener('wheel', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+        controlsTimeoutRef.current = null;
+      }
+    };
+  }, [lightboxIndex, showControls]);
+
   // Pointer drag tracking to ensure drag releases never accidentally toggle zoom
   const handlePointerDown = (e: React.PointerEvent) => {
+    wereControlsHiddenOnDown.current = !areControlsVisibleRef.current;
+    showControls();
+
     const target = e.target as HTMLElement | null;
     if (target?.closest('button') || target?.closest('a')) {
       pointerDownPos.current = null;
@@ -898,6 +959,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
+    showControls();
     if (!pointerDownPos.current) return;
     const dist = Math.hypot(
       e.clientX - pointerDownPos.current.x,
@@ -932,6 +994,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         handledByPointerUp.current = false;
       }, 200);
 
+      // If controls were hidden when user tapped, restore controls without zooming
+      if (wereControlsHiddenOnDown.current) {
+        showControls();
+        return;
+      }
+
+      showControls();
+
       if (isZoomed) {
         // ONE SINGLE TAP / CLICK UNZOOMS TO FIT IMMEDIATELY
         transformComponentRef.current?.resetTransform(300, 'easeOut');
@@ -953,6 +1023,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
+      showControls();
       if (e.key === 'ArrowRight') {
         handleNextPhoto();
       } else if (e.key === 'ArrowLeft') {
@@ -962,7 +1033,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         setCurrentScale(1);
       }
     },
-    [lightboxIndex, handleNextPhoto, handlePrevPhoto],
+    [lightboxIndex, handleNextPhoto, handlePrevPhoto, showControls],
   );
 
   useEffect(() => {
@@ -972,6 +1043,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Touch gesture support in lightbox: single-finger horizontal swipe navigates when fitted
   const handleTouchStart = (e: React.TouchEvent) => {
+    wereControlsHiddenOnDown.current = !areControlsVisibleRef.current;
+    showControls();
     if (isZoomed) return;
     if (e.touches.length === 1) {
       touchStartX.current = e.touches[0].clientX;
@@ -984,6 +1057,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    showControls();
     if (touchStartX.current === null || touchStartY.current === null) return;
     if (e.touches.length === 1) {
       const deltaX = Math.abs(e.touches[0].clientX - touchStartX.current);
@@ -1017,6 +1091,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
     // Minimum swipe distance 40px and predominantly horizontal
     if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      showControls();
       if (deltaX < 0) {
         handleNextPhoto();
       } else {
@@ -1037,6 +1112,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     )
       return;
 
+    if (wereControlsHiddenOnDown.current) {
+      showControls();
+      return;
+    }
+
+    showControls();
+
     if (!isZoomed) {
       transformComponentRef.current?.zoomToPoint(
         2.5,
@@ -1052,6 +1134,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   };
 
   const handleToggleZoomButton = () => {
+    showControls();
     if (!isZoomed) {
       transformComponentRef.current?.centerView(2.5, 300, 'easeOut');
     } else {
@@ -1333,15 +1416,24 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
             <div
-              className='relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none'
+              className={cn(
+                'relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none',
+                !areControlsVisible && !isZoomed && 'cursor-none',
+              )}
               style={{ height: '100dvh', maxHeight: '100dvh' }}
+              onMouseMove={showControls}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               {/* Top Controls Bar */}
               <div
-                className='shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent'
+                className={cn(
+                  'shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent transition-all duration-300 ease-out',
+                  areControlsVisible
+                    ? 'opacity-100 translate-y-0 pointer-events-auto'
+                    : 'opacity-0 -translate-y-4 pointer-events-none',
+                )}
                 style={{
                   paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))',
                 }}
@@ -1503,7 +1595,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         e.stopPropagation();
                         handlePrevPhoto();
                       }}
-                      className='absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-colors cursor-pointer z-30'
+                      className={cn(
+                        'absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30',
+                        areControlsVisible
+                          ? 'opacity-100 pointer-events-auto'
+                          : 'opacity-0 pointer-events-none',
+                      )}
                       aria-label='Vorheriges Foto (Pfeiltaste links)'
                     >
                       <IconChevronLeft className='size-6' />
@@ -1513,7 +1610,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         e.stopPropagation();
                         handleNextPhoto();
                       }}
-                      className='absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-colors cursor-pointer z-30'
+                      className={cn(
+                        'absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30',
+                        areControlsVisible
+                          ? 'opacity-100 pointer-events-auto'
+                          : 'opacity-0 pointer-events-none',
+                      )}
                       aria-label='Nächstes Foto (Pfeiltaste rechts)'
                     >
                       <IconChevronRight className='size-6' />
@@ -1524,7 +1626,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
               {/* Bottom Full EXIF Information Bar */}
               <div
-                className='shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10'
+                className={cn(
+                  'shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10 transition-all duration-300 ease-out',
+                  areControlsVisible
+                    ? 'opacity-100 translate-y-0 pointer-events-auto'
+                    : 'opacity-0 translate-y-4 pointer-events-none',
+                )}
                 style={{
                   paddingBottom:
                     'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))',
