@@ -106,7 +106,7 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
 
       {view === 'zine' ? (
         /* Default Zine Mode: Immersive, Zero-Crop Magazine Reading View */
-        <div className='max-w-4xl mx-auto'>
+        <div className='max-w-5xl lg:max-w-6xl mx-auto'>
           {posts.map((post, i) => (
             <div
               key={post.id}
