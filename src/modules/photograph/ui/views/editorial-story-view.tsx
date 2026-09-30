@@ -436,10 +436,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   );
 
   return (
-    <article className='w-full max-w-6xl mx-auto px-3 sm:px-6 md:px-8 py-6 md:py-12'>
+    <article className='w-full max-w-6xl mx-auto py-6 md:py-12'>
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
-      <header className='mb-8 md:mb-14'>
-        <div className='flex items-center justify-between gap-4 mb-6 border-b border-border/40 pb-4'>
+      <header className='mt-10 md:mt-0 mb-8 md:mb-14'>
+        <div className='hidden md:flex items-center justify-between gap-4 mb-6 border-b border-border/40 pb-4'>
           <button
             onClick={() => router.back()}
             className='inline-flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors cursor-pointer'

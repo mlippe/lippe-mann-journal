@@ -2,10 +2,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const EditorialStorySkeleton = () => {
   return (
-    <article className='w-full max-w-6xl mx-auto px-3 sm:px-6 md:px-8 py-6 md:py-12 animate-pulse space-y-10'>
+    <article className='w-full max-w-6xl mx-auto py-6 md:py-12 animate-pulse space-y-10'>
       {/* Header Skeleton */}
-      <div className='space-y-4 mb-8 border-b border-border/40 pb-6'>
-        <div className='flex items-center justify-between'>
+      <div className='mt-10 md:mt-0 space-y-4 mb-8 border-b border-border/40 pb-6'>
+        <div className='hidden md:flex items-center justify-between'>
           <Skeleton className='h-4 w-20' />
           <Skeleton className='h-4 w-24' />
         </div>
