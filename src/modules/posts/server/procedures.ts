@@ -316,6 +316,7 @@ export const postsRouter = createTRPCRouter({
               postId: true,
               photoId: true,
               sortOrder: true,
+              isHighlight: true,
             },
             with: {
               photo: {

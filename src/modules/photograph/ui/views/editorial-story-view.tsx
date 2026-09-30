@@ -1,22 +1,17 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import {
-  IconArrowLeft,
   IconArrowsMaximize,
   IconCamera,
-  IconClock,
   IconShare,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
   IconX,
   IconMessageCircle,
-  IconHeart,
   IconHeartFilled,
   IconMail,
   IconZoomIn,
@@ -29,7 +24,6 @@ import { Photo } from '@/db/schema';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import Author from '@/components/author';
@@ -83,7 +77,6 @@ function getEditorialBlockId(block: EditorialBlock): string {
 }
 
 export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
-  const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { fingerprint, isLoaded } = useIdentity();
@@ -196,12 +189,17 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       .filter((p) => p.length > 0);
   }, [post.content]);
 
+  const postSeed = useMemo(
+    () => getPostSeed(post.id || post.slug),
+    [post.id, post.slug],
+  );
+
   // Intelligent Portrait-First Layout Engine:
-  // - Hero: Opening plate (Photo 0)
-  // - Highlight: User-marked hero feature (always solo, dominant presence)
+  // - Hero: Opening plate (Photo 0) - Always commanding and solo
+  // - Highlight: User-marked hero feature - Always solo, dominant presence (90vh)
   // - Landscape: Horizontal frames (aspect ratio >= 1.15) as cinematic breathers
-  // - Diptych: Consecutive 3:2 vertical frames paired into an editorial spread
-  // - Solo: Standalone vertical plate with balanced margins
+  // - Solo: Standalone vertical plate (88vh) with balanced margins, carrying 70%+ of the essay
+  // - Diptych: Rare, intentional pairing of vertical frames - NEVER consecutive, separated by solos
   const blocks: EditorialBlock[] = useMemo(() => {
     if (photos.length === 0) return [];
     if (photos.length === 1) {
@@ -213,6 +211,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     const result: EditorialBlock[] = [{ type: 'hero', photo: hero, index: 0 }];
 
     let i = 0;
+    let lastWasPair = false;
+    let solosSinceLastPair = 2; // Allow natural pairing after initial solo frames
+
     while (i < remaining.length) {
       const current = remaining[i];
       const realIndex = i + 1;
@@ -224,13 +225,15 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       const isLandscape = ratio >= 1.15;
       const isHighlight = Boolean(current.isHighlight);
 
-      // Rule 1: User marked as Highlight -> Solo Feature Frame
+      // Rule 1: User marked as Highlight -> Solo Feature Frame (Never paired)
       if (isHighlight) {
         result.push({
           type: 'highlight',
           photo: current,
           index: realIndex,
         });
+        lastWasPair = false;
+        solosSinceLastPair += 1;
         i += 1;
         continue;
       }
@@ -242,11 +245,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           photo: current,
           index: realIndex,
         });
+        lastWasPair = false;
+        solosSinceLastPair += 1;
         i += 1;
         continue;
       }
 
-      // Rule 3: Vertical photo (Hochformat) -> Check if it pairs with next photo
+      // Rule 3: Vertical photo (Hochformat) -> Prioritize Big Solos, Diptychs as rare visual accents
       if (isVertical) {
         const next = remaining[i + 1];
         if (next) {
@@ -256,24 +261,37 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           const nextIsVertical = nextRatio < 1.15;
           const nextIsHighlight = Boolean(next.isHighlight);
 
-          // Pair into diptych if next is also vertical and not a highlight
-          if (nextIsVertical && !nextIsHighlight) {
+          // Master Editorial Pacing Cadence:
+          // 1. Strictly NEVER two diptychs in a row (!lastWasPair)
+          // 2. Next must be vertical and NOT a highlight
+          // 3. Must have had at least 2 big solo photos before considering a pair (solosSinceLastPair >= 2)
+          // 4. Deterministic rhythmic check so pairs occur deliberately (~25-30% of vertical photos)
+          const cadenceAllowsPair =
+            !lastWasPair &&
+            solosSinceLastPair >= 2 &&
+            (postSeed + realIndex) % 3 === 0;
+
+          if (nextIsVertical && !nextIsHighlight && cadenceAllowsPair) {
             result.push({
               type: 'diptych',
               photos: [current, next],
               startIndex: realIndex,
             });
+            lastWasPair = true;
+            solosSinceLastPair = 0;
             i += 2;
             continue;
           }
         }
 
-        // Single vertical
+        // Single vertical plate (Dominant, large scale with full visual gravitas)
         result.push({
           type: 'solo',
           photo: current,
           index: realIndex,
         });
+        lastWasPair = false;
+        solosSinceLastPair += 1;
         i += 1;
         continue;
       }
@@ -284,16 +302,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         photo: current,
         index: realIndex,
       });
+      lastWasPair = false;
+      solosSinceLastPair += 1;
       i += 1;
     }
 
     return result;
-  }, [photos]);
-
-  const postSeed = useMemo(
-    () => getPostSeed(post.id || post.slug),
-    [post.id, post.slug],
-  );
+  }, [photos, postSeed]);
 
   // Randomize the mixing of sticky photo pinning and organic scroll reveal animations:
   // - Hero (block 0) pins in ~60% of posts that have multiple blocks
@@ -497,11 +512,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       (photo.width && photo.height ? photo.width / photo.height : 2 / 3);
 
     return (
-      <div className='flex justify-center w-full max-w-5xl mx-auto py-2 sm:py-6'>
+      <div className='flex justify-center w-full max-w-6xl mx-auto py-6 sm:py-10'>
         <div
           className='group/plate flex flex-col items-end w-full'
           style={{
-            width: `min(100%, calc(min(88vh, calc(100dvh - 4.5rem)) * ${ratio}))`,
+            width: `min(100%, calc(min(90vh, calc(100dvh - 4rem)) * ${ratio}))`,
             maxWidth: '100%',
           }}
         >
@@ -510,7 +525,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(88vh, calc(100dvh - 4.5rem))',
+              maxHeight: 'min(90vh, calc(100dvh - 4rem))',
             }}
           >
             <BlurImage
@@ -538,7 +553,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
           {/* Understated Highlight Indicator */}
           <div className='pt-2 flex items-center justify-between w-full text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-            <span className='text-amber-500/90 font-medium'>★ Highlight</span>
+            <span className='text-amber-500/90 font-medium tracking-wider'>★ HIGHLIGHT</span>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -567,7 +582,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(80vh, calc(100dvh - 6rem))',
+              maxHeight: 'min(82vh, calc(100dvh - 5.5rem))',
             }}
           >
             <BlurImage
@@ -607,12 +622,23 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       photo.aspectRatio ||
       (photo.width && photo.height ? photo.width / photo.height : 3 / 2);
 
+    // Dynamic desktop layout pacing:
+    // Alternate alignment on large displays (centered, slightly left-biased, slightly right-biased)
+    // to give the organic breathing rhythm of turning pages in a curated fine-art photo monograph.
+    const layoutVariant = (postSeed + block.index) % 4;
+    const alignmentClass =
+      layoutVariant === 1
+        ? 'justify-center lg:justify-start lg:pl-8 xl:pl-16'
+        : layoutVariant === 3
+          ? 'justify-center lg:justify-end lg:pr-8 xl:pr-16'
+          : 'justify-center';
+
     return (
-      <div className='flex justify-center w-full max-w-5xl mx-auto'>
+      <div className={cn('flex w-full max-w-6xl mx-auto py-2 sm:py-4', alignmentClass)}>
         <div
           className='group/plate flex flex-col items-end'
           style={{
-            width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+            width: `min(100%, calc(min(88vh, calc(100dvh - 4.5rem)) * ${ratio}))`,
             maxWidth: '100%',
           }}
         >
@@ -621,7 +647,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+              maxHeight: 'min(88vh, calc(100dvh - 4.5rem))',
             }}
           >
             <BlurImage
@@ -631,7 +657,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               blurhash={photo.blurData}
               aspectRatio={ratio}
               className='object-contain w-full h-full'
-              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1024px'
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px'
             />
             <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
               <button

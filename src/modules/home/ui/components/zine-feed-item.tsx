@@ -13,7 +13,6 @@ import { useTRPC } from '@/trpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useIdentity } from '@/hooks/use-identity';
 import { type SocialInteractionsData } from '@/modules/social/types';
-import { cn, createPreview } from '@/lib/utils';
 import { ScrollReveal } from '@/components/scroll-reveal';
 
 interface ZineFeedItemProps {
@@ -104,7 +103,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   };
 
   const photos = post.postsToPhotos || [];
-  const highlightEntry = photos.find((p: any) => p.isHighlight);
+  const highlightEntry = photos.find((p) => p.isHighlight);
   const coverIndex = post.coverIndex ?? 0;
   const coverPhoto = highlightEntry?.photo || photos[coverIndex]?.photo || photos[0]?.photo;
   const hasMultiplePhotos = photos.length > 1;
@@ -113,7 +112,12 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
     ? format(new Date(post.createdAt), 'dd. MMMM yyyy', { locale: de })
     : '';
 
-  const cleanContent = post.content ? createPreview(post.content, 350) : null;
+  // On the zine feed, only display the first paragraph / before first newline
+  const cleanContent = useMemo(() => {
+    if (!post.content) return null;
+    const firstLine = post.content.trim().split(/\r?\n/)[0].trim();
+    return firstLine || null;
+  }, [post.content]);
 
   // Stable seed for layout variety
   const seed = useMemo(

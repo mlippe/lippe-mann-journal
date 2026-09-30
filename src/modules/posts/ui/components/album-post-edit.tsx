@@ -234,7 +234,10 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         };
       });
 
-      // 4. Update post basic info
+      // 4. Update post basic info (including coverImage if a highlight is designated)
+      const highlightPhoto = values.photos.find((p) => p.isHighlight);
+      const coverImageUrl = highlightPhoto ? highlightPhoto.url : values.photos[0]?.url;
+
       await updatePost.mutateAsync({
         id: post.id,
         title: values.postTitle,
@@ -242,6 +245,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         visibility: values.postVisibility,
         tags: values.tags,
         collectionIds: values.collectionIds,
+        coverImage: coverImageUrl,
       });
 
       // 5. Update post-to-photos relations (reordering/removal/additions/highlights)
@@ -274,9 +278,14 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       );
 
       toast.success('Album updated successfully');
-      queryClient.invalidateQueries(
-        trpc.posts.getOne.queryOptions({ slug: post.slug }),
-      );
+      await Promise.all([
+        queryClient.invalidateQueries(
+          trpc.posts.getOne.queryOptions({ slug: post.slug }),
+        ),
+        queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
+        queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
+      ]);
+      router.refresh();
       router.push('/dashboard/posts');
     } catch (error) {
       toast.error(`Failed to update album: ${(error as Error).message}`);

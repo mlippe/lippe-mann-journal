@@ -129,6 +129,9 @@ export const photosRouter = createTRPCRouter({
           const baseSlug = generateSlug(postTitle);
           const uniqueSlug = `album-${baseSlug}-${insertedPhotos[0].id.slice(0, 4)}`;
 
+          const highlightPhoto = inputPhotos.find((p) => p.isHighlight);
+          const coverImageUrl = highlightPhoto ? highlightPhoto.url : insertedPhotos[0].url;
+
           const [post] = await tx
             .insert(posts)
             .values({
@@ -136,7 +139,7 @@ export const photosRouter = createTRPCRouter({
               slug: uniqueSlug,
               type: 'ALBUM',
               visibility: postVisibility,
-              coverImage: insertedPhotos[0].url,
+              coverImage: coverImageUrl,
               content: content || null,
             })
             .returning();
