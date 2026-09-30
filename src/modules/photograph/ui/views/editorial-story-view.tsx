@@ -43,6 +43,7 @@ import {
   TransformComponent,
   type ReactZoomPanPinchRef,
 } from 'react-zoom-pan-pinch';
+import { ScrollReveal } from '@/components/scroll-reveal';
 
 interface EditorialStoryViewProps {
   post: PostGetOne;
@@ -552,14 +553,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
       </header>
 
-      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Sticky Stacking) */}
-      <div className='relative w-full'>
+      {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Scroll Reveal) */}
+      <div className='space-y-16 md:space-y-28'>
         {blocks.map((block, bIdx) => {
           /* ─────────────────────────────────────────────────────────────
            * BUILDING BLOCK 1: [ HERO BLEED ]
            * Strictly never taller than viewport height, never wider than width,
            * 100% native aspect ratio preserved. Opens lightbox on click!
-           * Pinned with sticky depth as subsequent blocks overlay it.
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'hero') {
             const photo = block.photo;
@@ -572,56 +572,53 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`hero-${photo.id}`}
-                style={{ zIndex: bIdx + 1 }}
-                className='relative w-full bg-background pb-16 md:pb-28'
+                className='relative w-full'
               >
-                <div className='sticky top-14 md:top-20'>
-                  <div className='flex justify-center w-full'>
+                <div className='flex justify-center w-full'>
+                  <div
+                    className='group/plate flex flex-col items-end'
+                    style={{
+                      width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+                      maxWidth: '100%',
+                    }}
+                  >
                     <div
-                      className='group/plate flex flex-col items-end'
+                      onClick={() => setLightboxIndex(block.index)}
+                      className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
                       style={{
-                        width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
-                        maxWidth: '100%',
+                        aspectRatio: `${ratio}`,
+                        maxHeight: 'min(86vh, calc(100dvh - 5rem))',
                       }}
                     >
-                      <div
-                        onClick={() => setLightboxIndex(block.index)}
-                        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
-                        style={{
-                          aspectRatio: `${ratio}`,
-                          maxHeight: 'min(86vh, calc(100dvh - 5rem))',
-                        }}
-                      >
-                        <BlurImage
-                          src={keyToUrl(photo.url)}
-                          alt={photo.title || post.title}
-                          fill
-                          blurhash={photo.blurData}
-                          aspectRatio={ratio}
-                          className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
-                          priority
-                          sizes='(max-width: 1024px) 100vw, 1200px'
-                        />
+                      <BlurImage
+                        src={keyToUrl(photo.url)}
+                        alt={photo.title || post.title}
+                        fill
+                        blurhash={photo.blurData}
+                        aspectRatio={ratio}
+                        className='object-contain w-full h-full transition-transform duration-700 ease-out group-hover/photo:scale-[1.01]'
+                        priority
+                        sizes='(max-width: 1024px) 100vw, 1200px'
+                      />
 
-                        {/* Actions overlay (Top Right) */}
-                        <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setLightboxIndex(block.index);
-                            }}
-                            className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
-                            aria-label='Foto vergrößern'
-                          >
-                            <IconArrowsMaximize className='size-4' />
-                          </button>
-                        </div>
+                      {/* Actions overlay (Top Right) */}
+                      <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxIndex(block.index);
+                          }}
+                          className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                          aria-label='Foto vergrößern'
+                        >
+                          <IconArrowsMaximize className='size-4' />
+                        </button>
                       </div>
+                    </div>
 
-                      {/* Frame number outside image (Bottom Right) */}
-                      <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
-                        <span>{String(block.index + 1).padStart(2, '0')}</span>
-                      </div>
+                    {/* Frame number outside image (Bottom Right) */}
+                    <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+                      <span>{String(block.index + 1).padStart(2, '0')}</span>
                     </div>
                   </div>
                 </div>
@@ -631,13 +628,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                  * Positioned immediately under the hero bleed anchor if provided
                  * ───────────────────────────────────────────────────────── */}
                 {post.content && post.content.trim().length > 0 && (
-                  <div className='max-w-2xl mx-auto pt-8 md:pt-14 px-4'>
+                  <ScrollReveal className='max-w-2xl mx-auto pt-8 md:pt-14 px-4'>
                     <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
                       <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
                         {post.content.trim()}
                       </p>
                     </div>
-                  </div>
+                  </ScrollReveal>
                 )}
               </section>
             );
@@ -648,7 +645,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
            * Strict zero-crop proportional flexbox: both images share equal
            * height, never exceed viewport height or width.
            * Plate numbers placed directly below each photo (Bottom Right).
-           * Sticky stacking card effect on mobile & desktop!
+           * Smooth organic ScrollReveal entry animation!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'diptych') {
             const [photoA, photoB] = block.photos;
@@ -666,14 +663,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`diptych-${photoA.id}-${photoB.id}`}
-                style={{ zIndex: bIdx + 1 }}
-                className='relative w-full bg-background pt-8 md:pt-14 pb-16 md:pb-28 border-t border-border/30 shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.5)] transition-shadow'
+                className='w-full'
               >
-                <div className='sticky top-14 md:top-20'>
+                <ScrollReveal>
                   <div className='flex flex-col md:flex-row items-center md:items-start justify-center gap-8 w-full'>
                     {/* Photo A */}
                     <div
-                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-a)_1_0%] sticky md:static top-14 z-0 md:z-auto'
+                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-a)_1_0%]'
                       style={
                         {
                           '--ratio-a': ratioA,
@@ -683,7 +679,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     >
                       <div
                         onClick={() => setLightboxIndex(block.startIndex)}
-                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
                         style={{
                           aspectRatio: `${ratioA}`,
                           maxHeight: 'min(82vh, calc(100dvh - 6rem))',
@@ -720,7 +716,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                     {/* Photo B */}
                     <div
-                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-b)_1_0%] relative md:static z-10 md:z-auto bg-background md:bg-transparent mt-8 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-border/20 shadow-[0_-16px_32px_-10px_rgba(0,0,0,0.2)] md:shadow-none'
+                      className='w-full md:w-auto flex flex-col items-end group/plate md:flex-[var(--ratio-b)_1_0%]'
                       style={
                         {
                           '--ratio-b': ratioB,
@@ -730,7 +726,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     >
                       <div
                         onClick={() => setLightboxIndex(block.startIndex + 1)}
-                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        className='w-full relative group/photo overflow-hidden bg-muted/20 border border-border/40 select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
                         style={{
                           aspectRatio: `${ratioB}`,
                           maxHeight: 'min(82vh, calc(100dvh - 6rem))',
@@ -765,7 +761,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </ScrollReveal>
               </section>
             );
           }
@@ -774,7 +770,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
            * SOLO FEATURE FRAME
            * Breathing room / detail highlight, viewport-fitted!
            * Plate number placed directly below photo (Bottom Right).
-           * Sticky stacking card effect!
+           * Smooth organic ScrollReveal entry animation!
            * ───────────────────────────────────────────────────────────── */
           if (block.type === 'solo') {
             const photo = block.photo;
@@ -787,10 +783,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`solo-${photo.id}`}
-                style={{ zIndex: bIdx + 1 }}
-                className='relative w-full bg-background pt-8 md:pt-14 pb-16 md:pb-28 border-t border-border/30 shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.12)] dark:shadow-[0_-24px_48px_-16px_rgba(0,0,0,0.5)] transition-shadow'
+                className='w-full'
               >
-                <div className='sticky top-14 md:top-20'>
+                <ScrollReveal>
                   <div className='flex justify-center w-full max-w-5xl mx-auto'>
                     <div
                       className='group/plate flex flex-col items-end'
@@ -801,7 +796,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     >
                       <div
                         onClick={() => setLightboxIndex(block.index)}
-                        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-foreground/30'
+                        className='w-full relative overflow-hidden bg-muted/20 border border-border/40 group/photo select-none cursor-zoom-in transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-foreground/30'
                         style={{
                           aspectRatio: `${ratio}`,
                           maxHeight: 'min(86vh, calc(100dvh - 5rem))',
@@ -836,7 +831,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </ScrollReveal>
               </section>
             );
           }
@@ -846,7 +841,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       </div>
 
       {/* 2.5 EDITORIAL COLOPHON (Fine-Art Prints on demand) */}
-      <section className='relative z-50 bg-background mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
+      <section className='mt-16 md:mt-24 pt-10 border-t border-border/40 max-w-xl mx-auto text-center space-y-3 px-4'>
         <span className='text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-muted-foreground'>
           Fine-Art Prints & Abzüge
         </span>
@@ -867,7 +862,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
-        className='relative z-50 bg-background mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
+        className='mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
       >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div>
