@@ -13,6 +13,8 @@ import {
 } from '@/modules/dashboard/ui/views/section-cards-view';
 import { NewPostView } from '@/modules/dashboard/ui/views/new-post-view';
 
+import { IconChartLine, IconFolder, IconPlus } from '@tabler/icons-react';
+
 const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
@@ -26,22 +28,54 @@ const page = async () => {
     <div className='py-4 px-4 md:px-8 flex flex-col'>
       <div>
         <h1 className='text-2xl font-bold'>Overview</h1>
-        <p className='text-muted-foreground '>
+        <p className='text-muted-foreground text-sm'>
           See your photos, travel history, and more.
         </p>
       </div>
       <div className='@container/main flex flex-1 flex-col'>
-        <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
+        <div className='flex flex-col gap-6 py-4 md:gap-8 md:py-6'>
           <HydrationBoundary state={dehydrate(queryClient)}>
-            <NewPostView />
-            <Suspense fallback={<SectionCardsLoading />}>
-              <SectionCardsView />
-            </Suspense>
-            <Suspense fallback={<ChartAreaLoading />}>
-              <ErrorBoundary fallback={<p>Error</p>}>
-                <ChartAreaView />
-              </ErrorBoundary>
-            </Suspense>
+            {/* 1. CREATE NEW SECTION */}
+            <section className='space-y-2.5'>
+              <div className='flex items-center gap-2'>
+                <span className='text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5'>
+                  <IconPlus className='size-3.5 text-primary' />
+                  Neu erstellen
+                </span>
+                <div className='h-px flex-1 bg-border/40' />
+              </div>
+              <NewPostView />
+            </section>
+
+            {/* 2. EXISTING ENTRIES SHORTCUTS SECTION */}
+            <section className='space-y-2.5'>
+              <div className='flex items-center gap-2'>
+                <span className='text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5'>
+                  <IconFolder className='size-3.5 text-primary' />
+                  Bestehende Einträge
+                </span>
+                <div className='h-px flex-1 bg-border/40' />
+              </div>
+              <Suspense fallback={<SectionCardsLoading />}>
+                <SectionCardsView />
+              </Suspense>
+            </section>
+
+            {/* 3. ACTIVITY SECTION */}
+            <section className='space-y-2.5'>
+              <div className='flex items-center gap-2'>
+                <span className='text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5'>
+                  <IconChartLine className='size-3.5 text-primary' />
+                  Aktivität
+                </span>
+                <div className='h-px flex-1 bg-border/40' />
+              </div>
+              <Suspense fallback={<ChartAreaLoading />}>
+                <ErrorBoundary fallback={<p>Error</p>}>
+                  <ChartAreaView />
+                </ErrorBoundary>
+              </Suspense>
+            </section>
           </HydrationBoundary>
         </div>
       </div>
