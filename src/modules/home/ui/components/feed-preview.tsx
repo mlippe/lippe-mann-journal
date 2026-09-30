@@ -4,7 +4,11 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { IconCamera, IconArrowUpRight, IconArrowRight } from '@tabler/icons-react';
+import {
+  IconCamera,
+  IconArrowUpRight,
+  IconArrowRight,
+} from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 
 import { type PostWithPhotos } from '@/db/schema';
@@ -325,13 +329,20 @@ const ZineCardCollage = ({
   );
 };
 
-export const ZinePreviewCard = ({ post, priority = false }: ZinePreviewCardProps) => {
+export const ZinePreviewCard = ({
+  post,
+  priority = false,
+}: ZinePreviewCardProps) => {
   const allPhotos = useMemo(
-    () => (post.postsToPhotos?.map((ptp) => ptp.photo).filter(Boolean) as PreviewPhoto[]) || [],
+    () =>
+      (post.postsToPhotos
+        ?.map((ptp) => ptp.photo)
+        .filter(Boolean) as PreviewPhoto[]) || [],
     [post.postsToPhotos],
   );
 
-  const photoCount = allPhotos.length > 0 ? allPhotos.length : post.coverImage ? 1 : 0;
+  const photoCount =
+    allPhotos.length > 0 ? allPhotos.length : post.coverImage ? 1 : 0;
 
   const previewPhotos = useMemo(() => {
     if (allPhotos.length === 0) {
@@ -400,22 +411,30 @@ export const ZinePreviewCard = ({ post, priority = false }: ZinePreviewCardProps
         />
 
         {/* 2. EDITORIAL METADATA & HEADLINE */}
-        <div className='pt-4 space-y-2.5 flex-1'>
+        <div className='pt-4 space-y-1 flex-1'>
           {/* Eyebrow: Date & Primary Tag */}
           <div className='flex items-center gap-1.5 text-[10px] sm:text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground/75 font-medium'>
-            <time dateTime={post.createdAt ? new Date(post.createdAt).toISOString() : undefined}>
+            <time
+              dateTime={
+                post.createdAt
+                  ? new Date(post.createdAt).toISOString()
+                  : undefined
+              }
+            >
               {formattedDate}
             </time>
             {post.tags && post.tags.length > 0 && (
               <>
                 <span className='text-muted-foreground/30'>/</span>
-                <span className='truncate text-foreground/80 font-medium'>{post.tags[0]}</span>
+                <span className='truncate text-foreground/80 font-medium'>
+                  {post.tags[0]}
+                </span>
               </>
             )}
           </div>
 
           {/* Headline */}
-          <h4 className='text-base sm:text-lg lg:text-[1.125rem] font-serif font-normal tracking-[-0.015em] text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.24]'>
+          <h4 className='text-lg lg:text-xl font-serif font-normal tracking-[-0.015em] text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.24]'>
             {post.title}
           </h4>
 
@@ -429,7 +448,7 @@ export const ZinePreviewCard = ({ post, priority = false }: ZinePreviewCardProps
       </div>
 
       {/* 3. DISCOVER CUE */}
-      <div className='pt-3 flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-mono tracking-[0.16em] uppercase text-muted-foreground/70 group-hover:text-foreground transition-colors mt-auto'>
+      <div className='pt-2 flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-mono tracking-[0.16em] uppercase text-muted-foreground/70 group-hover:text-foreground transition-colors mt-auto'>
         <span>{isArticle ? 'Artikel lesen' : 'Geschichte ansehen'}</span>
         <IconArrowUpRight className='size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-muted-foreground/80 group-hover:text-foreground' />
       </div>
@@ -498,12 +517,6 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
       {/* Editorial Section Header */}
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12'>
         <div>
-          <div className='flex items-center gap-2 mb-1.5'>
-            <span className='size-1.5 rounded-full bg-primary/70 animate-pulse' />
-            <p className='text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-muted-foreground/80 font-medium'>
-              Aus dem Journal
-            </p>
-          </div>
           <h3 className='text-2xl sm:text-3xl lg:text-[2rem] font-serif font-normal tracking-[-0.02em] leading-[1.15] text-foreground'>
             Weitere Serien & Geschichten
           </h3>
@@ -535,9 +548,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
           variant='outline'
           className='rounded-full px-6 text-xs font-mono uppercase tracking-[0.16em] border-border/70 hover:bg-muted'
         >
-          <Link href='/'>
-            Zum vollständigen Zine
-          </Link>
+          <Link href='/'>Zurück Zum Feed</Link>
         </Button>
       </div>
     </section>

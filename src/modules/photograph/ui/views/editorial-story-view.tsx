@@ -986,9 +986,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 key={`standard-${blockId}`}
                 className='w-full mt-16 md:mt-28'
               >
-                <ScrollReveal>
-                  {renderBlockContent(block)}
-                </ScrollReveal>
+                <ScrollReveal>{renderBlockContent(block)}</ScrollReveal>
               </section>
             );
           }
@@ -1003,20 +1001,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         className='relative z-20 bg-background mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
       >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
-          <div>
+          <div className='w-full'>
             <Author size='md' />
             <p className='text-xs text-muted-foreground mt-1'>
               Dokumentation & Fotografie aus dem Alltag.
             </p>
           </div>
-          <div className='flex items-center gap-3 flex-wrap'>
-            <a
-              href={createSeriesPrintInquiryUrl()}
-              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
-            >
-              <IconMail className='size-3.5 text-muted-foreground' />
-              <span>Print zu dieser Serie anfragen</span>
-            </a>
+          <div className='w-full flex items-center gap-3 flex-wrap'>
             <button
               onClick={() => {
                 if (fingerprint && isLoaded) {
@@ -1054,6 +1045,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </>
               )}
             </button>
+            <a
+              href={createSeriesPrintInquiryUrl()}
+              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+            >
+              <IconMail className='size-3.5 text-muted-foreground' />
+              <span>Print zu dieser Serie anfragen</span>
+            </a>
           </div>
         </div>
 
