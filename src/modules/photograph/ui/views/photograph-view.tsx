@@ -34,11 +34,11 @@ import 'swiper/css/pagination';
 import 'swiper/css/keyboard';
 
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Photo } from '@/db/schema';
 import { de } from 'date-fns/locale';
 import BlurImage from '@/components/blur-image';
 import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
+import { FeedPreviewSkeleton } from '@/modules/home/ui/components/feed-preview';
 
 // --- Types ---
 
@@ -257,17 +257,38 @@ const MobileMediaList = ({
       (ptp, i) =>
         ptp && (
           <div key={ptp.photo.id} className='mt-6 relative'>
-            <BlurImage
-              src={keyToUrl(ptp.photo.url)}
-              alt={title}
-              width={ptp.photo.width}
-              height={ptp.photo.height}
-              className='max-w-full w-full h-full object-contain max-h-screen'
-              priority={i === 0}
-              blurhash={ptp.photo.blurData}
-              aspectRatio={ptp.photo.aspectRatio}
-              sizes='100vw'
-            />
+            <div
+              className='relative w-full overflow-hidden'
+              style={{
+                aspectRatio: ptp.photo.aspectRatio
+                  ? `${ptp.photo.aspectRatio}`
+                  : ptp.photo.width && ptp.photo.height
+                    ? `${ptp.photo.width} / ${ptp.photo.height}`
+                    : '3 / 2',
+              }}
+            >
+              <BlurImage
+                src={keyToUrl(ptp.photo.url)}
+                alt={title}
+                width={ptp.photo.width}
+                height={ptp.photo.height}
+                className='max-w-full w-full h-full object-contain max-h-screen'
+                priority={i === 0}
+                blurhash={ptp.photo.blurData}
+                aspectRatio={ptp.photo.aspectRatio}
+                sizes='100vw'
+              />
+              <Button
+                size='icon-sm'
+                asChild
+                className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7 z-10'
+                variant='outline'
+              >
+                <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
+                  <IconArrowsMaximize className='size-3.5!' />
+                </Link>
+              </Button>
+            </div>
             {ptp.photo.make && (
               <div className='p-3 bg-muted/50'>
                 <ExifPreview
@@ -277,16 +298,6 @@ const MobileMediaList = ({
                 />
               </div>
             )}
-            <Button
-              size='icon-sm'
-              asChild
-              className='absolute top-1.5 right-1.5 bg-background/60 border-none backdrop-blur-md size-7'
-              variant='outline'
-            >
-              <Link target='_blank' href={keyToUrl(ptp.photo.url)}>
-                <IconArrowsMaximize className='size-3.5!' />
-              </Link>
-            </Button>
           </div>
         ),
     )}
@@ -305,7 +316,6 @@ export const PhotographView = ({
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [swiperActiveIndex, setSwiperActiveIndex] = useState<number>(0);
   const router = useRouter();
-  const isMobile = useIsMobile();
 
   const handleOpenChange = (openState: boolean) => {
     if (openState === false) router.back();
@@ -368,45 +378,41 @@ export const PhotographView = ({
 
   if (photos.length === 0) return null;
 
-  const content =
-    isMobile && !isModal ? (
-      <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3'>
-        <div className='px-3 border-b pb-4'>
+  if (!isModal) {
+    return (
+      <div className='w-full'>
+        {/* Mobile View */}
+        <div className='flex overflow-hidden min-h-0 min-w-0 flex-col mt-12 -mx-3 md:hidden'>
+          <div className='px-3 border-b pb-4'>
+            <PhotoInfo
+              post={post}
+              exif={currentExif}
+              isModal={false}
+              showExif={false}
+            />
+          </div>
+          <MobileMediaList post={post} photos={photos} title={post.title} />
+        </div>
+
+        {/* Desktop View */}
+        <div className='hidden md:flex overflow-hidden min-h-0 min-w-0 flex-row w-full border border-border/50 md:h-[calc(100vh-12rem)] max-h-[calc(100vh-5rem)] mt-12'>
+          <DesktopMedia
+            photos={photos}
+            title={post.title}
+            isModal={false}
+            activeIndex={swiperActiveIndex}
+            onSlideChange={setSwiperActiveIndex}
+          />
           <PhotoInfo
             post={post}
             exif={currentExif}
             isModal={false}
-            showExif={false}
+            showExif={true}
           />
         </div>
-        <MobileMediaList post={post} photos={photos} title={post.title} />
-      </div>
-    ) : (
-      <div
-        className={cn(
-          'flex overflow-hidden min-h-0 min-w-0',
-          isModal
-            ? 'rounded-sm w-full h-full'
-            : 'flex-col md:flex-row w-full border border-border/50 md:h-[calc(100vh-12rem)] max-h-[calc(100vh-5rem)] mt-12',
-        )}
-      >
-        <DesktopMedia
-          photos={photos}
-          title={post.title}
-          isModal={isModal}
-          activeIndex={swiperActiveIndex}
-          onSlideChange={setSwiperActiveIndex}
-        />
-        <PhotoInfo
-          post={post}
-          exif={currentExif}
-          isModal={isModal}
-          showExif={!isMobile}
-        />
       </div>
     );
-
-  if (!isModal) return content;
+  }
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
@@ -414,7 +420,21 @@ export const PhotographView = ({
         showCloseButton={false}
         className='bg-transparent border-none max-w-[calc(100%-2rem)]! w-full shadow-none h-full max-h-[calc(100%-2rem)]!'
       >
-        {content}
+        <div className='flex overflow-hidden min-h-0 min-w-0 rounded-sm w-full h-full'>
+          <DesktopMedia
+            photos={photos}
+            title={post.title}
+            isModal={true}
+            activeIndex={swiperActiveIndex}
+            onSlideChange={setSwiperActiveIndex}
+          />
+          <PhotoInfo
+            post={post}
+            exif={currentExif}
+            isModal={true}
+            showExif={true}
+          />
+        </div>
         <DialogTitle className='hidden'>{post.title}</DialogTitle>
       </DialogContent>
     </Dialog>
@@ -437,12 +457,12 @@ export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) =>
             </div>
 
             {/* Title & Date */}
-            <div className='p-3 border-b bg-muted/20 space-y-1.5'>
-              <Skeleton className='h-6 w-3/4' />
+            <div className='p-3 border-b bg-muted/20'>
+              <Skeleton className='h-6 w-3/4 mb-1' />
               <Skeleton className='h-3.5 w-32' />
             </div>
 
-            {/* Social Interactions */}
+            {/* Social Interactions (Top) */}
             <div className='p-3 space-y-4'>
               <div className='flex items-center gap-4'>
                 <div className='flex items-center gap-1.5'>
@@ -455,8 +475,10 @@ export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) =>
                 </div>
               </div>
               <div className='pt-2 border-t space-y-2'>
-                <Skeleton className='h-2.5 w-32' />
-                <Skeleton className='h-10 w-full rounded-md' />
+                <Skeleton className='h-3 w-36' />
+                <div className='relative flex items-end gap-2'>
+                  <Skeleton className='h-10 flex-1 rounded-md' />
+                </div>
               </div>
             </div>
           </div>
@@ -464,11 +486,45 @@ export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) =>
 
         {/* Media List Skeleton */}
         <div className='bg-background p-3 relative flex flex-col w-full'>
-          <div className='mt-6'>
-            <Skeleton className='w-full aspect-[3/2] rounded-xs' />
-          </div>
-          <div className='mt-6'>
-            <Skeleton className='w-full aspect-[3/2] rounded-xs' />
+          {[0, 1].map((index) => (
+            <div key={index} className='mt-6 relative'>
+              <div className='relative w-full aspect-[3/2] overflow-hidden'>
+                <Skeleton className='w-full h-full rounded-none' />
+                <Skeleton className='absolute top-1.5 right-1.5 size-7 rounded-md' />
+              </div>
+              <div className='p-3 bg-muted/50 space-y-1.5'>
+                <div className='flex items-center gap-2'>
+                  <Skeleton className='h-4 w-32' />
+                  <Skeleton className='h-3.5 w-24' />
+                </div>
+                <div className='flex items-center gap-2'>
+                  <Skeleton className='h-3 w-48 font-mono' />
+                  <Skeleton className='h-3 w-20' />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Bottom Social Interactions Skeleton */}
+          <div className='mt-8 border-t pt-6'>
+            <div className='flex flex-col gap-4'>
+              <div className='flex items-center gap-4'>
+                <div className='flex items-center gap-1.5'>
+                  <Skeleton className='size-6 rounded-full' />
+                  <Skeleton className='h-4 w-6 rounded-xs' />
+                </div>
+                <div className='flex items-center gap-1.5'>
+                  <Skeleton className='size-6 rounded-full' />
+                  <Skeleton className='h-4 w-6 rounded-xs' />
+                </div>
+              </div>
+              <div className='pt-2 border-t space-y-2'>
+                <Skeleton className='h-3 w-36' />
+                <div className='relative flex items-end gap-2'>
+                  <Skeleton className='h-10 flex-1 rounded-md' />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -505,8 +561,8 @@ export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) =>
           </div>
 
           {/* Title & Date */}
-          <div className='p-3 border-b bg-muted/20 space-y-1.5'>
-            <Skeleton className='h-6 w-4/5' />
+          <div className='p-3 border-b bg-muted/20'>
+            <Skeleton className='h-6 w-4/5 mb-1' />
             <Skeleton className='h-3.5 w-32' />
           </div>
 
@@ -541,12 +597,21 @@ export const LoadingState = ({ isModal = false }: { isModal?: boolean } = {}) =>
             </div>
 
             <div className='pt-2 border-t space-y-2 mt-auto'>
-              <Skeleton className='h-2.5 w-32' />
-              <Skeleton className='h-10 w-full rounded-md' />
+              <Skeleton className='h-3 w-36' />
+              <div className='relative flex items-end gap-2'>
+                <Skeleton className='h-10 flex-1 rounded-md' />
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Feed Preview Skeleton (non-modal only) */}
+      {!isModal && (
+        <div className='mt-4'>
+          <FeedPreviewSkeleton limit={3} />
+        </div>
+      )}
     </div>
   );
 };

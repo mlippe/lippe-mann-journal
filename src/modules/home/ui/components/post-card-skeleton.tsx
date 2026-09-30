@@ -26,7 +26,7 @@ export const PostCardSkeleton = ({ className }: PostCardSkeletonProps) => {
       </div>
 
       {/* Media Skeleton - The main aspect ratio box with shimmer */}
-      <div className='relative aspect-[0.8] p-3'>
+      <div className='relative aspect-[0.8]'>
         <Skeleton className={cn('w-full h-full rounded-none', shimmerClass)} />
       </div>
 

@@ -61,7 +61,7 @@ const PhotoPage = async ({ params }: Props) => {
   const { slug } = await params;
 
   return (
-    <Suspense fallback={<LoadingState />}>
+    <Suspense fallback={<LoadingState isModal={false} />}>
       <PhotoSuspense slug={slug} />
     </Suspense>
   );
@@ -79,6 +79,10 @@ async function PhotoSuspense({ slug }: { slug: string }) {
       trpc.social.getInteractions.queryOptions({ postId: post.id }),
     );
   }
+
+  await queryClient.prefetchQuery(
+    trpc.posts.getPublished.queryOptions({ limit: 4 }),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -15,7 +15,12 @@ import { Input } from '@/components/ui/input';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { Textarea } from '@/components/ui/textarea';
 import { type SocialInteractionsData } from '@/modules/social/types';
 
@@ -25,6 +30,73 @@ interface SocialInteractionsProps {
   commentHref?: string;
 }
 
+export const SocialInteractionsSkeleton = ({
+  variant = 'full',
+  showMockComments = false,
+}: {
+  variant?: 'compact' | 'full';
+  showMockComments?: boolean;
+}) => {
+  if (variant === 'compact') {
+    return (
+      <div className='flex items-center gap-3 py-0.5'>
+        <div className='flex items-center gap-1'>
+          <Skeleton className='size-5 rounded-full' />
+          <Skeleton className='h-3.5 w-4 rounded-xs' />
+        </div>
+        <div className='flex items-center gap-1'>
+          <Skeleton className='size-5 rounded-full' />
+          <Skeleton className='h-3.5 w-4 rounded-xs' />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='flex flex-col h-full gap-4'>
+      {/* Actions Skeleton */}
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-1.5'>
+          <Skeleton className='size-6 rounded-full' />
+          <Skeleton className='h-4 w-6 rounded-xs' />
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <Skeleton className='size-6 rounded-full' />
+          <Skeleton className='h-4 w-6 rounded-xs' />
+        </div>
+      </div>
+
+      {/* Comments List Skeleton */}
+      {showMockComments && (
+        <div className='flex-1 pr-4 -mr-4 overflow-y-auto space-y-4'>
+          <div className='flex flex-col gap-1.5'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-3.5 w-24' />
+              <Skeleton className='h-2.5 w-16' />
+            </div>
+            <Skeleton className='h-3.5 w-4/5' />
+          </div>
+          <div className='flex flex-col gap-1.5'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-3.5 w-20' />
+              <Skeleton className='h-2.5 w-14' />
+            </div>
+            <Skeleton className='h-3.5 w-2/3' />
+          </div>
+        </div>
+      )}
+
+      {/* Footer Area with Username Toggle & Textarea Skeleton */}
+      <div className='pt-2 border-t space-y-2 mt-auto'>
+        <Skeleton className='h-3 w-36' />
+        <div className='relative flex items-end gap-2'>
+          <Skeleton className='h-10 flex-1 rounded-md' />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const SocialInteractions = ({
   postId,
   variant = 'full',
@@ -32,7 +104,7 @@ export const SocialInteractions = ({
 }: SocialInteractionsProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const { fingerprint, username, updateUsername, isLoaded } = useIdentity();
+  const { fingerprint, username, updateUsername } = useIdentity();
   const [commentContent, setCommentContent] = useState('');
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState('');
@@ -44,7 +116,10 @@ export const SocialInteractions = ({
   const queryOptions =
     trpc.social.getInteractions.queryOptions(interactionParams);
 
-  const { data: interactions, isLoading } = useQuery(queryOptions);
+  const { data: interactions, isLoading } = useQuery({
+    ...queryOptions,
+    placeholderData: keepPreviousData,
+  });
 
   const toggleLike = useMutation(
     trpc.social.toggleLike.mutationOptions({
@@ -133,61 +208,11 @@ export const SocialInteractions = ({
   };
 
   if (isLoading && !interactions) {
-    if (variant === 'compact') {
-      return (
-        <div className='flex items-center gap-3 py-0.5'>
-          <div className='flex items-center gap-1'>
-            <Skeleton className='size-5 rounded-full' />
-            <Skeleton className='h-3.5 w-4 rounded-xs' />
-          </div>
-          <div className='flex items-center gap-1'>
-            <Skeleton className='size-5 rounded-full' />
-            <Skeleton className='h-3.5 w-4 rounded-xs' />
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <div className='flex flex-col h-full gap-4'>
-        {/* Actions Skeleton */}
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-1.5'>
-            <Skeleton className='size-6 rounded-full' />
-            <Skeleton className='h-4 w-6 rounded-xs' />
-          </div>
-          <div className='flex items-center gap-1.5'>
-            <Skeleton className='size-6 rounded-full' />
-            <Skeleton className='h-4 w-6 rounded-xs' />
-          </div>
-        </div>
-
-        {/* Comments List Skeleton */}
-        <div className='flex-1 pr-4 -mr-4 overflow-y-auto space-y-4'>
-          <div className='flex flex-col gap-1.5'>
-            <div className='flex items-center justify-between'>
-              <Skeleton className='h-3.5 w-24' />
-              <Skeleton className='h-2.5 w-16' />
-            </div>
-            <Skeleton className='h-3.5 w-4/5' />
-          </div>
-          <div className='flex flex-col gap-1.5'>
-            <div className='flex items-center justify-between'>
-              <Skeleton className='h-3.5 w-20' />
-              <Skeleton className='h-2.5 w-14' />
-            </div>
-            <Skeleton className='h-3.5 w-2/3' />
-          </div>
-        </div>
-
-        {/* Footer Area with Username Toggle & Textarea Skeleton */}
-        <div className='pt-2 border-t space-y-2 mt-auto'>
-          <Skeleton className='h-2.5 w-32' />
-          <div className='relative flex items-end gap-2'>
-            <Skeleton className='h-10 flex-1 rounded-md' />
-          </div>
-        </div>
-      </div>
+      <SocialInteractionsSkeleton
+        variant={variant}
+        showMockComments={false}
+      />
     );
   }
 

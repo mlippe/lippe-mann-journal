@@ -25,9 +25,15 @@ export const PhotographDetailPage = async ({
     );
   }
 
+  if (!isModal) {
+    await queryClient.prefetchQuery(
+      trpc.posts.getPublished.queryOptions({ limit: 4 }),
+    );
+  }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<LoadingState />}>
+      <Suspense fallback={<LoadingState isModal={isModal} />}>
         <ErrorBoundary fallback={<p>Error loading post.</p>}>
           <PhotographView post={post} isModal={isModal} />
           {!isModal && (
