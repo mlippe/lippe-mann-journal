@@ -14,7 +14,8 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: 'Feed', href: '/' },
+  { label: 'Feed', href: '/?view=zine' },
+  { label: 'Übersicht', href: '/?view=grid' },
   { label: 'Sammlungen', href: '/collections' },
   { label: 'Über dieses Journal', href: '/about' },
 ];

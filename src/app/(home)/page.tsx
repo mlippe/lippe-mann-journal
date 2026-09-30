@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 const page = () => {
   return (
     <div className='flex flex-col w-full'>
-      <div className='w-full lg:mt-10 mt-6 pb-3'>
+      <div className='w-full mt-10 pb-3'>
         {/* INTRO CARD  */}
         <IntroCard />
 
@@ -41,8 +41,8 @@ const page = () => {
           <ErrorBoundary
             fallback={
               <p>
-                Something went wrong while showing the infinite feed, please
-                try again.
+                Something went wrong while showing the infinite feed, please try
+                again.
               </p>
             }
           >

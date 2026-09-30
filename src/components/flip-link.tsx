@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "motion/react";
 
 const DURATION = 0.25;
@@ -8,16 +9,16 @@ const STAGGER = 0.025;
 interface Props {
   children: string;
   href: string;
+  className?: string;
 }
 
-const FlipLink = ({ children, href }: Props) => {
+const FlipLink = ({ children, href, className }: Props) => {
   return (
-    <motion.a
-      initial="initial"
-      whileHover="hovered"
+    <Link
       href={href}
-      className="relative block overflow-hidden whitespace-nowrap font-light text-sm"
+      className={`relative block overflow-hidden whitespace-nowrap font-light text-sm ${className || ''}`}
     >
+      <motion.div initial="initial" whileHover="hovered" className="relative">
       <div>
         {children.split("").map((l, i) => (
           <motion.span
@@ -64,7 +65,8 @@ const FlipLink = ({ children, href }: Props) => {
           </motion.span>
         ))}
       </div>
-    </motion.a>
+      </motion.div>
+    </Link>
   );
 };
 

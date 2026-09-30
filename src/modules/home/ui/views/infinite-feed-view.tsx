@@ -10,7 +10,6 @@ import { PostCard } from '../components/post-card';
 import { PostCardSkeleton } from '../components/post-card-skeleton';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 import { useQueryState, parseAsString } from 'nuqs';
-import { FeedViewSwitcher } from '../components/feed-view-switcher';
 import { TimelineDivider } from '../components/timeline-divider';
 import { ZineFeedItem } from '../components/zine-feed-item';
 import { ZinePostSkeleton } from '../components/zine-post-skeleton';
@@ -113,8 +112,6 @@ export const InfiniteFeedView = ({ collectionSlug }: InfiniteFeedViewProps) => {
 
   return (
     <div className='w-full space-y-3 pt-1 pb-8 md:pb-12 max-w-420 mx-auto'>
-      <FeedViewSwitcher totalPosts={posts.length} />
-
       {view === 'zine' ? (
         /* Default Zine Mode: Immersive, Zero-Crop Magazine Reading View */
         <div className='max-w-5xl lg:max-w-6xl mx-auto'>
