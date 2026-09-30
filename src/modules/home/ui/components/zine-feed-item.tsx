@@ -136,11 +136,15 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   }, [hasMultiplePhotos, photos.length, seed]);
 
   // Mobile layout style:
-  // - 'mobile-diptych': 2 photos side by side on mobile (~35% of multi-photo sets)
-  // - 'single': large full-width hero
+  // - 'sticky-deck': 2 photos stacked like a tactile card deck (Photo 1 pins, Photo 2 glides up)
+  // - 'mobile-diptych': 2 photos side by side with smooth ScrollReveal
+  // - 'single': large full-width hero with smooth ScrollReveal
   const mobileLayout = useMemo(() => {
     if (!hasMultiplePhotos || photos.length < 2) return 'single';
-    return seed % 5 < 2 ? 'mobile-diptych' : 'single';
+    // Mix sticky card deck (~65%) randomly with scroll reveals (diptych / single)
+    const mod = seed % 3;
+    if (mod !== 0) return 'sticky-deck';
+    return seed % 2 === 0 ? 'mobile-diptych' : 'single';
   }, [hasMultiplePhotos, photos.length, seed]);
 
   return (
@@ -173,8 +177,8 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
         )}
       </header>
 
-      {/* Main Photographic Presentation with ScrollReveal */}
-      <ScrollReveal className='relative w-full' onClick={handleDoubleTap}>
+      {/* Main Photographic Presentation */}
+      <div className='relative w-full' onClick={handleDoubleTap}>
         {/* Double Tap Heart Feedback */}
         {showHeart && (
           <div className='absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 fade-in duration-300'>
@@ -186,44 +190,46 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
          * DESKTOP VIEW: Artsy, Large-Scale Visual Anchors
          * ───────────────────────────────────────────────────────────── */}
         <div className='hidden md:block w-full'>
-          {/* VARIANT 1: BOLD DIPTYCH (2 large photos side-by-side, commanding real estate) */}
+          {/* VARIANT 1: BOLD DIPTYCH (2 large photos side-by-side with ScrollReveal) */}
           {desktopLayout === 'bold-diptych' && (
-            <div className='flex gap-4 lg:gap-6 w-full items-stretch'>
-              {photos.slice(0, 2).map((ptp, i) => {
-                const ratio =
-                  ptp.photo.aspectRatio ||
-                  (ptp.photo.width && ptp.photo.height
-                    ? ptp.photo.width / ptp.photo.height
-                    : 0.67);
-                return (
-                  <Link
-                    key={ptp.photo.id}
-                    href={href}
-                    className='relative block group overflow-hidden bg-muted/20 rounded-xs'
-                    style={{ flex: `${ratio} 1 0%` }}
-                  >
-                    <div
-                      style={{ aspectRatio: `${ratio}` }}
-                      className='relative w-full'
+            <ScrollReveal className='w-full'>
+              <div className='flex gap-4 lg:gap-6 w-full items-stretch'>
+                {photos.slice(0, 2).map((ptp, i) => {
+                  const ratio =
+                    ptp.photo.aspectRatio ||
+                    (ptp.photo.width && ptp.photo.height
+                      ? ptp.photo.width / ptp.photo.height
+                      : 0.67);
+                  return (
+                    <Link
+                      key={ptp.photo.id}
+                      href={href}
+                      className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                      style={{ flex: `${ratio} 1 0%` }}
                     >
-                      <BlurImage
-                        src={keyToUrl(ptp.photo.url)}
-                        alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
-                        fill
-                        priority={priority && i === 0}
-                        blurhash={ptp.photo.blurData}
-                        aspectRatio={ratio}
-                        sizes='(max-width: 1400px) 50vw, 650px'
-                        className='object-contain group-hover:scale-[1.01] transition-transform duration-500'
-                      />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                      <div
+                        style={{ aspectRatio: `${ratio}` }}
+                        className='relative w-full'
+                      >
+                        <BlurImage
+                          src={keyToUrl(ptp.photo.url)}
+                          alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
+                          fill
+                          priority={priority && i === 0}
+                          blurhash={ptp.photo.blurData}
+                          aspectRatio={ratio}
+                          sizes='(max-width: 1400px) 50vw, 650px'
+                          className='object-contain group-hover:scale-[1.01] transition-transform duration-500'
+                        />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
           )}
 
-          {/* VARIANT 2: HERO + COMPANION STACK (1 dominant anchor left ~60%, 2 stacked companions right ~40%) */}
+          {/* VARIANT 2: HERO + COMPANION STACK (1 dominant anchor left ~60% sticky, 2 companions right ~40%) */}
           {desktopLayout === 'hero-companion-stack' && photos.length >= 3 && (
             <div className='flex gap-4 lg:gap-6 w-full items-start'>
               {/* Left Dominant Anchor (Sticky while companions scroll) */}
@@ -292,13 +298,133 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             </div>
           )}
 
-          {/* VARIANT 3: HERO + DIPTYCH SPREAD (1 big anchor top + 2 photos below) */}
+          {/* VARIANT 3: HERO + DIPTYCH SPREAD (1 big anchor top + 2 photos below, mixed sticky / reveal) */}
           {desktopLayout === 'hero-diptych-spread' && (
-            <div className='space-y-4 lg:space-y-6 w-full'>
-              {/* Lead Hero Frame */}
+            seed % 2 === 0 ? (
+              /* Desktop Sticky Glide: Hero pins briefly, diptych smoothly glides over */
+              <div className='relative w-full pb-4'>
+                <div className='sticky top-20 z-0'>
+                  <Link
+                    href={href}
+                    className='block relative group overflow-hidden max-h-[80vh] rounded-xs'
+                    style={{
+                      aspectRatio: coverPhoto?.aspectRatio
+                        ? `${coverPhoto.aspectRatio}`
+                        : '3 / 2',
+                    }}
+                  >
+                    <BlurImage
+                      src={keyToUrl(coverPhoto?.url)}
+                      alt={coverPhoto?.title ?? post.title}
+                      fill
+                      priority={priority}
+                      blurhash={coverPhoto?.blurData}
+                      aspectRatio={coverPhoto?.aspectRatio}
+                      sizes='(max-width: 1400px) 100vw, 1200px'
+                      className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
+                    />
+                  </Link>
+                </div>
+
+                <div className='relative z-10 bg-background pt-6 pb-2 -mx-2 px-2 flex gap-4 lg:gap-6 w-full items-stretch shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-4 md:mt-6 rounded-xs'>
+                  {photos.slice(1, 3).map((ptp, i) => {
+                    const ratio =
+                      ptp.photo.aspectRatio ||
+                      (ptp.photo.width && ptp.photo.height
+                        ? ptp.photo.width / ptp.photo.height
+                        : 0.67);
+                    return (
+                      <Link
+                        key={ptp.photo.id}
+                        href={href}
+                        className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                        style={{ flex: `${ratio} 1 0%` }}
+                      >
+                        <div
+                          style={{ aspectRatio: `${ratio}` }}
+                          className='relative w-full'
+                        >
+                          <BlurImage
+                            src={keyToUrl(ptp.photo.url)}
+                            alt={ptp.photo.title ?? `${post.title} - ${i + 2}`}
+                            fill
+                            blurhash={ptp.photo.blurData}
+                            aspectRatio={ratio}
+                            sizes='(max-width: 1400px) 50vw, 600px'
+                            className='object-contain bg-muted/20 group-hover:scale-[1.01] transition-transform duration-500'
+                          />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* Desktop Scroll Reveal Spread */
+              <ScrollReveal className='space-y-4 lg:space-y-6 w-full'>
+                <Link
+                  href={href}
+                  className='block relative group overflow-hidden max-h-[80vh] rounded-xs'
+                  style={{
+                    aspectRatio: coverPhoto?.aspectRatio
+                      ? `${coverPhoto.aspectRatio}`
+                      : '3 / 2',
+                  }}
+                >
+                  <BlurImage
+                    src={keyToUrl(coverPhoto?.url)}
+                    alt={coverPhoto?.title ?? post.title}
+                    fill
+                    priority={priority}
+                    blurhash={coverPhoto?.blurData}
+                    aspectRatio={coverPhoto?.aspectRatio}
+                    sizes='(max-width: 1400px) 100vw, 1200px'
+                    className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
+                  />
+                </Link>
+
+                <div className='flex gap-4 lg:gap-6 w-full items-stretch'>
+                  {photos.slice(1, 3).map((ptp, i) => {
+                    const ratio =
+                      ptp.photo.aspectRatio ||
+                      (ptp.photo.width && ptp.photo.height
+                        ? ptp.photo.width / ptp.photo.height
+                        : 0.67);
+                    return (
+                      <Link
+                        key={ptp.photo.id}
+                        href={href}
+                        className='relative block group overflow-hidden bg-muted/20 rounded-xs'
+                        style={{ flex: `${ratio} 1 0%` }}
+                      >
+                        <div
+                          style={{ aspectRatio: `${ratio}` }}
+                          className='relative w-full'
+                        >
+                          <BlurImage
+                            src={keyToUrl(ptp.photo.url)}
+                            alt={ptp.photo.title ?? `${post.title} - ${i + 2}`}
+                            fill
+                            blurhash={ptp.photo.blurData}
+                            aspectRatio={ratio}
+                            sizes='(max-width: 1400px) 50vw, 600px'
+                            className='object-contain bg-muted/20 group-hover:scale-[1.01] transition-transform duration-500'
+                          />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </ScrollReveal>
+            )
+          )}
+
+          {/* VARIANT 4: SINGLE LARGE SOLO HERO WITH SCROLL REVEAL */}
+          {desktopLayout === 'solo' && (
+            <ScrollReveal className='w-full'>
               <Link
                 href={href}
-                className='block relative group overflow-hidden max-h-[80vh] rounded-xs'
+                className='block relative group overflow-hidden max-h-[85vh] w-full rounded-xs'
                 style={{
                   aspectRatio: coverPhoto?.aspectRatio
                     ? `${coverPhoto.aspectRatio}`
@@ -306,7 +432,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 }}
               >
                 <BlurImage
-                  src={keyToUrl(coverPhoto?.url)}
+                  src={keyToUrl(coverPhoto?.url || post.coverImage)}
                   alt={coverPhoto?.title ?? post.title}
                   fill
                   priority={priority}
@@ -316,10 +442,75 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
                 />
               </Link>
+            </ScrollReveal>
+          )}
+        </div>
 
-              {/* Secondary Diptych Pair */}
-              <div className='flex gap-4 lg:gap-6 w-full items-stretch'>
-                {photos.slice(1, 3).map((ptp, i) => {
+        {/* ─────────────────────────────────────────────────────────────
+         * MOBILE VIEW: Mixed Stacking Deck & Scroll Reveal
+         * ───────────────────────────────────────────────────────────── */}
+        <div className='block md:hidden w-full'>
+          {mobileLayout === 'sticky-deck' && photos.length >= 2 ? (
+            /* Mobile Sticky Stacking Deck: Photo 1 pins, Photo 2 glides over it! */
+            <div className='relative w-full pb-4'>
+              {/* Photo 1 (Sticky Pin) */}
+              <div className='sticky top-16 z-0'>
+                <Link
+                  href={href}
+                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20'
+                  style={{
+                    aspectRatio: photos[0].photo.aspectRatio
+                      ? `${photos[0].photo.aspectRatio}`
+                      : '3 / 2',
+                  }}
+                >
+                  <BlurImage
+                    src={keyToUrl(photos[0].photo.url)}
+                    alt={photos[0].photo.title ?? post.title}
+                    fill
+                    priority={priority}
+                    blurhash={photos[0].photo.blurData}
+                    aspectRatio={photos[0].photo.aspectRatio}
+                    sizes='100vw'
+                    className='object-contain'
+                  />
+                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
+                    01
+                  </div>
+                </Link>
+              </div>
+
+              {/* Photo 2 (Glides up and overlays Photo 1) */}
+              <div className='relative z-10 bg-background mt-4 pt-3 pb-1 -mx-1 px-1 shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.18)] dark:shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.45)]'>
+                <Link
+                  href={href}
+                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20'
+                  style={{
+                    aspectRatio: photos[1].photo.aspectRatio
+                      ? `${photos[1].photo.aspectRatio}`
+                      : '3 / 2',
+                  }}
+                >
+                  <BlurImage
+                    src={keyToUrl(photos[1].photo.url)}
+                    alt={photos[1].photo.title ?? `${post.title} - 2`}
+                    fill
+                    blurhash={photos[1].photo.blurData}
+                    aspectRatio={photos[1].photo.aspectRatio}
+                    sizes='100vw'
+                    className='object-contain'
+                  />
+                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
+                    02
+                  </div>
+                </Link>
+              </div>
+            </div>
+          ) : mobileLayout === 'mobile-diptych' ? (
+            /* Mobile Diptych with Scroll Reveal */
+            <ScrollReveal className='w-full'>
+              <div className='flex gap-2.5 w-full items-stretch'>
+                {photos.slice(0, 2).map((ptp, i) => {
                   const ratio =
                     ptp.photo.aspectRatio ||
                     (ptp.photo.width && ptp.photo.height
@@ -338,110 +529,47 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       >
                         <BlurImage
                           src={keyToUrl(ptp.photo.url)}
-                          alt={ptp.photo.title ?? `${post.title} - ${i + 2}`}
+                          alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
                           fill
+                          priority={priority && i === 0}
                           blurhash={ptp.photo.blurData}
                           aspectRatio={ratio}
-                          sizes='(max-width: 1400px) 50vw, 600px'
-                          className='object-contain bg-muted/20 group-hover:scale-[1.01] transition-transform duration-500'
+                          sizes='50vw'
+                          className='object-contain'
                         />
                       </div>
                     </Link>
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {/* VARIANT 4: SINGLE LARGE SOLO HERO */}
-          {desktopLayout === 'solo' && (
-            <Link
-              href={href}
-              className='block relative group overflow-hidden max-h-[85vh] w-full rounded-xs'
-              style={{
-                aspectRatio: coverPhoto?.aspectRatio
-                  ? `${coverPhoto.aspectRatio}`
-                  : '3 / 2',
-              }}
-            >
-              <BlurImage
-                src={keyToUrl(coverPhoto?.url || post.coverImage)}
-                alt={coverPhoto?.title ?? post.title}
-                fill
-                priority={priority}
-                blurhash={coverPhoto?.blurData}
-                aspectRatio={coverPhoto?.aspectRatio}
-                sizes='(max-width: 1400px) 100vw, 1200px'
-                className='object-contain bg-muted/20 group-hover:scale-[1.005] transition-transform duration-500'
-              />
-            </Link>
-          )}
-        </div>
-
-        {/* ─────────────────────────────────────────────────────────────
-         * MOBILE VIEW: Large Immersive Frames with Occasional Pair
-         * ───────────────────────────────────────────────────────────── */}
-        <div className='block md:hidden w-full'>
-          {mobileLayout === 'mobile-diptych' ? (
-            /* Mobile Diptych: 2 photos side by side with good presence */
-            <div className='flex gap-2.5 w-full items-stretch'>
-              {photos.slice(0, 2).map((ptp, i) => {
-                const ratio =
-                  ptp.photo.aspectRatio ||
-                  (ptp.photo.width && ptp.photo.height
-                    ? ptp.photo.width / ptp.photo.height
-                    : 0.67);
-                return (
-                  <Link
-                    key={ptp.photo.id}
-                    href={href}
-                    className='relative block group overflow-hidden bg-muted/20 rounded-xs'
-                    style={{ flex: `${ratio} 1 0%` }}
-                  >
-                    <div
-                      style={{ aspectRatio: `${ratio}` }}
-                      className='relative w-full'
-                    >
-                      <BlurImage
-                        src={keyToUrl(ptp.photo.url)}
-                        alt={ptp.photo.title ?? `${post.title} - ${i + 1}`}
-                        fill
-                        priority={priority && i === 0}
-                        blurhash={ptp.photo.blurData}
-                        aspectRatio={ratio}
-                        sizes='50vw'
-                        className='object-contain'
-                      />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            </ScrollReveal>
           ) : (
-            /* Mobile Full-Width Visual Anchor */
-            <Link
-              href={href}
-              className='block relative w-full overflow-hidden rounded-xs bg-muted/20'
-              style={{
-                aspectRatio: coverPhoto?.aspectRatio
-                  ? `${coverPhoto.aspectRatio}`
-                  : '3 / 2',
-              }}
-            >
-              <BlurImage
-                src={keyToUrl(coverPhoto?.url || post.coverImage)}
-                alt={coverPhoto?.title ?? post.title}
-                fill
-                priority={priority}
-                blurhash={coverPhoto?.blurData}
-                aspectRatio={coverPhoto?.aspectRatio}
-                sizes='100vw'
-                className='object-contain'
-              />
-            </Link>
+            /* Mobile Single Hero with Scroll Reveal */
+            <ScrollReveal className='w-full'>
+              <Link
+                href={href}
+                className='block relative w-full overflow-hidden rounded-xs bg-muted/20'
+                style={{
+                  aspectRatio: coverPhoto?.aspectRatio
+                    ? `${coverPhoto.aspectRatio}`
+                    : '3 / 2',
+                }}
+              >
+                <BlurImage
+                  src={keyToUrl(coverPhoto?.url || post.coverImage)}
+                  alt={coverPhoto?.title ?? post.title}
+                  fill
+                  priority={priority}
+                  blurhash={coverPhoto?.blurData}
+                  aspectRatio={coverPhoto?.aspectRatio}
+                  sizes='100vw'
+                  className='object-contain'
+                />
+              </Link>
+            </ScrollReveal>
           )}
         </div>
-      </ScrollReveal>
+      </div>
 
       {/* ─────────────────────────────────────────────────────────────
        * Editorial Footer: ONE Clear & Concise CTA

@@ -16,6 +16,7 @@ export const ScrollReveal = ({
   ...props
 }: ScrollRevealProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [hasCompleted, setHasCompleted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,20 +26,27 @@ export const ScrollReveal = ({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
       setIsVisible(true);
+      setHasCompleted(true);
       return;
     }
 
     const element = ref.current;
     if (!element) return;
 
+    let timer: NodeJS.Timeout;
+    let completionTimer: NodeJS.Timeout;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
           if (delayMs > 0) {
-            const timer = setTimeout(() => setIsVisible(true), delayMs);
-            return () => clearTimeout(timer);
+            timer = setTimeout(() => {
+              setIsVisible(true);
+              completionTimer = setTimeout(() => setHasCompleted(true), 750);
+            }, delayMs);
           } else {
             setIsVisible(true);
+            completionTimer = setTimeout(() => setHasCompleted(true), 750);
           }
           observer.disconnect();
         }
@@ -53,6 +61,8 @@ export const ScrollReveal = ({
 
     return () => {
       observer.disconnect();
+      if (timer) clearTimeout(timer);
+      if (completionTimer) clearTimeout(completionTimer);
     };
   }, [delayMs]);
 
@@ -61,8 +71,13 @@ export const ScrollReveal = ({
       ref={ref}
       {...props}
       className={cn(
-        'transition-[opacity,transform] duration-700 ease-out will-change-[opacity,transform]',
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5',
+        'transition-[opacity,transform] duration-700 ease-out',
+        !hasCompleted && 'will-change-[opacity,transform]',
+        isVisible
+          ? hasCompleted
+            ? 'opacity-100'
+            : 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-5',
         className,
       )}
     >
