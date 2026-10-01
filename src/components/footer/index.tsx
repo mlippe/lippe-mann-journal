@@ -14,8 +14,8 @@ const Footer = () => {
 
         {/* NAME  */}
         <div className='flex flex-col items-center lg:items-start gap-[2px]'>
-          <h1 className='text-2xl'>{siteConfig.name}</h1>
-          <p className='text-sm opacity-60'>{siteConfig.role}</p>
+          <span className='text-xl sm:text-2xl font-medium tracking-tight'>{siteConfig.name}</span>
+          <p className='text-xs sm:text-sm opacity-75'>{siteConfig.role}</p>
         </div>
       </div>
       <div className='grid lg:w-full grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-14'>

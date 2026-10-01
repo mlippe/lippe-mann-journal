@@ -625,7 +625,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           </div>
 
           {/* Frame number outside image (Bottom Right) */}
-          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -681,7 +681,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             </div>
           </div>
 
-          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -736,7 +736,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             </div>
           </div>
 
-          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -802,7 +802,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           </div>
 
           {/* Frame number outside Solo image (Bottom Right) */}
-          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.index + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -891,7 +891,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           </div>
 
           {/* Frame index number outside Photo A (Bottom Right) */}
-          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.startIndex + 1).padStart(2, '0')}</span>
           </div>
         </div>
@@ -951,7 +951,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           </div>
 
           {/* Frame index number outside Photo B (Bottom Right) */}
-          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
+          <div className='pt-1.5 sm:pt-2 text-[10px] sm:text-[11px] font-mono tracking-[0.14em] font-medium tabular-nums text-muted-foreground/80 group-hover/plate:text-foreground transition-colors duration-300 select-none'>
             <span>{String(block.startIndex + 2).padStart(2, '0')}</span>
           </div>
         </div>
@@ -1272,12 +1272,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       <header className='mt-10 md:mt-0 mb-8 md:mb-14'>
         {/* Editorial Story Title */}
         <div className='max-w-3xl'>
-          <div className='flex flex-wrap items-center gap-2 mb-3'>
-            <span className='text-[11px] font-mono tracking-widest uppercase text-muted-foreground'>
+          <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4'>
+            <span className='text-[10px] sm:text-[11px] font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
               {formattedDate}
             </span>
-            <span className='text-muted-foreground/40'>•</span>
-            <span className='text-[11px] font-mono tracking-widest uppercase text-muted-foreground'>
+            <span className='text-muted-foreground/40'>·</span>
+            <span className='text-[10px] sm:text-[11px] font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
               {photos.length > 1
                 ? `${photos.length} AUFNAHMEN`
                 : 'EINZELAUFNAHME'}
@@ -1286,14 +1286,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               <Badge
                 key={c.id}
                 variant='outline'
-                className='text-[10px] uppercase font-mono tracking-wider px-1.5 py-0 h-4 border-muted-foreground/30'
+                className='text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.1em] font-medium px-1.5 py-0 h-4 border-muted-foreground/30 text-muted-foreground'
               >
                 {c.name}
               </Badge>
             ))}
           </div>
 
-          <h1 className='text-3xl sm:text-4xl lg:text-[2.75rem] font-serif tracking-tight text-foreground leading-[1.12] mb-4'>
+          <h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.14] sm:leading-[1.1] lg:leading-[1.05] mb-4 sm:mb-6'>
             {post.title}
           </h1>
         </div>
@@ -1317,8 +1317,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
                   {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pb-12 md:pb-20'>
-                      <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
-                        <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                      <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                        <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
@@ -1356,8 +1356,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
                   {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pb-10 md:pb-16'>
-                      <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
-                        <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                      <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                        <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
@@ -1383,8 +1383,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   {isOnlyUnit && unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pb-8 md:pb-12'>
                       <ScrollReveal>
-                        <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
-                          <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                        <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                          <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                             {unit.fieldNote}
                           </p>
                         </div>
@@ -1398,8 +1398,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   {!isOnlyUnit && unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
                       <ScrollReveal>
-                        <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
-                          <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                        <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                          <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                             {unit.fieldNote}
                           </p>
                         </div>
@@ -1430,8 +1430,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 {unit.fieldNote && unitIdx < storyUnits.length - 1 && (
                   <div className='max-w-2xl mx-auto px-4 pt-10 md:pt-16'>
                     <ScrollReveal>
-                      <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
-                        <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                      <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                        <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
@@ -1454,11 +1454,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div className='w-full'>
             <Author size='md' />
-            <p className='text-xs text-muted-foreground mt-1'>
+            <p className='text-[13px] text-muted-foreground mt-1'>
               Dokumentation & Fotografie aus dem Alltag.
             </p>
           </div>
-          <div className='w-full flex items-center gap-3 flex-wrap'>
+          <div className='w-full flex items-center gap-2 sm:gap-3 flex-wrap'>
             <button
               onClick={() => {
                 if (fingerprint && isLoaded) {
@@ -1468,37 +1468,37 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   });
                 }
               }}
-              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+              className='inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-border bg-background hover:bg-muted text-[11px] sm:text-xs font-mono uppercase tracking-[0.12em] font-medium transition-colors cursor-pointer'
             >
               <IconHeartFilled
                 className={cn(
-                  'size-4 transition-colors',
+                  'size-3.5 sm:size-4 transition-colors',
                   currentInteractions?.hasLiked
                     ? 'text-red-500 fill-red-500'
                     : 'text-muted-foreground',
                 )}
               />
-              <span>{currentInteractions?.likeCount || 0} Gefällt mir</span>
+              <span className='tabular-nums'>{currentInteractions?.likeCount || 0} Gefällt mir</span>
             </button>
             <button
               onClick={handleShare}
-              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+              className='inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-border bg-background hover:bg-muted text-[11px] sm:text-xs font-mono uppercase tracking-[0.12em] font-medium transition-colors cursor-pointer'
             >
               {copied ? (
                 <>
-                  <IconCheck className='size-4 text-emerald-500' />
+                  <IconCheck className='size-3.5 sm:size-4 text-emerald-500' />
                   <span className='text-emerald-500'>Kopiert</span>
                 </>
               ) : (
                 <>
-                  <IconShare className='size-4' />
+                  <IconShare className='size-3.5 sm:size-4' />
                   <span>Teilen</span>
                 </>
               )}
             </button>
             <a
               href={createSeriesPrintInquiryUrl()}
-              className='inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:bg-muted text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer'
+              className='inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-border bg-background hover:bg-muted text-[11px] sm:text-xs font-mono uppercase tracking-[0.12em] font-medium transition-colors cursor-pointer'
             >
               <IconMail className='size-3.5 text-muted-foreground' />
               <span>Print zu dieser Serie anfragen</span>
@@ -1508,8 +1508,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
         {/* Curator's Guestbook (Gästebuch) */}
         <div className='bg-muted/30 border border-border/40 rounded-lg p-3 sm:p-4 md:p-6 max-w-3xl mx-auto'>
-          <h3 className='text-lg font-medium tracking-tight mb-6 flex items-center gap-2'>
-            <IconMessageCircle className='size-5 text-muted-foreground' />
+          <h3 className='text-base sm:text-lg font-medium tracking-tight mb-5 flex items-center gap-2 text-foreground'>
+            <IconMessageCircle className='size-4 sm:size-5 text-muted-foreground' />
             <span>Gästebuch der Serie</span>
           </h3>
           <SocialInteractions postId={post.id} variant='full' showActions={false} />

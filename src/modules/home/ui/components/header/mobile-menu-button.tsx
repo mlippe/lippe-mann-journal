@@ -25,7 +25,7 @@ const MobileMenuButton = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className='text-sm font-light whitespace-nowrap block'
+              className='text-sm font-medium whitespace-nowrap block text-foreground'
             >
               {isOpen ? 'Schließen' : 'Menü'}
             </motion.span>

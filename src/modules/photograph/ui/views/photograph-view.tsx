@@ -107,7 +107,7 @@ const PhotoInfo = ({
             {format(post.createdAt, 'dd.MM.yyyy, p', { locale: de })}
           </p>
           {post.content && (
-            <p className='text-xs md:text-sm text-muted-foreground/90 leading-relaxed mt-2.5 pt-2.5 border-t border-border/40 font-serif italic whitespace-pre-line'>
+            <p className='text-xs sm:text-[13px] text-foreground/80 leading-relaxed mt-2.5 pt-2.5 border-t border-border/40 font-normal whitespace-pre-line'>
               {post.content}
             </p>
           )}

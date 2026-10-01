@@ -16,7 +16,7 @@ const Logo = () => {
       <WordRotate
         label={siteConfig.title}
         label2={siteConfig.tagline}
-        style='font-medium uppercase'
+        style='text-[13px] sm:text-sm font-medium uppercase tracking-[0.08em]'
       />
     </Link>
   );

@@ -16,7 +16,7 @@ const FlipLink = ({ children, href, className }: Props) => {
   return (
     <Link
       href={href}
-      className={`relative block overflow-hidden whitespace-nowrap font-light text-sm ${className || ''}`}
+      className={`relative block overflow-hidden whitespace-nowrap text-[13px] font-medium tracking-[0.01em] text-foreground/80 hover:text-foreground transition-colors ${className || ''}`}
     >
       <motion.div initial="initial" whileHover="hovered" className="relative">
       <div>

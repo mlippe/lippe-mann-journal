@@ -199,9 +199,9 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
       }
     >
       {/* Editorial Header */}
-      <header className='mb-6 md:mb-8 space-y-2 max-w-3xl'>
-        <div className='flex items-center gap-2 text-[11px] uppercase font-mono tracking-widest text-muted-foreground'>
-          <span className={isArticle ? 'font-semibold text-foreground/90' : ''}>
+      <header className='mb-6 md:mb-8 space-y-2.5 max-w-3xl'>
+        <div className='flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.12em] sm:tracking-[0.14em] font-medium tabular-nums text-muted-foreground'>
+          <span className={isArticle ? 'text-foreground font-semibold' : ''}>
             {isArticle
               ? 'Artikel'
               : hasMultiplePhotos
@@ -210,23 +210,23 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           </span>
           {isArticle && (
             <>
-              <span>·</span>
+              <span className='text-muted-foreground/40'>·</span>
               <span>{readingTime} Min Lesezeit</span>
             </>
           )}
-          <span>·</span>
+          <span className='text-muted-foreground/40'>·</span>
           <span>{formattedDate}</span>
         </div>
 
-        <h2 className='text-3xl md:text-4xl font-serif tracking-tight text-foreground'>
-          <Link href={href} className='hover:opacity-80 transition-opacity'>
+        <h2 className='text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-[1.14] sm:leading-[1.1] md:leading-[1.08]'>
+          <Link href={href} className='hover:opacity-75 transition-opacity'>
             {post.title}
           </Link>
         </h2>
 
         {/* Field Note / Journal Text / Article Excerpt */}
         {leadText && (
-          <p className='pt-2 text-base md:text-lg font-serif italic text-foreground/80 leading-relaxed max-w-2xl'>
+          <p className='pt-1 sm:pt-2 text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.6] md:leading-[1.65] max-w-2xl'>
             {leadText}
           </p>
         )}
@@ -537,7 +537,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
                     className='object-contain'
                   />
-                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
+                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.14em] font-medium tabular-nums text-foreground/90 select-none'>
                     01
                   </div>
                 </Link>
@@ -547,7 +547,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <div className='relative z-10 bg-background mt-4 pt-3 pb-1 -mx-1 px-1 shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.18)] dark:shadow-[0_-14px_28px_-10px_rgba(0,0,0,0.45)]'>
                 <Link
                   href={href}
-                  className='block relative w-full overflow-hidden rounded-xs group bg-muted/20 cursor-ansehen'
+                  className='block relative w-full overflow-hidden rounded-xs group cursor-ansehen'
                   style={{
                     aspectRatio: photos[1].photo.aspectRatio
                       ? `${photos[1].photo.aspectRatio}`
@@ -563,7 +563,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
                     className='object-contain'
                   />
-                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-wider text-muted-foreground select-none'>
+                  <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.14em] font-medium tabular-nums text-foreground/90 select-none'>
                     02
                   </div>
                 </Link>
@@ -649,7 +649,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
 
         <Link
           href={href}
-          className='text-xs uppercase font-mono tracking-wider text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors group'
+          className='text-[11px] sm:text-xs uppercase font-mono tracking-[0.12em] sm:tracking-[0.14em] font-medium text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors group'
         >
           <span>
             {isArticle

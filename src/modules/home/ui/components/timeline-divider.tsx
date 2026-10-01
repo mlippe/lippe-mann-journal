@@ -33,12 +33,12 @@ export const TimelineDivider = ({
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4'>
         {/* Left: Editorial Chapter Title */}
         <div className='space-y-1.5'>
-          <div className='flex items-baseline gap-2.5 sm:gap-3.5'>
-            <h3 className='font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-foreground'>
+          <div className='flex items-baseline gap-2 sm:gap-3'>
+            <h3 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-none'>
               {formattedMonth}
             </h3>
             {displayYear && (
-              <span className='font-serif italic font-light text-2xl sm:text-3xl md:text-4xl text-muted-foreground/60'>
+              <span className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-tight text-muted-foreground/70 tabular-nums'>
                 {displayYear}
               </span>
             )}

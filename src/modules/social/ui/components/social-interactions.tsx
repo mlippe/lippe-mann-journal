@@ -309,7 +309,7 @@ export const SocialInteractions = ({
                     })}
                   </span>
                 </div>
-                <p className='text-sm text-foreground/85 leading-relaxed font-serif'>
+                <p className='text-sm text-foreground/85 leading-relaxed font-normal'>
                   {comment.content}
                 </p>
               </div>
@@ -365,7 +365,7 @@ export const SocialInteractions = ({
                 onChange={(e) => setCommentContent(e.target.value)}
                 initialSize='sm'
                 className={cn(
-                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300 py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30 font-serif',
+                  'bg-muted/30 border-border/50 hover:bg-muted/50 focus:bg-background transition-all duration-300 py-2.5 pr-12 text-sm resize-none shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:border-foreground/30',
                   commentContent.length > 0 && 'min-h-15',
                 )}
               />

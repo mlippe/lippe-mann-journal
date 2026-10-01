@@ -434,13 +434,13 @@ export const ZinePreviewCard = ({
           </div>
 
           {/* Headline */}
-          <h4 className='text-lg lg:text-xl font-serif font-normal tracking-[-0.015em] text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.24]'>
+          <h4 className='text-base sm:text-lg font-medium tracking-tight text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.2]'>
             {post.title}
           </h4>
 
           {/* Excerpt / Field Note */}
           {cleanContent && (
-            <p className='text-xs sm:text-[13px] font-serif italic text-muted-foreground/75 line-clamp-2 leading-[1.55] pt-0.5'>
+            <p className='text-xs sm:text-[13px] font-normal text-muted-foreground line-clamp-2 leading-[1.55] pt-0.5'>
               {cleanContent}
             </p>
           )}
@@ -523,7 +523,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
       {/* Editorial Section Header */}
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12'>
         <div>
-          <h3 className='text-2xl sm:text-3xl lg:text-[2rem] font-serif font-normal tracking-[-0.02em] leading-[1.15] text-foreground'>
+          <h3 className='text-xl sm:text-2xl lg:text-3xl font-medium tracking-tight md:tracking-[-0.025em] leading-[1.15] text-foreground'>
             Weitere Serien & Geschichten
           </h3>
         </div>
@@ -546,7 +546,7 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
 
       {/* Bottom Editorial Callout */}
       <div className='mt-12 md:mt-16 pt-8 border-t border-border/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left'>
-        <p className='text-xs sm:text-[13px] font-serif italic text-muted-foreground/80 leading-relaxed'>
+        <p className='text-xs sm:text-[13px] font-normal text-muted-foreground leading-relaxed'>
           Dokumentarische Streifzüge, Notizen und Serien aus dem Alltag.
         </p>
         <Button
