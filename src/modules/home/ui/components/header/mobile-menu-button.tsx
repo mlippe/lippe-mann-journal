@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Graphic from '../../../../../components/graphic';
-import { useState } from 'react';
 import MobileMenu from './mobile-menu';
+import { AnimatePresence, motion } from 'motion/react';
 
 const MobileMenuButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,13 +11,27 @@ const MobileMenuButton = () => {
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
-        className='fixed  top-3 right-0 lg:right-3 z-40 bg-background rounded-bl-[18px] lg:hidden cursor-pointer select-none'
+        type='button'
+        aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((prev) => !prev)}
+        className='fixed top-3 right-0 lg:right-3 z-50 bg-background rounded-bl-[18px] lg:hidden cursor-pointer select-none'
       >
         <div className='relative pb-3 px-4'>
-          <h1 className='text-sm font-light'>Menü</h1>
-          <Graphic className='absolute -bottom-4 right-0 rotate-90' />
-          <Graphic className='absolute -left-4 top-0 rotate-90' />
+          <AnimatePresence mode='wait' initial={false}>
+            <motion.span
+              key={isOpen ? 'close' : 'menu'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className='text-sm font-light whitespace-nowrap block'
+            >
+              {isOpen ? 'Schließen' : 'Menü'}
+            </motion.span>
+          </AnimatePresence>
+          <Graphic className='absolute -bottom-4.5 right-0 rotate-90 size-4.5 pointer-events-none' />
+          <Graphic className='absolute -left-4.5 top-0 rotate-90 size-4.5 pointer-events-none' />
         </div>
       </button>
 
@@ -27,3 +41,4 @@ const MobileMenuButton = () => {
 };
 
 export default MobileMenuButton;
+

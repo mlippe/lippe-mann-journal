@@ -1,8 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import Graphic from '../../../../../components/graphic';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
@@ -36,38 +35,45 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
+  const handleExitComplete = () => {
+    document.body.style.overflow = '';
+  };
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={handleExitComplete}>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className='fixed inset-0 z-50 lg:hidden bg-background p-3'
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
+          className='fixed inset-0 z-40 lg:hidden bg-background p-3 overscroll-contain'
+          style={{ willChange: 'opacity', transform: 'translateZ(0)' }}
         >
-          <div className='bg-muted h-full flex flex-col justify-between rounded-[18px]'>
+          <div className='bg-muted h-full flex flex-col justify-between rounded-[18px] overflow-hidden'>
             {/* Header */}
-            <div className='relative p-6'>
-              {/* CLOSE BUTTON  */}
-              <button
-                onClick={onClose}
-                className='fixed top-3 right-3 z-50 bg-background rounded-bl-[18px] cursor-pointer select-none'
-              >
-                <div className='relative pb-3 pl-4 pr-1'>
-                  <h1 className='text-sm font-light'>Schließen</h1>
-                  <Graphic className='absolute -bottom-4 right-0 rotate-90' />
-                  <Graphic className='absolute -left-4 top-0 rotate-90' />
-                </div>
-              </button>
-
+            <div className='relative p-6 pr-28'>
               <div className='flex gap-4 items-center'>
                 {/* AVATAR  */}
                 <Avatar className='size-15'>
@@ -84,12 +90,12 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
             </div>
 
             {/* Menu Items */}
-            <div className='overflow-y-auto px-4 py-2 scrollbar-none'>
+            <div className='overflow-y-auto px-4 py-2 scrollbar-none overscroll-contain'>
               {menuItems.map((item) => (
                 <motion.button
                   key={item.label}
                   onClick={() => handleNavigation(item.href)}
-                  className='w-full text-left p-4 rounded-xl mb-3 flex items-center justify-between bg-muted-hover text-text-muted text-sm'
+                  className='w-full text-left p-4 rounded-xl mb-3 flex items-center justify-between bg-muted-hover text-text-muted text-sm cursor-pointer'
                   whileTap={{ scale: 0.98 }}
                 >
                   {item.label}
@@ -103,3 +109,4 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
     </AnimatePresence>
   );
 }
+
