@@ -209,6 +209,48 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       .filter((p) => p.length > 0);
   }, [post.content]);
 
+  // Single Photo Post commentary placement:
+  // - If single line: placed below the image (topNote: null, bottomNote: line)
+  // - If multiple lines (enter line breaks): first line above image, rest below image
+  const singlePhotoNotes = useMemo(() => {
+    if (photos.length > 1 || !post.content) {
+      return { topNote: null, bottomNote: null };
+    }
+
+    const trimmed = post.content.trim();
+    if (!trimmed) {
+      return { topNote: null, bottomNote: null };
+    }
+
+    // Split on first newline occurrence (either \r\n or \n)
+    const newlineIndex = trimmed.search(/\r?\n/);
+
+    // No line break found -> strictly 1 line!
+    if (newlineIndex === -1) {
+      return {
+        topNote: null,
+        bottomNote: trimmed,
+      };
+    }
+
+    // Line break exists -> multiple lines!
+    const firstLine = trimmed.slice(0, newlineIndex).trim();
+    const remainingText = trimmed.slice(newlineIndex).trim();
+
+    // If remainingText is empty (e.g. only trailing newlines), treat as 1 line
+    if (!remainingText) {
+      return {
+        topNote: null,
+        bottomNote: firstLine,
+      };
+    }
+
+    return {
+      topNote: firstLine,
+      bottomNote: remainingText,
+    };
+  }, [photos.length, post.content]);
+
   const postSeed = useMemo(
     () => getPostSeed(post.id || post.slug),
     [post.id, post.slug],
@@ -508,13 +550,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     };
 
     if (paragraphs.length === 1) {
-      if (numUnits === 1) {
-        rawUnits[0].fieldNote = paragraphs[0];
-      } else {
+      if (numUnits > 1) {
         const targetIdx = getLastSnippetTargetUnitIdx();
         rawUnits[targetIdx].fieldNote = paragraphs[0];
       }
-    } else if (paragraphs.length > 1 && numUnits > 0) {
+    } else if (paragraphs.length > 1 && numUnits > 1) {
       // Paragraph 0: Intro / Lead note after Hero
       rawUnits[0].fieldNote = paragraphs[0];
 
@@ -989,9 +1029,16 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   };
 
   const createSeriesPrintInquiryUrl = () => {
-    const subject = encodeURIComponent(`Print-Anfrage: Serie „${post.title}“`);
+    const isSinglePhoto = photos.length <= 1;
+    const subject = encodeURIComponent(
+      isSinglePhoto
+        ? `Print-Anfrage: „${post.title}“`
+        : `Print-Anfrage: Serie „${post.title}“`,
+    );
     const body = encodeURIComponent(
-      `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print aus deiner Serie „${post.title}“:\n\n• Serie: ${post.title}\n• Motiv / Wunschfoto: [z. B. Titel oder Bildnummer]\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
+      isSinglePhoto
+        ? `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print von „${post.title}“:\n\n• Motiv: ${post.title}\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`
+        : `Hallo Manuel,\n\nich interessiere mich für einen Fine-Art Print aus deiner Serie „${post.title}“:\n\n• Serie: ${post.title}\n• Motiv / Wunschfoto: [z. B. Titel oder Bildnummer]\n\nBitte gib mir unverbindlich Bescheid über verfügbare Formate, Papiersorten und Konditionen.\n\nViele Grüße`,
     );
     return `mailto:manuel@lippe-mann.de?subject=${subject}&body=${body}`;
   };
@@ -1392,13 +1439,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   key={`hero-${block.photo.id}`}
                   className='relative w-full'
                 >
-                  {/* Single-photo story: Text snippet sits above the photo (never under the last image) */}
-                  {isOnlyUnit && unit.fieldNote && (
-                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
+                  {/* Single-photo story with multiple lines: First line sits above the photo */}
+                  {isOnlyUnit && singlePhotoNotes.topNote && (
+                    <div className='max-w-2xl mx-auto px-4 -mt-3 sm:-mt-5 md:-mt-6 mb-8 sm:mb-12 md:mb-14'>
                       <ScrollReveal>
-                        <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                        <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-1'>
                           <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
-                            {unit.fieldNote}
+                            {singlePhotoNotes.topNote}
                           </p>
                         </div>
                       </ScrollReveal>
@@ -1408,6 +1455,19 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   <ScrollReveal disabled>
                     {renderHeroContent(block)}
                   </ScrollReveal>
+
+                  {/* Single-photo story: Bottom note (single line OR remaining lines) sits under the photo */}
+                  {isOnlyUnit && singlePhotoNotes.bottomNote && (
+                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
+                      <ScrollReveal>
+                        <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
+                          <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                            {singlePhotoNotes.bottomNote}
+                          </p>
+                        </div>
+                      </ScrollReveal>
+                    </div>
+                  )}
 
                   {/* Multi-photo story: Lead note sits after hero, before subsequent images */}
                   {!isOnlyUnit && unit.fieldNote && (
@@ -1518,16 +1578,16 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className='inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-border bg-background hover:bg-muted text-xs sm:text-[13px] font-mono uppercase tracking-[0.12em] font-medium transition-colors cursor-pointer'
             >
               <IconMail className='size-3.5 text-muted-foreground' />
-              <span>Print zu dieser Serie anfragen</span>
+              <span>{photos.length <= 1 ? 'Print anfragen' : 'Print zu dieser Serie anfragen'}</span>
             </a>
           </div>
         </div>
 
-        {/* Curator's Guestbook (Gästebuch) */}
+        {/* Opinions & Thoughts (Meinungen & Gedanken) */}
         <div className='bg-muted/30 border border-border/40 rounded-xl p-4 sm:p-6 md:p-8 max-w-3xl mx-auto'>
           <h3 className='text-lg sm:text-xl font-medium tracking-tight mb-5 flex items-center gap-2 text-foreground'>
             <IconMessageCircle className='size-4 sm:size-5 text-muted-foreground' />
-            <span>Gästebuch der Serie</span>
+            <span>Meinungen & Gedanken</span>
           </h3>
           <SocialInteractions
             postId={post.id}

@@ -293,7 +293,7 @@ export const SocialInteractions = ({
         <div className='space-y-4'>
           {interactions?.comments.length === 0 ? (
             <p className='text-xs text-muted-foreground italic py-3'>
-              Noch keine Einträge im Gästebuch. Hinterlasse als Erster einen Gedanken.
+              Noch keine Gedanken hinterlassen. Teile als Erster deine Meinung.
             </p>
           ) : (
             interactions?.comments.map((comment) => (
@@ -325,7 +325,7 @@ export const SocialInteractions = ({
             onClick={startEditingUsername}
             className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase font-mono tracking-widest text-left'
           >
-            Im Gästebuch als <span className='underline decoration-dotted text-foreground'>{username}</span> eintragen:
+            Kommentieren als <span className='underline decoration-dotted text-foreground'>{username}</span>:
           </button>
         </div>
 
@@ -360,7 +360,7 @@ export const SocialInteractions = ({
           >
             <div className='relative flex-1'>
               <Textarea
-                placeholder='Eindruck oder Gedanken im Gästebuch hinterlassen...'
+                placeholder='Eindruck oder Gedanken teilen...'
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 initialSize='sm'
