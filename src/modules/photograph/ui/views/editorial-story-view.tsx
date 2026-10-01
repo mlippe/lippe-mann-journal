@@ -239,7 +239,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       const realIndex = i + 1;
       const ratio =
         current.aspectRatio ||
-        (current.width && current.height ? current.width / current.height : 2 / 3);
+        (current.width && current.height
+          ? current.width / current.height
+          : 2 / 3);
 
       const isVertical = ratio < 1.15;
       const isLandscape = ratio >= 1.15;
@@ -351,13 +353,17 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       const bSeed = getBlockSeed(postSeed, i);
 
       // Solo & highlight feature frames: ~40% chance of sticky pinning
-      if ((block.type === 'solo' || block.type === 'highlight') && bSeed % 10 < 4) {
+      if (
+        (block.type === 'solo' || block.type === 'highlight') &&
+        bSeed % 10 < 4
+      ) {
         pins.add(i);
       }
       // Occasional diptych: ~20% chance of sticky pinning if followed by a solo/highlight frame
       else if (
         block.type === 'diptych' &&
-        (blocks[i + 1]?.type === 'solo' || blocks[i + 1]?.type === 'highlight') &&
+        (blocks[i + 1]?.type === 'solo' ||
+          blocks[i + 1]?.type === 'highlight') &&
         bSeed % 10 < 2
       ) {
         pins.add(i);
@@ -762,7 +768,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           : 'justify-center';
 
     return (
-      <div className={cn('flex w-full max-w-6xl mx-auto py-2 sm:py-4', alignmentClass)}>
+      <div
+        className={cn(
+          'flex w-full max-w-6xl mx-auto py-2 sm:py-4',
+          alignmentClass,
+        )}
+      >
         <div
           className='group/plate flex flex-col items-end'
           style={{
@@ -1038,7 +1049,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     };
 
     window.addEventListener('mousemove', handleUserActivity, { passive: true });
-    window.addEventListener('pointermove', handleUserActivity, { passive: true });
+    window.addEventListener('pointermove', handleUserActivity, {
+      passive: true,
+    });
     window.addEventListener('wheel', handleUserActivity, { passive: true });
     window.addEventListener('keydown', handleUserActivity, { passive: true });
 
@@ -1267,9 +1280,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   );
 
   return (
-    <article className='w-full max-w-6xl mx-auto py-6 md:py-12'>
+    <article className='w-full max-w-6xl mx-auto py-6 sm:py-8 md:py-12'>
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
-      <header className='mt-10 md:mt-0 mb-8 md:mb-14'>
+      <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
         {/* Editorial Story Title */}
         <div className='max-w-3xl'>
           <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4'>
@@ -1314,9 +1327,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </div>
 
                 {/* 2. OVERLAY CONTAINER (Field note if present + Next Block) */}
-                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
+                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 sm:mt-8 md:mt-10 pt-8 sm:pt-12 md:pt-16 pb-4 sm:pb-6'>
                   {unit.fieldNote && (
-                    <div className='max-w-2xl mx-auto px-4 pb-12 md:pb-20'>
+                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
                         <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
@@ -1337,7 +1350,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`pinned-pair-${blockId}`}
-                className='relative w-full mt-16 md:mt-28'
+                className='relative w-full mt-16 sm:mt-20 md:mt-28'
                 style={
                   unitIdx > 0
                     ? {
@@ -1353,9 +1366,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </div>
 
                 {/* 2. OVERLAY FRAME */}
-                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 md:mt-10 pt-8 md:pt-14 pb-4'>
+                <div className='relative z-10 bg-background -mx-3 px-3 md:mx-0 md:px-0 shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_-16px_32px_-12px_rgba(0,0,0,0.4)] mt-6 sm:mt-8 md:mt-10 pt-8 sm:pt-12 md:pt-16 pb-4 sm:pb-6'>
                   {unit.fieldNote && (
-                    <div className='max-w-2xl mx-auto px-4 pb-10 md:pb-16'>
+                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
                         <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
@@ -1381,7 +1394,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 >
                   {/* Single-photo story: Text snippet sits above the photo (never under the last image) */}
                   {isOnlyUnit && unit.fieldNote && (
-                    <div className='max-w-2xl mx-auto px-4 pb-8 md:pb-12'>
+                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <ScrollReveal>
                         <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
                           <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
@@ -1392,11 +1405,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     </div>
                   )}
 
-                  <ScrollReveal disabled>{renderHeroContent(block)}</ScrollReveal>
+                  <ScrollReveal disabled>
+                    {renderHeroContent(block)}
+                  </ScrollReveal>
 
                   {/* Multi-photo story: Lead note sits after hero, before subsequent images */}
                   {!isOnlyUnit && unit.fieldNote && (
-                    <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
+                    <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <ScrollReveal>
                         <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
                           <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
@@ -1415,7 +1430,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             return (
               <section
                 key={`standard-${blockId}`}
-                className='w-full mt-16 md:mt-28'
+                className='w-full mt-16 sm:mt-20 md:mt-28'
                 style={
                   unitIdx > 0
                     ? {
@@ -1428,7 +1443,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 <ScrollReveal>{renderBlockContent(block)}</ScrollReveal>
                 {/* Never render trailing text under the last image unit */}
                 {unit.fieldNote && unitIdx < storyUnits.length - 1 && (
-                  <div className='max-w-2xl mx-auto px-4 pt-10 md:pt-16'>
+                  <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                     <ScrollReveal>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
                         <p className='text-[15px] sm:text-base md:text-lg lg:text-xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
@@ -1449,7 +1464,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
-        className='relative z-20 bg-background mt-14 md:mt-20 border-t border-border/60 pt-10 md:pt-14 space-y-12'
+        className='relative z-20 bg-background mt-16 sm:mt-20 md:mt-24 border-t border-border/40 pt-10 sm:pt-12 md:pt-16 space-y-10 sm:space-y-12'
       >
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-6'>
           <div className='w-full'>
@@ -1458,7 +1473,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               Dokumentation & Fotografie aus dem Alltag.
             </p>
           </div>
-          <div className='w-full flex items-center gap-2 sm:gap-3 flex-wrap'>
+          <div className='w-full flex items-center gap-2 sm:gap-3 flex-wrap md:justify-end'>
             <button
               onClick={() => {
                 if (fingerprint && isLoaded) {
@@ -1478,7 +1493,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     : 'text-muted-foreground',
                 )}
               />
-              <span className='tabular-nums'>{currentInteractions?.likeCount || 0} Gefällt mir</span>
+              <span className='tabular-nums'>
+                {currentInteractions?.likeCount || 0} · Gefällt mir
+              </span>
             </button>
             <button
               onClick={handleShare}
@@ -1507,12 +1524,16 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         </div>
 
         {/* Curator's Guestbook (Gästebuch) */}
-        <div className='bg-muted/30 border border-border/40 rounded-lg p-3 sm:p-4 md:p-6 max-w-3xl mx-auto'>
+        <div className='bg-muted/30 border border-border/40 rounded-xl p-4 sm:p-6 md:p-8 max-w-3xl mx-auto'>
           <h3 className='text-base sm:text-lg font-medium tracking-tight mb-5 flex items-center gap-2 text-foreground'>
             <IconMessageCircle className='size-4 sm:size-5 text-muted-foreground' />
             <span>Gästebuch der Serie</span>
           </h3>
-          <SocialInteractions postId={post.id} variant='full' showActions={false} />
+          <SocialInteractions
+            postId={post.id}
+            variant='full'
+            showActions={false}
+          />
         </div>
       </footer>
 

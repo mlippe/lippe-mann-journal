@@ -186,7 +186,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
 
   return (
     <article
-      className='w-full py-14 md:py-24 border-b border-border/40 last:border-b-0'
+      className='w-full py-12 sm:py-16 md:py-24 border-b border-border/40 last:border-b-0'
       style={
         !priority
           ? {
@@ -199,7 +199,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
       }
     >
       {/* Editorial Header */}
-      <header className='mb-6 md:mb-8 space-y-2.5 max-w-3xl'>
+      <header className='mb-6 sm:mb-8 md:mb-10 space-y-2 sm:space-y-3 max-w-3xl'>
         <div className='flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.12em] sm:tracking-[0.14em] font-medium tabular-nums text-muted-foreground'>
           <span className={isArticle ? 'text-foreground font-semibold' : ''}>
             {isArticle
@@ -226,7 +226,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
 
         {/* Field Note / Journal Text / Article Excerpt */}
         {leadText && (
-          <p className='pt-1 sm:pt-2 text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.6] md:leading-[1.65] max-w-2xl'>
+          <p className='pt-1 sm:pt-1.5 text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.6] md:leading-[1.65] max-w-2xl'>
             {leadText}
           </p>
         )}
@@ -572,7 +572,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           ) : mobileLayout === 'mobile-diptych' ? (
             /* Mobile Diptych with Scroll Reveal */
             <ScrollReveal disabled={priority} className='w-full'>
-              <div className='flex gap-2.5 w-full items-stretch'>
+              <div className='flex gap-3 sm:gap-4 w-full items-stretch'>
                 {photos.slice(0, 2).map((ptp, i) => {
                   const ratio =
                     ptp.photo.aspectRatio ||
@@ -638,7 +638,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
       {/* ─────────────────────────────────────────────────────────────
        * Editorial Footer: ONE Clear & Concise CTA
        * ───────────────────────────────────────────────────────────── */}
-      <footer className='mt-6 pt-4 flex items-center justify-between border-t border-border/30'>
+      <footer className='mt-6 sm:mt-8 pt-4 sm:pt-5 flex items-center justify-between border-t border-border/30'>
         <div className='flex items-center gap-4'>
           <SocialInteractions
             postId={post.id}

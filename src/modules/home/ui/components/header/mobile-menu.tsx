@@ -76,7 +76,7 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
             <div className='relative p-6 pr-28'>
               <div className='flex gap-4 items-center'>
                 {/* AVATAR  */}
-                <Avatar className='size-15'>
+                <Avatar className='size-14 shrink-0'>
                   <AvatarImage src={siteConfig.avatar} alt='Avatar' />
                   <AvatarFallback>{siteConfig.initials}</AvatarFallback>
                 </Avatar>

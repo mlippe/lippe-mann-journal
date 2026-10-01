@@ -26,7 +26,7 @@ export const TimelineDivider = ({
     <div
       className={cn(
         'col-span-full bg-background select-none transition-colors',
-        'py-7 px-4 sm:px-0 sm:py-9 md:py-10',
+        'py-8 px-4 sm:px-0 sm:py-10 md:py-12',
         className,
       )}
     >

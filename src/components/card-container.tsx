@@ -5,7 +5,7 @@
  * @returns {JSX.Element} - The CardContainer component.
  */
 const CardContainer = ({ children }: { children: React.ReactNode }) => {
-  return <div className="bg-muted rounded-xl">{children}</div>;
+  return <div className="bg-muted rounded-2xl w-full border border-border/40 overflow-hidden">{children}</div>;
 };
 
 export default CardContainer;

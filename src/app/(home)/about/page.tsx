@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 
 const AboutPage = () => {
   return (
-    <div className='mt-16 flex flex-col items-center gap-20'>
-      <div className='flex flex-col gap-6 items-center max-w-3xl'>
+    <div className='mt-12 sm:mt-16 md:mt-20 flex flex-col items-center gap-16 sm:gap-20 w-full'>
+      <div className='flex flex-col gap-6 sm:gap-8 items-center max-w-3xl w-full'>
         <CardContainer>
-          <div className='flex flex-col p-6 sm:p-8 lg:p-12 gap-6 sm:gap-8'>
+          <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
             <h1 className='text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-[1.12]'>
               Hallo! Moin! Servus! Grüzi!
             </h1>
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-4 sm:gap-5'>
               <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Das hier ist mein Journal:{' '}
                 <strong className='font-medium text-foreground'>
@@ -34,11 +34,11 @@ const AboutPage = () => {
         </CardContainer>
 
         <CardContainer>
-          <div className='flex flex-col p-6 sm:p-8 lg:p-12 gap-5'>
+          <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
             <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Wer bin ich?
             </h2>
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-4 sm:gap-5'>
               <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Ich heiße Manuel Lippmann und bin Vieles: digitaler
                 Produktdesigner, Frontend Entwickler, FPV Drohnenpilot, Fotograf
@@ -57,11 +57,11 @@ const AboutPage = () => {
         </CardContainer>
 
         <CardContainer>
-          <div className='flex flex-col p-6 sm:p-8 lg:p-12 gap-5'>
+          <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
             <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Warum dieses Journal?
             </h2>
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-4 sm:gap-5'>
               <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Vor Kurzem (Jan &apos;26) stieß ich auf das wunderbare Buch{' '}
                 <Link
@@ -92,11 +92,11 @@ const AboutPage = () => {
         </CardContainer>
 
         <CardContainer>
-          <div className='flex flex-col p-6 sm:p-8 lg:p-12 gap-5'>
+          <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
             <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Und das Ganze in konkret?
             </h2>
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-4 sm:gap-5'>
               <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Folgende Themen sind in diesem Journal zu finden:
               </p>
