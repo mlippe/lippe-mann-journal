@@ -13,8 +13,6 @@ interface BlurImageProps extends Omit<
   aspectRatio?: number;
 }
 
-const loadedImageUrls = new Set<string>();
-
 function getSrcString(src: ImageProps['src']): string {
   if (typeof src === 'string') return src;
   if (src && typeof src === 'object') {
@@ -60,29 +58,27 @@ const BlurImage = memo(function BlurImage({
   ...props
 }: BlurImageProps) {
   const srcString = getSrcString(src);
-  const isCached = Boolean(srcString ? loadedImageUrls.has(srcString) : false);
 
-  const [imageLoaded, setImageLoaded] = useState(isCached);
-  const [showPlaceholder, setShowPlaceholder] = useState(!isCached);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [prevSrc, setPrevSrc] = useState(srcString);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // Sync state if src changes on the same component instance
   if (prevSrc !== srcString) {
     setPrevSrc(srcString);
-    const alreadyLoaded = Boolean(
-      srcString ? loadedImageUrls.has(srcString) : false,
-    );
-    setImageLoaded(alreadyLoaded);
-    setShowPlaceholder(!alreadyLoaded);
+    setImageLoaded(false);
+    setShowPlaceholder(true);
   }
 
   // Check if image is already completed in browser cache on mount
   useEffect(() => {
     if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-      if (srcString) loadedImageUrls.add(srcString);
-      setImageLoaded(true);
-      setShowPlaceholder(false);
+      const timer = setTimeout(() => {
+        setImageLoaded(true);
+        setShowPlaceholder(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [srcString]);
 
@@ -90,14 +86,12 @@ const BlurImage = memo(function BlurImage({
   useEffect(() => {
     if (!imageLoaded) return;
 
-    if (priority) {
-      setShowPlaceholder(false);
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setShowPlaceholder(false);
-    }, 350);
+    const timeout = window.setTimeout(
+      () => {
+        setShowPlaceholder(false);
+      },
+      priority ? 0 : 350,
+    );
 
     return () => window.clearTimeout(timeout);
   }, [imageLoaded, priority]);
@@ -169,7 +163,7 @@ const BlurImage = memo(function BlurImage({
           baseClassName,
           fill ? 'z-10' : 'relative z-10',
           hasBackground && imageLoaded && 'bg-background',
-          priority || isCached
+          priority
             ? 'opacity-100'
             : cn(
                 'transition-opacity duration-300 ease-in-out',
@@ -177,7 +171,6 @@ const BlurImage = memo(function BlurImage({
               ),
         )}
         onLoad={() => {
-          if (srcString) loadedImageUrls.add(srcString);
           setImageLoaded(true);
         }}
         onError={() => {
