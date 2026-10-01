@@ -432,38 +432,148 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
 
     // Dynamic Text Weaving: Distribute paragraphs across story units!
-    if (paragraphs.length === 1) {
-      if (rawUnits.length > 0) {
-        rawUnits[0].fieldNote = paragraphs[0];
+    // The last snippet MUST NEVER be displayed under the last image,
+    // but ALWAYS above the last image or penultimate image depending on rhythm.
+    const numUnits = rawUnits.length;
+
+    const getLastSnippetTargetUnitIdx = (): number => {
+      if (numUnits <= 1) return 0;
+
+      const lastUnit = rawUnits[numUnits - 1];
+      const isLastUnitPinned = lastUnit?.type === 'pinned-unit';
+
+      if (numUnits === 2 && !isLastUnitPinned) return 0;
+
+      // Slot index:
+      // A fieldNote on rawUnits[u] appears:
+      // - In pinned-unit: inside the overlay (between its pinned photo and overlay photo = above last photo)
+      // - In standard-unit: after rawUnits[u]'s photo (before rawUnits[u+1]'s photo)
+      // Therefore:
+      // - "above-last" (über dem letzten Bild):
+      //   If last unit is pinned-unit, the note is inside it (numUnits - 1).
+      //   If last unit is standard-unit, the note is after numUnits - 2 (numUnits - 2).
+      const slotAboveLast = isLastUnitPinned ? numUnits - 1 : numUnits - 2;
+
+      // - "above-penultimate" (über dem vorletzten Bild):
+      //   If last unit is pinned-unit, penultimate photo is its pinned photo, so note before it is numUnits - 2.
+      //   If last unit is standard-unit, penultimate photo is on numUnits - 2, so note before it is numUnits - 3.
+      const slotAbovePenultimate = isLastUnitPinned
+        ? Math.max(0, numUnits - 2)
+        : Math.max(0, numUnits - 3);
+
+      // If there are multiple paragraphs and slotAbovePenultimate would collide with unit 0 (intro note)
+      if (paragraphs.length >= 2 && slotAbovePenultimate === 0) {
+        return slotAboveLast;
       }
-    } else if (paragraphs.length > 1 && rawUnits.length > 0) {
+
+      const lastBlock = blocks[blocks.length - 1];
+      const penultBlock = blocks.length >= 2 ? blocks[blocks.length - 2] : null;
+
+      // Rhythm Rule 1: Last block is a Diptych
+      // A diptych contains both the penultimate and last photo.
+      // Placing the note on slotAboveLast (rawUnits[numUnits - 2]) puts it directly above the diptych spread.
+      if (lastBlock?.type === 'diptych') {
+        return slotAboveLast;
+      }
+
+      // Rhythm Rule 2: Penultimate block is a Diptych
+      // [Diptych spread] -> [Closing text note] -> [Final single coda frame]
+      if (penultBlock?.type === 'diptych') {
+        return slotAboveLast;
+      }
+
+      // Rhythm Rule 3: Last block is a Highlight or wide Landscape
+      // The story concludes with a grand visual coda frame.
+      // [Preceding Frame] -> [Closing Reflection] -> [Grand Coda Frame].
+      if (lastBlock?.type === 'highlight' || lastBlock?.type === 'landscape') {
+        return slotAboveLast;
+      }
+
+      // Rhythm Rule 4: Penultimate block is a Highlight
+      // The penultimate frame is the feature highlight.
+      // Text leads into the highlight, followed by a quiet coda frame.
+      if (penultBlock?.type === 'highlight') {
+        return slotAbovePenultimate;
+      }
+
+      // Rhythm Rule 5: Organic Variety based on deterministic post seed
+      const preferPenultimate = (postSeed + blocks.length) % 2 === 1;
+      return preferPenultimate ? slotAbovePenultimate : slotAboveLast;
+    };
+
+    if (paragraphs.length === 1) {
+      if (numUnits === 1) {
+        rawUnits[0].fieldNote = paragraphs[0];
+      } else {
+        const targetIdx = getLastSnippetTargetUnitIdx();
+        rawUnits[targetIdx].fieldNote = paragraphs[0];
+      }
+    } else if (paragraphs.length > 1 && numUnits > 0) {
       // Paragraph 0: Intro / Lead note after Hero
       rawUnits[0].fieldNote = paragraphs[0];
 
-      const remainingPars = paragraphs.slice(1);
-      const remainingUnitsCount = rawUnits.length - 1;
+      // Last Paragraph: Placed at the rhythmically optimal final slot
+      const finalTargetIdx = getLastSnippetTargetUnitIdx();
+      const lastParagraph = paragraphs[paragraphs.length - 1];
 
-      if (remainingUnitsCount <= 0) {
-        rawUnits[0].fieldNote = paragraphs.join('\n\n');
+      // Intermediate paragraphs (if any exist between paragraph 0 and last paragraph)
+      const intermediateParagraphs = paragraphs.slice(1, -1);
+
+      if (intermediateParagraphs.length === 0) {
+        // Exactly 2 paragraphs:
+        if (finalTargetIdx === 0) {
+          rawUnits[0].fieldNote += `\n\n${lastParagraph}`;
+        } else {
+          rawUnits[finalTargetIdx].fieldNote = lastParagraph;
+        }
       } else {
-        remainingPars.forEach((para, pIdx) => {
-          const targetUnitIdx =
-            1 +
-            Math.min(
-              remainingUnitsCount - 1,
-              Math.floor((pIdx + 0.5) * (remainingUnitsCount / remainingPars.length)),
-            );
-          if (rawUnits[targetUnitIdx].fieldNote) {
-            rawUnits[targetUnitIdx].fieldNote += `\n\n${para}`;
+        // 3 or more paragraphs:
+        const availableIntermediateSlots = finalTargetIdx - 1;
+
+        if (availableIntermediateSlots <= 0) {
+          intermediateParagraphs.forEach((para, idx) => {
+            if (idx % 2 === 0) {
+              rawUnits[0].fieldNote += `\n\n${para}`;
+            } else if (rawUnits[finalTargetIdx].fieldNote) {
+              rawUnits[finalTargetIdx].fieldNote += `\n\n${para}`;
+            } else {
+              rawUnits[finalTargetIdx].fieldNote = para;
+            }
+          });
+          if (rawUnits[finalTargetIdx].fieldNote) {
+            rawUnits[finalTargetIdx].fieldNote += `\n\n${lastParagraph}`;
           } else {
-            rawUnits[targetUnitIdx].fieldNote = para;
+            rawUnits[finalTargetIdx].fieldNote = lastParagraph;
           }
-        });
+        } else {
+          intermediateParagraphs.forEach((para, pIdx) => {
+            const intermediateUnitIdx =
+              1 +
+              Math.min(
+                availableIntermediateSlots - 1,
+                Math.floor(
+                  (pIdx / intermediateParagraphs.length) *
+                    availableIntermediateSlots,
+                ),
+              );
+            if (rawUnits[intermediateUnitIdx].fieldNote) {
+              rawUnits[intermediateUnitIdx].fieldNote += `\n\n${para}`;
+            } else {
+              rawUnits[intermediateUnitIdx].fieldNote = para;
+            }
+          });
+
+          if (rawUnits[finalTargetIdx].fieldNote) {
+            rawUnits[finalTargetIdx].fieldNote += `\n\n${lastParagraph}`;
+          } else {
+            rawUnits[finalTargetIdx].fieldNote = lastParagraph;
+          }
+        }
       }
     }
 
     return rawUnits as StoryUnit[];
-  }, [blocks, stickyPinIndices, paragraphs]);
+  }, [blocks, stickyPinIndices, paragraphs, postSeed]);
 
   const renderHeroContent = (block: EditorialBlock & { type: 'hero' }) => {
     const photo = block.photo;
@@ -911,7 +1021,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   useEffect(() => {
     if (lightboxIndex === null) {
       areControlsVisibleRef.current = true;
-      setAreControlsVisible(true);
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
         controlsTimeoutRef.current = null;
@@ -920,7 +1029,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
 
     // Immediately show controls when lightbox opens or photo changes, and start 2s timer
-    showControls();
+    const timer = setTimeout(() => {
+      showControls();
+    }, 0);
 
     const handleUserActivity = () => {
       showControls();
@@ -932,6 +1043,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     window.addEventListener('keydown', handleUserActivity, { passive: true });
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('mousemove', handleUserActivity);
       window.removeEventListener('pointermove', handleUserActivity);
       window.removeEventListener('wheel', handleUserActivity);
@@ -1260,14 +1372,30 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           if (unit.type === 'standard-unit') {
             const block = unit.block;
             if (block.type === 'hero') {
+              const isOnlyUnit = storyUnits.length === 1;
+
               return (
                 <section
                   key={`hero-${block.photo.id}`}
                   className='relative w-full'
                 >
+                  {/* Single-photo story: Text snippet sits above the photo (never under the last image) */}
+                  {isOnlyUnit && unit.fieldNote && (
+                    <div className='max-w-2xl mx-auto px-4 pb-8 md:pb-12'>
+                      <ScrollReveal>
+                        <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
+                          <p className='font-serif text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 whitespace-pre-line italic'>
+                            {unit.fieldNote}
+                          </p>
+                        </div>
+                      </ScrollReveal>
+                    </div>
+                  )}
+
                   <ScrollReveal disabled>{renderHeroContent(block)}</ScrollReveal>
 
-                  {unit.fieldNote && (
+                  {/* Multi-photo story: Lead note sits after hero, before subsequent images */}
+                  {!isOnlyUnit && unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 pt-8 md:pt-14'>
                       <ScrollReveal>
                         <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
@@ -1298,7 +1426,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 }
               >
                 <ScrollReveal>{renderBlockContent(block)}</ScrollReveal>
-                {unit.fieldNote && (
+                {/* Never render trailing text under the last image unit */}
+                {unit.fieldNote && unitIdx < storyUnits.length - 1 && (
                   <div className='max-w-2xl mx-auto px-4 pt-10 md:pt-16'>
                     <ScrollReveal>
                       <div className='border-l-2 border-foreground/30 pl-6 py-2 my-2'>
