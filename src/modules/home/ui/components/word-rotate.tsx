@@ -19,22 +19,22 @@ interface Props {
 
 const WordRotate = ({ label, label2, style }: Props) => {
   return (
-    <div
-      className="relative inline-block overflow-hidden"
-      style={{ lineHeight: 0.75 }}
-    >
-      <div
-        className={cn("relative inline-block group text-sm font-light", style)}
-      >
-        {/* Default Text (visible initially, moves down on hover) */}
-        <span className="block transform transition-transform duration-300 ease-in-out group-hover:translate-y-full">
+    <div className="relative inline-block overflow-hidden leading-tight">
+      <div className={cn("relative inline-block group", style)}>
+        {/* Default Text (visible initially, moves down on hover on desktop) */}
+        <span className="block transform transition-transform duration-300 ease-in-out sm:group-hover:translate-y-[120%] select-none">
           {label}
         </span>
 
-        {/* Hover Text (hidden initially, moves up on hover) */}
-        <span className="absolute inset-0 transform -translate-y-full transition-transform duration-300 ease-in-out group-hover:translate-y-0">
-          {label2 || label}
-        </span>
+        {/* Hover Text (only on desktop/sm+, safely translated well outside container) */}
+        {label2 && (
+          <span
+            aria-hidden="true"
+            className="hidden sm:block absolute inset-0 transform -translate-y-[120%] transition-transform duration-300 ease-in-out sm:group-hover:translate-y-0 select-none pointer-events-none whitespace-nowrap"
+          >
+            {label2}
+          </span>
+        )}
       </div>
     </div>
   );

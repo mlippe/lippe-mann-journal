@@ -293,11 +293,15 @@ export const SocialInteractions = ({
         <div className='space-y-4'>
           {interactions?.comments.length === 0 ? (
             <p className='text-xs text-muted-foreground italic py-3'>
-              Noch keine Gedanken hinterlassen. Teile als Erster deine Meinung.
+              Es wurden noch keine Gedanken hinterlassen. Du kannst ja anfangen
+              :)
             </p>
           ) : (
             interactions?.comments.map((comment) => (
-              <div key={comment.id} className='flex flex-col gap-1 border-b border-border/20 pb-3 last:border-none'>
+              <div
+                key={comment.id}
+                className='flex flex-col gap-1 border-b border-border/20 pb-3 last:border-none'
+              >
                 <div className='flex items-center justify-between'>
                   <span className='text-xs font-mono font-medium tracking-tight text-foreground'>
                     {comment.username}
@@ -325,7 +329,11 @@ export const SocialInteractions = ({
             onClick={startEditingUsername}
             className='text-[10px] text-muted-foreground hover:text-foreground transition-colors uppercase font-mono tracking-widest text-left'
           >
-            Kommentieren als <span className='underline decoration-dotted text-foreground'>{username}</span>:
+            Kommentieren als{' '}
+            <span className='underline decoration-dotted text-foreground'>
+              {username}
+            </span>
+            :
           </button>
         </div>
 

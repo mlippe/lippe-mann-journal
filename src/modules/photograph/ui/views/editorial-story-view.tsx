@@ -1378,7 +1378,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
-                        <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                        <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
@@ -1417,7 +1417,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   {unit.fieldNote && (
                     <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
-                        <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                        <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
@@ -1444,7 +1444,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     <div className='max-w-2xl mx-auto px-4 -mt-3 sm:-mt-5 md:-mt-6 mb-8 sm:mb-12 md:mb-14'>
                       <ScrollReveal>
                         <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-1'>
-                          <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                          <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                             {singlePhotoNotes.topNote}
                           </p>
                         </div>
@@ -1461,7 +1461,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <ScrollReveal>
                         <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
-                          <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                          <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                             {singlePhotoNotes.bottomNote}
                           </p>
                         </div>
@@ -1474,7 +1474,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                       <ScrollReveal>
                         <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
-                          <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                          <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                             {unit.fieldNote}
                           </p>
                         </div>
@@ -1506,7 +1506,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   <div className='max-w-2xl mx-auto px-4 py-8 sm:py-12 md:py-16'>
                     <ScrollReveal>
                       <div className='border-l border-foreground/25 pl-4 sm:pl-6 py-1 my-2'>
-                        <p className='text-base sm:text-lg md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
+                        <p className='text-lg sm:text-[19px] md:text-xl lg:text-2xl leading-[1.6] md:leading-[1.65] font-normal text-foreground/85 whitespace-pre-line'>
                           {unit.fieldNote}
                         </p>
                       </div>
