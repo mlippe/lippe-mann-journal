@@ -25,7 +25,7 @@ const IntroCard = () => {
 
             <div className='flex flex-col min-w-0 grow'>
               <div className='flex items-center justify-between gap-1'>
-                <span className='text-base sm:text-lg font-medium tracking-tight text-foreground truncate'>
+                <span className='text-[17px] sm:text-lg font-medium tracking-tight text-foreground truncate'>
                   {siteConfig.name}
                 </span>
                 <ArrowUpRight className='size-4 sm:size-5 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 shrink-0' />
@@ -37,7 +37,7 @@ const IntroCard = () => {
           </div>
 
           {/* Eye-catching Bio */}
-          <p className='text-base sm:text-lg text-foreground/85 leading-snug sm:leading-relaxed font-normal'>
+          <p className='text-[17px] sm:text-lg text-foreground/85 leading-relaxed font-normal'>
             {siteConfig.bio}
           </p>
         </div>

@@ -89,7 +89,7 @@ const ZineCardCollage = ({
           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 380px'
           className='object-cover w-full h-full '
         />
-        <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.16em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
+        <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.14em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
           01 FOTO
         </div>
       </div>
@@ -177,7 +177,7 @@ const ZineCardCollage = ({
           </div>
         )}
 
-        <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.16em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
+        <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.14em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
           {totalCount > 2
             ? `${String(totalCount).padStart(2, '0')} AUFNAHMEN`
             : '02 AUFNAHMEN'}
@@ -320,7 +320,7 @@ const ZineCardCollage = ({
         </div>
       )}
 
-      <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[10px] font-mono tracking-[0.16em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
+      <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.14em] text-muted-foreground group-hover:text-foreground transition-colors z-20 pointer-events-none tabular-nums'>
         {totalCount > 3
           ? `${String(totalCount).padStart(2, '0')} AUFNAHMEN`
           : '03 AUFNAHMEN'}
@@ -413,7 +413,7 @@ export const ZinePreviewCard = ({
         {/* 2. EDITORIAL METADATA & HEADLINE */}
         <div className='pt-4 space-y-1 flex-1'>
           {/* Eyebrow: Date & Primary Tag */}
-          <div className='flex items-center gap-1.5 text-[10px] sm:text-[10.5px] font-mono tracking-[0.18em] uppercase text-muted-foreground/75 font-medium'>
+          <div className='flex items-center gap-1.5 text-[11px] sm:text-xs font-mono tracking-[0.14em] uppercase text-muted-foreground/75 font-medium'>
             <time
               dateTime={
                 post.createdAt
@@ -434,13 +434,13 @@ export const ZinePreviewCard = ({
           </div>
 
           {/* Headline */}
-          <h4 className='text-base sm:text-lg font-medium tracking-tight text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.2]'>
+          <h4 className='text-[17px] sm:text-lg font-medium tracking-tight text-foreground group-hover:text-foreground/85 transition-colors line-clamp-2 leading-[1.2]'>
             {post.title}
           </h4>
 
           {/* Excerpt / Field Note */}
           {cleanContent && (
-            <p className='text-xs sm:text-[13px] font-normal text-muted-foreground line-clamp-2 leading-[1.55] pt-0.5'>
+            <p className='text-[13px] sm:text-sm font-normal text-muted-foreground line-clamp-2 leading-[1.55] pt-0.5'>
               {cleanContent}
             </p>
           )}
@@ -448,7 +448,7 @@ export const ZinePreviewCard = ({
       </div>
 
       {/* 3. DISCOVER CUE */}
-      <div className='pt-2 flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-mono tracking-[0.16em] uppercase text-muted-foreground/70 group-hover:text-foreground transition-colors mt-auto'>
+      <div className='pt-2 flex items-center gap-1.5 text-xs sm:text-[13px] font-mono tracking-[0.12em] uppercase text-muted-foreground/70 group-hover:text-foreground transition-colors mt-auto'>
         <span>{isArticle ? 'Artikel lesen' : 'Geschichte ansehen'}</span>
         <IconArrowUpRight className='size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-muted-foreground/80 group-hover:text-foreground' />
       </div>
@@ -523,14 +523,14 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
       {/* Editorial Section Header */}
       <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12'>
         <div>
-          <h3 className='text-xl sm:text-2xl lg:text-3xl font-medium tracking-tight md:tracking-[-0.025em] leading-[1.15] text-foreground'>
+          <h3 className='text-2xl sm:text-3xl lg:text-[2rem] font-medium tracking-tight md:tracking-[-0.025em] leading-[1.15] text-foreground'>
             Weitere Serien & Geschichten
           </h3>
         </div>
 
         <Link
           href='/'
-          className='inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors group/link w-fit'
+          className='inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-mono uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors group/link w-fit'
         >
           <span>Alle Einträge ansehen</span>
           <IconArrowRight className='size-3.5 transition-transform duration-300 group-hover/link:translate-x-1' />
@@ -546,13 +546,13 @@ export const FeedPreview = ({ excludeSlug, limit = 3 }: FeedPreviewProps) => {
 
       {/* Bottom Editorial Callout */}
       <div className='mt-12 md:mt-16 pt-8 border-t border-border/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left'>
-        <p className='text-xs sm:text-[13px] font-normal text-muted-foreground leading-relaxed'>
+        <p className='text-[13px] sm:text-sm font-normal text-muted-foreground leading-relaxed'>
           Dokumentarische Streifzüge, Notizen und Serien aus dem Alltag.
         </p>
         <Button
           asChild
           variant='outline'
-          className='rounded-full px-6 text-xs font-mono uppercase tracking-[0.16em] border-border/70 hover:bg-muted'
+          className='rounded-full px-6 text-xs sm:text-[13px] font-mono uppercase tracking-[0.14em] border-border/70 hover:bg-muted'
         >
           <Link href='/'>Zurück Zum Feed</Link>
         </Button>

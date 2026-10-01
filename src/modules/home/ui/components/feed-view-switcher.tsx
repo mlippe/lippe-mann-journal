@@ -29,7 +29,7 @@ export const FeedViewSwitcher = ({
         <button
           onClick={() => setView('zine')}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer',
+            'flex items-center gap-1.5 px-3.5 py-1.5 sm:px-3 sm:py-1 rounded-full text-[13px] sm:text-xs font-medium transition-all duration-200 cursor-pointer',
             view === 'zine'
               ? 'bg-background text-foreground shadow-xs'
               : 'text-muted-foreground hover:text-foreground',
@@ -42,7 +42,7 @@ export const FeedViewSwitcher = ({
         <button
           onClick={() => setView('grid')}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer',
+            'flex items-center gap-1.5 px-3.5 py-1.5 sm:px-3 sm:py-1 rounded-full text-[13px] sm:text-xs font-medium transition-all duration-200 cursor-pointer',
             view === 'grid'
               ? 'bg-background text-foreground shadow-xs'
               : 'text-muted-foreground hover:text-foreground',

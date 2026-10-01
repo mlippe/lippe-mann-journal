@@ -83,10 +83,10 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
 
                 {/* NAME  */}
                 <div className='flex flex-col'>
-                  <span className='text-base font-medium tracking-tight text-foreground'>
+                  <span className='text-[17px] font-medium tracking-tight text-foreground'>
                     {siteConfig.name}
                   </span>
-                  <p className='text-xs text-muted-foreground font-normal mt-0.5'>
+                  <p className='text-xs font-mono text-muted-foreground mt-0.5'>
                     {siteConfig.role}
                   </p>
                 </div>
@@ -99,7 +99,7 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
                 <motion.button
                   key={item.label}
                   onClick={() => handleNavigation(item.href)}
-                  className='w-full text-left px-4 py-3.5 rounded-xl mb-2 flex items-center justify-between bg-background/70 hover:bg-background text-foreground text-sm font-medium tracking-[0.01em] border border-border/40 transition-colors cursor-pointer'
+                  className='w-full text-left px-4 py-3.5 rounded-xl mb-2 flex items-center justify-between bg-background/70 hover:bg-background text-foreground text-[15px] sm:text-base font-medium tracking-[0.01em] border border-border/40 transition-colors cursor-pointer'
                   whileTap={{ scale: 0.98 }}
                 >
                   <span>{item.label}</span>

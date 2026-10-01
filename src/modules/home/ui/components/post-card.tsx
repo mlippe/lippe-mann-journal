@@ -85,11 +85,11 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
           <div className='size-9 bg-muted rounded-full flex justify-center items-center'>
             <PostTypeIcon className='size-4.5!' />
           </div>
-          <span className='block text-sm font-medium whitespace-nowrap'>
+          <span className='block text-[15px] font-medium whitespace-nowrap'>
             {postTypeDisplayString}
           </span>
         </div>
-        <p className='text-xs uppercase text-muted-foreground font-mono'>
+        <p className='text-[11px] sm:text-xs uppercase text-muted-foreground font-mono tracking-[0.14em]'>
           {formatRelativeCustom(post.createdAt)}
         </p>
       </a>
@@ -150,7 +150,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       {!isArticle && (
         <div className='p-3 pt-5 pb-6 md:hidden flex gap-2 flex-col w-full'>
           <div className='flex items-center justify-between gap-4'>
-            <p className='text-sm line-clamp-3 block max-w-xl pr-2 flex-1'>
+            <p className='text-[15px] font-medium line-clamp-3 block max-w-xl pr-2 flex-1'>
               {post.title}
             </p>
             <SocialInteractions
@@ -160,7 +160,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
             />
           </div>
           <a
-            className='text-xs underline flex items-center gap-1 text-foreground/70'
+            className='text-xs sm:text-[13px] font-mono uppercase tracking-[0.12em] flex items-center gap-1 text-foreground/80 hover:text-foreground'
             href={href}
           >
             Mehr Details <IconArrowUpRight className='size-3.5' />
@@ -171,14 +171,14 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
       {/* Mobile Footer Article */}
       {isArticle && (
         <div className='p-3 pb-6 md:hidden flex gap-2 flex-col w-full '>
-          <p className='text-lg tracking-tight leading-snug font-medium block max-w-xl'>
+          <p className='text-xl tracking-tight leading-snug font-medium block max-w-xl'>
             {post.title}
           </p>
-          <p className='text-sm line-clamp-4 text-foreground/70 -mt-0.5 max-w-lg'>
+          <p className='text-[15px] line-clamp-4 text-foreground/75 leading-relaxed -mt-0.5 max-w-lg'>
             {createPreview(post.content)}
           </p>
 
-          <Button className='text-xs  gap-1  mt-2' size='lg' asChild>
+          <Button className='text-xs sm:text-[13px] font-mono uppercase tracking-[0.14em] gap-1 mt-2' size='lg' asChild>
             <Link href={href}>
               Weiterlesen
               <IconArrowUpRight className='size-3.5' />

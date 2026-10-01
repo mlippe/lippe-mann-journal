@@ -17,11 +17,11 @@ const AboutPage = () => {
       <div className='flex flex-col gap-6 sm:gap-8 items-center max-w-3xl w-full'>
         <CardContainer>
           <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
-            <h1 className='text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-[1.12]'>
+            <h1 className='text-[1.75rem] sm:text-3xl md:text-4xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-[1.12]'>
               Hallo! Moin! Servus! Grüzi!
             </h1>
             <div className='flex flex-col gap-4 sm:gap-5'>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Das hier ist mein Journal:{' '}
                 <strong className='font-medium text-foreground'>
                   eine visuelle Chronik aus Fragmenten, Begegnungen und Momenten
@@ -35,11 +35,11 @@ const AboutPage = () => {
 
         <CardContainer>
           <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
-            <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
+            <h2 className='text-xl sm:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Wer bin ich?
             </h2>
             <div className='flex flex-col gap-4 sm:gap-5'>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Ich heiße Manuel Lippmann und bin Vieles: digitaler
                 Produktdesigner, Frontend Entwickler, FPV Drohnenpilot, Fotograf
                 und Videograf. Zur Zeit lebe in München.
@@ -48,7 +48,7 @@ const AboutPage = () => {
               <Link
                 href='https://lippe-mann.de/about'
                 target='_blank'
-                className='text-[14px] sm:text-[15px] text-foreground/90 font-medium underline decoration-border hover:decoration-foreground underline-offset-4 transition-colors w-fit'
+                className='text-[15px] sm:text-base text-foreground/90 font-medium underline decoration-border hover:decoration-foreground underline-offset-4 transition-colors w-fit'
               >
                 Mehr & Kontakt
               </Link>
@@ -58,11 +58,11 @@ const AboutPage = () => {
 
         <CardContainer>
           <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
-            <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
+            <h2 className='text-xl sm:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Warum dieses Journal?
             </h2>
             <div className='flex flex-col gap-4 sm:gap-5'>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Vor Kurzem (Jan &apos;26) stieß ich auf das wunderbare Buch{' '}
                 <Link
                   href='https://austinkleon.com/show-your-work/'
@@ -75,11 +75,11 @@ const AboutPage = () => {
                 eigenen Arbeit zeigen sollen. Nicht die fertigen Ergebnisse,
                 sondern den Prozess, Ausschnitte, Gedanken.
               </p>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Genau das tue ich hier, nur dass es bei mir hauptsächlich Bilder
                 geworden sind:
               </p>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Ich fotografiere, was mir im Alltag auffällt: das Licht an einer
                 Hauswand, eine Farbe, die plötzlich zusammenpasst, ein Moment,
                 der ohne Kamera einfach vorbeigegangen wäre. Ich bin dankbar für
@@ -93,19 +93,19 @@ const AboutPage = () => {
 
         <CardContainer>
           <div className='flex flex-col p-6 sm:p-8 md:p-10 lg:p-12 gap-6 sm:gap-8'>
-            <h2 className='text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
+            <h2 className='text-xl sm:text-2xl font-medium tracking-tight text-foreground leading-[1.2]'>
               Und das Ganze in konkret?
             </h2>
             <div className='flex flex-col gap-4 sm:gap-5'>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 Folgende Themen sind in diesem Journal zu finden:
               </p>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 <strong className='font-medium text-foreground'>
                   Fotoserien aus dem Alltag, oft mit ein paar Sätzen dazu
                 </strong>
               </p>
-              <p className='text-[15px] sm:text-base md:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
+              <p className='text-base sm:text-[17px] font-normal text-foreground/85 leading-[1.65] md:leading-[1.7]'>
                 <strong className='font-medium text-foreground'>
                   Gelegentlich Gedanken und Einblicke
                 </strong>{' '}

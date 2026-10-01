@@ -34,11 +34,11 @@ export const TimelineDivider = ({
         {/* Left: Editorial Chapter Title */}
         <div className='space-y-1.5'>
           <div className='flex items-baseline gap-2 sm:gap-3'>
-            <h3 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-none'>
+            <h3 className='text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight md:tracking-[-0.03em] text-foreground leading-none'>
               {formattedMonth}
             </h3>
             {displayYear && (
-              <span className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light tracking-tight text-muted-foreground/70 tabular-nums'>
+              <span className='text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-muted-foreground/70 tabular-nums'>
                 {displayYear}
               </span>
             )}
@@ -47,7 +47,7 @@ export const TimelineDivider = ({
 
         {/* Right: Tactile Editorial Badge */}
         <div className='flex items-center gap-2 self-start sm:self-end'>
-          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border/50 bg-muted/20 text-[10px] sm:text-[11px] font-mono tracking-[0.16em] uppercase text-muted-foreground tabular-nums'>
+          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border/50 bg-muted/20 text-[11px] sm:text-xs font-mono tracking-[0.14em] uppercase text-muted-foreground tabular-nums'>
             <span className='size-1 rounded-full bg-foreground/40' />
             <span>
               {String(count).padStart(2, '0')}{' '}
