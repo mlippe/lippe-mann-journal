@@ -8,6 +8,7 @@ import { desc, count, eq, and } from 'drizzle-orm';
 import {
   collections,
   posts,
+  photos,
   postsWithPhotos,
   postsToCollections,
   PostWithPhotos,
@@ -28,7 +29,7 @@ export const postsInCollectionOutputSchema = z.object({
   totalPages: z.number(),
 });
 
-// Helper to enhance collection data with post count and latest image
+// Helper to enhance collection data with post count, latest image, and aspect ratio
 async function enhanceCollection(ctx: Context, collection: Collection) {
   const [postCountResult] = await ctx.db
     .select({ count: count() })
@@ -64,10 +65,33 @@ async function enhanceCollection(ctx: Context, collection: Collection) {
     },
   });
 
+  let coverPhoto = null;
+  if (collection.coverImageUrl) {
+    coverPhoto = await ctx.db.query.photos.findFirst({
+      where: eq(photos.url, collection.coverImageUrl),
+      columns: {
+        aspectRatio: true,
+        blurData: true,
+      },
+    });
+  }
+
+  if (!coverPhoto && latestPost?.coverImage) {
+    coverPhoto = await ctx.db.query.photos.findFirst({
+      where: eq(photos.url, latestPost.coverImage),
+      columns: {
+        aspectRatio: true,
+        blurData: true,
+      },
+    });
+  }
+
   return {
     ...collection,
     postCount: (postCountResult?.count as number) ?? 0,
     latestPostImage: (latestPost?.coverImage as string) ?? null,
+    aspectRatio: (coverPhoto?.aspectRatio as number) ?? null,
+    blurData: (coverPhoto?.blurData as string) ?? null,
   };
 }
 

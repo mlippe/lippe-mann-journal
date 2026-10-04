@@ -29,20 +29,27 @@ export const CollectionCard = ({
     ? format(new Date(collection.updatedAt), 'MMM yyyy', { locale: de })
     : null;
 
+  const photoRatio = collection.aspectRatio || 2 / 3;
+
   return (
     <Link
       href={`/collections/${collection.slug}`}
       className='group block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground rounded-xl transition-all'
     >
       <article className='flex flex-col'>
-        {/* Frame / Photograph Container (Classic 3:2 Photography Ratio) */}
-        <div className='relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-muted/25 border border-border/40 shadow-2xs'>
+        {/* Frame / Photograph Container matching exact photo aspect ratio without cropping */}
+        <div
+          className='relative w-full overflow-hidden rounded-xl bg-muted/20 border border-border/40 shadow-2xs'
+          style={{ aspectRatio: `${photoRatio}` }}
+        >
           {imageUrl ? (
             <BlurImage
               src={imageUrl}
               alt={collection.name}
               fill
               priority={priority}
+              blurhash={collection.blurData || undefined}
+              aspectRatio={photoRatio}
               sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
               className='object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025]'
             />
