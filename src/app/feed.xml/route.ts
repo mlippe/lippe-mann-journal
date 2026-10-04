@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { siteConfig } from '@/site.config';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { createPreview } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Cache for 1 hour
@@ -26,12 +27,22 @@ function getBaseUrl(): string {
   return 'https://journal.lippe-mann.de';
 }
 
+function getPostHref(post: { type: string; slug?: string | null; id: string }): string {
+  if (post.slug) {
+    if (post.type === 'ARTICLE') return `/article/${post.slug}`;
+    if (post.type === 'PHOTO') return `/photo/${post.slug}`;
+    if (post.type === 'ALBUM') return `/album/${post.slug}`;
+  }
+  return `/post/${post.slug || post.id}`;
+}
+
 type FeedPost = {
   id: string;
   title: string;
-  slug: string;
+  slug: string | null;
   visibility: string;
   type: string;
+  coverImage?: string | null;
   content: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -53,10 +64,11 @@ type FeedPost = {
 export async function GET() {
   const baseUrl = getBaseUrl();
 
+  // Limit to max 15 posts for lightning-fast loading and lean payload
   const rawPosts = await db.query.posts.findMany({
     where: (posts, { eq }) => eq(posts.visibility, 'public'),
     orderBy: (posts, { desc }) => [desc(posts.createdAt), desc(posts.id)],
-    limit: 50,
+    limit: 15,
     with: {
       postsToPhotos: {
         with: {
@@ -80,7 +92,7 @@ export async function GET() {
 
   const itemsXml = publicPosts
     .map((post) => {
-      const postUrl = `${baseUrl}/post/${post.slug || post.id}`;
+      const postUrl = `${baseUrl}${getPostHref(post)}`;
       const pubDate = new Date(post.createdAt).toUTCString();
       const photos = (post.postsToPhotos || [])
         .slice()
@@ -88,31 +100,43 @@ export async function GET() {
         .map((p2p) => p2p.photo)
         .filter((photo): photo is NonNullable<typeof photo> => Boolean(photo));
       const heroPhoto = photos[0];
-      const heroUrl = heroPhoto ? keyToUrl(heroPhoto.url) : null;
+      const heroUrl = heroPhoto
+        ? keyToUrl(heroPhoto.url)
+        : post.coverImage
+          ? keyToUrl(post.coverImage)
+          : null;
 
-      // Build rich HTML content for modern feed readers (NetNewsWire, Readwise Reader, etc.)
+      // Clean, concise excerpt: strip inline data-URIs / figures and truncate cleanly
+      let excerpt = '';
+      if (post.content) {
+        const stripped = post.content
+          .replace(/data:image\/[^;]+;base64,[^"'\s>]+/gi, '')
+          .replace(/<figcaption[^>]*>.*?<\/figcaption>/gi, ' ');
+        excerpt = createPreview(stripped, 260);
+      }
+
+      if (!excerpt) {
+        excerpt =
+          photos.length > 0
+            ? `${photos.length} Aufnahme${photos.length > 1 ? 'n' : ''} in dieser Serie.`
+            : post.title;
+      }
+
+      // Build concise HTML content for feed readers (lightweight, no bloated base64 or long dumps)
       const contentParts: string[] = [];
 
       if (heroUrl) {
         contentParts.push(
           `<p><img src="${escapeXml(heroUrl)}" alt="${escapeXml(
-            heroPhoto.title || post.title,
+            heroPhoto?.title || post.title,
           )}" style="max-width: 100%; height: auto; border-radius: 4px;" /></p>`,
         );
       }
 
-      if (post.content) {
-        const paragraphs = post.content
-          .split(/\n\s*\n/)
-          .map((p) => p.trim())
-          .filter((p) => p.length > 0);
-
-        for (const paragraph of paragraphs) {
-          contentParts.push(`<p>${escapeXml(paragraph).replace(/\n/g, '<br/>')}</p>`);
-        }
+      if (excerpt) {
+        contentParts.push(`<p>${escapeXml(excerpt)}</p>`);
       }
 
-      // If additional photos exist, append them as gallery items
       if (photos.length > 1) {
         contentParts.push(
           `<p><em>+ ${photos.length - 1} weitere Aufnahme${
@@ -126,13 +150,6 @@ export async function GET() {
       );
 
       const encodedContent = `<![CDATA[${contentParts.join('\n')}]]>`;
-
-      // Clean plain-text excerpt for the RSS description
-      const excerpt = post.content
-        ? post.content.slice(0, 280) + (post.content.length > 280 ? '...' : '')
-        : photos.length > 0
-          ? `${photos.length} Aufnahme${photos.length > 1 ? 'n' : ''} in dieser Serie.`
-          : post.title;
 
       const categoriesXml =
         post.postsToCollections
