@@ -668,7 +668,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-3 right-3 flex items-center gap-2 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.index)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -677,7 +677,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.index);
                 }}
-                className='p-2 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-4' />
@@ -733,7 +733,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.index)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -742,7 +742,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.index);
                 }}
-                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-3.5' />
@@ -796,7 +796,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.index)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -805,7 +805,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.index);
                 }}
-                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-3.5' />
@@ -874,7 +874,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.index)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -883,7 +883,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.index);
                 }}
-                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-3.5' />
@@ -971,7 +971,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.startIndex)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -980,7 +980,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.startIndex);
                 }}
-                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-3.5' />
@@ -1039,7 +1039,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className={cn(
                 'absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
                 idlePhotoIndices.has(block.startIndex + 1)
-                  ? 'opacity-100'
+                  ? 'opacity-90'
                   : 'opacity-0 group-hover/photo:opacity-100',
               )}
             >
@@ -1048,7 +1048,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   e.stopPropagation();
                   setLightboxIndex(block.startIndex + 1);
                 }}
-                className='p-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-foreground shadow-sm transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
+                className='p-1.5 rounded-full bg-background/45 backdrop-blur-xl border border-border/60 dark:border-white/15 hover:bg-background/70 text-foreground shadow-xs transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer'
                 aria-label='Foto vergrößern'
               >
                 <IconArrowsMaximize className='size-3.5' />
@@ -1636,7 +1636,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className='inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-border bg-background hover:bg-muted text-xs sm:text-[13px] font-mono uppercase tracking-[0.12em] font-medium transition-colors cursor-pointer'
             >
               <IconMail className='size-3.5 text-muted-foreground' />
-              <span>{photos.length <= 1 ? 'Print anfragen' : 'Print zu dieser Serie anfragen'}</span>
+              <span>
+                {photos.length <= 1
+                  ? 'Print anfragen'
+                  : 'Print zu dieser Serie anfragen'}
+              </span>
             </a>
           </div>
         </div>
