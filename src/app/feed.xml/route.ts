@@ -4,7 +4,8 @@ import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { createPreview } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 function escapeXml(unsafe: string): string {
   return unsafe
@@ -198,7 +199,9 @@ ${itemsXml}
     status: 200,
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   });
 }
