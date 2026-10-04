@@ -32,6 +32,11 @@ export const metadata: Metadata = {
       process.env.BETTER_AUTH_URL ||
       'http://localhost:3000',
   ),
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
 };
 
 export default function RootLayout({

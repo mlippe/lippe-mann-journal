@@ -5,6 +5,8 @@ interface Props {
   links: {
     title: string;
     href: string;
+    target?: string;
+    rel?: string;
   }[];
 }
 
@@ -18,6 +20,8 @@ const FooterNav = ({ title, links }: Props) => {
             <LinkRotate
               link={link.href}
               label={link.title}
+              target={link.target}
+              rel={link.rel}
               className="text-text-default dark:text-text-inverse"
             />
           </li>

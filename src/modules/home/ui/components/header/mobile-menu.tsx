@@ -17,6 +17,7 @@ const menuItems: MenuItem[] = [
   { label: 'Übersicht', href: '/?view=grid' },
   { label: 'Sammlungen', href: '/collections' },
   { label: 'Über dieses Journal', href: '/about' },
+  { label: 'RSS Feed', href: '/feed.xml' },
 ];
 
 interface Props {
@@ -28,6 +29,11 @@ export default function MobileMenu({ isOpen, onClose }: Props) {
   const router = useRouter();
 
   const handleNavigation = (href: string) => {
+    if (href.endsWith('.xml')) {
+      window.open(href, '_blank');
+      onClose();
+      return;
+    }
     router.push(href);
     onClose();
   };

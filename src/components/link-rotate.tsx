@@ -5,6 +5,8 @@ interface Props {
   link: string;
   label: string;
   className?: string;
+  target?: string;
+  rel?: string;
 }
 
 /**
@@ -18,11 +20,13 @@ interface Props {
  * @returns {JSX.Element} JSX Element
  */
 
-const LinkRotate = ({ link, label, className }: Props) => {
+const LinkRotate = ({ link, label, className, target, rel }: Props) => {
   return (
     <div className="relative inline-block overflow-hidden">
       <Link
         href={link}
+        target={target}
+        rel={rel}
         className={cn(
           "relative inline-block group text-black font-light text-sm dark:text-white",
           className,

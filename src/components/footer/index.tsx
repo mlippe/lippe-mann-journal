@@ -25,6 +25,7 @@ const Footer = () => {
             { title: 'Feed', href: '/' },
             { title: 'Sammlungen', href: '/collections' },
             { title: 'Über das Journal', href: '/about' },
+            { title: 'RSS Feed', href: '/feed.xml', target: '_blank', rel: 'alternate type="application/rss+xml"' },
           ]}
         />
       </div>
