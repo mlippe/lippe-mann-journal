@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import WordRotate from '../word-rotate';
@@ -10,17 +11,51 @@ import { AnimatePresence, motion } from 'motion/react';
 
 interface NavbarProps {
   isCollapsed?: boolean;
+  isManuallyRevealed?: boolean;
+  onToggleManualReveal?: () => void;
 }
 
-const Navbar = ({ isCollapsed = false }: NavbarProps) => {
+const Navbar = ({
+  isCollapsed = false,
+  isManuallyRevealed = false,
+  onToggleManualReveal,
+}: NavbarProps) => {
+  const wasCollapsedOnPointerDown = useRef(false);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'touch') {
+      wasCollapsedOnPointerDown.current = isCollapsed;
+    }
+  };
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    // If navbar is collapsed, was collapsed when touch started, or is manually revealed:
+    // toggle the manual reveal state instead of navigating to home
+    if (isCollapsed || wasCollapsedOnPointerDown.current || isManuallyRevealed) {
+      e.preventDefault();
+      e.stopPropagation();
+      wasCollapsedOnPointerDown.current = false;
+      onToggleManualReveal?.();
+    }
+  };
+
+  const ariaLabel = isCollapsed
+    ? 'Navigation einblenden'
+    : isManuallyRevealed
+      ? 'Navigation ausblenden'
+      : 'Startseite';
+
   return (
     <nav className='pb-3 px-3.5 sm:px-4'>
       <div className='flex items-center h-6 relative'>
         {/* Permanent Anchor: The Lip Icon with fixed row height so it never shifts vertically */}
         <Link
           href='/'
+          onClick={handleLogoClick}
+          onPointerDown={handlePointerDown}
           className='flex items-center justify-center shrink-0 group size-6'
-          aria-label='Startseite'
+          aria-label={ariaLabel}
+          title={ariaLabel}
         >
           <Image
             src='/lm_logo.svg'
