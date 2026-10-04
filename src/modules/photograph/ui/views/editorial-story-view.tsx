@@ -38,6 +38,7 @@ import {
   type ReactZoomPanPinchRef,
 } from 'react-zoom-pan-pinch';
 import { ScrollReveal } from '@/components/scroll-reveal';
+import { useMobilePhotoIdleIndicator } from '../hooks/use-mobile-photo-idle-indicator';
 
 interface EditorialStoryViewProps {
   post: PostGetOne;
@@ -199,6 +200,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }
     return [];
   }, [post]);
+
+  const articleRef = useRef<HTMLElement>(null);
+  const idlePhotoIndices = useMobilePhotoIdleIndicator({
+    containerRef: articleRef,
+    deps: [photos.length],
+  });
 
   // Split single post content into paragraphs for dynamic story weaving
   const paragraphs: string[] = useMemo(() => {
@@ -637,6 +644,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }}
         >
           <div
+            data-story-photo-index={block.index}
             onClick={() => setLightboxIndex(block.index)}
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -656,7 +664,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             />
 
             {/* Actions overlay (Top Right) */}
-            <div className='absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-3 right-3 flex items-center gap-2 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.index)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -697,6 +712,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }}
         >
           <div
+            data-story-photo-index={block.index}
             onClick={() => setLightboxIndex(block.index)}
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -713,7 +729,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className='object-contain w-full h-full'
               sizes='(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1200px'
             />
-            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.index)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -752,6 +775,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }}
         >
           <div
+            data-story-photo-index={block.index}
             onClick={() => setLightboxIndex(block.index)}
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -768,7 +792,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className='object-contain w-full h-full'
               sizes='(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1100px'
             />
-            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.index)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -822,6 +853,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }}
         >
           <div
+            data-story-photo-index={block.index}
             onClick={() => setLightboxIndex(block.index)}
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -838,7 +870,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               className='object-contain w-full h-full'
               sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px'
             />
-            <div className='absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-3 right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.index)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -905,6 +944,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }
         >
           <div
+            data-story-photo-index={block.startIndex}
             onClick={() => setLightboxIndex(block.startIndex)}
             className='w-full relative group/photo overflow-hidden bg-muted/10 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -927,7 +967,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   : '(max-width: 768px) 100vw, 550px'
               }
             />
-            <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.startIndex)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -965,6 +1012,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           }
         >
           <div
+            data-story-photo-index={block.startIndex + 1}
             onClick={() => setLightboxIndex(block.startIndex + 1)}
             className='w-full relative group/photo overflow-hidden bg-muted/10 select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
@@ -987,7 +1035,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   : '(max-width: 768px) 100vw, 550px'
               }
             />
-            <div className='absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 opacity-0 group-hover/photo:opacity-100 transition-opacity z-20'>
+            <div
+              className={cn(
+                'absolute top-2.5 right-2.5 sm:top-3 sm:right-3 flex items-center gap-1.5 transition-opacity duration-300 z-20',
+                idlePhotoIndices.has(block.startIndex + 1)
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover/photo:opacity-100',
+              )}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1327,7 +1382,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   );
 
   return (
-    <article className='w-full max-w-6xl mx-auto py-6 sm:py-8 md:py-12'>
+    <article
+      ref={articleRef}
+      className='w-full max-w-6xl mx-auto py-6 sm:py-8 md:py-12'
+    >
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
       <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
         {/* Editorial Story Title */}
