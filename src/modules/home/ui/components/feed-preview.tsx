@@ -360,22 +360,9 @@ export const ZinePreviewCard = ({
       return [];
     }
 
-    if (allPhotos.length <= 2) {
-      return allPhotos;
-    }
-
-    // If 3 or more photos, prioritize cover index if specified
-    const coverIdx =
-      typeof post.coverIndex === 'number' &&
-      post.coverIndex >= 0 &&
-      post.coverIndex < allPhotos.length
-        ? post.coverIndex
-        : 0;
-
-    const hero = allPhotos[coverIdx];
-    const others = allPhotos.filter((_, idx) => idx !== coverIdx);
-    return [hero, others[0], others[1]];
-  }, [allPhotos, post.coverIndex, post.coverImage, post.title]);
+    // When previewing photos, follow post image ordering
+    return allPhotos.slice(0, 3);
+  }, [allPhotos, post.coverImage, post.title]);
 
   const formattedDate = post.createdAt
     ? format(new Date(post.createdAt), 'dd. MMMM yyyy', { locale: de })

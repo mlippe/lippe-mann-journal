@@ -110,13 +110,20 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
   const coverPhoto = highlightEntry?.photo || photos[coverIndex]?.photo || photos[0]?.photo;
   const hasMultiplePhotos = photos.length > 1;
 
-  const heroPhoto = coverPhoto || photos[0]?.photo;
-  const heroRatio =
-    heroPhoto?.aspectRatio ||
-    (heroPhoto?.width && heroPhoto?.height
-      ? heroPhoto.width / heroPhoto.height
+  const firstPhoto = photos[0]?.photo;
+  const firstPhotoRatio =
+    firstPhoto?.aspectRatio ||
+    (firstPhoto?.width && firstPhoto?.height
+      ? firstPhoto.width / firstPhoto.height
       : 1.5);
-  const isLandscapeHero = heroRatio >= 1.15;
+  const isLandscapeFirstPhoto = firstPhotoRatio >= 1.15;
+
+  const coverRatio =
+    coverPhoto?.aspectRatio ||
+    (coverPhoto?.width && coverPhoto?.height
+      ? coverPhoto.width / coverPhoto.height
+      : 1.5);
+  const isLandscapeCover = coverRatio >= 1.15;
 
   const formattedDate = post.createdAt
     ? format(new Date(post.createdAt), 'dd. MMMM yyyy', { locale: de })
@@ -364,19 +371,19 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     href={href}
                     className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
                     style={{
-                      aspectRatio: `${heroRatio}`,
-                      width: isLandscapeHero
+                      aspectRatio: `${firstPhotoRatio}`,
+                      width: isLandscapeFirstPhoto
                         ? '100%'
-                        : `min(100%, calc(85vh * ${heroRatio}))`,
+                        : `min(100%, calc(85vh * ${firstPhotoRatio}))`,
                     }}
                   >
                     <BlurImage
-                      src={keyToUrl(heroPhoto?.url)}
-                      alt={heroPhoto?.title ?? post.title}
+                      src={keyToUrl(firstPhoto?.url)}
+                      alt={firstPhoto?.title ?? post.title}
                       fill
                       priority={priority}
-                      blurhash={heroPhoto?.blurData}
-                      aspectRatio={heroRatio}
+                      blurhash={firstPhoto?.blurData}
+                      aspectRatio={firstPhotoRatio}
                       sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                       className='object-contain'
                     />
@@ -424,19 +431,19 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     href={href}
                     className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
                     style={{
-                      aspectRatio: `${heroRatio}`,
-                      width: isLandscapeHero
+                      aspectRatio: `${firstPhotoRatio}`,
+                      width: isLandscapeFirstPhoto
                         ? '100%'
-                        : `min(100%, calc(85vh * ${heroRatio}))`,
+                        : `min(100%, calc(85vh * ${firstPhotoRatio}))`,
                     }}
                   >
                     <BlurImage
-                      src={keyToUrl(heroPhoto?.url)}
-                      alt={heroPhoto?.title ?? post.title}
+                      src={keyToUrl(firstPhoto?.url)}
+                      alt={firstPhoto?.title ?? post.title}
                       fill
                       priority={priority}
-                      blurhash={heroPhoto?.blurData}
-                      aspectRatio={heroRatio}
+                      blurhash={firstPhoto?.blurData}
+                      aspectRatio={firstPhotoRatio}
                       sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                       className='object-contain'
                     />
@@ -486,10 +493,10 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   href={href}
                   className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
                   style={{
-                    aspectRatio: `${heroRatio}`,
+                    aspectRatio: `${coverRatio}`,
                     width:
-                      !isArticle && !isLandscapeHero
-                        ? `min(100%, calc(85vh * ${heroRatio}))`
+                      !isArticle && !isLandscapeCover
+                        ? `min(100%, calc(85vh * ${coverRatio}))`
                         : '100%',
                   }}
                 >
@@ -499,7 +506,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     fill
                     priority={priority}
                     blurhash={coverPhoto?.blurData}
-                    aspectRatio={heroRatio}
+                    aspectRatio={coverRatio}
                     sizes='(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px'
                     className={isArticle ? 'object-cover' : 'object-contain'}
                   />

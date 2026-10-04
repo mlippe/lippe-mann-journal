@@ -259,15 +259,25 @@ export const collectionsRouter = createTRPCRouter({
 
       const totalPages = Math.ceil(total.count / limit);
 
-      const items = (data as PostWithPhotos[]).map((post) => ({
-        ...post,
-        coverIndex:
+      const timeSeed = new Date().getUTCMinutes() + new Date().getUTCDate();
+
+      const items = (data as PostWithPhotos[]).map((post) => {
+        let coverIndex = 0;
+        if (
           post.type === 'ALBUM' &&
           post.postsToPhotos &&
           post.postsToPhotos.length > 0
-            ? Math.floor(Math.random() * post.postsToPhotos.length)
-            : 0,
-      }));
+        ) {
+          const postSeed = post.id
+            .split('')
+            .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          coverIndex = (timeSeed + postSeed) % post.postsToPhotos.length;
+        }
+        return {
+          ...post,
+          coverIndex,
+        };
+      });
 
       return {
         items,
