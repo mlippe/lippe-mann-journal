@@ -65,7 +65,7 @@ export const generateMetadata = async ({
 
 const CollectionHeaderSkeleton = () => {
   return (
-    <div className='max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 mb-8 sm:mb-12 pt-2 sm:pt-4 animate-pulse'>
+    <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-8 sm:mb-12 pt-2 sm:pt-4 animate-pulse'>
       <div className='flex items-center justify-between pb-3 border-b border-border/30'>
         <Skeleton className='h-3 w-36 rounded' />
         <Skeleton className='h-3 w-20 rounded' />
@@ -136,7 +136,7 @@ async function CollectionHeaderSuspense({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <header className='max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 mb-8 sm:mb-12 pt-2 sm:pt-4'>
+      <header className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-8 sm:mb-12 pt-2 sm:pt-4'>
         {/* Top Eyebrow / Breadcrumbs */}
         <div className='flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground/70 pb-3 border-b border-border/30'>
           <div className='flex items-center gap-2'>
@@ -147,8 +147,6 @@ async function CollectionHeaderSuspense({
               <ArrowLeft className='size-3 text-muted-foreground/60 group-hover:text-foreground group-hover:-translate-x-0.5 transition-all' />
               <span>Sammlungen</span>
             </Link>
-            <span className='opacity-40'>/</span>
-            <span className='text-foreground/80'>{collection.slug}</span>
           </div>
 
           <div className='flex items-center gap-3'>
