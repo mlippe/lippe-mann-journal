@@ -185,7 +185,7 @@ export const collectionsRouter = createTRPCRouter({
         });
       }
 
-      return collection;
+      return await enhanceCollection(ctx, collection);
     }),
 
   getFeaturedCollections: baseProcedure
