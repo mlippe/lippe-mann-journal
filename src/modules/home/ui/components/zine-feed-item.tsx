@@ -369,12 +369,12 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 <div className='sticky top-20 z-0 w-full flex justify-center'>
                   <Link
                     href={href}
-                    className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
+                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
                     style={{
                       aspectRatio: `${firstPhotoRatio}`,
                       width: isLandscapeFirstPhoto
                         ? '100%'
-                        : `min(100%, calc(85vh * ${firstPhotoRatio}))`,
+                        : `min(100%, calc(94vh * ${firstPhotoRatio}))`,
                     }}
                   >
                     <BlurImage
@@ -429,12 +429,12 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 <div className='w-full flex justify-center'>
                   <Link
                     href={href}
-                    className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
+                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
                     style={{
                       aspectRatio: `${firstPhotoRatio}`,
                       width: isLandscapeFirstPhoto
                         ? '100%'
-                        : `min(100%, calc(85vh * ${firstPhotoRatio}))`,
+                        : `min(100%, calc(94vh * ${firstPhotoRatio}))`,
                     }}
                   >
                     <BlurImage
@@ -491,12 +491,12 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <div className='w-full flex justify-center'>
                 <Link
                   href={href}
-                  className='block relative group overflow-hidden max-h-[85vh] rounded-xs cursor-ansehen mx-auto'
+                  className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
                   style={{
                     aspectRatio: `${coverRatio}`,
                     width:
                       !isArticle && !isLandscapeCover
-                        ? `min(100%, calc(85vh * ${coverRatio}))`
+                        ? `min(100%, calc(94vh * ${coverRatio}))`
                         : '100%',
                   }}
                 >

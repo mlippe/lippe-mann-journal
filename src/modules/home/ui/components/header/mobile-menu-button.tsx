@@ -5,16 +5,43 @@ import Graphic from '../../../../../components/graphic';
 import MobileMenu from './mobile-menu';
 import { AnimatePresence, motion } from 'motion/react';
 
-const MobileMenuButton = () => {
+interface MobileMenuButtonProps {
+  isCollapsed?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
+}
+
+const MobileMenuButton = ({
+  isCollapsed = false,
+  onOpenChange,
+}: MobileMenuButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggle = () => {
+    setIsOpen((prev) => {
+      const next = !prev;
+      onOpenChange?.(next);
+      return next;
+    });
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    onOpenChange?.(false);
+  };
 
   return (
     <>
-      <button
+      <motion.button
         type='button'
         aria-label={isOpen ? 'Menü schließen' : 'Menü öffnen'}
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={handleToggle}
+        animate={
+          isCollapsed && !isOpen
+            ? { x: 60, opacity: 0, pointerEvents: 'none' as const }
+            : { x: 0, opacity: 1, pointerEvents: 'auto' as const }
+        }
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
         className='fixed top-3 right-0 lg:right-3 z-50 bg-background rounded-bl-[18px] lg:hidden cursor-pointer select-none'
       >
         <div className='relative pb-3 px-4'>
@@ -33,12 +60,11 @@ const MobileMenuButton = () => {
           <Graphic className='absolute -bottom-4.5 right-0 rotate-90 size-4.5 pointer-events-none' />
           <Graphic className='absolute -left-4.5 top-0 rotate-90 size-4.5 pointer-events-none' />
         </div>
-      </button>
+      </motion.button>
 
-      <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <MobileMenu isOpen={isOpen} onClose={handleClose} />
     </>
   );
 };
 
 export default MobileMenuButton;
-

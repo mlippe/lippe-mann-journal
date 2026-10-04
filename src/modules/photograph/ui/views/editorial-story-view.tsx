@@ -257,10 +257,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   );
 
   // Intelligent Portrait-First Layout Engine:
-  // - Hero: Opening plate (Photo 0) - Always commanding and solo
-  // - Highlight: User-marked hero feature - Always solo, dominant presence (90vh)
+  // - Hero: Opening plate (Photo 0) - Always commanding and solo (94vh)
+  // - Highlight: User-marked hero feature - Always solo, dominant presence (94vh)
   // - Landscape: Horizontal frames (aspect ratio >= 1.15) as cinematic breathers
-  // - Solo: Standalone vertical plate (88vh) with balanced margins, carrying 70%+ of the essay
+  // - Solo: Standalone vertical plate (94vh) with balanced margins, carrying 70%+ of the essay
   // - Diptych: Rare, intentional pairing of vertical frames - NEVER consecutive, separated by solos
   const blocks: EditorialBlock[] = useMemo(() => {
     if (photos.length === 0) return [];
@@ -632,7 +632,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         <div
           className='group/plate flex flex-col items-end'
           style={{
-            width: `min(100%, calc(min(86vh, calc(100dvh - 5rem)) * ${ratio}))`,
+            width: `min(100%, calc(min(94vh, calc(100dvh - 2rem)) * ${ratio}))`,
             maxWidth: '100%',
           }}
         >
@@ -641,7 +641,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(86vh, calc(100dvh - 5rem))',
+              maxHeight: 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage
@@ -692,7 +692,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         <div
           className='group/plate flex flex-col items-end w-full'
           style={{
-            width: `min(100%, calc(min(90vh, calc(100dvh - 4rem)) * ${ratio}))`,
+            width: `min(100%, calc(min(94vh, calc(100dvh - 2rem)) * ${ratio}))`,
             maxWidth: '100%',
           }}
         >
@@ -701,7 +701,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(90vh, calc(100dvh - 4rem))',
+              maxHeight: 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage
@@ -756,7 +756,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(82vh, calc(100dvh - 5.5rem))',
+              maxHeight: 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage
@@ -817,7 +817,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         <div
           className='group/plate flex flex-col items-end'
           style={{
-            width: `min(100%, calc(min(88vh, calc(100dvh - 4.5rem)) * ${ratio}))`,
+            width: `min(100%, calc(min(94vh, calc(100dvh - 2rem)) * ${ratio}))`,
             maxWidth: '100%',
           }}
         >
@@ -826,7 +826,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             className='w-full relative overflow-hidden bg-muted/10 group/photo select-none cursor-zoom-in transition-transform duration-500 ease-out hover:-translate-y-0.5'
             style={{
               aspectRatio: `${ratio}`,
-              maxHeight: 'min(88vh, calc(100dvh - 4.5rem))',
+              maxHeight: 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage
@@ -900,7 +900,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               '--ratio-a': ratioA,
               maxWidth: isMobileSideBySide
                 ? undefined
-                : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioA}))`,
+                : `min(100%, calc(min(94vh, calc(100dvh - 2rem)) * ${ratioA}))`,
             } as React.CSSProperties
           }
         >
@@ -910,8 +910,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             style={{
               aspectRatio: `${ratioA}`,
               maxHeight: isMobileSideBySide
-                ? '70vh'
-                : 'min(82vh, calc(100dvh - 6rem))',
+                ? '94vh'
+                : 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage
@@ -960,7 +960,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               '--ratio-b': ratioB,
               maxWidth: isMobileSideBySide
                 ? undefined
-                : `min(100%, calc(min(82vh, calc(100dvh - 6rem)) * ${ratioB}))`,
+                : `min(100%, calc(min(94vh, calc(100dvh - 2rem)) * ${ratioB}))`,
             } as React.CSSProperties
           }
         >
@@ -970,8 +970,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             style={{
               aspectRatio: `${ratioB}`,
               maxHeight: isMobileSideBySide
-                ? '70vh'
-                : 'min(82vh, calc(100dvh - 6rem))',
+                ? '94vh'
+                : 'min(94vh, calc(100dvh - 2rem))',
             }}
           >
             <BlurImage

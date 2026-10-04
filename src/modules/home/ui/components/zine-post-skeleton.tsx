@@ -19,7 +19,7 @@ export const ZinePostSkeleton = () => {
       </div>
 
       {/* Main Photographic Frame Skeleton */}
-      <div className='w-full aspect-[3/2] max-h-[75vh]'>
+      <div className='w-full aspect-[3/2] max-h-[94vh]'>
         <Skeleton className={cn('w-full h-full rounded-none', shimmerClass)} />
       </div>
 

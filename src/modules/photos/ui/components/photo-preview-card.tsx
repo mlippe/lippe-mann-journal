@@ -62,9 +62,9 @@ export function PhotoPreviewCard({
       <div
         className='bg-white relative shadow-2xl rounded-lg w-full'
         style={{
-          maxWidth: `min(85vh * ${aspectRatio}, ${widthConstraint})`,
+          maxWidth: `min(94vh * ${aspectRatio}, ${widthConstraint})`,
           aspectRatio: aspectRatio,
-          maxHeight: '85dvh',
+          maxHeight: '94dvh',
         }}
       >
         <BlurImage
