@@ -5,7 +5,7 @@ import { useTRPC } from '@/trpc/client';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
-import { ArrowRight, GalleryVerticalEnd } from 'lucide-react';
+import { ArrowRight, GalleryVerticalEnd, Rss } from 'lucide-react';
 import BlurImage from '@/components/blur-image';
 
 export const CollectionStoryFeed = () => {
@@ -25,6 +25,23 @@ export const CollectionStoryFeed = () => {
   return (
     <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-4 sm:mb-5 px-1'>
       <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1 -my-1'>
+        {/* RSS Feed Chip */}
+        <Link
+          href='/feed.xml'
+          target='_blank'
+          rel='alternate type="application/rss+xml"'
+          className='group inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-border/40 hover:border-foreground/30 bg-muted/15 hover:bg-muted/35 transition-all duration-200 select-none shrink-0 cursor-pointer shadow-2xs'
+        >
+          {/* Micro Icon Container */}
+          <div className='relative size-5 sm:size-5.5 rounded-full overflow-hidden bg-muted/40 shrink-0 ring-1 ring-border/30 flex items-center justify-center group-hover:bg-muted/60 transition-colors'>
+            <Rss className='size-3 sm:size-3.5 text-muted-foreground group-hover:text-foreground transition-colors' />
+          </div>
+
+          {/* Title */}
+          <span className='text-xs font-medium text-foreground/85 group-hover:text-foreground transition-colors whitespace-nowrap'>
+            RSS
+          </span>
+        </Link>
 
         {collections.map((collection) => {
           const imageUrl = collection.coverImageUrl
@@ -86,7 +103,7 @@ export const CollectionStorySkeleton = () => {
   return (
     <div className='w-full max-w-5xl lg:max-w-6xl mx-auto mb-4 sm:mb-5 px-1'>
       <div className='flex items-center sm:justify-center gap-2 overflow-x-auto hide-scrollbar sm:flex-wrap py-1'>
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
             className='inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-border/30 bg-muted/10 shrink-0 animate-pulse'
