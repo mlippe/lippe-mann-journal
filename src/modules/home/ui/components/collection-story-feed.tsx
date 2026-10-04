@@ -91,7 +91,7 @@ export const CollectionStoryFeed = () => {
           className='group inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-dashed border-border/60 hover:border-foreground/40 bg-transparent hover:bg-muted/25 transition-all duration-200 text-xs font-mono text-muted-foreground hover:text-foreground select-none shrink-0'
         >
           <GalleryVerticalEnd className='size-3.5 transition-transform group-hover:scale-110' />
-          <span>Katalog</span>
+          <span>Alle Sammlugen</span>
           <ArrowRight className='size-3 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all' />
         </Link>
       </div>

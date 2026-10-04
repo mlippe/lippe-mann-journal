@@ -161,6 +161,7 @@ const Header = () => {
       </div>
 
       <MobileMenuButton
+        isOpen={isMobileMenuOpen}
         isCollapsed={isEffectiveCollapsed}
         onOpenChange={handleMobileMenuOpenChange}
       />

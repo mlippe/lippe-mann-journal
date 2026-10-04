@@ -7,25 +7,31 @@ import { AnimatePresence, motion } from 'motion/react';
 
 interface MobileMenuButtonProps {
   isCollapsed?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
 }
 
 const MobileMenuButton = ({
   isCollapsed = false,
+  isOpen: controlledIsOpen,
   onOpenChange,
 }: MobileMenuButtonProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen =
+    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const handleToggle = () => {
-    setIsOpen((prev) => {
-      const next = !prev;
-      onOpenChange?.(next);
-      return next;
-    });
+    const next = !isOpen;
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(next);
+    }
+    onOpenChange?.(next);
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(false);
+    }
     onOpenChange?.(false);
   };
 
