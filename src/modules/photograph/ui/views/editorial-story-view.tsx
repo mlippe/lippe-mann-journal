@@ -87,6 +87,17 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const [currentScale, setCurrentScale] = useState(1);
   const [isCurrentlyDragging, setIsCurrentlyDragging] = useState(false);
 
+  // History & browser back support
+  const isHistoryPushedRef = useRef(false);
+  const isProgrammaticBackRef = useRef(false);
+
+  // Swipe-to-dismiss & gesture tracking
+  const lightboxContainerRef = useRef<HTMLDivElement>(null);
+  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isDraggingDownRef = useRef(false);
+  const touchStartTime = useRef(0);
+  const isNearEdgeRef = useRef(false);
+
   // Auto-hide controls after 2s of inactivity
   const [areControlsVisible, setAreControlsVisible] = useState(true);
   const areControlsVisibleRef = useRef(true);
@@ -1115,6 +1126,94 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     setCurrentScale(1);
   }, [photos.length, showControls]);
 
+  // Close lightbox overlay and sync browser history
+  const closeLightbox = useCallback(() => {
+    if (dismissTimeoutRef.current) {
+      clearTimeout(dismissTimeoutRef.current);
+      dismissTimeoutRef.current = null;
+    }
+    if (lightboxContainerRef.current) {
+      lightboxContainerRef.current.style.transform = '';
+      lightboxContainerRef.current.style.opacity = '';
+      lightboxContainerRef.current.style.transition = '';
+    }
+    isDraggingDownRef.current = false;
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    if (isHistoryPushedRef.current && typeof window !== 'undefined') {
+      isHistoryPushedRef.current = false;
+      isProgrammaticBackRef.current = true;
+      window.history.back();
+    }
+    setLightboxIndex(null);
+    setCurrentScale(1);
+  }, []);
+
+  // Sync browser history state with lightbox overlay open/close
+  useEffect(() => {
+    if (lightboxIndex !== null) {
+      if (!isHistoryPushedRef.current && typeof window !== 'undefined') {
+        window.history.pushState(
+          { ...window.history.state, __lightbox: true },
+          '',
+          window.location.href,
+        );
+        isHistoryPushedRef.current = true;
+      }
+    } else {
+      if (isHistoryPushedRef.current && typeof window !== 'undefined') {
+        isHistoryPushedRef.current = false;
+        isProgrammaticBackRef.current = true;
+        window.history.back();
+      }
+    }
+  }, [lightboxIndex]);
+
+  // Keep a ref of lightboxIndex for the popstate event listener
+  const lightboxIndexRef = useRef(lightboxIndex);
+  useEffect(() => {
+    lightboxIndexRef.current = lightboxIndex;
+  }, [lightboxIndex]);
+
+  // Handle browser back action (desktop toolbar, mouse back button, mobile back gesture / Android back)
+  useEffect(() => {
+    const handlePopState = () => {
+      // If back was triggered programmatically by closeLightbox, ignore it
+      if (isProgrammaticBackRef.current) {
+        isProgrammaticBackRef.current = false;
+        return;
+      }
+      // If user pressed browser back while lightbox is open, close overlay
+      if (isHistoryPushedRef.current || lightboxIndexRef.current !== null) {
+        isHistoryPushedRef.current = false;
+        if (dismissTimeoutRef.current) {
+          clearTimeout(dismissTimeoutRef.current);
+          dismissTimeoutRef.current = null;
+        }
+        if (lightboxContainerRef.current) {
+          lightboxContainerRef.current.style.transform = '';
+          lightboxContainerRef.current.style.opacity = '';
+          lightboxContainerRef.current.style.transition = '';
+        }
+        isDraggingDownRef.current = false;
+        touchStartX.current = null;
+        touchStartY.current = null;
+        setLightboxIndex(null);
+        setCurrentScale(1);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (dismissTimeoutRef.current) {
+        clearTimeout(dismissTimeoutRef.current);
+        dismissTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   // Reset scale and gesture tracking on slide change
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1127,6 +1226,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     touchStartX.current = null;
     touchStartY.current = null;
     hasTouchMoved.current = false;
+    isDraggingDownRef.current = false;
+    if (lightboxContainerRef.current) {
+      lightboxContainerRef.current.style.transform = '';
+      lightboxContainerRef.current.style.opacity = '';
+      lightboxContainerRef.current.style.transition = '';
+    }
     return () => clearTimeout(timer);
   }, [lightboxIndex]);
 
@@ -1256,11 +1361,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       } else if (e.key === 'ArrowLeft') {
         handlePrevPhoto();
       } else if (e.key === 'Escape') {
-        setLightboxIndex(null);
-        setCurrentScale(1);
+        closeLightbox();
       }
     },
-    [lightboxIndex, handleNextPhoto, handlePrevPhoto, showControls],
+    [lightboxIndex, handleNextPhoto, handlePrevPhoto, showControls, closeLightbox],
   );
 
   useEffect(() => {
@@ -1268,29 +1372,74 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Touch gesture support in lightbox: single-finger horizontal swipe navigates when fitted
+  // Touch gesture support in lightbox:
+  // - Clear downward swipe when fitted (!isZoomed) dismisses/closes the lightbox overlay
+  // - Single-finger horizontal swipe navigates between photos when fitted (!isZoomed)
   const handleTouchStart = (e: React.TouchEvent) => {
     wereControlsHiddenOnDown.current = !areControlsVisibleRef.current;
     showControls();
+
+    if (dismissTimeoutRef.current) {
+      clearTimeout(dismissTimeoutRef.current);
+      dismissTimeoutRef.current = null;
+    }
+    if (lightboxContainerRef.current) {
+      lightboxContainerRef.current.style.transition = 'none';
+    }
+
     if (isZoomed) return;
+
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button') || target?.closest('a')) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      isDraggingDownRef.current = false;
+      return;
+    }
+
     if (e.touches.length === 1) {
       touchStartX.current = e.touches[0].clientX;
       touchStartY.current = e.touches[0].clientY;
+      touchStartTime.current = Date.now();
+      isNearEdgeRef.current =
+        e.touches[0].clientX <= 24 ||
+        (typeof window !== 'undefined' &&
+          e.touches[0].clientX >= window.innerWidth - 24);
       hasTouchMoved.current = false;
+      isDraggingDownRef.current = false;
     } else {
       touchStartX.current = null;
       touchStartY.current = null;
+      isDraggingDownRef.current = false;
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     showControls();
     if (touchStartX.current === null || touchStartY.current === null) return;
+    if (isZoomed) return;
+
     if (e.touches.length === 1) {
-      const deltaX = Math.abs(e.touches[0].clientX - touchStartX.current);
-      const deltaY = Math.abs(e.touches[0].clientY - touchStartY.current);
-      if (deltaX > 10 || deltaY > 10) {
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const deltaX = currentX - touchStartX.current;
+      const deltaY = currentY - touchStartY.current;
+
+      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
         hasTouchMoved.current = true;
+      }
+
+      // Check if user is swiping down:
+      // Movement must be downwards and downward distance must dominate horizontal distance
+      if (deltaY > 15 && deltaY > Math.abs(deltaX) * 1.2) {
+        isDraggingDownRef.current = true;
+      }
+
+      if (isDraggingDownRef.current && lightboxContainerRef.current) {
+        const pullDistance = Math.max(0, deltaY);
+        lightboxContainerRef.current.style.transition = 'none';
+        lightboxContainerRef.current.style.transform = `translate3d(0, ${pullDistance}px, 0)`;
+        lightboxContainerRef.current.style.opacity = `${Math.max(0.3, 1 - pullDistance / 400)}`;
       }
     }
   };
@@ -1310,23 +1459,73 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     ) {
       touchStartX.current = null;
       touchStartY.current = null;
+      isDraggingDownRef.current = false;
       return;
     }
 
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
     const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    const elapsed = Date.now() - touchStartTime.current;
 
-    // Minimum swipe distance 40px and predominantly horizontal
-    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      showControls();
-      if (deltaX < 0) {
-        handleNextPhoto();
-      } else {
-        handlePrevPhoto();
+    // A clear down swipe:
+    // 1. Moving downwards (deltaY > 0)
+    // 2. Predominantly vertical: deltaY > Math.abs(deltaX) * 1.2
+    // 3. Either a clear drag distance (deltaY >= 65px) or a quick downwards flick (elapsed < 350ms and deltaY >= 35px)
+    const isClearDownSwipe =
+      deltaY > 0 &&
+      deltaY > Math.abs(deltaX) * 1.2 &&
+      (deltaY >= 65 || (elapsed < 350 && deltaY >= 35));
+
+    if (isClearDownSwipe) {
+      if (lightboxContainerRef.current) {
+        lightboxContainerRef.current.style.transition =
+          'transform 0.22s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease-out';
+        lightboxContainerRef.current.style.transform = 'translate3d(0, 100%, 0)';
+        lightboxContainerRef.current.style.opacity = '0';
       }
+      dismissTimeoutRef.current = setTimeout(() => {
+        closeLightbox();
+      }, 200);
+    } else {
+      // Snap back if downwards threshold was not reached
+      if (lightboxContainerRef.current && isDraggingDownRef.current) {
+        lightboxContainerRef.current.style.transition =
+          'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease-out';
+        lightboxContainerRef.current.style.transform = 'translate3d(0, 0px, 0)';
+        lightboxContainerRef.current.style.opacity = '1';
+      }
+
+      // Check horizontal swipe for previous/next photo when not dragging down and not starting near edge
+      if (
+        !isDraggingDownRef.current &&
+        !isNearEdgeRef.current &&
+        Math.abs(deltaX) > 40 &&
+        Math.abs(deltaX) > Math.abs(deltaY)
+      ) {
+        showControls();
+        if (deltaX < 0) {
+          handleNextPhoto();
+        } else {
+          handlePrevPhoto();
+        }
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+    isDraggingDownRef.current = false;
+  };
+
+  const handleTouchCancel = () => {
+    if (lightboxContainerRef.current && isDraggingDownRef.current) {
+      lightboxContainerRef.current.style.transition =
+        'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease-out';
+      lightboxContainerRef.current.style.transform = 'translate3d(0, 0px, 0)';
+      lightboxContainerRef.current.style.opacity = '1';
     }
     touchStartX.current = null;
     touchStartY.current = null;
+    isDraggingDownRef.current = false;
   };
 
   // Single click/tap fallback (when click is dispatched without pointerup or vice versa)
@@ -1664,14 +1863,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         open={lightboxIndex !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setLightboxIndex(null);
-            setCurrentScale(1);
+            closeLightbox();
           }
         }}
       >
         <DialogContent
           showCloseButton={false}
-          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-black/95 border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden'
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden'
           style={{
             position: 'fixed',
             top: 0,
@@ -1688,8 +1886,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
           {lightboxIndex !== null && photos[lightboxIndex] && (
             <div
+              ref={lightboxContainerRef}
               className={cn(
-                'relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none',
+                'relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none bg-black/95',
                 !areControlsVisible && !isZoomed && 'cursor-none',
               )}
               style={{ height: '100dvh', maxHeight: '100dvh' }}
@@ -1697,6 +1896,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchCancel}
             >
               {/* Top Controls Bar */}
               <div
@@ -1768,10 +1968,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   </button>
 
                   <button
-                    onClick={() => {
-                      setLightboxIndex(null);
-                      setCurrentScale(1);
-                    }}
+                    onClick={closeLightbox}
                     className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0'
                     aria-label='Schließen (Esc)'
                   >
