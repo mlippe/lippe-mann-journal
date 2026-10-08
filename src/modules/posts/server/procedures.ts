@@ -401,6 +401,10 @@ export const postsRouter = createTRPCRouter({
             z.object({
               photoId: z.string().uuid(),
               isHighlight: z.boolean().optional(),
+              layoutPosition: z
+                .enum(['left', 'right', 'solo'])
+                .optional()
+                .nullable(),
             }),
           )
           .optional(),
@@ -415,6 +419,7 @@ export const postsRouter = createTRPCRouter({
         input.photoIds?.map((id) => ({
           photoId: id,
           isHighlight: input.highlightPhotoIds?.includes(id) ?? false,
+          layoutPosition: 'solo' as const,
         })) ??
         [];
 
@@ -429,6 +434,7 @@ export const postsRouter = createTRPCRouter({
             photoId: entry.photoId,
             sortOrder: index,
             isHighlight: entry.isHighlight ?? false,
+            layoutPosition: entry.layoutPosition ?? 'solo',
           }));
           await tx.insert(postsToPhotos).values(newLinks);
         }

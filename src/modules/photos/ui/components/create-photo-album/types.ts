@@ -21,6 +21,7 @@ export const albumPhotoSchema = z.object({
   height: z.number(),
   blurData: z.string(),
   isHighlight: z.boolean(),
+  layoutPosition: z.enum(['left', 'right', 'solo']).optional().nullable(),
 
   // EXIF Data
   make: z.string().optional().nullable(),

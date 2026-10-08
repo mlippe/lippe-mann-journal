@@ -36,6 +36,7 @@ const UploadStep = ({
       height,
       blurData: imageInfo.blurhash || '',
       isHighlight: false,
+      layoutPosition: 'solo',
       ...exif,
     };
     onPhotoUploaded(newPhoto);

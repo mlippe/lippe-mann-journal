@@ -51,6 +51,7 @@ const ConfirmStep = ({
     ...photo,
     title: photo.title?.trim() || 'Untitled.jpg',
     isHighlight: photo.isHighlight ?? false,
+    layoutPosition: photo.layoutPosition ?? 'solo',
     aspectRatio:
       typeof photo.aspectRatio === 'number' &&
       Number.isFinite(photo.aspectRatio) &&
@@ -178,6 +179,198 @@ const ConfirmStep = ({
     toast.error('Please check the form for errors before creating the album.');
   };
 
+  const handleSetLayout = (
+    index: number,
+    position: 'solo' | 'left' | 'right',
+  ) => {
+    const current =
+      form.getValues(`photos.${index}.layoutPosition`) || 'solo';
+    if (current === position) return;
+
+    if (position === 'solo') {
+      form.setValue(`photos.${index}.layoutPosition`, 'solo', {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+
+      const nextPhoto = form.getValues(`photos.${index + 1}`);
+      const shouldResetNext =
+        nextPhoto &&
+        (nextPhoto.layoutPosition === 'left' ||
+          nextPhoto.layoutPosition === 'right');
+      if (shouldResetNext) {
+        form.setValue(`photos.${index + 1}.layoutPosition`, 'solo', {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      }
+
+      const prevPhoto =
+        index > 0 ? form.getValues(`photos.${index - 1}`) : null;
+      const shouldResetPrev =
+        prevPhoto &&
+        (prevPhoto.layoutPosition === 'left' ||
+          prevPhoto.layoutPosition === 'right');
+      if (shouldResetPrev) {
+        form.setValue(`photos.${index - 1}.layoutPosition`, 'solo', {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      }
+
+      setPhotos((prev) => {
+        const updated = [...prev];
+        if (updated[index]) {
+          updated[index] = { ...updated[index], layoutPosition: 'solo' };
+        }
+        if (shouldResetNext && updated[index + 1]) {
+          updated[index + 1] = {
+            ...updated[index + 1],
+            layoutPosition: 'solo',
+          };
+        }
+        if (shouldResetPrev && updated[index - 1]) {
+          updated[index - 1] = {
+            ...updated[index - 1],
+            layoutPosition: 'solo',
+          };
+        }
+        return updated;
+      });
+    } else if (position === 'left') {
+      form.setValue(`photos.${index}.layoutPosition`, 'left', {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      form.setValue(`photos.${index}.isHighlight`, false, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+
+      const prevPhoto =
+        index > 0 ? form.getValues(`photos.${index - 1}`) : null;
+      const isSwappingPrev =
+        prevPhoto &&
+        (prevPhoto.layoutPosition === 'left' ||
+          prevPhoto.layoutPosition === 'right');
+
+      if (isSwappingPrev) {
+        form.setValue(`photos.${index - 1}.layoutPosition`, 'right', {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      } else {
+        const nextPhoto = form.getValues(`photos.${index + 1}`);
+        if (nextPhoto) {
+          form.setValue(`photos.${index + 1}.layoutPosition`, 'right', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index + 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+        }
+      }
+
+      setPhotos((prev) => {
+        const updated = [...prev];
+        if (updated[index]) {
+          updated[index] = {
+            ...updated[index],
+            layoutPosition: 'left',
+            isHighlight: false,
+          };
+        }
+        if (isSwappingPrev && updated[index - 1]) {
+          updated[index - 1] = {
+            ...updated[index - 1],
+            layoutPosition: 'right',
+          };
+        } else if (!isSwappingPrev && updated[index + 1]) {
+          updated[index + 1] = {
+            ...updated[index + 1],
+            layoutPosition: 'right',
+            isHighlight: false,
+          };
+        }
+        return updated;
+      });
+    } else if (position === 'right') {
+      form.setValue(`photos.${index}.layoutPosition`, 'right', {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      form.setValue(`photos.${index}.isHighlight`, false, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+
+      const prevPhoto =
+        index > 0 ? form.getValues(`photos.${index - 1}`) : null;
+      const isSwappingPrev =
+        prevPhoto &&
+        (prevPhoto.layoutPosition === 'left' ||
+          prevPhoto.layoutPosition === 'right');
+
+      if (isSwappingPrev) {
+        form.setValue(`photos.${index - 1}.layoutPosition`, 'left', {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        });
+      } else {
+        const nextPhoto = form.getValues(`photos.${index + 1}`);
+        if (nextPhoto) {
+          form.setValue(`photos.${index + 1}.layoutPosition`, 'left', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index + 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+        }
+      }
+
+      setPhotos((prev) => {
+        const updated = [...prev];
+        if (updated[index]) {
+          updated[index] = {
+            ...updated[index],
+            layoutPosition: 'right',
+            isHighlight: false,
+          };
+        }
+        if (isSwappingPrev && updated[index - 1]) {
+          updated[index - 1] = {
+            ...updated[index - 1],
+            layoutPosition: 'left',
+          };
+        } else if (!isSwappingPrev && updated[index + 1]) {
+          updated[index + 1] = {
+            ...updated[index + 1],
+            layoutPosition: 'left',
+            isHighlight: false,
+          };
+        }
+        return updated;
+      });
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit, onInvalid)} className='space-y-8'>
@@ -278,6 +471,10 @@ const ConfirmStep = ({
                 index === 0 && 'border-primary shadow-sm',
                 form.watch(`photos.${index}.isHighlight`) &&
                   'border-amber-500/60 shadow-xs ring-1 ring-amber-500/20',
+                index !== 0 &&
+                  form.watch(`photos.${index}.layoutPosition`) &&
+                  form.watch(`photos.${index}.layoutPosition`) !== 'solo' &&
+                  'border-sky-500/60 shadow-xs ring-1 ring-sky-500/20',
               )}
             >
               {index === 0 && (
@@ -291,6 +488,15 @@ const ConfirmStep = ({
                   Highlight
                 </div>
               )}
+              {index !== 0 &&
+                form.watch(`photos.${index}.layoutPosition`) &&
+                form.watch(`photos.${index}.layoutPosition`) !== 'solo' && (
+                  <div className='absolute top-0 right-0 bg-sky-500 text-white text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold font-mono z-10 flex items-center gap-1'>
+                    {form.watch(`photos.${index}.layoutPosition`) === 'left'
+                      ? '← 2er-Paar (Links)'
+                      : '2er-Paar (Rechts) →'}
+                  </div>
+                )}
               <CardContent className='px-4'>
                 <div className='flex gap-4 items-start lg:flex-row flex-col'>
                   {/* Sorting & Basic Controls */}
@@ -365,51 +571,99 @@ const ConfirmStep = ({
                   {/* Photo Details */}
                   <div className='flex-1 space-y-4 w-full'>
                     <div className='flex items-center justify-between gap-2 flex-wrap'>
-                      <FormField
-                        control={form.control}
-                        name={`photos.${index}.isHighlight`}
-                        render={({ field: highlightField }) => (
-                          <Button
-                            type='button'
-                            size='sm'
-                            variant={highlightField.value ? 'default' : 'outline'}
-                            onClick={() => {
-                              const nextVal = !highlightField.value;
-                              highlightField.onChange(nextVal);
-                              setPhotos((prev) => {
-                                const updated = [...prev];
-                                if (updated[index]) {
-                                  updated[index] = {
-                                    ...updated[index],
-                                    isHighlight: nextVal,
-                                  };
+                      <div className='flex items-center gap-2 flex-wrap'>
+                        <FormField
+                          control={form.control}
+                          name={`photos.${index}.isHighlight`}
+                          render={({ field: highlightField }) => (
+                            <Button
+                              type='button'
+                              size='sm'
+                              variant={highlightField.value ? 'default' : 'outline'}
+                              onClick={() => {
+                                const nextVal = !highlightField.value;
+                                highlightField.onChange(nextVal);
+                                setPhotos((prev) => {
+                                  const updated = [...prev];
+                                  if (updated[index]) {
+                                    updated[index] = {
+                                      ...updated[index],
+                                      isHighlight: nextVal,
+                                    };
+                                  }
+                                  return updated;
+                                });
+                                if (nextVal) {
+                                  handleSetLayout(index, 'solo');
                                 }
-                                return updated;
-                              });
-                            }}
-                            className={cn(
-                              'text-xs font-mono gap-1.5 transition-all cursor-pointer h-8',
-                              highlightField.value
-                                ? 'bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow-xs border-amber-500'
-                                : 'text-muted-foreground hover:text-foreground',
-                            )}
-                          >
-                            <Star
+                              }}
                               className={cn(
-                                'size-3.5',
+                                'text-xs font-mono gap-1.5 transition-all cursor-pointer h-8',
                                 highlightField.value
-                                  ? 'fill-black text-black'
-                                  : 'text-muted-foreground',
+                                  ? 'bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow-xs border-amber-500'
+                                  : 'text-muted-foreground hover:text-foreground',
                               )}
-                            />
-                            <span>
-                              {highlightField.value
-                                ? '⭐ Highlight-Bild'
-                                : 'Als Highlight setzen'}
-                            </span>
-                          </Button>
+                            >
+                              <Star
+                                className={cn(
+                                  'size-3.5',
+                                  highlightField.value
+                                    ? 'fill-black text-black'
+                                    : 'text-muted-foreground',
+                                )}
+                              />
+                              <span>
+                                {highlightField.value
+                                  ? '⭐ Highlight-Bild'
+                                  : 'Als Highlight setzen'}
+                              </span>
+                            </Button>
+                          )}
+                        />
+
+                        {index !== 0 && (
+                          <div className='flex items-center rounded-md border border-input p-0.5 bg-muted/40 text-xs h-8'>
+                            <button
+                              type='button'
+                              onClick={() => handleSetLayout(index, 'solo')}
+                              className={cn(
+                                'px-2.5 py-1 rounded text-xs font-mono font-medium transition-all cursor-pointer h-full flex items-center',
+                                (form.watch(`photos.${index}.layoutPosition`) || 'solo') === 'solo'
+                                  ? 'bg-background text-foreground shadow-xs font-semibold'
+                                  : 'text-muted-foreground hover:text-foreground',
+                              )}
+                            >
+                              Solo
+                            </button>
+                            <button
+                              type='button'
+                              onClick={() => handleSetLayout(index, 'left')}
+                              title='Bild links im 2er-Paar anordnen'
+                              className={cn(
+                                'px-2.5 py-1 rounded text-xs font-mono font-medium transition-all cursor-pointer h-full flex items-center gap-1',
+                                form.watch(`photos.${index}.layoutPosition`) === 'left'
+                                  ? 'bg-sky-500 text-white dark:bg-sky-600 font-semibold shadow-xs'
+                                  : 'text-muted-foreground hover:text-foreground',
+                              )}
+                            >
+                              <span>← Links</span>
+                            </button>
+                            <button
+                              type='button'
+                              onClick={() => handleSetLayout(index, 'right')}
+                              title='Bild rechts im 2er-Paar anordnen'
+                              className={cn(
+                                'px-2.5 py-1 rounded text-xs font-mono font-medium transition-all cursor-pointer h-full flex items-center gap-1',
+                                form.watch(`photos.${index}.layoutPosition`) === 'right'
+                                  ? 'bg-sky-500 text-white dark:bg-sky-600 font-semibold shadow-xs'
+                                  : 'text-muted-foreground hover:text-foreground',
+                              )}
+                            >
+                              <span>Rechts →</span>
+                            </button>
+                          </div>
                         )}
-                      />
+                      </div>
                     </div>
                     <FormField
                       control={form.control}
