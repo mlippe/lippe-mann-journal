@@ -39,20 +39,22 @@ const CreateSinglePhoto = () => {
 
     createPhoto.mutate(finalData, {
       onSuccess: async () => {
-        // Invalidate queries to refetch photos list
-        await queryClient.invalidateQueries(
-          trpc.photos.getMany.queryOptions({}),
-        );
-        // await queryClient.invalidateQueries(
-        //   trpc.home.getManyLikePhotos.queryOptions({ limit: 10 }),
-        // );
-        // await queryClient.invalidateQueries(
-        //   trpc.home.getCitySets.queryOptions({ limit: 9 }),
-        // );
-        // await queryClient.invalidateQueries(trpc.city.getMany.queryOptions());
+        // Invalidate queries to refetch photos and posts list
+        await Promise.all([
+          queryClient.invalidateQueries(
+            trpc.photos.getMany.queryOptions({}),
+          ),
+          queryClient.invalidateQueries(
+            trpc.posts.getMany.queryOptions({}),
+          ),
+          queryClient.invalidateQueries(
+            trpc.posts.getPublished.queryOptions({}),
+          ),
+        ]);
 
         toast.success('Photo uploaded successfully!');
-        router.push(`/dashboard/new`);
+        router.refresh();
+        router.push('/dashboard/posts?type=PHOTO');
         setIsSubmitting(false);
       },
       onError: (error) => {

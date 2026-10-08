@@ -54,11 +54,20 @@ const CreatePhotoAlbum = () => {
       },
       {
         onSuccess: async () => {
-          await queryClient.invalidateQueries(
-            trpc.photos.getMany.queryOptions({}),
-          );
+          await Promise.all([
+            queryClient.invalidateQueries(
+              trpc.photos.getMany.queryOptions({}),
+            ),
+            queryClient.invalidateQueries(
+              trpc.posts.getMany.queryOptions({}),
+            ),
+            queryClient.invalidateQueries(
+              trpc.posts.getPublished.queryOptions({}),
+            ),
+          ]);
           toast.success('Album created successfully!');
-          router.push(`/dashboard/new`);
+          router.refresh();
+          router.push('/dashboard/posts?type=ALBUM');
         },
         onError: (error) => {
           toast.error(error.message);

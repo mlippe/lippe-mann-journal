@@ -35,7 +35,8 @@ export const DashboardPostView = ({ slug }: { slug: string }) => {
         await queryClient.invalidateQueries(
           trpc.posts.getMany.queryOptions({}),
         );
-        router.push('/dashboard/posts');
+        router.refresh();
+        router.push('/dashboard/posts?type=ARTICLE');
       },
       onError: (error) => {
         toast.error(error.message);

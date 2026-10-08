@@ -42,6 +42,7 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
       onSuccess: () => {
         toast.success('Collection created');
         queryClient.invalidateQueries(trpc.collections.getAllCollections.queryOptions());
+        router.refresh();
         router.push('/dashboard/collections');
       },
       onError: (e) => toast.error(`Failed to create collection: ${e.message}`),
@@ -56,6 +57,8 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
         if (collection) {
            queryClient.invalidateQueries(trpc.collections.getCollectionBySlug.queryOptions({ slug: collection.slug }));
         }
+        router.refresh();
+        router.push('/dashboard/collections');
       },
       onError: (e) => toast.error(`Failed to update collection: ${e.message}`),
     }),

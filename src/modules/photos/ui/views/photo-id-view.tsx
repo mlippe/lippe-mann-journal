@@ -3,7 +3,9 @@
 import { FramedPhoto } from '@/components/framed-photo';
 import { photosUpdateSchema } from '@/db/schema';
 import { useTRPC } from '@/trpc/client';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -41,7 +43,9 @@ const formSchema = photosUpdateSchema.extend({
 });
 
 export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
+  const router = useRouter();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { data } = useSuspenseQuery(
     trpc.photos.getOne.queryOptions({
       id,
@@ -50,8 +54,15 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
   const updateMutation = useMutation(
     trpc.photos.update.mutationOptions({
-      onSuccess: () => {},
-      onError: () => {},
+      onSuccess: () => {
+        toast.success('Photo updated successfully');
+        queryClient.invalidateQueries(trpc.photos.getMany.queryOptions({}));
+        router.refresh();
+        router.push('/dashboard/photos');
+      },
+      onError: (err) => {
+        toast.error(err.message || 'Failed to update photo');
+      },
     }),
   );
 

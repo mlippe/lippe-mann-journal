@@ -174,7 +174,8 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
       }),
     ]);
 
-    router.push('/dashboard/posts');
+    router.refresh();
+    router.push('/dashboard/posts?type=PHOTO');
   }
 
   const isPending = updatePost.isPending || updatePhoto.isPending;

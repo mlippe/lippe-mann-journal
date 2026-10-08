@@ -49,7 +49,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
 
   const createArticle = useMutation(
     trpc.posts.create.mutationOptions({
-      onSuccess: async (data) => {
+      onSuccess: async () => {
         toast.success('Article created successfully');
         await queryClient.invalidateQueries(
           trpc.posts.getMany.queryOptions({}),
@@ -59,7 +59,8 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
-        router.push(`/dashboard/posts/${data.slug}`);
+        router.refresh();
+        router.push('/dashboard/posts?type=ARTICLE');
       },
       onError: (e) => {
         toast.error('Failed to create article', {
@@ -84,7 +85,8 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         );
         await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
-        router.push(`/dashboard/posts/${data.slug}`);
+        router.refresh();
+        router.push('/dashboard/posts?type=ARTICLE');
       },
       onError: (e) => {
         toast.error('Failed to update article', {

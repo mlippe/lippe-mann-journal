@@ -426,7 +426,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
       ]);
       router.refresh();
-      router.push('/dashboard/posts');
+      router.push('/dashboard/posts?type=ALBUM');
     } catch (error) {
       toast.error(`Failed to update album: ${(error as Error).message}`);
     }
