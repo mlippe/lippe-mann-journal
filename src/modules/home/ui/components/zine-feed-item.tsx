@@ -302,27 +302,31 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                   p1.aspectRatio ||
                   (p1.width && p1.height ? p1.width / p1.height : 0.67);
                 return (
-                  <Link
-                    href={href}
-                    className='relative block group overflow-hidden sticky top-20 self-start rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
+                  <div
+                    className='sticky top-6 pb-[7.5vh] md:pb-[5vh] self-start'
                     style={{ flex: `${r1 * 1.8} 1 0%` }}
                   >
-                    <div
-                      style={{ aspectRatio: `${r1}` }}
-                      className='relative w-full h-full'
+                    <Link
+                      href={href}
+                      className='relative block group overflow-hidden rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                     >
-                      <BlurImage
-                        src={keyToUrl(p1.url)}
-                        alt={p1.title ?? post.title}
-                        fill
-                        priority={priority}
-                        blurhash={p1.blurData}
-                        aspectRatio={r1}
-                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
-                        className='object-contain'
-                      />
-                    </div>
-                  </Link>
+                      <div
+                        style={{ aspectRatio: `${r1}` }}
+                        className='relative w-full h-full'
+                      >
+                        <BlurImage
+                          src={keyToUrl(p1.url)}
+                          alt={p1.title ?? post.title}
+                          fill
+                          priority={priority}
+                          blurhash={p1.blurData}
+                          aspectRatio={r1}
+                          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 65vw, 750px'
+                          className='object-contain'
+                        />
+                      </div>
+                    </Link>
+                  </div>
                 );
               })()}
 
@@ -366,7 +370,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             (seed % 2 === 0 ? (
               /* Desktop Sticky Glide: Hero pins briefly, diptych smoothly glides over */
               <div className='relative w-full pb-4'>
-                <div className='sticky top-20 z-0 w-full flex justify-center'>
+                <div className='sticky top-6 pb-[7.5vh] md:pb-[5vh] z-0 w-full flex justify-center'>
                   <Link
                     href={href}
                     className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
@@ -524,7 +528,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             /* Mobile Sticky Stacking Deck: Photo 1 pins, Photo 2 glides over it! */
             <div className='relative w-full pb-4'>
               {/* Photo 1 (Sticky Pin) */}
-              <div className='sticky top-16 z-0'>
+              <div className='sticky top-16 md:top-6 pb-[7.5vh] md:pb-[5vh] z-0'>
                 <Link
                   href={href}
                   className='block relative w-full overflow-hidden rounded-xs group bg-muted/20 cursor-ansehen'

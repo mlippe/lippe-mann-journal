@@ -1701,7 +1701,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 className='relative w-full'
               >
                 {/* 1. HERO PINNED FRAME */}
-                <div className='sticky top-14 md:top-20 z-0'>
+                <div className='sticky top-14 md:top-6 pb-[7.5vh] md:pb-[5vh] z-0'>
                   {renderHeroContent(unit.heroBlock)}
                 </div>
 
@@ -1740,7 +1740,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 }
               >
                 {/* 1. PINNED FRAME */}
-                <div className='sticky top-14 md:top-20 z-0'>
+                <div className='sticky top-14 md:top-6 pb-[7.5vh] md:pb-[5vh] z-0'>
                   {renderBlockContent(unit.pinnedBlock)}
                 </div>
 
