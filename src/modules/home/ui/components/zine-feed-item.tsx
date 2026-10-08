@@ -267,7 +267,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     <Link
                       key={ptp.photo.id}
                       href={href}
-                      className='relative block group overflow-hidden rounded-xs cursor-ansehen'
+                      className='relative block group overflow-hidden rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                       style={{ flex: `${ratio} 1 0%` }}
                     >
                       <div
@@ -284,6 +284,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px'
                           className='object-contain'
                         />
+                        {i === 1 && photos.length > 2 && (
+                          <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.12em] font-medium text-foreground/90 tabular-nums z-10 pointer-events-none'>
+                            +{photos.length - 2}
+                          </div>
+                        )}
                       </div>
                     </Link>
                   );
@@ -342,7 +347,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                     <Link
                       key={ptp.photo.id}
                       href={href}
-                      className='relative block group overflow-hidden flex-1 rounded-xs cursor-ansehen'
+                      className='relative block group overflow-hidden flex-1 rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                     >
                       <div
                         style={{ aspectRatio: `${ratio}` }}
@@ -357,6 +362,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                           sizes='(max-width: 768px) 50vw, (max-width: 1200px) 35vw, 420px'
                           className='object-contain'
                         />
+                        {i === 1 && photos.length > 3 && (
+                          <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.12em] font-medium text-foreground/90 tabular-nums z-10 pointer-events-none'>
+                            +{photos.length - 3}
+                          </div>
+                        )}
                       </div>
                     </Link>
                   );
@@ -373,7 +383,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 <div className='sticky top-6 pb-[7.5vh] md:pb-[5vh] z-0 w-full flex justify-center'>
                   <Link
                     href={href}
-                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
+                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen mx-auto'
                     style={{
                       aspectRatio: `${firstPhotoRatio}`,
                       width: isLandscapeFirstPhoto
@@ -405,7 +415,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       <Link
                         key={ptp.photo.id}
                         href={href}
-                        className='relative block group overflow-hidden rounded-xs cursor-ansehen'
+                        className='relative block group overflow-hidden rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                         style={{ flex: `${ratio} 1 0%` }}
                       >
                         <div
@@ -421,6 +431,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             sizes='(max-width: 768px) 50vw, (max-width: 1200px) 45vw, 576px'
                             className='object-contain'
                           />
+                          {i === 1 && photos.length > 3 && (
+                            <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.12em] font-medium text-foreground/90 tabular-nums z-10 pointer-events-none'>
+                              +{photos.length - 3}
+                            </div>
+                          )}
                         </div>
                       </Link>
                     );
@@ -433,7 +448,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                 <div className='w-full flex justify-center'>
                   <Link
                     href={href}
-                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
+                    className='block relative group overflow-hidden max-h-[94vh] rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen mx-auto'
                     style={{
                       aspectRatio: `${firstPhotoRatio}`,
                       width: isLandscapeFirstPhoto
@@ -465,7 +480,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                       <Link
                         key={ptp.photo.id}
                         href={href}
-                        className='relative block group overflow-hidden rounded-xs cursor-ansehen'
+                        className='relative block group overflow-hidden rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen'
                         style={{ flex: `${ratio} 1 0%` }}
                       >
                         <div
@@ -481,6 +496,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
                             sizes='(max-width: 768px) 50vw, (max-width: 1200px) 45vw, 576px'
                             className='object-contain'
                           />
+                          {i === 1 && photos.length > 3 && (
+                            <div className='absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-background/85 backdrop-blur-md border border-border/50 text-[11px] font-mono tracking-[0.12em] font-medium text-foreground/90 tabular-nums z-10 pointer-events-none'>
+                              +{photos.length - 3}
+                            </div>
+                          )}
                         </div>
                       </Link>
                     );
@@ -495,7 +515,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
               <div className='w-full flex justify-center'>
                 <Link
                   href={href}
-                  className='block relative group overflow-hidden max-h-[94vh] rounded-xs cursor-ansehen mx-auto'
+                  className='block relative group overflow-hidden max-h-[94vh] rounded-xs transition-transform duration-500 ease-out hover:-translate-y-0.5 cursor-ansehen mx-auto'
                   style={{
                     aspectRatio: `${coverRatio}`,
                     width:
