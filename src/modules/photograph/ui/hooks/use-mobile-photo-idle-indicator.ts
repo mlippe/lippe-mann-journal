@@ -9,7 +9,7 @@ interface UseMobilePhotoIdleIndicatorOptions {
   containerRef: React.RefObject<HTMLElement | null>;
   /**
    * Time in milliseconds of scroll inactivity before showing the indicator.
-   * Default: 1500ms (1.5 seconds)
+   * Default: 2500ms (2.5 seconds)
    */
   idleDelayMs?: number;
   /**
@@ -30,7 +30,7 @@ interface UseMobilePhotoIdleIndicatorOptions {
 
 /**
  * High-performance hook for mobile devices to show fullscreen photo indicators
- * after 1.5s of scroll inactivity.
+ * after 2.5s of scroll inactivity.
  *
  * Performance characteristics:
  * - 0% desktop overhead: exits immediately if the device supports native hover.
@@ -40,7 +40,7 @@ interface UseMobilePhotoIdleIndicatorOptions {
  */
 export function useMobilePhotoIdleIndicator({
   containerRef,
-  idleDelayMs = 1000,
+  idleDelayMs = 2500,
   attributeName = 'data-story-photo-index',
   threshold = 0.3,
   deps = [],

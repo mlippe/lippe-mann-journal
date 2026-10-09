@@ -221,6 +221,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const articleRef = useRef<HTMLElement>(null);
   const idlePhotoIndices = useMobilePhotoIdleIndicator({
     containerRef: articleRef,
+    idleDelayMs: 2500,
     deps: [photos.length],
   });
 
