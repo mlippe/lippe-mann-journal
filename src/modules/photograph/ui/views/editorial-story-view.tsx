@@ -39,6 +39,7 @@ import {
 } from 'react-zoom-pan-pinch';
 import { ScrollReveal } from '@/components/scroll-reveal';
 import { useMobilePhotoIdleIndicator } from '../hooks/use-mobile-photo-idle-indicator';
+import { EditorialOpticalIndicator } from '../components/editorial-optical-indicator';
 
 interface EditorialStoryViewProps {
   post: PostGetOne;
@@ -1678,6 +1679,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       ref={articleRef}
       className='w-full max-w-6xl mx-auto py-6 sm:py-8 md:py-12'
     >
+      {/* Precision Optical Scroll & Frame Indicator (Swiss Design) */}
+      <EditorialOpticalIndicator
+        containerRef={articleRef}
+        photos={photos}
+      />
+
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
       <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
         {/* Editorial Story Title */}
