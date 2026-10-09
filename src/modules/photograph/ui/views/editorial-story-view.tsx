@@ -1969,7 +1969,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       >
         <DialogContent
           showCloseButton={false}
-          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none!'
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none!'
           style={{
             position: 'fixed',
             top: 0,
@@ -1988,7 +1988,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             <div
               ref={lightboxContainerRef}
               className={cn(
-                'relative w-full h-[100dvh] max-h-[100dvh] flex flex-col justify-between select-none overflow-hidden touch-none bg-black/95',
+                'relative w-full h-[100dvh] max-h-[100dvh] select-none overflow-hidden touch-none bg-black/95',
                 !areControlsVisible && !isZoomed && 'cursor-none',
               )}
               style={{ height: '100dvh', maxHeight: '100dvh' }}
@@ -1998,89 +1998,10 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               onTouchEnd={handleTouchEnd}
               onTouchCancel={handleTouchCancel}
             >
-              {/* Top Controls Bar */}
-              <div
-                className={cn(
-                  'shrink-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-2 sm:pb-3 bg-linear-to-b from-black/95 via-black/80 to-transparent transition-all duration-300 ease-out',
-                  areControlsVisible
-                    ? 'opacity-100 translate-y-0 pointer-events-auto'
-                    : 'opacity-0 -translate-y-4 pointer-events-none',
-                )}
-                style={{
-                  paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))',
-                }}
-              >
-                <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
-                  <span className='text-[11px] sm:text-xs font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
-                    {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
-                    {String(photos.length).padStart(2, '0')}
-                  </span>
-                </div>
-
-                {/* Actions & Zoom Toggle */}
-                <div className='flex items-center gap-1.5 sm:gap-2.5 shrink-0'>
-                  <button
-                    onClick={handleToggleZoomButton}
-                    className={cn(
-                      'px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0',
-                      isZoomed
-                        ? 'bg-white text-black font-semibold'
-                        : 'bg-white/10 hover:bg-white/20 text-white',
-                    )}
-                    title={isZoomed ? 'Zoom zurücksetzen' : '100% Zoom'}
-                  >
-                    {isZoomed ? (
-                      <>
-                        <IconZoomOut className='size-3.5' />
-                        <span>Einpassen</span>
-                      </>
-                    ) : (
-                      <>
-                        <IconZoomIn className='size-3.5' />
-                        <span>100% Zoom</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (fingerprint && isLoaded) {
-                        toggleLike.mutate({
-                          postId: post.id,
-                          userFingerprint: fingerprint,
-                        });
-                      }
-                    }}
-                    className='p-1.5 sm:px-2.5 sm:py-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0'
-                    aria-label='Serie liken'
-                  >
-                    <IconHeartFilled
-                      className={cn(
-                        'size-4 transition-colors',
-                        currentInteractions?.hasLiked
-                          ? 'text-red-500 fill-red-500'
-                          : 'text-white',
-                      )}
-                    />
-                    <span className='text-xs font-mono'>
-                      {currentInteractions?.likeCount || 0}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={closeLightbox}
-                    className='p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0'
-                    aria-label='Schließen (Esc)'
-                  >
-                    <IconX className='size-5' />
-                  </button>
-                </div>
-              </div>
-
               {/* Main Image Stage (Drag/Pan, Pinch & Single Click/Tap 100% Zoomable) */}
               <div
                 className={cn(
-                  'relative grow min-h-0 w-full flex items-center justify-center overflow-hidden select-none',
+                  'absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none',
                   isZoomed
                     ? isCurrentlyDragging
                       ? 'cursor-grabbing'
@@ -2192,18 +2113,99 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 )}
               </div>
 
+              {/* Top Controls Bar */}
+              <div
+                className={cn(
+                  'absolute top-0 inset-x-0 w-full flex items-center justify-between z-30 text-white/90 px-3 sm:px-5 pb-1.5 bg-black/90 backdrop-blur-md border-b border-white/10 transition-all duration-300 ease-out',
+                  areControlsVisible
+                    ? 'opacity-100 translate-y-0 pointer-events-auto'
+                    : 'opacity-0 -translate-y-full pointer-events-none',
+                )}
+                style={{
+                  paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0.375rem))',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
+                  <span className='text-[11px] font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
+                    {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
+                    {String(photos.length).padStart(2, '0')}
+                  </span>
+                </div>
+
+                {/* Actions & Zoom Toggle */}
+                <div className='flex items-center gap-1.5 sm:gap-2 shrink-0'>
+                  <button
+                    onClick={handleToggleZoomButton}
+                    className={cn(
+                      'px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0',
+                      isZoomed
+                        ? 'bg-white text-black font-semibold'
+                        : 'bg-white/10 hover:bg-white/20 text-white',
+                    )}
+                    title={isZoomed ? 'Zoom zurücksetzen' : '100% Zoom'}
+                  >
+                    {isZoomed ? (
+                      <>
+                        <IconZoomOut className='size-3.5' />
+                        <span>Einpassen</span>
+                      </>
+                    ) : (
+                      <>
+                        <IconZoomIn className='size-3.5' />
+                        <span>100% Zoom</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (fingerprint && isLoaded) {
+                        toggleLike.mutate({
+                          postId: post.id,
+                          userFingerprint: fingerprint,
+                        });
+                      }
+                    }}
+                    className='p-1 sm:px-2 sm:py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0'
+                    aria-label='Serie liken'
+                  >
+                    <IconHeartFilled
+                      className={cn(
+                        'size-3.5 transition-colors',
+                        currentInteractions?.hasLiked
+                          ? 'text-red-500 fill-red-500'
+                          : 'text-white',
+                      )}
+                    />
+                    <span className='text-[11px] font-mono'>
+                      {currentInteractions?.likeCount || 0}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={closeLightbox}
+                    className='p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0'
+                    aria-label='Schließen (Esc)'
+                  >
+                    <IconX className='size-4' />
+                  </button>
+                </div>
+              </div>
+
               {/* Bottom Full EXIF Information Bar */}
               <div
                 className={cn(
-                  'shrink-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2 bg-linear-to-t from-black/95 via-black/80 to-transparent border-t border-white/10 transition-all duration-300 ease-out',
+                  'absolute bottom-0 inset-x-0 w-full z-30 text-white/80 px-3 sm:px-5 pt-2.5 sm:pt-3 bg-black/90 backdrop-blur-md border-t border-white/10 transition-all duration-300 ease-out',
                   areControlsVisible
                     ? 'opacity-100 translate-y-0 pointer-events-auto'
-                    : 'opacity-0 translate-y-4 pointer-events-none',
+                    : 'opacity-0 translate-y-full pointer-events-none',
                 )}
                 style={{
                   paddingBottom:
                     'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))',
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 max-w-6xl mx-auto text-[11px] sm:text-xs font-mono leading-tight'>
                   {/* Camera & Lens Details */}
