@@ -1,14 +1,9 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState, useRef, memo } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import Image, { ImageProps } from 'next/image';
 import { BlurhashCanvas } from 'react-blurhash';
 import { cn } from '@/lib/utils';
-
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
-const loadedImageSources = new Set<string>();
 
 interface BlurImageProps extends Omit<
   ImageProps,
@@ -63,33 +58,18 @@ const BlurImage = memo(function BlurImage({
   ...props
 }: BlurImageProps) {
   const srcString = getSrcString(src);
-  const isInitiallyLoaded = Boolean(
-    srcString && loadedImageSources.has(srcString),
-  );
 
-  const [imageLoaded, setImageLoaded] = useState(isInitiallyLoaded);
-  const [showPlaceholder, setShowPlaceholder] = useState(!isInitiallyLoaded);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [prevSrc, setPrevSrc] = useState(srcString);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // Sync state if src changes on the same component instance
   if (prevSrc !== srcString) {
-    const isLoaded = Boolean(srcString && loadedImageSources.has(srcString));
     setPrevSrc(srcString);
-    setImageLoaded(isLoaded);
-    setShowPlaceholder(!isLoaded);
+    setImageLoaded(false);
+    setShowPlaceholder(true);
   }
-
-  // Check if image is already completed in browser cache on mount
-  useIsomorphicLayoutEffect(() => {
-    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-      if (srcString) {
-        loadedImageSources.add(srcString);
-      }
-      setImageLoaded(true);
-      setShowPlaceholder(false);
-    }
-  }, [srcString]);
 
   // Handle placeholder fade-out after image is loaded
   useEffect(() => {
@@ -175,9 +155,6 @@ const BlurImage = memo(function BlurImage({
           imageLoaded ? 'opacity-100' : 'opacity-0',
         )}
         onLoad={() => {
-          if (srcString) {
-            loadedImageSources.add(srcString);
-          }
           setImageLoaded(true);
         }}
         onError={() => {
