@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef, memo } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef, memo } from 'react';
 import Image, { ImageProps } from 'next/image';
-import { Blurhash } from 'react-blurhash';
+import { BlurhashCanvas } from 'react-blurhash';
 import { cn } from '@/lib/utils';
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+const loadedImageSources = new Set<string>();
 
 interface BlurImageProps extends Omit<
   ImageProps,
@@ -58,27 +63,31 @@ const BlurImage = memo(function BlurImage({
   ...props
 }: BlurImageProps) {
   const srcString = getSrcString(src);
+  const isInitiallyLoaded = Boolean(
+    srcString && loadedImageSources.has(srcString),
+  );
 
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(isInitiallyLoaded);
+  const [showPlaceholder, setShowPlaceholder] = useState(!isInitiallyLoaded);
   const [prevSrc, setPrevSrc] = useState(srcString);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // Sync state if src changes on the same component instance
   if (prevSrc !== srcString) {
+    const isLoaded = Boolean(srcString && loadedImageSources.has(srcString));
     setPrevSrc(srcString);
-    setImageLoaded(false);
-    setShowPlaceholder(true);
+    setImageLoaded(isLoaded);
+    setShowPlaceholder(!isLoaded);
   }
 
   // Check if image is already completed in browser cache on mount
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-      const timer = setTimeout(() => {
-        setImageLoaded(true);
-        setShowPlaceholder(false);
-      }, 0);
-      return () => clearTimeout(timer);
+      if (srcString) {
+        loadedImageSources.add(srcString);
+      }
+      setImageLoaded(true);
+      setShowPlaceholder(false);
     }
   }, [srcString]);
 
@@ -90,11 +99,11 @@ const BlurImage = memo(function BlurImage({
       () => {
         setShowPlaceholder(false);
       },
-      priority ? 0 : 350,
+      350,
     );
 
     return () => window.clearTimeout(timeout);
-  }, [imageLoaded, priority]);
+  }, [imageLoaded]);
 
   // Extract background classes to apply them only when loaded
   const hasBackground = className?.includes('bg-background');
@@ -104,50 +113,49 @@ const BlurImage = memo(function BlurImage({
     ? 'absolute inset-0 flex items-center justify-center'
     : 'relative w-full h-full flex justify-center items-center';
 
-  const showBlurhash = showPlaceholder && blurhash && blurhash.length >= 6;
+  const showBlurhash =
+    showPlaceholder && Boolean(blurhash && blurhash.length >= 6);
   const isObjectCover = className?.includes('object-cover');
+
+  const resolvedAspectRatio =
+    aspectRatio ||
+    (typeof width === 'number' && typeof height === 'number' && height > 0
+      ? width / height
+      : undefined);
 
   return (
     <div className={containerStyle}>
-      {showBlurhash && (
+      {showBlurhash && blurhash && (
         <div
           className={cn(
-            'absolute inset-0 flex items-center justify-center pointer-events-none z-0',
-            !priority && 'transition-opacity duration-300 ease-in-out',
+            'absolute inset-0 flex items-center justify-center pointer-events-none z-0 transition-opacity duration-300 ease-in-out',
             imageLoaded ? 'opacity-0' : 'opacity-100',
           )}
         >
-          <div
-            className={cn('overflow-hidden', baseClassName)}
+          <BlurhashCanvas
+            hash={blurhash}
+            width={32}
+            height={Math.max(
+              1,
+              Math.round(32 / (resolvedAspectRatio || 1)),
+            )}
+            punch={1}
+            className={cn(
+              baseClassName,
+              fill
+                ? isObjectCover
+                  ? 'w-full h-full object-cover'
+                  : 'w-full h-full object-contain'
+                : 'max-w-full max-h-full object-contain',
+            )}
             style={{
-              aspectRatio: !isObjectCover && aspectRatio ? `${aspectRatio}` : undefined,
-              width: isObjectCover
-                ? '100%'
-                : aspectRatio
-                  ? aspectRatio > 0.8
-                    ? '100%'
-                    : 'auto'
-                  : '100%',
-              height: isObjectCover
-                ? '100%'
-                : aspectRatio
-                  ? aspectRatio > 0.8
-                    ? 'auto'
-                    : '100%'
-                  : '100%',
-              maxHeight: '100%',
-              maxWidth: '100%',
+              ...(!fill ? { width: '100%', height: 'auto', ...style } : style),
+              aspectRatio: resolvedAspectRatio
+                ? `${resolvedAspectRatio}`
+                : undefined,
+              objectFit: isObjectCover ? 'cover' : 'contain',
             }}
-          >
-            <Blurhash
-              hash={blurhash}
-              width='100%'
-              height='100%'
-              resolutionX={16}
-              resolutionY={16}
-              punch={1}
-            />
-          </div>
+          />
         </div>
       )}
       <Image
@@ -163,14 +171,13 @@ const BlurImage = memo(function BlurImage({
           baseClassName,
           fill ? 'z-10' : 'relative z-10',
           hasBackground && imageLoaded && 'bg-background',
-          priority
-            ? 'opacity-100'
-            : cn(
-                'transition-opacity duration-300 ease-in-out',
-                imageLoaded ? 'opacity-100' : 'opacity-0',
-              ),
+          'transition-opacity duration-300 ease-in-out',
+          imageLoaded ? 'opacity-100' : 'opacity-0',
         )}
         onLoad={() => {
+          if (srcString) {
+            loadedImageSources.add(srcString);
+          }
           setImageLoaded(true);
         }}
         onError={() => {

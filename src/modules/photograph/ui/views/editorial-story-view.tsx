@@ -1310,6 +1310,23 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     return () => clearTimeout(timer);
   }, [lightboxIndex]);
 
+  // Preload adjacent photos for seamless lightbox navigation
+  useEffect(() => {
+    if (lightboxIndex === null || photos.length <= 1) return;
+
+    const preloadIndices = [lightboxIndex + 1, lightboxIndex - 1].filter(
+      (idx) => idx >= 0 && idx < photos.length,
+    );
+
+    preloadIndices.forEach((idx) => {
+      const photo = photos[idx];
+      if (photo?.url) {
+        const img = new window.Image();
+        img.src = keyToUrl(photo.url);
+      }
+    });
+  }, [lightboxIndex, photos]);
+
   // Manage 2s inactivity auto-hiding of lightbox controls
   useEffect(() => {
     if (lightboxIndex === null) {
@@ -1944,7 +1961,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       >
         <DialogContent
           showCloseButton={false}
-          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden'
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! flex flex-col justify-between z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none!'
           style={{
             position: 'fixed',
             top: 0,
@@ -2126,7 +2143,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       aspectRatio={photos[lightboxIndex].aspectRatio}
                       className='max-w-full max-h-full object-contain select-none pointer-events-none p-1 sm:p-2 md:p-4'
                       sizes='100vw'
-                      priority
                     />
                   </TransformComponent>
                 </TransformWrapper>
