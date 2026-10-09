@@ -1969,7 +1969,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       >
         <DialogContent
           showCloseButton={false}
-          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none!'
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none! outline-none'
           style={{
             position: 'fixed',
             top: 0,
@@ -2085,7 +2086,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         handlePrevPhoto();
                       }}
                       className={cn(
-                        'absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30',
+                        'absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30 outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40',
                         areControlsVisible
                           ? 'opacity-100 pointer-events-auto'
                           : 'opacity-0 pointer-events-none',
@@ -2100,7 +2101,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         handleNextPhoto();
                       }}
                       className={cn(
-                        'absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30',
+                        'absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white transition-all duration-300 cursor-pointer z-30 outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40',
                         areControlsVisible
                           ? 'opacity-100 pointer-events-auto'
                           : 'opacity-0 pointer-events-none',
@@ -2138,7 +2139,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   <button
                     onClick={handleToggleZoomButton}
                     className={cn(
-                      'px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0',
+                      'px-2 sm:px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0 outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40',
                       isZoomed
                         ? 'bg-white text-black font-semibold'
                         : 'bg-white/10 hover:bg-white/20 text-white',
@@ -2167,7 +2168,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         });
                       }
                     }}
-                    className='p-1 sm:px-2 sm:py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0'
+                    className='p-1 sm:px-2 sm:py-0.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0 outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40'
                     aria-label='Serie liken'
                   >
                     <IconHeartFilled
@@ -2185,7 +2186,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                   <button
                     onClick={closeLightbox}
-                    className='p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0'
+                    className='p-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer shrink-0 outline-none focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40'
                     aria-label='Schließen (Esc)'
                   >
                     <IconX className='size-4' />
