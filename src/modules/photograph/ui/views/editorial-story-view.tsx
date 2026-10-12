@@ -415,7 +415,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Randomize the mixing of sticky photo pinning and organic scroll reveal animations:
   // - Hero (block 0) pins in ~60% of posts that have multiple blocks
-  // - Middle blocks (solo & occasional diptych) randomly and sparingly pin based on deterministic seed
+  // - Middle blocks (solo & highlight feature frames) randomly and sparingly pin based on deterministic seed
+  // - Multi-photo blocks (diptychs) are NEVER pinned: on mobile screens they stack vertically
+  //   inside the sticky container, which leaves the bottom photo cut off / barely visible.
   const stickyPinIndices = useMemo(() => {
     const pins = new Set<number>();
     if (blocks.length <= 1) return pins;
@@ -425,7 +427,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       pins.add(0);
     }
 
-    // 2. Middle blocks: sparingly and randomly pick candidates
+    // 2. Middle blocks: sparingly and randomly pick candidates (solo & highlight only)
     for (let i = 1; i < blocks.length - 1; i++) {
       // Don't pin if adjacent to another pin or within 1 block of a pin
       if (pins.has(i - 1) || pins.has(i - 2)) continue;
@@ -437,15 +439,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       if (
         (block.type === 'solo' || block.type === 'highlight') &&
         bSeed % 10 < 4
-      ) {
-        pins.add(i);
-      }
-      // Occasional diptych: ~20% chance of sticky pinning if followed by a solo/highlight frame
-      else if (
-        block.type === 'diptych' &&
-        (blocks[i + 1]?.type === 'solo' ||
-          blocks[i + 1]?.type === 'highlight') &&
-        bSeed % 10 < 2
       ) {
         pins.add(i);
       }
@@ -463,7 +456,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       }
     | {
         type: 'pinned-unit';
-        pinnedBlock: EditorialBlock;
+        pinnedBlock: EditorialBlock & { type: 'solo' | 'highlight' };
         overlayBlock: EditorialBlock;
         fieldNote?: string;
       }
@@ -477,7 +470,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     const rawUnits: Array<{
       type: 'pinned-hero-unit' | 'pinned-unit' | 'standard-unit';
       heroBlock?: EditorialBlock & { type: 'hero' };
-      pinnedBlock?: EditorialBlock;
+      pinnedBlock?: EditorialBlock & { type: 'solo' | 'highlight' };
       overlayBlock?: EditorialBlock;
       block?: EditorialBlock;
       fieldNote?: string;
@@ -501,10 +494,16 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           i = 1;
         }
       } else {
-        if (stickyPinIndices.has(i) && i + 1 < blocks.length) {
+        if (
+          stickyPinIndices.has(i) &&
+          (blocks[i].type === 'solo' || blocks[i].type === 'highlight') &&
+          i + 1 < blocks.length
+        ) {
           rawUnits.push({
             type: 'pinned-unit',
-            pinnedBlock: blocks[i],
+            pinnedBlock: blocks[i] as EditorialBlock & {
+              type: 'solo' | 'highlight';
+            },
             overlayBlock: blocks[i + 1],
           });
           i += 2;
