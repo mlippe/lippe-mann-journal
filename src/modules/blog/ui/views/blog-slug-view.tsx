@@ -128,7 +128,7 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
                 <Author size='md' />
                 <div className='flex flex-col items-end text-sm text-muted-foreground'>
                   <span className='font-medium'>
-                    {format(data.createdAt, 'MMM d, yyyy')}
+                    {format(data.createdAt, 'dd.MM.yyyy')}
                   </span>
                   <span>{readingTime} Min Lesezeit</span>
                 </div>
@@ -148,7 +148,7 @@ export const ArticleSlugView = ({ slug }: { slug: string }) => {
         <div className='flex flex-col lg:flex-row gap-6 items-center lg:items-start p-8 rounded-3xl bg-muted/30 border mb-20'>
           <Author size='md' />
           <div className='flex-1 text-center lg:text-left space-y-2'>
-            <h3 className='font-bold text-lg'>About {siteConfig.name}</h3>
+            <h3 className='font-bold text-lg'>Über {siteConfig.name}</h3>
             <p className='text-muted-foreground font-light leading-relaxed'>
               {siteConfig.bio}
             </p>

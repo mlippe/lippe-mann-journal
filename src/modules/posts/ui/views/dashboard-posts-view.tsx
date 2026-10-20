@@ -22,7 +22,7 @@ export const DashboardPostsView = () => {
         <div className='relative w-full sm:max-w-sm'>
           <IconSearch className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
-            placeholder='Search posts...'
+            placeholder='Beiträge durchsuchen...'
             value={filters.search}
             onChange={(e) => setFilters({ search: e.target.value, page: 1 })}
             className='pl-9'
@@ -39,9 +39,9 @@ export const DashboardPostsView = () => {
       >
         <TabsList className='w-full grid grid-cols-4 sm:w-auto sm:inline-flex'>
           <TabsTrigger value='SESSION'>Sessions</TabsTrigger>
-          <TabsTrigger value='PHOTO'>Photos</TabsTrigger>
-          <TabsTrigger value='ALBUM'>Albums</TabsTrigger>
-          <TabsTrigger value='ARTICLE'>Articles</TabsTrigger>
+          <TabsTrigger value='PHOTO'>Fotos</TabsTrigger>
+          <TabsTrigger value='ALBUM'>Alben</TabsTrigger>
+          <TabsTrigger value='ARTICLE'>Artikel</TabsTrigger>
         </TabsList>
 
         <div className='mt-4'>

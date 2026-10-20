@@ -71,14 +71,14 @@ export const ProfileForm = () => {
         name: name || undefined,
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Profile updated successfully");
+            toast.success("Profil erfolgreich aktualisiert");
             setName("");
             setImage(null);
             setImagePreview(null);
             router.refresh();
           },
           onError: (error) => {
-            toast.error(error.error.message || "Failed to update profile");
+            toast.error(error.error.message || "Fehler beim Aktualisieren des Profils");
           },
         },
       });
@@ -89,11 +89,11 @@ export const ProfileForm = () => {
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Die Passwörter stimmen nicht überein");
       return;
     }
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error("Das Passwort muss mindestens 8 Zeichen lang sein");
       return;
     }
 
@@ -108,10 +108,10 @@ export const ProfileForm = () => {
       if (res.error) {
         toast.error(
           res.error.message ||
-            "Couldn't change your password! Make sure it's correct",
+            "Passwort konnte nicht geändert werden! Bitte überprüfe deine Eingaben.",
         );
       } else {
-        toast.success("Password changed successfully");
+        toast.success("Passwort erfolgreich geändert");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -126,21 +126,21 @@ export const ProfileForm = () => {
   return (
     <Tabs defaultValue="profile" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="profile">Profile</TabsTrigger>
-        <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsTrigger value="profile">Profil</TabsTrigger>
+        <TabsTrigger value="password">Passwort</TabsTrigger>
       </TabsList>
 
       {/* Profile Tab */}
       <TabsContent value="profile" className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
-            <CardDescription>Update your profile information</CardDescription>
+            <CardTitle>Profil bearbeiten</CardTitle>
+            <CardDescription>Aktualisiere deine Profilinformationen</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Profile Picture Section */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Profile Picture</Label>
+              <Label className="text-base font-semibold">Profilbild</Label>
               <div className="flex items-end gap-4">
                 {/* Image Preview */}
                 <div className="relative">
@@ -165,7 +165,7 @@ export const ProfileForm = () => {
                   ) : (
                     <div className="w-24 h-24 rounded-lg bg-muted border-2 border-dashed border-muted-foreground/30 flex items-center justify-center">
                       <span className="text-xs text-muted-foreground">
-                        No image
+                        Kein Bild
                       </span>
                     </div>
                   )}
@@ -188,7 +188,7 @@ export const ProfileForm = () => {
                       onClick={() => document.getElementById("image")?.click()}
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Choose Image
+                      Bild auswählen
                     </Button>
                   </div>
                   {imagePreview && (
@@ -203,7 +203,7 @@ export const ProfileForm = () => {
                       }}
                     >
                       <X className="w-4 h-4 mr-2" />
-                      Remove
+                      Entfernen
                     </Button>
                   )}
                 </div>
@@ -213,12 +213,12 @@ export const ProfileForm = () => {
             {/* Name Section */}
             <div className="space-y-3">
               <Label htmlFor="name" className="text-base font-semibold">
-                Full Name
+                Vollständiger Name
               </Label>
               <Input
                 id="name"
                 type="text"
-                placeholder={data?.user.name || "Enter your name"}
+                placeholder={data?.user.name || "Dein Name"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="h-10"
@@ -235,10 +235,10 @@ export const ProfileForm = () => {
               {isUpdatingProfile ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Updating...
+                  Wird aktualisiert...
                 </>
               ) : (
-                "Save Changes"
+                "Änderungen speichern"
               )}
             </Button>
           </CardContent>
@@ -249,9 +249,9 @@ export const ProfileForm = () => {
       <TabsContent value="password" className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Change Password</CardTitle>
+            <CardTitle>Passwort ändern</CardTitle>
             <CardDescription>
-              Update your password to keep your account secure
+              Aktualisiere dein Passwort, um dein Konto zu schützen
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -261,13 +261,13 @@ export const ProfileForm = () => {
                 htmlFor="current-password"
                 className="text-base font-semibold"
               >
-                Current Password
+                Aktuelles Passwort
               </Label>
               <PasswordInput
                 id="current-password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter your current password"
+                placeholder="Aktuelles Passwort eingeben"
                 className="h-10"
               />
             </div>
@@ -275,13 +275,13 @@ export const ProfileForm = () => {
             {/* New Password */}
             <div className="space-y-3">
               <Label htmlFor="new-password" className="text-base font-semibold">
-                New Password
+                Neues Passwort
               </Label>
               <PasswordInput
                 id="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter your new password (min. 8 characters)"
+                placeholder="Neues Passwort eingeben (mind. 8 Zeichen)"
                 className="h-10"
               />
             </div>
@@ -292,13 +292,13 @@ export const ProfileForm = () => {
                 htmlFor="confirm-password"
                 className="text-base font-semibold"
               >
-                Confirm Password
+                Neues Passwort bestätigen
               </Label>
               <PasswordInput
                 id="confirm-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your new password"
+                placeholder="Neues Passwort wiederholen"
                 className="h-10"
               />
             </div>
@@ -316,7 +316,7 @@ export const ProfileForm = () => {
                 htmlFor="sign-out-devices"
                 className="text-sm font-medium cursor-pointer flex-1 mb-0"
               >
-                Sign out from all other devices
+                Von allen anderen Geräten abmelden
               </Label>
             </div>
 
@@ -335,10 +335,10 @@ export const ProfileForm = () => {
               {isChangingPassword ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Changing...
+                  Wird geändert...
                 </>
               ) : (
-                "Change Password"
+                "Passwort ändern"
               )}
             </Button>
           </CardContent>

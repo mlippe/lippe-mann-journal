@@ -20,6 +20,16 @@ export function SiteHeader() {
 
   const formatTitle = (segment: string) => {
     if (segment === "substanz-checklist") return "Substanz-Checkliste";
+    if (segment === "photos") return "Fotos";
+    if (segment === "posts") return "Beiträge";
+    if (segment === "collections") return "Sammlungen";
+    if (segment === "new") return "Neu";
+    if (segment === "session") return "Session";
+    if (segment === "album") return "Album";
+    if (segment === "photo") return "Foto";
+    if (segment === "article") return "Artikel";
+    if (segment === "profile") return "Profil";
+    if (segment === "revisit") return "Revisit";
     return segment.charAt(0).toUpperCase() + segment.slice(1);
   };
 

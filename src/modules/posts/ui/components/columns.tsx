@@ -9,7 +9,7 @@ import { Post } from '@/db/schema';
 export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'title',
-    header: 'Title',
+    header: 'Titel',
     cell: ({ row }) => {
       const editPath = `/dashboard/posts/${row.original.slug}`;
       return (
@@ -24,7 +24,7 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     accessorKey: 'type',
-    header: 'Type',
+    header: 'Typ',
     cell: ({ row }) => {
       const type = row.original.type;
       return (
@@ -36,7 +36,7 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     accessorKey: 'visibility',
-    header: 'Visibility',
+    header: 'Sichtbarkeit',
     cell: ({ row }) => {
       return (
         <VisibilityToggle
@@ -48,7 +48,7 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     id: 'actions',
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span className='sr-only'>Aktionen</span>,
     cell: ({ row }) => {
       return (
         <div className='flex justify-end'>

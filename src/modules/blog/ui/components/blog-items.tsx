@@ -35,7 +35,7 @@ export const PostsSection = ({ data }: PostsSectionProps) => {
           >
             <Image
               src={keyToUrl(item.coverImage) || '/placeholder.svg'}
-              alt={item.title || 'Blog post'}
+              alt={item.title || 'Beitrag'}
               fill
               unoptimized
               priority
@@ -47,7 +47,7 @@ export const PostsSection = ({ data }: PostsSectionProps) => {
                 <h2 className='font-light line-clamp-2'>{item.title}</h2>
 
                 <div className='relative mr-2'>
-                  <span className='text-sm font-light'>Read</span>
+                  <span className='text-sm font-light'>Lesen</span>
                   <div className='absolute bottxom-0.5 left-0 w-full h-px bg-black dark:bg-white transition-all duration-300 transform ease-in-out group-hover:w-1/3'></div>
                 </div>
               </div>

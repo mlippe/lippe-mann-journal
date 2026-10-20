@@ -49,8 +49,8 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
         onValueChange={handleSelectChange}
       >
         <SelectTrigger className='w-full'>
-          <SelectValue placeholder='Select aperture'>
-            {isCustom ? 'Custom' : value ? `f/${value}` : 'Select aperture'}
+          <SelectValue placeholder='Blende wählen'>
+            {isCustom ? 'Benutzerdefiniert' : value ? `f/${value}` : 'Blende wählen'}
           </SelectValue>
         </SelectTrigger>
         <SelectContent className='max-h-75'>
@@ -59,7 +59,7 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
               f/{f}
             </SelectItem>
           ))}
-          <SelectItem value='custom'>Custom value...</SelectItem>
+          <SelectItem value='custom'>Benutzerdefiniert...</SelectItem>
         </SelectContent>
       </Select>
 
@@ -69,7 +69,7 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
           <Input
             type='number'
             step='0.1'
-            placeholder='Enter custom value'
+            placeholder='Wert eingeben'
             value={value ?? ''}
             onChange={handleCustomChange}
             className='flex-1'
@@ -80,7 +80,7 @@ export function ApertureSelector({ value, onChange }: ApertureSelectorProps) {
             size='sm'
             onClick={() => setIsCustom(false)}
           >
-            Cancel
+            Abbrechen
           </Button>
         </div>
       )}

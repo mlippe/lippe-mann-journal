@@ -74,14 +74,14 @@ const ConfirmStep = ({
   const onInvalid = (errors: FieldErrors<ConfirmStepData>) => {
     console.error('Photo creation validation errors:', errors);
     if (errors.postTitle) {
-      toast.error(errors.postTitle.message || 'Please enter a post title.');
+      toast.error(errors.postTitle.message || 'Bitte gib einen Beitragstitel ein.');
       return;
     }
     if (errors.title) {
-      toast.error(errors.title.message || 'Please enter a photo title.');
+      toast.error(errors.title.message || 'Bitte gib einen Fototitel ein.');
       return;
     }
-    toast.error('Please check the form for errors before saving.');
+    toast.error('Bitte überprüfe die Eingaben im Formular.');
   };
 
   const onSubmit = (data: ConfirmStepData) => {
@@ -121,7 +121,7 @@ const ConfirmStep = ({
               <BlurImage
                 blurhash={imageInfo.blurhash}
                 src={keyToUrl(url)}
-                alt='Uploaded photo'
+                alt='Hochgeladenes Foto'
                 fill
                 className='object-contain w-full h-full'
                 unoptimized
@@ -134,7 +134,7 @@ const ConfirmStep = ({
             render={({ field }) => (
               <FormItem className='mb-10'>
                 <FormControl>
-                  <Input {...field} placeholder='Photo title' />
+                  <Input {...field} placeholder='Fototitel' />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -151,7 +151,7 @@ const ConfirmStep = ({
                       <div className='flex items-center gap-4'>
                         <div className='flex items-center gap-2'>
                           <span className='text-sm text-muted-foreground'>
-                            {field.value === 'public' ? 'Public' : 'Private'}
+                            {field.value === 'public' ? 'Öffentlich' : 'Privat'}
                           </span>
                           <FormControl>
                             <Switch
@@ -173,11 +173,11 @@ const ConfirmStep = ({
                   name='postTitle'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='mb-3'>Post Title</FormLabel>
+                      <FormLabel className='mb-3'>Beitragstitel</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder='Post title'
+                          placeholder='Titel des Beitrags'
                         ></Textarea>
                       </FormControl>
                       <FormMessage />
@@ -209,7 +209,7 @@ const ConfirmStep = ({
                   name='collectionIds'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='mb-3'>Collections</FormLabel>
+                      <FormLabel className='mb-3'>Sammlungen</FormLabel>
                       <FormControl>
                         <CollectionSelect
                           value={field.value || []}
@@ -226,7 +226,7 @@ const ConfirmStep = ({
 
               <div className='space-y-4 border-t pt-4'>
                 <div>
-                  <h3 className='text-sm font-semibold'>EXIF Data</h3>
+                  <h3 className='text-sm font-semibold'>EXIF-Daten</h3>
 
                   {!isEditExif && (
                     <div className='mt-4 border border-border/80 rounded-sm p-4 w-full'>
@@ -242,9 +242,9 @@ const ConfirmStep = ({
                         name='make'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Camera Make</FormLabel>
+                            <FormLabel>Kamera-Hersteller</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder='e.g., Canon' />
+                              <Input {...field} placeholder='z. B. Canon' />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -256,9 +256,9 @@ const ConfirmStep = ({
                         name='model'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Camera Model</FormLabel>
+                            <FormLabel>Kameramodell</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder='e.g., EOS R5' />
+                              <Input {...field} placeholder='z. B. EOS R5' />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -271,11 +271,11 @@ const ConfirmStep = ({
                       name='lensModel'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Lens Model</FormLabel>
+                          <FormLabel>Objektiv</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder='e.g., RF 24-70mm f/2.8L'
+                              placeholder='z. B. RF 24-70mm f/2.8L'
                             />
                           </FormControl>
                           <FormMessage />
@@ -289,7 +289,7 @@ const ConfirmStep = ({
                         name='focalLength'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Focal Length (mm)</FormLabel>
+                            <FormLabel>Brennweite (mm)</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
@@ -315,7 +315,7 @@ const ConfirmStep = ({
                         name='focalLength35mm'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>35mm Equivalent (mm)</FormLabel>
+                            <FormLabel>KB-Äquivalent (mm)</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
@@ -343,7 +343,7 @@ const ConfirmStep = ({
                         name='fNumber'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Aperture</FormLabel>
+                            <FormLabel>Blende</FormLabel>
                             <FormControl>
                               <ApertureSelector
                                 value={field.value}
@@ -360,7 +360,7 @@ const ConfirmStep = ({
                         name='exposureTime'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Shutter Speed</FormLabel>
+                            <FormLabel>Verschlusszeit</FormLabel>
                             <FormControl>
                               <ShutterSpeedSelector
                                 value={field.value}
@@ -395,7 +395,7 @@ const ConfirmStep = ({
                         name='exposureCompensation'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>EV</FormLabel>
+                            <FormLabel>Belichtungskorrektur (EV)</FormLabel>
                             <FormControl>
                               <ExposureCompensationSelector
                                 value={field.value}
@@ -415,17 +415,17 @@ const ConfirmStep = ({
                     variant='outline'
                     onClick={() => setIsEditExif(true)}
                   >
-                    Edit EXIF Data
+                    EXIF-Daten bearbeiten
                   </Button>
                 ) : (
                   <div className='flex gap-2'>
-                    <Button type='submit'>Save EXIF Data</Button>
+                    <Button type='submit'>EXIF-Daten übernehmen</Button>
                     <Button
                       type='button'
                       variant='secondary'
                       onClick={() => setIsEditExif(false)}
                     >
-                      Cancel
+                      Abbrechen
                     </Button>
                   </div>
                 )}
@@ -434,7 +434,7 @@ const ConfirmStep = ({
           </div>
           <div className='border-t pt-4'>
             <Button type='submit' disabled={isEditExif || isSubmitting}>
-              {!isSubmitting ? 'Save image' : 'Creating image... '}
+              {!isSubmitting ? 'Foto speichern' : 'Foto wird erstellt...'}
             </Button>
           </div>
         </form>

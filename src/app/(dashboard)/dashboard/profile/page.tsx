@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import SecurityAccessCard from "@/modules/auth/ui/components/security-access-card";
 
 export const metadata = {
-  title: "Security & Access",
+  title: "Sicherheit & Zugang",
 };
 
 const ProfilePage = async () => {
@@ -22,9 +22,9 @@ const ProfilePage = async () => {
   return (
     <div className="py-4 px-4 md:px-8 flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">Profile & Security</h1>
+        <h1 className="text-2xl font-bold">Profil & Sicherheit</h1>
         <p className="text-sm text-muted-foreground">
-          Manage your profile, password, and active sessions
+          Verwalte dein Profil, Passwort und aktive Sitzungen
         </p>
       </div>
 

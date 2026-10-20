@@ -41,9 +41,9 @@ export const CollectionsList = () => {
           <EmptyMedia variant='icon'>
             <IconFolderOff />
           </EmptyMedia>
-          <EmptyTitle>No collections found</EmptyTitle>
+          <EmptyTitle>Keine Sammlungen gefunden</EmptyTitle>
           <EmptyDescription>
-            Create your first collection to start organizing your posts.
+            Erstelle deine erste Sammlung, um deine Beiträge zu organisieren.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -97,8 +97,8 @@ const LoadingStatus = () => {
             <TableRow>
               <TableHead className='pl-6'>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead className='text-right pr-6'>Actions</TableHead>
+              <TableHead>Zuletzt aktualisiert</TableHead>
+              <TableHead className='text-right pr-6'>Aktionen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

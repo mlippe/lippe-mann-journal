@@ -45,13 +45,13 @@ export function UploadZone({
       </div>
       <div className="text-center space-y-2">
         <h1 className={cn(isUploading && "opacity-50")}>
-          Drag and drop photo file to upload
+          Fotos per Drag & Drop hier ablegen
         </h1>
         <p className="text-xs text-muted-foreground">
-          Your photo will be private until you publish it.
+          Deine Fotos bleiben privat, bis du sie veröffentlichst.
         </p>
         <p className="text-xs text-muted-foreground">
-          Maximum file size: {IMAGE_SIZE_LIMIT / 1024 / 1024} MB
+          Maximale Dateigröße: {IMAGE_SIZE_LIMIT / 1024 / 1024} MB
         </p>
       </div>
       {isUploading ? (
@@ -62,11 +62,11 @@ export function UploadZone({
             background: `linear-gradient(to right, rgb(34 197 94) ${uploadProgress}%, rgb(15 23 42) ${uploadProgress}%)`,
           }}
         >
-          Uploading... {uploadProgress}%
+          Wird hochgeladen... {uploadProgress}%
         </Button>
       ) : (
         <Button type="button" disabled={isUploading} onClick={open}>
-          Select file
+          Datei auswählen
         </Button>
       )}
     </div>

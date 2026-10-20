@@ -65,7 +65,7 @@ const CreatePhotoAlbum = () => {
               trpc.posts.getPublished.queryOptions({}),
             ),
           ]);
-          toast.success('Album created successfully!');
+          toast.success('Album erfolgreich erstellt!');
           router.refresh();
           router.push('/dashboard/posts?type=ALBUM');
         },
@@ -86,7 +86,7 @@ const CreatePhotoAlbum = () => {
           {photos.length > 0 && (
             <div className='space-y-4'>
               <h3 className='text-lg font-medium'>
-                Uploaded Photos ({photos.length})
+                Hochgeladene Fotos ({photos.length})
               </h3>
               <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                 {photos.map((photo) => (
@@ -119,7 +119,7 @@ const CreatePhotoAlbum = () => {
 
               <div className='flex justify-end pt-4'>
                 <Button onClick={() => setStep('confirm')} size='lg'>
-                  Next: Album Details ({photos.length} photos)
+                  Weiter: Albumdetails ({photos.length} Fotos)
                 </Button>
               </div>
             </div>
@@ -130,9 +130,9 @@ const CreatePhotoAlbum = () => {
       {step === 'confirm' && (
         <div className='space-y-6'>
           <div className='flex items-center justify-between'>
-            <h2 className='text-2xl font-bold'>Album Configuration</h2>
+            <h2 className='text-2xl font-bold'>Albumeinstellungen</h2>
             <Button variant='ghost' onClick={() => setStep('upload')}>
-              ← Back to Upload
+              ← Zurück zum Upload
             </Button>
           </div>
           <ConfirmStep

@@ -20,8 +20,8 @@ export function DeleteArticleButton({
   const queryClient = useQueryClient();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    'Delete article',
-    `Are you sure you want to delete "${articleTitle}"? This action cannot be undone. The article will be permanently deleted.`,
+    'Artikel löschen',
+    `Bist du sicher, dass du „${articleTitle}“ löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden. Der Artikel wird dauerhaft gelöscht.`,
   );
 
   const deleteArticle = useMutation(trpc.posts.remove.mutationOptions());
@@ -39,10 +39,10 @@ export function DeleteArticleButton({
           await queryClient.invalidateQueries(
             trpc.posts.getMany.queryOptions({}),
           );
-          toast.success('article deleted successfully');
+          toast.success('Artikel erfolgreich gelöscht');
         },
         onError: (error) => {
-          toast.error(error.message || 'Failed to delete article');
+          toast.error(error.message || 'Fehler beim Löschen des Artikels');
         },
       },
     );
@@ -59,7 +59,7 @@ export function DeleteArticleButton({
           handleDelete();
         }}
         className='h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10'
-        title='Delete article'
+        title='Artikel löschen'
       >
         <Trash2 className='size-4' />
       </Button>

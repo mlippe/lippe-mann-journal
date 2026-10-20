@@ -16,7 +16,7 @@ export const LatestPostSection = ({ data }: LatestPostSectionProps) => {
   if (!data) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted rounded-xl">
-        <p className="text-muted-foreground">No blog available</p>
+        <p className="text-muted-foreground">Keine Beiträge verfügbar</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export const LatestPostSection = ({ data }: LatestPostSectionProps) => {
     >
       <Image
         src={keyToUrl(data.coverImage) || "/placeholder.svg"}
-        alt={data.title || "Blog post"}
+        alt={data.title || "Beitrag"}
         fill
         unoptimized
         priority
@@ -39,13 +39,13 @@ export const LatestPostSection = ({ data }: LatestPostSectionProps) => {
         <div className="bg-background backdrop-blur-xs p-3 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Badge>
-              <span className="text-xs font-light">New</span>
+              <span className="text-xs font-light">Neu</span>
             </Badge>
             <h2 className="font-light">{data.title}</h2>
           </div>
 
           <div className="relative mr-2">
-            <span className="text-sm font-light">Read</span>
+            <span className="text-sm font-light">Lesen</span>
             <div className="absolute bottom-[2px] left-0 w-full h-px bg-black dark:bg-white transition-all duration-300 transform ease-in-out group-hover:w-1/3"></div>
           </div>
         </div>

@@ -25,14 +25,14 @@ export function SectionCardsView() {
 
   const cardData = [
     {
-      title: 'Posts',
+      title: 'Beiträge',
       value: stats.totalPosts,
       href: '/dashboard/posts',
       icon: IconFiles,
       caption: 'Beiträge',
     },
     {
-      title: 'Collections',
+      title: 'Sammlungen',
       value: stats.totalCollections,
       href: '/dashboard/collections',
       icon: IconFolder,

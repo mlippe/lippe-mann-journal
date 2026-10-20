@@ -55,13 +55,13 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   const updateMutation = useMutation(
     trpc.photos.update.mutationOptions({
       onSuccess: () => {
-        toast.success('Photo updated successfully');
+        toast.success('Foto erfolgreich aktualisiert');
         queryClient.invalidateQueries(trpc.photos.getMany.queryOptions({}));
         router.refresh();
         router.push('/dashboard/photos');
       },
       onError: (err) => {
-        toast.error(err.message || 'Failed to update photo');
+        toast.error(err.message || 'Fehler beim Aktualisieren des Fotos');
       },
     }),
   );
@@ -92,7 +92,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
   }
 
   const takenAt = data.dateTimeOriginal
-    ? formatExifDate(data.dateTimeOriginal, 'd MMM yyyy')
+    ? formatExifDate(data.dateTimeOriginal, 'dd.MM.yyyy')
     : null;
 
   return (
@@ -101,11 +101,11 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
         <div className='mb-6 flex items-baseline justify-between gap-4'>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>
-              {data.title || 'Untitled photo'}
+              {data.title || 'Ohne Titel'}
             </h1>
             {takenAt && (
               <p className='text-sm text-muted-foreground'>
-                Taken on {takenAt}
+                Aufgenommen am {takenAt}
               </p>
             )}
           </div>
@@ -124,9 +124,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                   name='title'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel>Titel</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder='Photo title' />
+                        <Input {...field} placeholder='Fototitel' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -136,10 +136,10 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                 {/* Camera parameters */}
                 <div className='space-y-4 border-t pt-4'>
                   <div>
-                    <h3 className='text-sm font-semibold'>Camera Parameters</h3>
+                    <h3 className='text-sm font-semibold'>Kamera-Parameter</h3>
                     <p className='mt-1 text-xs text-muted-foreground'>
-                      Auto-filled from EXIF when available. You can edit these
-                      values.
+                      Automatisch aus den EXIF-Daten ausgelesen. Du kannst die
+                      Werte manuell anpassen.
                     </p>
                   </div>
                   <div className='grid gap-4 md:grid-cols-2'>
@@ -148,9 +148,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='make'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Camera Make</FormLabel>
+                          <FormLabel>Kamera-Hersteller</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder='e.g., Canon' />
+                            <Input {...field} placeholder='z. B. Canon' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -162,9 +162,9 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='model'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Camera Model</FormLabel>
+                          <FormLabel>Kameramodell</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder='e.g., EOS R5' />
+                            <Input {...field} placeholder='z. B. EOS R5' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -176,11 +176,11 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                     name='lensModel'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Lens Model</FormLabel>
+                        <FormLabel>Objektiv</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder='e.g., RF 24-70mm f/2.8L'
+                            placeholder='z. B. RF 24-70mm f/2.8L'
                           />
                         </FormControl>
                         <FormMessage />
@@ -193,7 +193,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='focalLength'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Focal Length (mm)</FormLabel>
+                          <FormLabel>Brennweite (mm)</FormLabel>
                           <FormControl>
                             <Input
                               type='number'
@@ -218,7 +218,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='focalLength35mm'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>35mm Equivalent (mm)</FormLabel>
+                          <FormLabel>KB-Äquivalent (mm)</FormLabel>
                           <FormControl>
                             <Input
                               type='number'
@@ -244,7 +244,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='fNumber'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Aperture</FormLabel>
+                          <FormLabel>Blende</FormLabel>
                           <FormControl>
                             <ApertureSelector
                               value={field.value}
@@ -261,7 +261,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='exposureTime'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Shutter Speed</FormLabel>
+                          <FormLabel>Verschlusszeit</FormLabel>
                           <FormControl>
                             <ShutterSpeedSelector
                               value={field.value}
@@ -296,7 +296,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                       name='exposureCompensation'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>EV</FormLabel>
+                          <FormLabel>Belichtungskorrektur (EV)</FormLabel>
                           <FormControl>
                             <ExposureCompensationSelector
                               value={field.value}
@@ -316,7 +316,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                     name='latitude'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Latitude</FormLabel>
+                        <FormLabel>Breitengrad (Latitude)</FormLabel>
                         <FormControl>
                           <Input
                             type='number'
@@ -328,7 +328,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                                 value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
                             }}
-                            placeholder='e.g. 37.7749'
+                            placeholder='z. B. 37.7749'
                           />
                         </FormControl>
                         <FormMessage />
@@ -341,7 +341,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                     name='longitude'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Longitude</FormLabel>
+                        <FormLabel>Längengrad (Longitude)</FormLabel>
                         <FormControl>
                           <Input
                             type='number'
@@ -353,7 +353,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
                                 value === '' ? undefined : Number(value);
                               field.onChange(numericValue);
                             }}
-                            placeholder='e.g. -122.4194'
+                            placeholder='z. B. -122.4194'
                           />
                         </FormControl>
                         <FormMessage />
@@ -364,7 +364,7 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
 
                 <div className='flex justify-end pt-2'>
                   <Button type='submit' disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : 'Save changes'}
+                    {isSubmitting ? 'Wird gespeichert...' : 'Änderungen speichern'}
                   </Button>
                 </div>
               </form>

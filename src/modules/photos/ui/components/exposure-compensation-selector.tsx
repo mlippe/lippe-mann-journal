@@ -78,10 +78,10 @@ export function ExposureCompensationSelector({
   };
 
   const displayValue = isCustom
-    ? "Custom"
+    ? "Benutzerdefiniert"
     : value !== undefined
       ? formatEV(closestEV ?? value)
-      : "Select EV";
+      : "Belichtungskorrektur wählen";
 
   return (
     <div className="space-y-2">
@@ -90,7 +90,7 @@ export function ExposureCompensationSelector({
         onValueChange={handleSelectChange}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select EV">{displayValue}</SelectValue>
+          <SelectValue placeholder="Belichtungskorrektur wählen">{displayValue}</SelectValue>
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
           {STANDARD_EV_VALUES.map((ev) => (
@@ -98,7 +98,7 @@ export function ExposureCompensationSelector({
               {formatEV(ev)}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Custom value...</SelectItem>
+          <SelectItem value="custom">Benutzerdefiniert...</SelectItem>
         </SelectContent>
       </Select>
 
@@ -107,7 +107,7 @@ export function ExposureCompensationSelector({
           <Input
             type="number"
             step="0.33"
-            placeholder="Enter EV value (e.g., -1.5)"
+            placeholder="EV-Wert eingeben (z. B. -1.5)"
             value={value ?? ""}
             onChange={handleCustomChange}
             className="flex-1"
@@ -121,7 +121,7 @@ export function ExposureCompensationSelector({
             size="sm"
             onClick={() => setIsCustom(false)}
           >
-            Cancel
+            Abbrechen
           </Button>
         </div>
       )}

@@ -122,9 +122,9 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
         queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
-        toast.success('Post updated');
+        toast.success('Beitrag erfolgreich aktualisiert');
       },
-      onError: (e) => toast.error(`Failed to update post: ${e.message}`),
+      onError: (e) => toast.error(`Fehler beim Aktualisieren des Beitrags: ${e.message}`),
     }),
   );
 
@@ -137,9 +137,9 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
         queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
-        toast.success('Photo metadata updated');
+        toast.success('Foto-Metadaten erfolgreich aktualisiert');
       },
-      onError: (e) => toast.error(`Failed to update photo: ${e.message}`),
+      onError: (e) => toast.error(`Fehler beim Aktualisieren des Fotos: ${e.message}`),
     }),
   );
 
@@ -188,7 +188,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Post Settings</CardTitle>
+            <CardTitle>Beitragseinstellungen</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
             <FormField
@@ -196,7 +196,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
               name='postTitle'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Post Title</FormLabel>
+                  <FormLabel>Titel des Beitrags</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -229,7 +229,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
               name='collectionIds'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Collections</FormLabel>
+                  <FormLabel>Sammlungen</FormLabel>
                   <FormControl>
                     <CollectionSelect
                       value={field.value || []}
@@ -243,11 +243,11 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
 
             <div className='flex items-center justify-between rounded-lg border p-4'>
               <div className='space-y-0.5'>
-                <FormLabel>Visibility</FormLabel>
+                <FormLabel>Sichtbarkeit</FormLabel>
                 <div className='text-sm text-muted-foreground'>
                   {form.watch('postVisibility') === 'public'
-                    ? 'Public'
-                    : 'Private'}
+                    ? 'Öffentlich'
+                    : 'Privat'}
                 </div>
               </div>
               <FormField
@@ -284,7 +284,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Photo Metadata</CardTitle>
+            <CardTitle>Foto-Metadaten</CardTitle>
           </CardHeader>
           <CardContent className='space-y-6'>
             {photo && (
@@ -305,7 +305,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
               name='title'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Photo Title</FormLabel>
+                  <FormLabel>Fototitel</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -316,14 +316,14 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
 
             <div className='space-y-4 border-t pt-4'>
               <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-semibold'>EXIF Data</h3>
+                <h3 className='text-sm font-semibold'>EXIF-Daten</h3>
                 <Button
                   type='button'
                   variant='outline'
                   size='sm'
                   onClick={() => setIsEditExif(!isEditExif)}
                 >
-                  {isEditExif ? 'Hide EXIF Editor' : 'Edit EXIF'}
+                  {isEditExif ? 'EXIF-Editor ausblenden' : 'EXIF bearbeiten'}
                 </Button>
               </div>
 
@@ -341,12 +341,12 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='make'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Camera Make</FormLabel>
+                        <FormLabel>Kamera-Hersteller</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value || ''}
-                            placeholder='e.g., Canon'
+                            placeholder='z. B. Canon'
                           />
                         </FormControl>
                         <FormMessage />
@@ -358,12 +358,12 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='model'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Camera Model</FormLabel>
+                        <FormLabel>Kameramodell</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value || ''}
-                            placeholder='e.g., EOS R5'
+                            placeholder='z. B. EOS R5'
                           />
                         </FormControl>
                         <FormMessage />
@@ -375,12 +375,12 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='lensModel'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Lens Model</FormLabel>
+                        <FormLabel>Objektiv</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value || ''}
-                            placeholder='e.g., RF 24-70mm'
+                            placeholder='z. B. RF 24-70mm'
                           />
                         </FormControl>
                         <FormMessage />
@@ -392,7 +392,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='focalLength'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Focal Length (mm)</FormLabel>
+                        <FormLabel>Brennweite (mm)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -415,7 +415,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='focalLength35mm'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Focal Length 35mm (mm)</FormLabel>
+                        <FormLabel>Brennweite 35mm (mm)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -438,7 +438,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='fNumber'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Aperture</FormLabel>
+                        <FormLabel>Blende</FormLabel>
                         <FormControl>
                           <ApertureSelector
                             value={field.value ?? undefined}
@@ -453,7 +453,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='exposureTime'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Shutter Speed</FormLabel>
+                        <FormLabel>Verschlusszeit</FormLabel>
                         <FormControl>
                           <ShutterSpeedSelector
                             value={field.value ?? undefined}
@@ -483,7 +483,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='exposureCompensation'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Exposure Comp.</FormLabel>
+                        <FormLabel>Belichtungskorrektur</FormLabel>
                         <FormControl>
                           <ExposureCompensationSelector
                             value={field.value ?? undefined}
@@ -498,7 +498,7 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
                     name='dateTimeOriginal'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date Taken</FormLabel>
+                        <FormLabel>Aufnahmedatum</FormLabel>
                         <FormControl>
                           <Input
                             type='datetime-local'
@@ -521,10 +521,10 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
 
         <div className='flex justify-end gap-4'>
           <Button type='button' variant='ghost' onClick={() => router.back()}>
-            Cancel
+            Abbrechen
           </Button>
           <Button type='submit' disabled={isPending}>
-            {isPending ? 'Updating...' : 'Update Post & Photo'}
+            {isPending ? 'Wird gespeichert...' : 'Beitrag & Foto aktualisieren'}
           </Button>
         </div>
       </form>

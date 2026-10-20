@@ -50,8 +50,8 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
         onValueChange={handleSelectChange}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select ISO">
-            {isCustom ? "Custom" : value ? `ISO ${value}` : "Select ISO"}
+          <SelectValue placeholder="ISO wählen">
+            {isCustom ? "Benutzerdefiniert" : value ? `ISO ${value}` : "ISO wählen"}
           </SelectValue>
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
@@ -60,7 +60,7 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
               ISO {iso}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Custom value...</SelectItem>
+          <SelectItem value="custom">Benutzerdefiniert...</SelectItem>
         </SelectContent>
       </Select>
 
@@ -69,7 +69,7 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
           <span className="text-sm text-muted-foreground">ISO</span>
           <Input
             type="number"
-            placeholder="Enter custom value"
+            placeholder="Wert eingeben"
             value={value ?? ""}
             onChange={handleCustomChange}
             className="flex-1"
@@ -80,7 +80,7 @@ export function ISOSelector({ value, onChange }: ISOSelectorProps) {
             size="sm"
             onClick={() => setIsCustom(false)}
           >
-            Cancel
+            Abbrechen
           </Button>
         </div>
       )}

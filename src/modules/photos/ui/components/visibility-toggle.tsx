@@ -39,13 +39,13 @@ export function VisibilityToggle({
             trpc.photos.getMany.queryOptions({}),
           );
           toast.success(
-            `Photo is now ${newValue === 'public' ? 'public' : 'private'}`,
+            `Foto ist jetzt ${newValue === 'public' ? 'öffentlich' : 'privat'}`,
           );
         },
         onError: (error) => {
           // Revert on error
           setVisibility(newValue === 'public' ? 'private' : 'public');
-          toast.error(error.message || 'Failed to update visibility');
+          toast.error(error.message || 'Fehler beim Ändern der Sichtbarkeit');
         },
       },
     );
@@ -65,10 +65,10 @@ export function VisibilityToggle({
         checked={visibility === 'public'}
         onCheckedChange={handleToggle}
         disabled={updatePhoto.isPending}
-        aria-label='Toggle visibility'
+        aria-label='Sichtbarkeit umschalten'
       />
       <span className='text-sm text-muted-foreground min-w-12.5'>
-        {visibility === 'public' ? 'Public' : 'Private'}
+        {visibility === 'public' ? 'Öffentlich' : 'Privat'}
       </span>
     </div>
   );

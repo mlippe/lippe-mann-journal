@@ -16,9 +16,9 @@ export const DashboardArticleViewHeader = ({
       <h1 className='text-xl'>{title}</h1>
       <div className='flex gap-2'>
         <Button onClick={onRemove} variant='destructive'>
-          Delete
+          Löschen
         </Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button onClick={onSave}>Speichern</Button>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export const ExifPreview = ({
   if (!hasAnyExifValue || !exif) {
     return (
       <p className='text-xs text-muted-foreground mt-1'>
-        No EXIF data found. Please fill in manually.
+        Keine EXIF-Daten gefunden. Bitte manuell ausfüllen.
       </p>
     );
   }

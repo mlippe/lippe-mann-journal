@@ -40,19 +40,19 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
   const createCollection = useMutation(
     trpc.collections.create.mutationOptions({
       onSuccess: () => {
-        toast.success('Collection created');
+        toast.success('Sammlung erfolgreich erstellt');
         queryClient.invalidateQueries(trpc.collections.getAllCollections.queryOptions());
         router.refresh();
         router.push('/dashboard/collections');
       },
-      onError: (e) => toast.error(`Failed to create collection: ${e.message}`),
+      onError: (e) => toast.error(`Fehler beim Erstellen der Sammlung: ${e.message}`),
     }),
   );
 
   const updateCollection = useMutation(
     trpc.collections.update.mutationOptions({
       onSuccess: () => {
-        toast.success('Collection updated');
+        toast.success('Sammlung erfolgreich aktualisiert');
         queryClient.invalidateQueries(trpc.collections.getAllCollections.queryOptions());
         if (collection) {
            queryClient.invalidateQueries(trpc.collections.getCollectionBySlug.queryOptions({ slug: collection.slug }));
@@ -60,7 +60,7 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
         router.refresh();
         router.push('/dashboard/collections');
       },
-      onError: (e) => toast.error(`Failed to update collection: ${e.message}`),
+      onError: (e) => toast.error(`Fehler beim Aktualisieren der Sammlung: ${e.message}`),
     }),
   );
 
@@ -104,7 +104,7 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder='Collection name' {...field} />
+                <Input placeholder='Name der Sammlung' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,10 +118,10 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
             <FormItem>
               <FormLabel>Slug</FormLabel>
               <FormControl>
-                <Input placeholder='collection-slug' {...field} disabled={!!collection} />
+                <Input placeholder='sammlung-slug' {...field} disabled={!!collection} />
               </FormControl>
               <FormDescription>
-                The unique URL identifier for this collection.
+                Der eindeutige URL-Bezeichner für diese Sammlung.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -133,10 +133,10 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
           name='description'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Beschreibung</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='Tell us more about this collection...'
+                  placeholder='Beschreibe diese Sammlung...'
                   className='resize-none'
                   {...field}
                   value={field.value || ''}
@@ -152,7 +152,7 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
           name='coverImageUrl'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cover Image</FormLabel>
+              <FormLabel>Titelbild</FormLabel>
               <FormControl>
                 <FileUploader
                   onUploadSuccess={(key) => field.onChange(key)}
@@ -171,9 +171,9 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
           render={({ field }) => (
             <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
               <div className='space-y-0.5'>
-                <FormLabel className='text-base'>Featured</FormLabel>
+                <FormLabel className='text-base'>Hervorgehoben</FormLabel>
                 <FormDescription>
-                  Display this collection in the home page story feed.
+                  Diese Sammlung auf der Startseite hervorheben.
                 </FormDescription>
               </div>
               <FormControl>
@@ -187,7 +187,7 @@ export const CollectionForm = ({ collection }: CollectionFormProps) => {
         />
 
         <Button type='submit' disabled={isPending}>
-          {collection ? 'Update Collection' : 'Create Collection'}
+          {collection ? 'Sammlung aktualisieren' : 'Sammlung erstellen'}
         </Button>
       </form>
     </Form>

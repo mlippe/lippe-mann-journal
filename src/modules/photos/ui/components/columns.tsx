@@ -11,7 +11,7 @@ import Link from 'next/link';
 export const columns: ColumnDef<photoGetMany[number]>[] = [
   {
     accessorKey: 'url',
-    header: 'Image',
+    header: 'Bild',
     cell: ({ row }) => {
       const url = row.original.url;
       const imageUrl = keyToUrl(url);
@@ -20,7 +20,7 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
         <div className='w-14 h-14 relative rounded-md overflow-hidden bg-muted border border-border/40'>
           <BlurImage
             src={imageUrl}
-            alt={row.original.title || 'Photo'}
+            alt={row.original.title || 'Foto'}
             fill
             blurhash={row.original.blurData}
             className='object-cover'
@@ -32,7 +32,7 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
   },
   {
     accessorKey: 'title',
-    header: 'Title',
+    header: 'Titel',
     cell: ({ row }) => {
       const editPath = `/dashboard/photos/${row.original.id}`;
       return (
@@ -47,20 +47,20 @@ export const columns: ColumnDef<photoGetMany[number]>[] = [
   },
   {
     accessorKey: 'dateTimeOriginal',
-    header: 'Taken At',
+    header: 'Aufnahmedatum',
     cell: ({ row }) => {
       const takenAt = row.original.dateTimeOriginal;
       if (!takenAt) return <span className='text-muted-foreground'>-</span>;
 
       // Use formatExifDate for consistent formatting without timezone shifts
-      const formatted = formatExifDate(takenAt, 'MMM d, yyyy HH:mm');
+      const formatted = formatExifDate(takenAt, 'dd.MM.yyyy HH:mm');
 
       return <span suppressHydrationWarning className='text-sm text-muted-foreground'>{formatted}</span>;
     },
   },
   {
     id: 'actions',
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span className='sr-only'>Aktionen</span>,
     cell: ({ row }) => {
       return (
         <div className='flex justify-end'>
