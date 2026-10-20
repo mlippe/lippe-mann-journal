@@ -43,7 +43,7 @@ export function NavMain({
           <SidebarMenu>
             <SidebarMenuItem className='flex items-center gap-2'>
               <SidebarMenuButton
-                tooltip='Add Photo'
+                tooltip='Neuer Beitrag'
                 className='bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear pl-3'
                 isActive={pathname.startsWith('/dashboard/new')}
                 asChild
@@ -52,7 +52,7 @@ export function NavMain({
                   href='/dashboard/new'
                   className='flex w-full cursor-pointer '
                 >
-                  <span>+ New Post</span>
+                  <span>+ Neuer Beitrag</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

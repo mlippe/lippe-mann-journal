@@ -1,7 +1,7 @@
 import {
   IconLayoutDashboard,
   IconPhoto,
-  IconUser,
+  IconFolder,
   IconNotebook,
   IconListCheck,
 } from '@tabler/icons-react';
@@ -16,8 +16,8 @@ const IconMap = ({ icon }: IconMapProps) => {
       return <IconLayoutDashboard />;
     case 'photo':
       return <IconPhoto />;
-    case 'user':
-      return <IconUser />;
+    case 'folder':
+      return <IconFolder />;
     case 'post':
       return <IconNotebook />;
     case 'checklist':
