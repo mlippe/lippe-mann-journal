@@ -8,6 +8,7 @@ import {
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { getOptimizedImageUrl } from '@/lib/images';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 type Props = {
@@ -45,9 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: imageUrl ? [imageUrl] : [],
       },
     };
-  } catch (error) {
+  } catch {
     return {
-      title: 'Artikel',
+      title: 'Artikel nicht gefunden',
     };
   }
 }
@@ -65,7 +66,13 @@ const ArticlePage = async ({ params }: Props) => {
 async function ArticleSuspense({ slug }: { slug: string }) {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery(trpc.posts.getOne.queryOptions({ slug }));
+  const post = await queryClient
+    .fetchQuery(trpc.posts.getOne.queryOptions({ slug }))
+    .catch(() => null);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

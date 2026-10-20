@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { trpc } from "@/trpc/server";
 import { getQueryClient } from "@/trpc/server";
@@ -16,14 +17,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const id = (await params).id;
 
   const queryClient = getQueryClient();
-  const photo = await queryClient.fetchQuery(
-    trpc.photos.getOne.queryOptions({
-      id,
-    }),
-  );
+  const photo = await queryClient
+    .fetchQuery(
+      trpc.photos.getOne.queryOptions({
+        id,
+      }),
+    )
+    .catch(() => null);
 
   return {
-    title: photo.title,
+    title: photo?.title ?? "Foto nicht gefunden",
   };
 }
 
@@ -31,11 +34,17 @@ const Page = async ({ params }: Props) => {
   const { id } = await params;
 
   const queryClient = getQueryClient();
-  await queryClient.fetchQuery(
-    trpc.photos.getOne.queryOptions({
-      id,
-    }),
-  );
+  const photo = await queryClient
+    .fetchQuery(
+      trpc.photos.getOne.queryOptions({
+        id,
+      }),
+    )
+    .catch(() => null);
+
+  if (!photo) {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

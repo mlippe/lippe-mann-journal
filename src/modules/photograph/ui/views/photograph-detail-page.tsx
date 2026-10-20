@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getQueryClient, trpc } from '@/trpc/server';
@@ -14,11 +15,15 @@ export const PhotographDetailPage = async ({
   isModal = false,
 }: PhotographDetailPageProps) => {
   const queryClient = getQueryClient();
-  const post = await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({ slug }),
-  );
+  const post = await queryClient
+    .fetchQuery(trpc.posts.getOne.queryOptions({ slug }))
+    .catch(() => null);
 
-  if (post?.id) {
+  if (!post) {
+    notFound();
+  }
+
+  if (post.id) {
     await queryClient.prefetchQuery(
       trpc.social.getInteractions.queryOptions({ postId: post.id }),
     );

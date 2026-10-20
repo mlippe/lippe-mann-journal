@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -120,16 +121,16 @@ async function CollectionHeaderSuspense({
   collectionSlug: string;
 }) {
   const queryClient = getQueryClient();
-  const collection = await queryClient.fetchQuery(
-    trpc.collections.getCollectionBySlug.queryOptions({ slug: collectionSlug }),
-  );
+  const collection = await queryClient
+    .fetchQuery(
+      trpc.collections.getCollectionBySlug.queryOptions({
+        slug: collectionSlug,
+      }),
+    )
+    .catch(() => null);
 
   if (!collection) {
-    return (
-      <div className='text-center py-10 text-sm text-muted-foreground'>
-        Sammlung nicht gefunden.
-      </div>
-    );
+    notFound();
   }
 
   const postCount = collection.postCount ?? 0;
