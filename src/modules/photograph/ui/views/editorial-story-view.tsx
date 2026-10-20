@@ -1773,7 +1773,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
       <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
         {/* Editorial Story Title */}
-        <div className='max-w-3xl'>
+        <div className={cn('w-full', !isSession && 'max-w-3xl')}>
           <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4'>
             <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
               {formattedDate}
@@ -1797,13 +1797,18 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             ))}
           </div>
 
-          <h1 className='text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.12] sm:leading-[1.1] lg:leading-[1.05] mb-4 sm:mb-6'>
+          <h1
+            className={cn(
+              'text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.12] sm:leading-[1.1] lg:leading-[1.05] mb-4 sm:mb-6',
+              isSession && 'max-w-4xl',
+            )}
+          >
             {post.title}
           </h1>
 
           {/* Session Dual-Cut Switcher & Contact Sheet Trigger */}
           {isSession && (
-            <div className='mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-border/40 pt-4'>
+            <div className='mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-border/40 pt-4 w-full'>
               <SessionCutSwitcher
                 activeCut={selectedCut}
                 onCutChange={setSelectedCut}

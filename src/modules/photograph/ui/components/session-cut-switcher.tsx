@@ -12,6 +12,7 @@ interface SessionCutSwitcherProps {
   revisitedCount: number;
   revisitedNote?: string | null;
   revisitedAt?: Date | string | null;
+  className?: string;
 }
 
 export const SessionCutSwitcher = ({
@@ -22,9 +23,10 @@ export const SessionCutSwitcher = ({
   revisitedCount,
   revisitedNote,
   revisitedAt,
+  className,
 }: SessionCutSwitcherProps) => {
   return (
-    <div className='my-6 space-y-3'>
+    <div className={cn('space-y-3', className)}>
       {/* Cut Toggle Controls */}
       <div className='flex items-center gap-2 flex-wrap'>
         {hasRevisitedCut ? (
