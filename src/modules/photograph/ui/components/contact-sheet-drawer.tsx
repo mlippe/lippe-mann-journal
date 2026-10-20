@@ -44,7 +44,7 @@ export const ContactSheetDrawer = ({
           <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pr-8'>
             <div>
               <DialogTitle className='text-sm sm:text-base font-mono font-medium tracking-wide text-zinc-100 flex items-center gap-2'>
-                <span>🎞 {title}</span>
+                <span>{title}</span>
                 <span className='text-xs text-zinc-500 font-normal'>
                   ({totalFrames} Frames)
                 </span>
@@ -54,15 +54,15 @@ export const ContactSheetDrawer = ({
             {/* Kontaktbogen Marker Outline Legend */}
             <div className='flex items-center gap-3 text-[11px] font-mono text-zinc-400'>
               <span className='inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
+                <span className='size-2 rounded-full ring-2 ring-amber-400/80' />
                 <span>Erstauswahl</span>
               </span>
               <span className='inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
+                <span className='size-2 rounded-full ring-2 ring-red-500/80' />
                 <span>Neuauswahl</span>
               </span>
               <span className='hidden sm:inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
+                <span className='size-2 rounded-full ring-2 ring-red-500 border-2 border-amber-400' />
                 <span>Beide</span>
               </span>
             </div>

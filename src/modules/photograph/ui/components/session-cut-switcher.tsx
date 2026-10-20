@@ -38,13 +38,16 @@ export const SessionCutSwitcher = ({
         aria-selected={activeCut === 'revisited'}
         onClick={() => onCutChange('revisited')}
         className={cn(
-          'flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 cursor-pointer',
+          'flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full transition-all duration-200 cursor-pointer',
           activeCut === 'revisited'
             ? 'bg-background text-foreground font-semibold shadow-xs ring-1 ring-border/80'
             : 'text-muted-foreground hover:text-foreground',
         )}
       >
-        <span>Neuauswahl ({revisitedCount})</span>
+        <span>
+          <span className='hidden sm:inline'>Neuauswahl</span>
+          <span className='sm:hidden'>Neu</span> ({revisitedCount})
+        </span>
       </button>
 
       <button
@@ -53,13 +56,16 @@ export const SessionCutSwitcher = ({
         aria-selected={activeCut === 'initial'}
         onClick={() => onCutChange('initial')}
         className={cn(
-          'flex items-center gap-1.5 px-2.5 py-0.5 rounded-full transition-all duration-200 cursor-pointer',
+          'flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full transition-all duration-200 cursor-pointer',
           activeCut === 'initial'
             ? 'bg-background text-foreground font-semibold shadow-xs ring-1 ring-border/80'
             : 'text-muted-foreground hover:text-foreground',
         )}
       >
-        <span>Erstauswahl ({initialCount})</span>
+        <span>
+          <span className='hidden sm:inline'>Erstauswahl</span>
+          <span className='sm:hidden'>Erst</span> ({initialCount})
+        </span>
       </button>
     </div>
   );

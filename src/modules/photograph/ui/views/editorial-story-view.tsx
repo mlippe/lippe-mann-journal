@@ -1778,24 +1778,26 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
         {/* Editorial Story Title & Clean Metadata */}
         <div className='w-full'>
-          <div className='flex flex-wrap items-center justify-between gap-y-2.5 gap-x-3 mb-3 sm:mb-4'>
-            <div className='flex flex-wrap items-center gap-1.5 sm:gap-2'>
-              <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
+          <div className='flex items-center justify-between gap-x-2 sm:gap-x-3 mb-3 sm:mb-4 min-w-0'>
+            <div className='flex items-center gap-1.5 sm:gap-2 min-w-0 flex-wrap'>
+              <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground shrink-0'>
                 {formattedDate}
               </span>
-              <span className='text-muted-foreground/40'>·</span>
-              <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
-                {isSession
-                  ? `SESSION · ${allSessionPhotos.length} FRAMES`
-                  : photos.length > 1
-                    ? `${photos.length} AUFNAHMEN`
-                    : 'EINZELAUFNAHME'}
-              </span>
+              {!isSession && (
+                <>
+                  <span className='text-muted-foreground/40'>·</span>
+                  <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground shrink-0'>
+                    {photos.length > 1
+                      ? `${photos.length} AUFNAHMEN`
+                      : 'EINZELAUFNAHME'}
+                  </span>
+                </>
+              )}
               {collections.map((c) => (
                 <Badge
                   key={c.id}
                   variant='outline'
-                  className='text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.1em] font-medium px-2 py-0.5 h-auto border-muted-foreground/30 text-muted-foreground'
+                  className='text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.1em] font-medium px-2 py-0.5 h-auto border-muted-foreground/30 text-muted-foreground shrink-0'
                 >
                   {c.name}
                 </Badge>
@@ -1817,15 +1819,18 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               )}
             </div>
 
-            {/* Small Discreet Contact Sheet Trigger in Header */}
+            {/* Small Discreet Kontaktbogen Trigger in Header */}
             {isSession && (
               <button
                 type='button'
                 onClick={() => setIsContactSheetOpen(true)}
-                className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border/60 bg-muted/30 hover:bg-muted text-[11px] font-mono tracking-wider text-muted-foreground hover:text-foreground transition-all cursor-pointer shrink-0'
+                className='inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full border border-border/60 bg-muted/30 hover:bg-muted text-[11px] font-mono tracking-wider text-muted-foreground hover:text-foreground transition-all cursor-pointer shrink-0'
+                title={`Kontaktbogen (${allSessionPhotos.length} Frames)`}
+                aria-label={`Kontaktbogen (${allSessionPhotos.length} Frames)`}
               >
                 <IconLayoutGrid className='size-3 text-muted-foreground' />
-                <span>Kontaktbogen ({allSessionPhotos.length})</span>
+                <span className='hidden sm:inline'>Kontaktbogen</span>
+                <span>({allSessionPhotos.length})</span>
               </button>
             )}
           </div>
