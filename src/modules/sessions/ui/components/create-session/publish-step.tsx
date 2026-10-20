@@ -117,7 +117,7 @@ export const PublishStep = ({
 
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
           <span>
-            Initial Cut: <strong className='text-foreground'>{pickedCount}</strong> von{' '}
+            Erstauswahl: <strong className='text-foreground'>{pickedCount}</strong> von{' '}
             <strong>{totalFrames}</strong> Frames
           </span>
 

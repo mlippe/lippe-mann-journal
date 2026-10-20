@@ -1825,7 +1825,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border/60 bg-muted/30 hover:bg-muted text-[11px] font-mono tracking-wider text-muted-foreground hover:text-foreground transition-all cursor-pointer shrink-0'
               >
                 <IconLayoutGrid className='size-3 text-muted-foreground' />
-                <span>Contact Sheet ({allSessionPhotos.length})</span>
+                <span>Kontaktbogen ({allSessionPhotos.length})</span>
               </button>
             )}
           </div>
@@ -2035,7 +2035,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             <div className='flex items-center justify-between mb-4 px-1'>
               <div className='flex items-center gap-2 text-xs font-mono tracking-wider text-muted-foreground uppercase'>
                 <IconLayoutGrid className='size-3.5 text-muted-foreground' />
-                <span>Contact Sheet</span>
+                <span>Kontaktbogen</span>
                 <span className='text-muted-foreground/40'>·</span>
                 <span>{allSessionPhotos.length} Frames</span>
               </div>
@@ -2096,7 +2096,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     className='group-hover:scale-[1.02] inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-foreground text-background text-xs sm:text-[13px] font-mono tracking-wider font-medium shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'
                   >
                     <IconLayoutGrid className='size-3.5 sm:size-4' />
-                    <span>Contact Sheet dieser Session ansehen</span>
+                    <span>Kontaktbogen dieser Session ansehen</span>
                     <span className='opacity-60 text-[11px] sm:text-xs'>
                       ({allSessionPhotos.length})
                     </span>

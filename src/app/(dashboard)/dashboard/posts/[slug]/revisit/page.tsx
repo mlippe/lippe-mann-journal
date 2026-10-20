@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   );
 
   return {
-    title: `Revisit Cut · ${post.title}`,
+    title: `Neuauswahl · ${post.title}`,
   };
 }
 
@@ -45,7 +45,7 @@ const Page = async ({ params }: Props) => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ErrorBoundary fallback={<p>Fehler beim Laden der Session</p>}>
-        <Suspense fallback={<p>Lade Session Contact Sheet...</p>}>
+        <Suspense fallback={<p>Lade Session-Kontaktbogen...</p>}>
           <SessionRevisitView slug={decodedSlug} />
         </Suspense>
       </ErrorBoundary>

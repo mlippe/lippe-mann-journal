@@ -31,7 +31,7 @@ export const ContactSheetDrawer = ({
   open,
   onOpenChange,
   photos,
-  title = 'Contact Sheet',
+  title = 'Kontaktbogen',
   onSelectPhoto,
 }: ContactSheetDrawerProps) => {
   const totalFrames = photos.length;
@@ -51,15 +51,15 @@ export const ContactSheetDrawer = ({
               </DialogTitle>
             </div>
 
-            {/* Contact Sheet Marker Outline Legend */}
+            {/* Kontaktbogen Marker Outline Legend */}
             <div className='flex items-center gap-3 text-[11px] font-mono text-zinc-400'>
               <span className='inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
-                <span>Initial Cut</span>
+                <span>Erstauswahl</span>
               </span>
               <span className='inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
-                <span>Revisited Cut</span>
+                <span>Neuauswahl</span>
               </span>
               <span className='hidden sm:inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
@@ -113,15 +113,15 @@ export const ContactSheetDrawer = ({
                   {/* Top-Right Neutral Indicator Badge */}
                   {isBoth ? (
                     <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
-                      BOTH
+                      BEIDE
                     </div>
                   ) : isRevisited ? (
                     <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
-                      REV
+                      NEU
                     </div>
                   ) : isInitial ? (
                     <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
-                      1ST
+                      ERST
                     </div>
                   ) : null}
 

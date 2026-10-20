@@ -26,7 +26,7 @@ export const SessionCutSwitcher = ({
   return (
     <div
       role='tablist'
-      aria-label='Session Auswahl'
+      aria-label='Auswahl wechseln'
       className={cn(
         'inline-flex items-center p-0.5 rounded-full bg-muted/60 border border-border/60 text-[10px] sm:text-[11px] font-mono shrink-0',
         className,
@@ -44,7 +44,7 @@ export const SessionCutSwitcher = ({
             : 'text-muted-foreground hover:text-foreground',
         )}
       >
-        <span>Revisited ({revisitedCount})</span>
+        <span>Neuauswahl ({revisitedCount})</span>
       </button>
 
       <button
@@ -59,7 +59,7 @@ export const SessionCutSwitcher = ({
             : 'text-muted-foreground hover:text-foreground',
         )}
       >
-        <span>Initial ({initialCount})</span>
+        <span>Erstauswahl ({initialCount})</span>
       </button>
     </div>
   );

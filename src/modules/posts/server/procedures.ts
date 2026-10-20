@@ -619,7 +619,7 @@ export const postsRouter = createTRPCRouter({
               isHighlight: z.boolean().default(false),
             }),
           )
-          .min(1, 'Please select at least 1 photo for the revisited cut'),
+          .min(1, 'Bitte wähle mindestens 1 Foto für die Neuauswahl aus'),
       }),
     )
     .mutation(async ({ ctx, input }) => {

@@ -138,7 +138,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
 
   const handleSave = async () => {
     if (revisitedPicks.length === 0) {
-      toast.error('Bitte wähle mindestens 1 Bild für den Revisited Cut aus.');
+      toast.error('Bitte wähle mindestens 1 Bild für die Neuauswahl aus.');
       return;
     }
 
@@ -161,7 +161,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
-      toast.success('Revisited Cut erfolgreich gespeichert!');
+      toast.success('Neuauswahl erfolgreich gespeichert!');
       router.push(`/session/${post.slug}`);
     } catch (error) {
       console.error('Revisit error:', error);
@@ -182,7 +182,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         <div>
           <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest font-semibold mb-1'>
             <IconRotateClockwise className='size-4' />
-            <span>Session Revisit Studio</span>
+            <span>Session-Neuauswahl</span>
           </div>
           <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>
             {post.title}
@@ -206,26 +206,26 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='flex flex-wrap items-center gap-4 text-xs font-mono p-3 rounded-xl bg-card border border-border/70 text-muted-foreground'>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
-          <span>Initial Gut Pick (damals)</span>
+          <span>Erstauswahl (damals)</span>
         </div>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
-          <span>Revisited Pick (heute)</span>
+          <span>Neuauswahl (heute)</span>
         </div>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
-          <span>In beiden bestätigt</span>
+          <span>In beiden Auswahlen</span>
         </div>
       </div>
 
-      {/* 1. Contact Sheet Grid */}
+      {/* 1. Kontaktbogen Grid */}
       <div className='space-y-4'>
         <div className='flex items-center justify-between'>
           <h2 className='text-base sm:text-lg font-semibold tracking-tight'>
-            1. Contact Sheet durchsuchen & Auswählen
+            1. Kontaktbogen durchsuchen & auswählen
           </h2>
           <span className='text-xs font-mono text-muted-foreground'>
-            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Revisited ausgewählt
+            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Neuauswahl ausgewählt
           </span>
         </div>
 
@@ -266,15 +266,15 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                 <div className='absolute top-1 right-1 z-10 flex items-center gap-0.5 font-mono text-[9px] font-medium'>
                   {isBoth ? (
                     <span className='bg-black/80 text-white border border-white/10 px-1.5 py-0.5 rounded-xs shadow-xs'>
-                      Rev #{revPick!.revisitedOrder + 1} · Both
+                      Neu #{revPick!.revisitedOrder + 1} · Beide
                     </span>
                   ) : isRevisited ? (
                     <span className='bg-black/80 text-white border border-white/10 px-1.5 py-0.5 rounded-xs shadow-xs'>
-                      Rev #{revPick!.revisitedOrder + 1}
+                      Neu #{revPick!.revisitedOrder + 1}
                     </span>
                   ) : isInitial ? (
                     <span className='bg-black/80 text-zinc-300 border border-white/10 px-1 py-0.5 rounded-xs shadow-xs'>
-                      1st
+                      Erst
                     </span>
                   ) : null}
                 </div>
@@ -309,10 +309,10 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       {revisitedPicks.length > 0 && (
         <div className='space-y-4 pt-6 border-t border-border/70'>
           <h2 className='text-base sm:text-lg font-semibold tracking-tight'>
-            2. Pacing des Revisited Cuts ({revisitedPicks.length} Frames)
+            2. Reihenfolge der Neuauswahl ({revisitedPicks.length} Frames)
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground'>
-            Bestimme Reihenfolge und Bildrhythmus für die neue kuratierte Fassung.
+            Bestimme Reihenfolge und Bildrhythmus für die neu kuratierte Auswahl.
           </p>
 
           <div className='space-y-3'>
@@ -496,7 +496,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
           3. Retrospektive Notiz (optional)
         </Label>
         <p className='text-xs sm:text-sm text-muted-foreground'>
-          Erkläre deinen Sinneswandel in 1–2 Sätzen. Diese Notiz wird Lesern im Session Cut Switcher angezeigt.
+          Erkläre deinen Sinneswandel in 1–2 Sätzen. Diese Notiz wird Lesern im Auswahl-Umschalter angezeigt.
         </p>
         <Textarea
           id='revisited-note'
@@ -511,7 +511,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span>
-            Revisited Cut: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
+            Neuauswahl: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
           </span>
           <Button
             size='sm'
@@ -520,7 +520,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             className='bg-white text-zinc-950 hover:bg-zinc-200 font-semibold rounded-full px-5 h-8 text-xs cursor-pointer'
           >
             <IconCheck className='size-3.5 mr-1' />
-            <span>Revisited Cut speichern</span>
+            <span>Neuauswahl speichern</span>
           </Button>
         </div>
       </div>
