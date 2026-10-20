@@ -17,7 +17,9 @@ import {
   IconZoomIn,
   IconZoomOut,
   IconLayoutGrid,
+  IconArrowUpRight,
 } from '@tabler/icons-react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 
 import { PostGetOne } from '@/modules/posts/types';
@@ -1774,62 +1776,68 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}
       <header className='mt-8 sm:mt-10 md:mt-0 mb-8 sm:mb-12 md:mb-16'>
-        {/* Editorial Story Title */}
-        <div className={cn('w-full', !isSession && 'max-w-3xl')}>
-          <div className='flex flex-wrap items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4'>
-            <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
-              {formattedDate}
-            </span>
-            <span className='text-muted-foreground/40'>·</span>
-            <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
-              {isSession
-                ? `SESSION · ${allSessionPhotos.length} FRAMES (${photos.length} IM STORY-EDIT)`
-                : photos.length > 1
-                  ? `${photos.length} AUFNAHMEN`
-                  : 'EINZELAUFNAHME'}
-            </span>
-            {collections.map((c) => (
-              <Badge
-                key={c.id}
-                variant='outline'
-                className='text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.1em] font-medium px-2 py-0.5 h-auto border-muted-foreground/30 text-muted-foreground'
+        {/* Editorial Story Title & Clean Metadata */}
+        <div className='w-full'>
+          <div className='flex flex-wrap items-center justify-between gap-y-2.5 gap-x-3 mb-3 sm:mb-4'>
+            <div className='flex flex-wrap items-center gap-1.5 sm:gap-2'>
+              <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
+                {formattedDate}
+              </span>
+              <span className='text-muted-foreground/40'>·</span>
+              <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
+                {isSession
+                  ? `SESSION · ${allSessionPhotos.length} FRAMES`
+                  : photos.length > 1
+                    ? `${photos.length} AUFNAHMEN`
+                    : 'EINZELAUFNAHME'}
+              </span>
+              {collections.map((c) => (
+                <Badge
+                  key={c.id}
+                  variant='outline'
+                  className='text-[10px] sm:text-[11px] uppercase font-mono tracking-[0.1em] font-medium px-2 py-0.5 h-auto border-muted-foreground/30 text-muted-foreground'
+                >
+                  {c.name}
+                </Badge>
+              ))}
+
+              {isSession && hasRevisitedCut && (
+                <>
+                  <span className='text-muted-foreground/40 hidden sm:inline'>
+                    ·
+                  </span>
+                  <SessionCutSwitcher
+                    activeCut={selectedCut}
+                    onCutChange={setSelectedCut}
+                    hasRevisitedCut={hasRevisitedCut}
+                    initialCount={initialCount}
+                    revisitedCount={revisitedCount}
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Small Discreet Contact Sheet Trigger in Header */}
+            {isSession && (
+              <button
+                type='button'
+                onClick={() => setIsContactSheetOpen(true)}
+                className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border/60 bg-muted/30 hover:bg-muted text-[11px] font-mono tracking-wider text-muted-foreground hover:text-foreground transition-all cursor-pointer shrink-0'
               >
-                {c.name}
-              </Badge>
-            ))}
+                <IconLayoutGrid className='size-3 text-muted-foreground' />
+                <span>Contact Sheet ({allSessionPhotos.length})</span>
+              </button>
+            )}
           </div>
 
           <h1
             className={cn(
-              'text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.12] sm:leading-[1.1] lg:leading-[1.05] mb-4 sm:mb-6',
-              isSession && 'max-w-4xl',
+              'text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.12] sm:leading-[1.1] lg:leading-[1.05]',
+              !isSession ? 'max-w-3xl' : 'max-w-4xl',
             )}
           >
             {post.title}
           </h1>
-
-          {/* Session Dual-Cut Switcher & Contact Sheet Trigger */}
-          {isSession && (
-            <div className='mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-border/40 pt-4 w-full'>
-              <SessionCutSwitcher
-                activeCut={selectedCut}
-                onCutChange={setSelectedCut}
-                hasRevisitedCut={hasRevisitedCut}
-                initialCount={initialCount}
-                revisitedCount={revisitedCount}
-                revisitedNote={post.revisitedNote}
-                revisitedAt={post.revisitedAt}
-              />
-              <button
-                type='button'
-                onClick={() => setIsContactSheetOpen(true)}
-                className='inline-flex items-center gap-2 self-start sm:self-center px-4 py-2 rounded-full border border-border/80 bg-muted/40 hover:bg-muted text-xs font-mono tracking-wider transition-all cursor-pointer shrink-0'
-              >
-                <IconLayoutGrid className='size-3.5 text-muted-foreground' />
-                <span>Contact Sheet ({allSessionPhotos.length})</span>
-              </button>
-            </div>
-          )}
         </div>
       </header>
 
@@ -1995,7 +2003,113 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         })}
       </div>
 
-      {/* 3. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
+      {/* 3. SESSION CONTACT SHEET PREVIEW & RETROSPECTIVE NOTE */}
+      {isSession && (
+        <section className='relative z-10 mt-16 sm:mt-24 mb-6 sm:mb-8'>
+          {/* Retrospective Note (if present) */}
+          {post.revisitedNote && (
+            <div className='max-w-2xl mx-auto mb-10 px-4 text-center sm:text-left'>
+              <p className='text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground/70 mb-2'>
+                Retrospektive Notiz
+                {post.revisitedAt && (
+                  <>
+                    {' · '}
+                    {format(new Date(post.revisitedAt), 'MMMM yyyy', {
+                      locale: de,
+                    })}
+                  </>
+                )}
+              </p>
+              <blockquote className='border-l-2 border-border/80 pl-4 py-1 text-sm sm:text-base text-muted-foreground italic font-sans text-left'>
+                &ldquo;{post.revisitedNote}&rdquo;
+              </blockquote>
+            </div>
+          )}
+
+          {/* Contact Sheet Preview Card */}
+          <div
+            onClick={() => setIsContactSheetOpen(true)}
+            className='group relative w-full rounded-2xl border border-border/50 bg-muted/15 hover:bg-muted/25 transition-all duration-300 p-4 sm:p-6 overflow-hidden cursor-pointer'
+          >
+            {/* Header info */}
+            <div className='flex items-center justify-between mb-4 px-1'>
+              <div className='flex items-center gap-2 text-xs font-mono tracking-wider text-muted-foreground uppercase'>
+                <IconLayoutGrid className='size-3.5 text-muted-foreground' />
+                <span>Contact Sheet</span>
+                <span className='text-muted-foreground/40'>·</span>
+                <span>{allSessionPhotos.length} Frames</span>
+              </div>
+              <span className='text-[11px] font-mono text-muted-foreground/60 hidden sm:inline'>
+                Vollständige Session
+              </span>
+            </div>
+
+            {/* Thumbnail Grid with gradient fadeout */}
+            <div className='relative max-h-56 sm:max-h-64 overflow-hidden rounded-xl'>
+              <div className='grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1.5 sm:gap-2 opacity-85 group-hover:opacity-100 transition-opacity'>
+                {allSessionPhotos.map((photo, idx) => {
+                  const frameNum = photo.frameNumber ?? idx + 1;
+                  const formattedFrame = String(frameNum).padStart(2, '0');
+                  const isInitial = Boolean(photo.isInitialPick);
+                  const isRevisited = Boolean(photo.isRevisitedPick);
+                  const isBoth = isInitial && isRevisited;
+
+                  return (
+                    <div
+                      key={photo.id || idx}
+                      className={cn(
+                        'relative aspect-[3/2] rounded-xs overflow-hidden bg-muted/50 border transition-all',
+                        isBoth
+                          ? 'border-amber-400/80 ring-1 ring-red-500/80'
+                          : isRevisited
+                            ? 'border-red-500/70 ring-1 ring-red-500/70'
+                            : isInitial
+                              ? 'border-amber-400/70 ring-1 ring-amber-400/70'
+                              : 'border-border/40',
+                      )}
+                    >
+                      <Image
+                        src={keyToUrl(photo.url)}
+                        alt={photo.title || `Frame ${formattedFrame}`}
+                        fill
+                        sizes='(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw'
+                        className='object-cover'
+                        loading='lazy'
+                      />
+                      <span className='absolute bottom-0.5 left-1 z-10 text-[9px] font-mono font-semibold text-white/90 drop-shadow-xs'>
+                        {formattedFrame}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Gradient Fadeout Overlay */}
+              <div className='absolute inset-x-0 bottom-0 h-36 sm:h-44 bg-gradient-to-t from-background via-background/80 to-transparent flex items-end justify-center pb-4 sm:pb-6 pointer-events-none'>
+                <div className='pointer-events-auto'>
+                  <button
+                    type='button'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsContactSheetOpen(true);
+                    }}
+                    className='group-hover:scale-[1.02] inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-foreground text-background text-xs sm:text-[13px] font-mono tracking-wider font-medium shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer'
+                  >
+                    <IconLayoutGrid className='size-3.5 sm:size-4' />
+                    <span>Contact Sheet dieser Session ansehen</span>
+                    <span className='opacity-60 text-[11px] sm:text-xs'>
+                      ({allSessionPhotos.length})
+                    </span>
+                    <IconArrowUpRight className='size-3.5 sm:size-4 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform' />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 4. EDITORIAL FOOTER & CURATOR'S GUESTBOOK */}
       <footer
         id='guestbook'
         className='relative z-20 bg-background mt-16 sm:mt-20 md:mt-24 border-t border-border/40 pt-10 sm:pt-12 md:pt-16 space-y-10 sm:space-y-12'
@@ -2397,21 +2511,6 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Floating Bottom Contact Sheet Pill */}
-      {isSession && (
-        <div className='fixed bottom-6 right-6 z-30 animate-in fade-in slide-in-from-bottom-3 duration-300'>
-          <button
-            type='button'
-            onClick={() => setIsContactSheetOpen(true)}
-            className='flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-xl border border-zinc-700 dark:border-zinc-300 text-xs font-mono font-medium hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md'
-          >
-            <IconLayoutGrid className='size-3.5' />
-            <span>Contact Sheet</span>
-            <span className='opacity-60 text-[11px]'>({allSessionPhotos.length})</span>
-          </button>
-        </div>
-      )}
 
       {/* Contact Sheet Drawer */}
       {isSession && (
