@@ -37,7 +37,8 @@ export const DashboardPostsView = () => {
         }
         className='w-full'
       >
-        <TabsList className='w-full grid grid-cols-3 sm:w-auto sm:inline-flex'>
+        <TabsList className='w-full grid grid-cols-4 sm:w-auto sm:inline-flex'>
+          <TabsTrigger value='SESSION'>Sessions</TabsTrigger>
           <TabsTrigger value='PHOTO'>Photos</TabsTrigger>
           <TabsTrigger value='ALBUM'>Albums</TabsTrigger>
           <TabsTrigger value='ARTICLE'>Articles</TabsTrigger>

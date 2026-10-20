@@ -1,0 +1,69 @@
+import { Metadata } from 'next';
+import { getQueryClient } from '@/trpc/server';
+import { trpc } from '@/trpc/server';
+import { PhotographDetailPage } from '@/modules/photograph/ui/views/photograph-detail-page';
+import { EditorialStorySkeleton } from '@/modules/photograph/ui/views/editorial-story-skeleton';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { getOptimizedImageUrl } from '@/lib/images';
+import { Suspense } from 'react';
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  try {
+    const slug = (await params).slug;
+    const queryClient = getQueryClient();
+    const data = await queryClient.fetchQuery(
+      trpc.posts.getOne.queryOptions({ slug }),
+    );
+
+    if (!data) return {};
+
+    const firstPhoto = data.postsToPhotos?.[0]?.photo;
+    const rawImageUrl = firstPhoto
+      ? keyToUrl(firstPhoto.url)
+      : data.coverImage
+        ? keyToUrl(data.coverImage)
+        : undefined;
+
+    const imageUrl =
+      rawImageUrl ? getOptimizedImageUrl(rawImageUrl) : undefined;
+
+    const description = `Schau dir die Session "${data.title}" in meinem Journal an.`;
+
+    return {
+      title: data.title,
+      description,
+      openGraph: {
+        title: data.title,
+        description,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: 'article',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: data.title,
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
+    };
+  } catch {
+    return {
+      title: 'Session',
+    };
+  }
+}
+
+const SessionPage = async ({ params }: Props) => {
+  const { slug } = await params;
+
+  return (
+    <Suspense fallback={<EditorialStorySkeleton />}>
+      <PhotographDetailPage slug={slug} isModal={false} />
+    </Suspense>
+  );
+};
+
+export default SessionPage;

@@ -16,11 +16,17 @@ import {
   IconMail,
   IconZoomIn,
   IconZoomOut,
+  IconLayoutGrid,
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
 import { PostGetOne } from '@/modules/posts/types';
 import { Photo } from '@/db/schema';
+import { SessionCutSwitcher } from '../components/session-cut-switcher';
+import {
+  ContactSheetDrawer,
+  type SessionContactPhoto,
+} from '../components/contact-sheet-drawer';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { SocialInteractions } from '@/modules/social/ui/components/social-interactions';
@@ -48,6 +54,11 @@ interface EditorialStoryViewProps {
 type StoryPhoto = Photo & {
   isHighlight?: boolean;
   layoutPosition?: 'left' | 'right' | 'solo' | null;
+  frameNumber?: number | null;
+  isInitialPick?: boolean | null;
+  isRevisitedPick?: boolean | null;
+  initialOrder?: number | null;
+  revisitedOrder?: number | null;
 };
 
 type EditorialBlock =
@@ -88,6 +99,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   const [copied, setCopied] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [lightboxPhotosList, setLightboxPhotosList] = useState<StoryPhoto[] | null>(null);
+  const [isContactSheetOpen, setIsContactSheetOpen] = useState(false);
   const [currentScale, setCurrentScale] = useState(1);
   const [isCurrentlyDragging, setIsCurrentlyDragging] = useState(false);
 
@@ -176,9 +189,73 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     }),
   );
 
-  // Extract all photos sorted, preserving highlight flag
+  const isSession = post.type === 'SESSION';
+
+  // Extract all session photos chronologically for the contact sheet
+  const allSessionPhotos: SessionContactPhoto[] = useMemo(() => {
+    if (!isSession || !post.postsToPhotos) return [];
+    return [...post.postsToPhotos]
+      .sort(
+        (a, b) =>
+          ((a as { frameNumber?: number }).frameNumber ?? 0) -
+          ((b as { frameNumber?: number }).frameNumber ?? 0),
+      )
+      .map((ptp) => ({
+        ...ptp.photo,
+        frameNumber: (ptp as { frameNumber?: number | null }).frameNumber,
+        isInitialPick: (ptp as { isInitialPick?: boolean | null }).isInitialPick,
+        initialOrder: (ptp as { initialOrder?: number | null }).initialOrder,
+        isRevisitedPick: (ptp as { isRevisitedPick?: boolean | null }).isRevisitedPick,
+        revisitedOrder: (ptp as { revisitedOrder?: number | null }).revisitedOrder,
+        layoutPosition:
+          ((ptp as { layoutPosition?: 'left' | 'right' | 'solo' | null })
+            .layoutPosition as 'left' | 'right' | 'solo') || 'solo',
+        isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
+      }));
+  }, [isSession, post.postsToPhotos]);
+
+  const hasRevisitedCut = useMemo(() => {
+    if (!isSession) return false;
+    return allSessionPhotos.some((p) => p.isRevisitedPick);
+  }, [isSession, allSessionPhotos]);
+
+  const [selectedCut, setSelectedCut] = useState<'revisited' | 'initial'>(
+    hasRevisitedCut ? 'revisited' : 'initial',
+  );
+
+  useEffect(() => {
+    setSelectedCut(hasRevisitedCut ? 'revisited' : 'initial');
+  }, [hasRevisitedCut]);
+
+  const initialCount = useMemo(
+    () => allSessionPhotos.filter((p) => p.isInitialPick).length,
+    [allSessionPhotos],
+  );
+  const revisitedCount = useMemo(
+    () => allSessionPhotos.filter((p) => p.isRevisitedPick).length,
+    [allSessionPhotos],
+  );
+
+  // Extract active story photos sorted, preserving highlight flag
   const photos: StoryPhoto[] = useMemo(() => {
     if (post.postsToPhotos && post.postsToPhotos.length > 0) {
+      if (isSession) {
+        if (selectedCut === 'revisited') {
+          const rev = allSessionPhotos
+            .filter((p) => p.isRevisitedPick)
+            .sort((a, b) => (a.revisitedOrder ?? 0) - (b.revisitedOrder ?? 0));
+          if (rev.length > 0) return rev;
+        }
+
+        const init = allSessionPhotos
+          .filter((p) => p.isInitialPick)
+          .sort((a, b) => (a.initialOrder ?? 0) - (b.initialOrder ?? 0));
+        if (init.length > 0) return init;
+
+        // Fallback: if no picks flagged, take first 5 frames
+        return allSessionPhotos.slice(0, 5);
+      }
+
       return post.postsToPhotos.map((ptp) => ({
         ...ptp.photo,
         isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
@@ -217,7 +294,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       ];
     }
     return [];
-  }, [post]);
+  }, [post, isSession, selectedCut, allSessionPhotos]);
+
+  const activeLightboxPhotos = lightboxPhotosList || photos;
 
   const articleRef = useRef<HTMLElement>(null);
   const idlePhotoIndices = useMobilePhotoIdleIndicator({
@@ -1189,18 +1268,20 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
   const handleNextPhoto = useCallback(() => {
     showControls();
     setLightboxIndex((prev) =>
-      prev !== null ? (prev + 1) % photos.length : null,
+      prev !== null ? (prev + 1) % activeLightboxPhotos.length : null,
     );
     setCurrentScale(1);
-  }, [photos.length, showControls]);
+  }, [activeLightboxPhotos.length, showControls]);
 
   const handlePrevPhoto = useCallback(() => {
     showControls();
     setLightboxIndex((prev) =>
-      prev !== null ? (prev - 1 + photos.length) % photos.length : null,
+      prev !== null
+        ? (prev - 1 + activeLightboxPhotos.length) % activeLightboxPhotos.length
+        : null,
     );
     setCurrentScale(1);
-  }, [photos.length, showControls]);
+  }, [activeLightboxPhotos.length, showControls]);
 
   // Close lightbox overlay and sync browser history
   const closeLightbox = useCallback(() => {
@@ -1223,6 +1304,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       window.history.back();
     }
     setLightboxIndex(null);
+    setLightboxPhotosList(null);
     setCurrentScale(1);
   }, []);
 
@@ -1276,6 +1358,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         touchStartX.current = null;
         touchStartY.current = null;
         setLightboxIndex(null);
+        setLightboxPhotosList(null);
         setCurrentScale(1);
       }
     };
@@ -1313,20 +1396,20 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
   // Preload adjacent photos for seamless lightbox navigation
   useEffect(() => {
-    if (lightboxIndex === null || photos.length <= 1) return;
+    if (lightboxIndex === null || activeLightboxPhotos.length <= 1) return;
 
     const preloadIndices = [lightboxIndex + 1, lightboxIndex - 1].filter(
-      (idx) => idx >= 0 && idx < photos.length,
+      (idx) => idx >= 0 && idx < activeLightboxPhotos.length,
     );
 
     preloadIndices.forEach((idx) => {
-      const photo = photos[idx];
+      const photo = activeLightboxPhotos[idx];
       if (photo?.url) {
         const img = new window.Image();
         img.src = keyToUrl(photo.url);
       }
     });
-  }, [lightboxIndex, photos]);
+  }, [lightboxIndex, activeLightboxPhotos]);
 
   // Manage 2s inactivity auto-hiding of lightbox controls
   useEffect(() => {
@@ -1673,6 +1756,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
     queryOptions.queryKey,
   );
 
+  const currentLightboxPhoto =
+    lightboxIndex !== null ? activeLightboxPhotos[lightboxIndex] : null;
+
   return (
     <article
       ref={articleRef}
@@ -1694,9 +1780,11 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             </span>
             <span className='text-muted-foreground/40'>·</span>
             <span className='text-[11px] sm:text-xs font-mono tracking-[0.12em] sm:tracking-[0.14em] uppercase font-medium tabular-nums text-muted-foreground'>
-              {photos.length > 1
-                ? `${photos.length} AUFNAHMEN`
-                : 'EINZELAUFNAHME'}
+              {isSession
+                ? `SESSION · ${allSessionPhotos.length} FRAMES (${photos.length} IM STORY-EDIT)`
+                : photos.length > 1
+                  ? `${photos.length} AUFNAHMEN`
+                  : 'EINZELAUFNAHME'}
             </span>
             {collections.map((c) => (
               <Badge
@@ -1712,6 +1800,29 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           <h1 className='text-[1.85rem] sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight md:tracking-[-0.03em] lg:tracking-[-0.035em] text-foreground leading-[1.12] sm:leading-[1.1] lg:leading-[1.05] mb-4 sm:mb-6'>
             {post.title}
           </h1>
+
+          {/* Session Dual-Cut Switcher & Contact Sheet Trigger */}
+          {isSession && (
+            <div className='mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-border/40 pt-4'>
+              <SessionCutSwitcher
+                activeCut={selectedCut}
+                onCutChange={setSelectedCut}
+                hasRevisitedCut={hasRevisitedCut}
+                initialCount={initialCount}
+                revisitedCount={revisitedCount}
+                revisitedNote={post.revisitedNote}
+                revisitedAt={post.revisitedAt}
+              />
+              <button
+                type='button'
+                onClick={() => setIsContactSheetOpen(true)}
+                className='inline-flex items-center gap-2 self-start sm:self-center px-4 py-2 rounded-full border border-border/80 bg-muted/40 hover:bg-muted text-xs font-mono tracking-wider transition-all cursor-pointer shrink-0'
+              >
+                <IconLayoutGrid className='size-3.5 text-muted-foreground' />
+                <span>Contact Sheet ({allSessionPhotos.length})</span>
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -1984,7 +2095,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         >
           <DialogTitle className='sr-only'>Foto Großansicht</DialogTitle>
 
-          {lightboxIndex !== null && photos[lightboxIndex] && (
+          {lightboxIndex !== null && currentLightboxPhoto && (
             <div
               ref={lightboxContainerRef}
               className={cn(
@@ -2064,12 +2175,12 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     }}
                   >
                     <BlurImage
-                      src={keyToUrl(photos[lightboxIndex].url)}
-                      alt={photos[lightboxIndex].title || post.title}
-                      width={photos[lightboxIndex].width}
-                      height={photos[lightboxIndex].height}
-                      blurhash={photos[lightboxIndex].blurData}
-                      aspectRatio={photos[lightboxIndex].aspectRatio}
+                      src={keyToUrl(currentLightboxPhoto.url)}
+                      alt={currentLightboxPhoto.title || post.title}
+                      width={currentLightboxPhoto.width}
+                      height={currentLightboxPhoto.height}
+                      blurhash={currentLightboxPhoto.blurData}
+                      aspectRatio={currentLightboxPhoto.aspectRatio}
                       className='max-w-full max-h-full object-contain select-none pointer-events-none p-1 sm:p-2 md:p-4'
                       sizes='100vw'
                     />
@@ -2077,7 +2188,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                 </TransformWrapper>
 
                 {/* Left/Right Prev/Next Buttons (Visible when not zoomed in) */}
-                {photos.length > 1 && !isZoomed && (
+                {activeLightboxPhotos.length > 1 && !isZoomed && (
                   <>
                     <button
                       onClick={(e) => {
@@ -2128,8 +2239,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               >
                 <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
                   <span className='text-[11px] font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
-                    {String(lightboxIndex + 1).padStart(2, '0')} /{' '}
-                    {String(photos.length).padStart(2, '0')}
+                    {isSession && currentLightboxPhoto.frameNumber
+                      ? `FRAME ${String(currentLightboxPhoto.frameNumber).padStart(2, '0')} / ${String(activeLightboxPhotos.length).padStart(2, '0')}`
+                      : `${String(lightboxIndex + 1).padStart(2, '0')} / ${String(activeLightboxPhotos.length).padStart(2, '0')}`}
                   </span>
                 </div>
 
@@ -2213,20 +2325,20 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                     <IconCamera className='size-3.5 text-white/50 shrink-0' />
                     <span className='font-medium text-white truncate max-w-[200px] sm:max-w-none'>
                       {[
-                        photos[lightboxIndex].make &&
-                        photos[lightboxIndex].model
-                          ? `${photos[lightboxIndex].make} ${photos[lightboxIndex].model}`
-                          : photos[lightboxIndex].make ||
-                            photos[lightboxIndex].model,
+                        currentLightboxPhoto.make &&
+                        currentLightboxPhoto.model
+                          ? `${currentLightboxPhoto.make} ${currentLightboxPhoto.model}`
+                          : currentLightboxPhoto.make ||
+                            currentLightboxPhoto.model,
                       ]
                         .filter(Boolean)
                         .join(' ') || 'Kamera'}
                     </span>
-                    {photos[lightboxIndex].lensModel && (
+                    {currentLightboxPhoto.lensModel && (
                       <>
                         <span className='text-white/30'>·</span>
                         <span className='text-white/80 truncate max-w-[180px] sm:max-w-none'>
-                          {photos[lightboxIndex].lensModel}
+                          {currentLightboxPhoto.lensModel}
                         </span>
                       </>
                     )}
@@ -2234,39 +2346,39 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
 
                   {/* Exposure Parameters */}
                   <div className='flex items-center gap-1.5 flex-wrap text-white/70'>
-                    {photos[lightboxIndex].focalLength && (
-                      <span>{photos[lightboxIndex].focalLength}mm</span>
+                    {currentLightboxPhoto.focalLength && (
+                      <span>{currentLightboxPhoto.focalLength}mm</span>
                     )}
-                    {photos[lightboxIndex].fNumber && (
+                    {currentLightboxPhoto.fNumber && (
                       <>
                         <span className='text-white/30'>·</span>
-                        <span>f/{photos[lightboxIndex].fNumber}</span>
+                        <span>f/{currentLightboxPhoto.fNumber}</span>
                       </>
                     )}
-                    {photos[lightboxIndex].exposureTime && (
+                    {currentLightboxPhoto.exposureTime && (
                       <>
                         <span className='text-white/30'>·</span>
                         <span>
                           1/
-                          {Math.round(1 / photos[lightboxIndex].exposureTime!)}s
+                          {Math.round(1 / currentLightboxPhoto.exposureTime!)}s
                         </span>
                       </>
                     )}
-                    {photos[lightboxIndex].iso && (
+                    {currentLightboxPhoto.iso && (
                       <>
                         <span className='text-white/30'>·</span>
-                        <span>ISO {photos[lightboxIndex].iso}</span>
+                        <span>ISO {currentLightboxPhoto.iso}</span>
                       </>
                     )}
-                    {photos[lightboxIndex].width &&
-                      photos[lightboxIndex].height && (
+                    {currentLightboxPhoto.width &&
+                      currentLightboxPhoto.height && (
                         <>
                           <span className='text-white/30 hidden md:inline'>
                             ·
                           </span>
                           <span className='text-white/40 hidden md:inline'>
-                            {photos[lightboxIndex].width} ×{' '}
-                            {photos[lightboxIndex].height}
+                            {currentLightboxPhoto.width} ×{' '}
+                            {currentLightboxPhoto.height}
                           </span>
                         </>
                       )}
@@ -2277,6 +2389,35 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Floating Bottom Contact Sheet Pill */}
+      {isSession && (
+        <div className='fixed bottom-6 right-6 z-30 animate-in fade-in slide-in-from-bottom-3 duration-300'>
+          <button
+            type='button'
+            onClick={() => setIsContactSheetOpen(true)}
+            className='flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-xl border border-zinc-700 dark:border-zinc-300 text-xs font-mono font-medium hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md'
+          >
+            <IconLayoutGrid className='size-3.5' />
+            <span>Contact Sheet</span>
+            <span className='opacity-60 text-[11px]'>({allSessionPhotos.length})</span>
+          </button>
+        </div>
+      )}
+
+      {/* Contact Sheet Drawer */}
+      {isSession && (
+        <ContactSheetDrawer
+          open={isContactSheetOpen}
+          onOpenChange={setIsContactSheetOpen}
+          photos={allSessionPhotos}
+          title={post.title}
+          onSelectPhoto={(_photo, index) => {
+            setLightboxPhotosList(allSessionPhotos);
+            setLightboxIndex(index);
+          }}
+        />
+      )}
     </article>
   );
 };

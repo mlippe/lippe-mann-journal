@@ -28,7 +28,7 @@ import { usePostsFilters } from '../../hooks/use-posts-filters';
 import { PostCardMobile } from './post-card-mobile';
 
 interface PostsListProps {
-  type?: 'ARTICLE' | 'PHOTO' | 'ALBUM';
+  type?: 'ARTICLE' | 'PHOTO' | 'ALBUM' | 'SESSION';
 }
 
 export const PostsList = ({ type }: PostsListProps) => {

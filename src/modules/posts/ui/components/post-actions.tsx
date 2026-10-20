@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConfirm } from '@/hooks/use-confirm';
 import Link from 'next/link';
 import { Post } from '@/db/schema';
+import { IconRotateClockwise } from '@tabler/icons-react';
 
 interface PostActionsProps {
   post: Post;
@@ -38,7 +39,9 @@ export function PostActions({ post }: PostActionsProps) {
       ? `/article/${post.slug}`
       : post.type === 'PHOTO'
         ? `/photo/${post.slug}`
-        : `/album/${post.slug}`;
+        : post.type === 'SESSION'
+          ? `/session/${post.slug}`
+          : `/album/${post.slug}`;
 
   const handleDelete = async () => {
     const ok = await confirm();
@@ -104,6 +107,15 @@ export function PostActions({ post }: PostActionsProps) {
               <span>Bearbeiten</span>
             </Link>
           </DropdownMenuItem>
+
+          {post.type === 'SESSION' && (
+            <DropdownMenuItem asChild>
+              <Link href={`/dashboard/posts/${post.slug}/revisit`}>
+                <IconRotateClockwise className='mr-2 size-4 text-red-500' />
+                <span>Revisited Cut</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem asChild>
             <Link href={publicPath} target='_blank'>

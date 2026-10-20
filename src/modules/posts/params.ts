@@ -6,7 +6,7 @@ export const filtersSearchParams = {
   page: parseAsInteger
     .withDefault(DEFAULT_PAGE)
     .withOptions({ clearOnDefault: true }),
-  type: parseAsStringEnum(['ARTICLE', 'PHOTO', 'ALBUM']).withDefault('PHOTO').withOptions({ clearOnDefault: true }),
+  type: parseAsStringEnum(['ARTICLE', 'PHOTO', 'ALBUM', 'SESSION']).withDefault('PHOTO').withOptions({ clearOnDefault: true }),
 };
 
 export const loadSearchParams = createLoader(filtersSearchParams);

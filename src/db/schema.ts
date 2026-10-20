@@ -166,7 +166,7 @@ export const collectionsUpdateSchema = createUpdateSchema(collections);
  ***************/
 
 export const postVisibility = pgEnum('post_visibility', ['public', 'private']);
-export const postType = pgEnum('post_type', ['ARTICLE', 'PHOTO', 'ALBUM']);
+export const postType = pgEnum('post_type', ['ARTICLE', 'PHOTO', 'ALBUM', 'SESSION']);
 
 export const posts = pgTable(
   'posts',
@@ -179,6 +179,8 @@ export const posts = pgTable(
     tags: text('tags').array(),
     coverImage: text('cover_image'),
     content: text('content'), // For BLOG posts
+    revisitedNote: text('revisited_note'),
+    revisitedAt: timestamp('revisited_at'),
     ...timestamps,
   },
   (t) => [index('tags_idx').on(t.tags), index('slug_idx').on(t.slug)],
@@ -202,6 +204,11 @@ export const postsWithPhotos = createSelectSchema(posts).extend({
         sortOrder: z.number().optional(),
         isHighlight: z.boolean().optional(),
         layoutPosition: z.enum(['left', 'right', 'solo']).optional().nullable(),
+        frameNumber: z.number().optional().nullable(),
+        isInitialPick: z.boolean().optional().nullable(),
+        initialOrder: z.number().optional().nullable(),
+        isRevisitedPick: z.boolean().optional().nullable(),
+        revisitedOrder: z.number().optional().nullable(),
       }),
     )
     .optional(),
@@ -242,6 +249,11 @@ export const postsToPhotos = pgTable(
     sortOrder: integer('sort_order').notNull().default(0),
     isHighlight: boolean('is_highlight').notNull().default(false),
     layoutPosition: varchar('layout_position', { length: 20 }).default('solo'),
+    frameNumber: integer('frame_number').notNull().default(1),
+    isInitialPick: boolean('is_initial_pick').notNull().default(false),
+    initialOrder: integer('initial_order'),
+    isRevisitedPick: boolean('is_revisited_pick').notNull().default(false),
+    revisitedOrder: integer('revisited_order'),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.postId, t.photoId] }),

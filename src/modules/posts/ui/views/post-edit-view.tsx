@@ -5,6 +5,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArticleForm } from '@/modules/articles/ui/components/article-form';
 import { PhotoPostEdit } from '../components/photo-post-edit';
 import { AlbumPostEdit } from '../components/album-post-edit';
+import { SessionPostEdit } from '@/modules/sessions/ui/components/session-post-edit';
 
 export const PostEditView = ({ slug }: { slug: string }) => {
   const trpc = useTRPC();
@@ -15,6 +16,7 @@ export const PostEditView = ({ slug }: { slug: string }) => {
       {data.type === 'ARTICLE' && <ArticleForm post={data} />}
       {data.type === 'PHOTO' && <PhotoPostEdit post={data} />}
       {data.type === 'ALBUM' && <AlbumPostEdit post={data} />}
+      {data.type === 'SESSION' && <SessionPostEdit post={data} />}
     </div>
   );
 };

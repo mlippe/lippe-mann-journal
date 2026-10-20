@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import BlurImage from '@/components/blur-image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 import { PostActions } from './post-actions';
-import { IconNotebook, IconPhoto, IconPhotoVideo } from '@tabler/icons-react';
+import { IconCamera, IconNotebook, IconPhoto, IconPhotoVideo } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -41,6 +41,8 @@ export function PostCardMobile({ post }: PostCardMobileProps) {
           <IconNotebook className='size-6 text-muted-foreground' />
         ) : post.type === 'ALBUM' ? (
           <IconPhotoVideo className='size-6 text-muted-foreground' />
+        ) : post.type === 'SESSION' ? (
+          <IconCamera className='size-6 text-muted-foreground' />
         ) : (
           <IconPhoto className='size-6 text-muted-foreground' />
         )}
