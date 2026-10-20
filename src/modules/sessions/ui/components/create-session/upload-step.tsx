@@ -92,7 +92,7 @@ export const UploadStep = ({ onPhotosReady }: UploadStepProps) => {
               previewUrl,
               title:
                 item.imageInfo.fileName?.trim() ||
-                `Frame ${String(frameNumber).padStart(2, '0')}`,
+                `Aufnahme ${String(frameNumber).padStart(2, '0')}`,
               width: item.width,
               height: item.height,
               aspectRatio: item.aspectRatio,
@@ -121,7 +121,7 @@ export const UploadStep = ({ onPhotosReady }: UploadStepProps) => {
         );
 
         toast.success(
-          `${drafts.length} Frames erfolgreich chronologisch sortiert.`,
+          `${drafts.length} Aufnahmen erfolgreich chronologisch sortiert.`,
         );
         onPhotosReady(drafts);
       } catch (error) {
@@ -162,8 +162,8 @@ export const UploadStep = ({ onPhotosReady }: UploadStepProps) => {
         </h3>
 
         <p className='text-sm text-muted-foreground max-w-md mb-4'>
-          Lade alle Bilder deines Spaziergangs oder Ausflugs hoch (~36 Frames empfohlen).
-          Wir ordnen sie automatisch chronologisch nach Aufnahmezeitpunkt (Frame 01–N).
+          Lade alle Bilder deines Spaziergangs oder Ausflugs hoch (~36 Aufnahmen empfohlen).
+          Wir ordnen sie automatisch chronologisch nach Aufnahmezeitpunkt (Aufnahme 01–N).
         </p>
 
         {isProcessing ? (

@@ -46,7 +46,7 @@ export const ContactSheetDrawer = ({
               <DialogTitle className='text-sm sm:text-base font-mono font-medium tracking-wide text-zinc-100 flex items-center gap-2'>
                 <span>{title}</span>
                 <span className='text-xs text-zinc-500 font-normal'>
-                  ({totalFrames} Frames)
+                  ({totalFrames} Aufnahmen)
                 </span>
               </DialogTitle>
             </div>
@@ -109,7 +109,7 @@ export const ContactSheetDrawer = ({
                   >
                     <Image
                       src={keyToUrl(photo.url)}
-                      alt={photo.title || `Frame ${formattedFrame}`}
+                      alt={photo.title || `Aufnahme ${formattedFrame}`}
                       fill
                       sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
                       loading='lazy'

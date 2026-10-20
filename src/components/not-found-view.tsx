@@ -26,7 +26,7 @@ export function NotFoundView({
           <div className='flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground/70 pb-6 mb-8 border-b border-border/40'>
             <span className='inline-flex items-center gap-2'>
               <span className='size-1.5 rounded-full bg-primary/80' />
-              <span>FRAME 00 / 404</span>
+              <span>AUFNAHME 00 / 404</span>
             </span>
             <span>KEIN NEGATIV GEFUNDEN</span>
           </div>

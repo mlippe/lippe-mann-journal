@@ -471,7 +471,7 @@ export const postsRouter = createTRPCRouter({
         const photoRecords = preparedPhotos.map((p) => ({
           id: p.id,
           url: p.url,
-          title: p.title || `Frame ${String(p.frameNumber).padStart(2, '0')}`,
+          title: p.title || `Aufnahme ${String(p.frameNumber).padStart(2, '0')}`,
           width: p.width,
           height: p.height,
           aspectRatio: p.aspectRatio,

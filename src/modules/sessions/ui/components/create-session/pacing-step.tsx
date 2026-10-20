@@ -112,7 +112,7 @@ export const PacingStep = ({
             Story Pacing · Curated Selection
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground mt-0.5'>
-            Arrangiere deine {pickedPhotos.length} ausgewählten Frames. Bestimme Reihenfolge und Rhythmus.
+            Arrangiere deine {pickedPhotos.length} ausgewählten Aufnahmen. Bestimme Reihenfolge und Rhythmus.
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export const PacingStep = ({
 
                 <div className='flex-1 min-w-0 sm:hidden'>
                   <p className='text-xs font-mono font-semibold truncate'>
-                    Frame {formattedFrame}
+                    Aufnahme {formattedFrame}
                   </p>
                   <p className='text-[11px] text-muted-foreground'>
                     {isHero
@@ -182,7 +182,7 @@ export const PacingStep = ({
                         ? 'Diptych (Links)'
                         : isRight
                           ? 'Diptych (Rechts)'
-                          : 'Solo Frame'}
+                          : 'Solo'}
                   </p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const PacingStep = ({
               {/* Middle Info / Pacing details on Desktop */}
               <div className='hidden sm:flex flex-col flex-1 min-w-0'>
                 <span className='text-xs font-mono font-semibold truncate'>
-                  Frame {formattedFrame}
+                  Aufnahme {formattedFrame}
                 </span>
                 <span className='text-xs text-muted-foreground'>
                   {isHero
@@ -291,7 +291,7 @@ export const PacingStep = ({
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span>
-            Pacing bereit (<strong>{pickedPhotos.length}</strong> Frames)
+            Pacing bereit (<strong>{pickedPhotos.length}</strong> Aufnahmen)
           </span>
           <Button
             size='sm'

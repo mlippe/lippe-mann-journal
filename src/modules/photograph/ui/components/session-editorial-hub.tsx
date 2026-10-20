@@ -57,7 +57,7 @@ export const SessionEditorialHub = ({
             </span>
             <span className='text-muted-foreground/30'>·</span>
             <span className='text-[11px] sm:text-xs font-mono text-muted-foreground'>
-              {totalFrames} Frames gesamt
+              {totalFrames} Aufnahmen gesamt
             </span>
           </div>
 
@@ -76,8 +76,8 @@ export const SessionEditorialHub = ({
 
             <p className='text-sm sm:text-[15px] text-muted-foreground font-sans leading-relaxed'>
               {hasRevisitedCut && activeCut === 'revisited'
-                ? `Mit zeitlichem Abstand neu kuratierte Serie aus allen ${totalFrames} Frames dieser Session.`
-                : `Die ursprüngliche Auswahl direkt nach dem Shooting – intuitiv getroffen aus allen ${totalFrames} Frames.`}
+                ? `Mit zeitlichem Abstand neu kuratierte Serie aus allen ${totalFrames} Aufnahmen dieser Session.`
+                : `Die ursprüngliche Auswahl direkt nach dem Shooting – intuitiv getroffen aus allen ${totalFrames} Aufnahmen.`}
             </p>
           </div>
 
@@ -174,7 +174,7 @@ export const SessionEditorialHub = ({
                     >
                       <Image
                         src={keyToUrl(photo.url)}
-                        alt={photo.title || `Frame ${formattedFrame}`}
+                        alt={photo.title || `Aufnahme ${formattedFrame}`}
                         fill
                         sizes='(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw'
                         className='object-cover'

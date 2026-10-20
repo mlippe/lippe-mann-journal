@@ -187,7 +187,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             {post.title}
           </h1>
           <p className='text-xs sm:text-sm text-muted-foreground mt-1'>
-            Kuratieren mit zeitlichem Abstand. Wähle deinen neuen Blickwinkel auf die {allSessionPhotos.length} Frames.
+            Kuratieren mit zeitlichem Abstand. Wähle deinen neuen Blickwinkel auf die {allSessionPhotos.length} Aufnahmen.
           </p>
         </div>
 
@@ -224,7 +224,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             1. Kontaktbogen durchsuchen & auswählen
           </h2>
           <span className='text-xs font-mono text-muted-foreground'>
-            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Finale Wahl ausgewählt
+            <strong className='text-foreground'>{revisitedPicks.length}</strong> Aufnahmen für Finale Wahl ausgewählt
           </span>
         </div>
 
@@ -262,7 +262,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                 >
                   <Image
                     src={keyToUrl(photo.url)}
-                    alt={photo.title || `Frame ${formattedFrame}`}
+                    alt={photo.title || `Aufnahme ${formattedFrame}`}
                     fill
                     sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
                     className='object-cover'
@@ -318,7 +318,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       {revisitedPicks.length > 0 && (
         <div className='space-y-4 pt-6 border-t border-border/70'>
           <h2 className='text-base sm:text-lg font-semibold tracking-tight'>
-            2. Reihenfolge der Finalen Wahl ({revisitedPicks.length} Frames)
+            2. Reihenfolge der Finalen Wahl ({revisitedPicks.length} Aufnahmen)
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground'>
             Bestimme Reihenfolge und Bildrhythmus für die neu kuratierte Auswahl.
@@ -356,7 +356,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                     <div className='relative w-20 h-14 sm:w-24 sm:h-16 rounded-md overflow-hidden bg-black/10 shrink-0 border border-border/60'>
                       <Image
                         src={keyToUrl(photo.url)}
-                        alt={photo.title || `Frame ${formattedFrame}`}
+                        alt={photo.title || `Aufnahme ${formattedFrame}`}
                         fill
                         sizes='96px'
                         className='object-cover'
@@ -368,7 +368,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
 
                     <div className='flex-1 min-w-0 sm:hidden'>
                       <p className='text-xs font-mono font-semibold truncate'>
-                        Frame {formattedFrame}
+                        Aufnahme {formattedFrame}
                       </p>
                       <p className='text-[11px] text-muted-foreground'>
                         {isHero
@@ -384,7 +384,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
 
                   <div className='hidden sm:flex flex-col flex-1 min-w-0'>
                     <span className='text-xs font-mono font-semibold truncate'>
-                      Frame {formattedFrame}
+                      Aufnahme {formattedFrame}
                     </span>
                     <span className='text-xs text-muted-foreground'>
                       {isHero
@@ -509,7 +509,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         </p>
         <Textarea
           id='revisited-note'
-          placeholder='z.B. 6 Wochen später neu betrachtet: Frame 14 hatte rückblickend das viel ruhigere Morgenlicht als Frame 08...'
+          placeholder='z.B. 6 Wochen später neu betrachtet: Aufnahme 14 hatte rückblickend das viel ruhigere Morgenlicht als Aufnahme 08...'
           rows={3}
           value={revisitedNote}
           onChange={(e) => setRevisitedNote(e.target.value)}
@@ -520,7 +520,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span>
-            Finale Wahl: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
+            Finale Wahl: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Aufnahmen
           </span>
           <Button
             size='sm'
@@ -545,7 +545,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             <div className='relative w-full aspect-[3/2] max-h-[80vh] flex items-center justify-center'>
               <Image
                 src={keyToUrl(previewPhoto.url)}
-                alt={`Frame ${previewPhoto.frameNumber}`}
+                alt={`Aufnahme ${previewPhoto.frameNumber}`}
                 fill
                 className='object-contain'
                 sizes='100vw'

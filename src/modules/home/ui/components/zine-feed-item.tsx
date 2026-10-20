@@ -228,7 +228,7 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
             {isArticle
               ? 'Artikel'
               : post.type === 'SESSION'
-                ? `Session (${allPhotos.length} Frames · ${photos.length} im Edit)`
+                ? `Session (${allPhotos.length} Aufnahmen · ${photos.length} im Edit)`
                 : hasMultiplePhotos
                   ? `Serie (${photos.length} Fotos)`
                   : 'Einzelaufnahme'}

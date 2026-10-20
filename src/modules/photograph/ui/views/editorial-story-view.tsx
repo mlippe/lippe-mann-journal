@@ -1823,8 +1823,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   type='button'
                   onClick={() => setIsContactSheetOpen(true)}
                   className='inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/60 text-[10px] sm:text-[11px] font-mono transition-colors cursor-pointer shrink-0'
-                  title={`Kontaktbogen (${allSessionPhotos.length} Frames)`}
-                  aria-label={`Kontaktbogen (${allSessionPhotos.length} Frames) öffnen`}
+                  title={`Kontaktbogen (${allSessionPhotos.length} Aufnahmen)`}
+                  aria-label={`Kontaktbogen (${allSessionPhotos.length} Aufnahmen) öffnen`}
                 >
                   <IconLayoutGrid className='size-3' />
                   <span className='hidden sm:inline'>Kontaktbogen</span>
@@ -2279,7 +2279,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                   </span>
                   {isSession && currentLightboxPhoto.frameNumber && !lightboxPhotosList && (
                     <span className='text-[10px] sm:text-[11px] font-mono tracking-wider text-white/50 bg-white/5 px-1.5 py-0.5 rounded-sm border border-white/10 shrink-0 hidden xs:inline-block'>
-                      Frame {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
+                      Aufnahme {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
                     </span>
                   )}
                 </div>
@@ -2385,7 +2385,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                       <>
                         <span className='text-white/30'>·</span>
                         <span className='text-white/80'>
-                          Frame {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
+                          Aufnahme {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
                         </span>
                       </>
                     )}

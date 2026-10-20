@@ -324,7 +324,7 @@ export function ChartAreaView() {
                       {session.title}
                     </p>
                     <p className="text-[11px] text-muted-foreground font-mono">
-                      Erstwahl ({session.initialPicks}/{session.totalFrames} Frames) ·{" "}
+                      Erstwahl ({session.initialPicks}/{session.totalFrames} Aufnahmen) ·{" "}
                       {formatDistanceToNow(new Date(session.createdAt), {
                         addSuffix: true,
                         locale: de,
