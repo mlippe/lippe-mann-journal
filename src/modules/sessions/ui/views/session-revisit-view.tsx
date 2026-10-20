@@ -235,6 +235,9 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             const revPick = revisitedPicks.find((p) => p.photoId === photo.id);
             const isRevisited = Boolean(revPick);
             const isBoth = isInitial && isRevisited;
+            const isVertical =
+              (photo.width && photo.height && photo.height > photo.width) ||
+              (photo.aspectRatio && photo.aspectRatio < 1);
 
             return (
               <div
@@ -251,13 +254,20 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                         : 'border-border/80 hover:border-foreground/40',
                 )}
               >
-                <Image
-                  src={keyToUrl(photo.url)}
-                  alt={photo.title || `Frame ${formattedFrame}`}
-                  fill
-                  sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
-                  className='object-cover'
-                />
+                <div
+                  className={cn(
+                    'absolute inset-0',
+                    isVertical && 'm-auto w-2/3 h-[150%] -rotate-90',
+                  )}
+                >
+                  <Image
+                    src={keyToUrl(photo.url)}
+                    alt={photo.title || `Frame ${formattedFrame}`}
+                    fill
+                    sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
+                    className='object-cover'
+                  />
+                </div>
 
                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none' />
 

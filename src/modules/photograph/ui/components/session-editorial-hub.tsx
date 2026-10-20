@@ -148,6 +148,9 @@ export const SessionEditorialHub = ({
                 const isInitial = Boolean(photo.isInitialPick);
                 const isRevisited = Boolean(photo.isRevisitedPick);
                 const isBoth = isInitial && isRevisited;
+                const isVertical =
+                  (photo.width && photo.height && photo.height > photo.width) ||
+                  (photo.aspectRatio && photo.aspectRatio < 1);
 
                 return (
                   <div
@@ -163,14 +166,21 @@ export const SessionEditorialHub = ({
                             : 'border-border/40',
                     )}
                   >
-                    <Image
-                      src={keyToUrl(photo.url)}
-                      alt={photo.title || `Frame ${formattedFrame}`}
-                      fill
-                      sizes='(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw'
-                      className='object-cover'
-                      loading='lazy'
-                    />
+                    <div
+                      className={cn(
+                        'absolute inset-0',
+                        isVertical && 'm-auto w-2/3 h-[150%] -rotate-90',
+                      )}
+                    >
+                      <Image
+                        src={keyToUrl(photo.url)}
+                        alt={photo.title || `Frame ${formattedFrame}`}
+                        fill
+                        sizes='(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw'
+                        className='object-cover'
+                        loading='lazy'
+                      />
+                    </div>
                     <span className='absolute bottom-0.5 left-1 z-10 text-[9px] font-mono font-semibold text-white/90 drop-shadow-xs'>
                       {formattedFrame}
                     </span>

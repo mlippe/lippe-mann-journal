@@ -78,6 +78,9 @@ export const ContactSheetDrawer = ({
               const isInitial = Boolean(photo.isInitialPick);
               const isRevisited = Boolean(photo.isRevisitedPick);
               const isBoth = isInitial && isRevisited;
+              const isVertical =
+                (photo.width && photo.height && photo.height > photo.width) ||
+                (photo.aspectRatio && photo.aspectRatio < 1);
 
               return (
                 <button
@@ -98,14 +101,21 @@ export const ContactSheetDrawer = ({
                   )}
                 >
                   {/* Thumbnail Image - Lightweight WebP via Cloudflare Loader */}
-                  <Image
-                    src={keyToUrl(photo.url)}
-                    alt={photo.title || `Frame ${formattedFrame}`}
-                    fill
-                    sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
-                    loading='lazy'
-                    className='object-cover transition-transform duration-300 group-hover:scale-[1.03]'
-                  />
+                  <div
+                    className={cn(
+                      'absolute inset-0',
+                      isVertical && 'm-auto w-2/3 h-[150%] -rotate-90',
+                    )}
+                  >
+                    <Image
+                      src={keyToUrl(photo.url)}
+                      alt={photo.title || `Frame ${formattedFrame}`}
+                      fill
+                      sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
+                      loading='lazy'
+                      className='object-cover transition-transform duration-300 group-hover:scale-[1.03]'
+                    />
+                  </div>
 
                   {/* Dark Vignette Overlay for readability */}
                   <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none' />
