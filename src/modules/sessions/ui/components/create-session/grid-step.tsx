@@ -42,7 +42,7 @@ export const GridStep = ({
             Leuchttisch · Erstwahl
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground mt-0.5'>
-            Wähle deine Favoriten direkt nach dem Shooting (3–7 Frames empfohlen).
+            Wähle deine Favoriten direkt nach dem Shooting (3–7 Aufnahmen empfohlen).
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export const GridStep = ({
       <div className='flex items-center justify-between text-xs font-mono text-muted-foreground px-1'>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full bg-foreground' />
-          <span>Ausgewählte Frames für das Story-Pacing</span>
+          <span>Ausgewählte Aufnahmen für das Story-Pacing</span>
         </div>
         <span className='tabular-nums font-medium text-foreground'>
           {selectedCount} von {photos.length} ausgewählt
@@ -76,6 +76,9 @@ export const GridStep = ({
           const formattedFrame = String(photo.frameNumber).padStart(2, '0');
           const isSelected = photo.isInitialPick;
           const pickIndex = photo.initialOrder;
+          const isVertical =
+            (photo.width && photo.height && photo.height > photo.width) ||
+            (photo.aspectRatio && photo.aspectRatio < 1);
 
           return (
             <div
@@ -89,14 +92,21 @@ export const GridStep = ({
               onClick={() => onTogglePick(photo.id)}
             >
               {/* Thumbnail Image */}
-              <Image
-                src={photo.previewUrl}
-                alt={photo.title}
-                fill
-                sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
-                className='object-cover'
-                unoptimized
-              />
+              <div
+                className={cn(
+                  'absolute inset-0',
+                  isVertical && 'm-auto w-2/3 h-[150%] -rotate-90',
+                )}
+              >
+                <Image
+                  src={photo.previewUrl}
+                  alt={photo.title}
+                  fill
+                  sizes='(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw'
+                  className='object-cover'
+                  unoptimized
+                />
+              </div>
 
               {/* Gradient Scrim */}
               <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none' />
@@ -134,7 +144,7 @@ export const GridStep = ({
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span className='tabular-nums'>
-            <strong className='text-zinc-100'>{selectedCount}</strong> Frames ausgewählt
+            <strong className='text-zinc-100'>{selectedCount}</strong> Aufnahmen ausgewählt
           </span>
           <Button
             size='sm'
@@ -165,7 +175,7 @@ export const GridStep = ({
                 unoptimized
               />
               <div className='absolute bottom-3 left-3 bg-black/70 px-3 py-1 rounded text-xs font-mono text-zinc-200'>
-                Frame {String(previewPhoto.frameNumber).padStart(2, '0')} · {previewPhoto.title}
+                Aufnahme {String(previewPhoto.frameNumber).padStart(2, '0')} · {previewPhoto.title}
               </div>
             </div>
           )}

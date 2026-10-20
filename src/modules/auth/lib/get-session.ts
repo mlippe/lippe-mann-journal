@@ -7,9 +7,3 @@ export const getSession = cache(async () => {
     headers: await headers(),
   });
 });
-
-export const getActiveSessions = cache(async () => {
-  return await auth.api.listSessions({
-    headers: await headers(),
-  });
-});

@@ -329,7 +329,7 @@ const ZineCardCollage = ({
   );
 };
 
-export const ZinePreviewCard = ({
+const ZinePreviewCard = ({
   post,
   priority = false,
 }: ZinePreviewCardProps) => {
@@ -445,7 +445,7 @@ export const ZinePreviewCard = ({
   );
 };
 
-export const FeedPreviewSkeleton = ({ limit = 3 }: { limit?: number }) => (
+const FeedPreviewSkeleton = ({ limit = 3 }: { limit?: number }) => (
   <section className='w-full max-w-6xl mx-auto pt-16 md:pt-24 border-t border-border/40'>
     {/* Section Header Skeleton */}
     <div className='flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 md:mb-14'>

@@ -28,8 +28,7 @@ export function SiteHeader() {
     if (segment === "album") return "Album";
     if (segment === "photo") return "Foto";
     if (segment === "article") return "Artikel";
-    if (segment === "profile") return "Profil";
-    if (segment === "revisit") return "Revisit";
+    if (segment === "revisit") return "Finale Wahl";
     return segment.charAt(0).toUpperCase() + segment.slice(1);
   };
 

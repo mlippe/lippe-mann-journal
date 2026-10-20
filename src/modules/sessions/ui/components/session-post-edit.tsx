@@ -67,7 +67,6 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(trpc.posts.getOne.queryOptions({ slug: post.slug })),
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
       toast.success('Session erfolgreich aktualisiert!');
@@ -93,7 +92,7 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
             {post.title}
           </h1>
           <p className='text-xs sm:text-sm text-muted-foreground mt-1'>
-            {totalFrames} Frames · {initialPicks} in Erstwahl
+            {totalFrames} Aufnahmen · {initialPicks} in Erstwahl
             {hasRevisitedCut ? ` · ${revisitedPicks} in Finaler Wahl` : ''}
           </p>
         </div>
@@ -115,7 +114,7 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
             <IconRotateClockwise className='size-5 text-foreground' />
             <span>
               {hasRevisitedCut
-                ? `Finale Wahl aktiv (${revisitedPicks} Frames)`
+                ? `Finale Wahl aktiv (${revisitedPicks} Aufnahmen)`
                 : 'Bereit für den zweiten Blick?'}
             </span>
           </div>

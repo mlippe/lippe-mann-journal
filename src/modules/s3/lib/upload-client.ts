@@ -41,7 +41,7 @@ class UploadError extends Error {
   }
 }
 
-export class S3Client {
+class S3Client {
   /**
    * generate a unique filename
    * @param originalFilename the original filename

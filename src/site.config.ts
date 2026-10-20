@@ -9,7 +9,13 @@
  * ============================================================================
  */
 
-import type { ContactCardTitle } from '@/components/contact-card';
+type ContactCardTitle =
+  | 'Instagram'
+  | 'GitHub'
+  | 'X'
+  | 'Xiaohongshu'
+  | 'Contact me'
+  | 'Kontakt';
 
 export const siteConfig = {
   title: 'Lippe & Mann Journal',
@@ -104,5 +110,3 @@ export const siteConfig = {
     { brand: 'Viltrox', model: 'AF 40mm F/2.5 FE' },
   ],
 } as const;
-
-export type SiteConfig = typeof siteConfig;

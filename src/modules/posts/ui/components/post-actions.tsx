@@ -53,7 +53,6 @@ export function PostActions({ post }: PostActionsProps) {
         onSuccess: async () => {
           await queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
           await queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
-          await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
           toast.success('Beitrag erfolgreich gelöscht');
         },
         onError: (error) => {

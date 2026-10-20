@@ -287,7 +287,6 @@ export const CreateSession = () => {
       await Promise.all([
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
       toast.success('Session erfolgreich veröffentlicht!');
@@ -307,7 +306,7 @@ export const CreateSession = () => {
   const uploadProgressText =
     photos.length > 0
       ? uploadedCount === photos.length
-        ? `✓ ${photos.length}/${photos.length} Frames`
+        ? `✓ ${photos.length}/${photos.length} Aufnahmen`
         : `Upload ${uploadedCount}/${photos.length}`
       : undefined;
 

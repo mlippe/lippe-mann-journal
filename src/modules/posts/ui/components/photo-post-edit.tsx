@@ -121,7 +121,6 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         );
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         toast.success('Beitrag erfolgreich aktualisiert');
       },
       onError: (e) => toast.error(`Fehler beim Aktualisieren des Beitrags: ${e.message}`),
@@ -136,7 +135,6 @@ export const PhotoPostEdit = ({ post }: { post: PostGetOne }) => {
         );
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         toast.success('Foto-Metadaten erfolgreich aktualisiert');
       },
       onError: (e) => toast.error(`Fehler beim Aktualisieren des Fotos: ${e.message}`),

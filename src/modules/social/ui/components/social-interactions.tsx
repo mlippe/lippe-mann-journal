@@ -31,7 +31,7 @@ interface SocialInteractionsProps {
   showActions?: boolean;
 }
 
-export const SocialInteractionsSkeleton = ({
+const SocialInteractionsSkeleton = ({
   variant = 'full',
   showMockComments = false,
   showActions = true,

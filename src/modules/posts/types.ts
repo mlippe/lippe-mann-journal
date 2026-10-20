@@ -5,10 +5,6 @@ export type PostGetOne = inferRouterOutputs<
   typeof appRouter
 >["posts"]["getOne"];
 
-export type PostGetMany = inferRouterOutputs<
-  typeof appRouter
->["posts"]["getMany"];
-
 export type PostGetPublished = inferRouterOutputs<
   typeof appRouter
 >["posts"]["getPublished"];

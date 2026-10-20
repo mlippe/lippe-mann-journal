@@ -6,7 +6,6 @@ import { usePhotosFilters } from "../../hooks/use-photos-filters";
 import { DEFAULT_PAGE } from "@/constants";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PhotosSearchFilter } from "./photos-search-filter";
-import { useModal } from "@/hooks/use-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const PhotosListHeader = () => {
-  const modal = useModal();
   const [filters, setFilters] = usePhotosFilters();
 
   const isAnyFilterModified = !!filters.search;
@@ -81,9 +79,6 @@ export const PhotosListHeader = () => {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-          <Button variant="default" onClick={modal.onOpen}>
-            Foto hinzufügen
-          </Button>
         </div>
       </div>
     </>

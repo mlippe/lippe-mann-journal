@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface OpticalIndicatorPhoto {
+interface OpticalIndicatorPhoto {
   id: string;
   title?: string | null;
   focalLength?: number | null;

@@ -101,7 +101,7 @@ export const PublishStep = ({
             <span>R2 Cloud-Speicher Status</span>
           </span>
           <span className='text-muted-foreground tabular-nums'>
-            {uploadedFrames} / {totalFrames} Frames synchronisiert
+            {uploadedFrames} / {totalFrames} Aufnahmen synchronisiert
           </span>
         </div>
 
@@ -118,7 +118,7 @@ export const PublishStep = ({
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
           <span>
             Erstwahl: <strong className='text-foreground'>{pickedCount}</strong> von{' '}
-            <strong>{totalFrames}</strong> Frames
+            <strong>{totalFrames}</strong> Aufnahmen
           </span>
 
           {failedFrames > 0 && onRetryFailedUploads && (

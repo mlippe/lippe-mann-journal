@@ -25,7 +25,7 @@ import Link from 'next/link';
 const page = async () => {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(
-    trpc.dashboard.getPhotosCountByMonth.queryOptions({ years: 3 }),
+    trpc.dashboard.getJournalActivity.queryOptions(),
   );
   void queryClient.prefetchQuery(
     trpc.dashboard.getDashboardStats.queryOptions(),
@@ -34,9 +34,9 @@ const page = async () => {
   return (
     <div className='py-4 px-4 md:px-8 flex flex-col'>
       <div>
-        <h1 className='text-2xl font-bold'>Overview</h1>
+        <h1 className='text-2xl font-bold'>Übersicht</h1>
         <p className='text-muted-foreground text-sm'>
-          See your photos, travel history, and more.
+          Dein Journal, neue Einträge und Kuration auf einen Blick.
         </p>
       </div>
       <div className='@container/main flex flex-1 flex-col'>
@@ -100,12 +100,12 @@ const page = async () => {
               </div>
             </Link>
 
-            {/* 3. ACTIVITY SECTION */}
+            {/* 4. JOURNAL RHYTHM & CURATION SECTION */}
             <section className='space-y-2.5'>
               <div className='flex items-center gap-2'>
                 <span className='text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5'>
                   <IconChartLine className='size-3.5 text-primary' />
-                  Aktivität
+                  Journal-Rhythmus & Kuration
                 </span>
                 <div className='h-px flex-1 bg-border/40' />
               </div>

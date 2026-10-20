@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
@@ -15,11 +16,17 @@ const Page = async ({ params }: Props) => {
   const decodedSlug = decodeURIComponent(slug);
 
   const queryClient = getQueryClient();
-  const collection = await queryClient.fetchQuery(
-    trpc.collections.getCollectionBySlug.queryOptions({
-      slug: decodedSlug,
-    }),
-  );
+  const collection = await queryClient
+    .fetchQuery(
+      trpc.collections.getCollectionBySlug.queryOptions({
+        slug: decodedSlug,
+      }),
+    )
+    .catch(() => null);
+
+  if (!collection) {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -156,7 +156,6 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         );
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
       },
     }),
   );
@@ -169,7 +168,6 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         );
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({}));
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({}));
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
       },
     }),
   );

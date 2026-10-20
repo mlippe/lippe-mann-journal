@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { trpc } from '@/trpc/server';
 import { getQueryClient } from '@/trpc/server';
@@ -17,33 +18,38 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = (await params).slug;
-  // Decode URL-encoded params
   const decodedSlug = decodeURIComponent(slug);
 
   const queryClient = getQueryClient();
-  const post = await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({
-      slug: decodedSlug,
-    }),
-  );
+  const post = await queryClient
+    .fetchQuery(
+      trpc.posts.getOne.queryOptions({
+        slug: decodedSlug,
+      }),
+    )
+    .catch(() => null);
 
   return {
-    title: post.title,
+    title: post?.title ?? 'Beitrag nicht gefunden',
   };
 }
 
 const Page = async ({ params }: Props) => {
   const { slug } = await params;
-
-  // Decode URL-encoded params
   const decodedSlug = decodeURIComponent(slug);
 
   const queryClient = getQueryClient();
-  await queryClient.fetchQuery(
-    trpc.posts.getOne.queryOptions({
-      slug: decodedSlug,
-    }),
-  );
+  const post = await queryClient
+    .fetchQuery(
+      trpc.posts.getOne.queryOptions({
+        slug: decodedSlug,
+      }),
+    )
+    .catch(() => null);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

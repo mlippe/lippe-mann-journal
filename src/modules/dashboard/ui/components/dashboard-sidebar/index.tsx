@@ -1,5 +1,4 @@
 import { NavMain } from '@/modules/dashboard/ui/components/dashboard-sidebar/nav-main';
-import { NavSecondary } from '@/modules/dashboard/ui/components/dashboard-sidebar/nav-secondary';
 import { NavUser } from '@/modules/dashboard/ui/components/dashboard-sidebar/nav-user';
 import {
   Sidebar,
@@ -35,31 +34,12 @@ const data = {
     {
       title: 'Sammlungen',
       url: '/dashboard/collections',
-      icon: 'post',
+      icon: 'folder',
     },
     {
       title: 'Substanz-Checkliste',
       url: '/dashboard/substanz-checklist',
       icon: 'checklist',
-    },
-    {
-      title: 'Profil',
-      url: '/dashboard/profile',
-      icon: 'user',
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Einstellungen',
-      url: '#',
-    },
-    {
-      title: 'Hilfe',
-      url: '#',
-    },
-    {
-      title: 'Suche',
-      url: '#',
     },
   ],
 };
@@ -90,7 +70,6 @@ export const DashboardSidebar = async ({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={session?.user as User} />

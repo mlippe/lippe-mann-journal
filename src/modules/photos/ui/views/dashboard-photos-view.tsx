@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useErrorBoundary } from 'react-error-boundary';
-import { useModal } from '@/hooks/use-modal';
 
 import { PhotoCardMobile } from '../components/photo-card-mobile';
 
@@ -70,8 +69,6 @@ export const DashboardPhotosView = () => {
 };
 
 const EmptyStatus = () => {
-  const modal = useModal();
-
   return (
     <Empty className='border border-dashed'>
       <EmptyHeader>
@@ -83,11 +80,6 @@ const EmptyStatus = () => {
           Du hast noch keine Fotos. Lade neue Fotos hoch, um zu beginnen.
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent>
-        <Button variant='outline' size='sm' onClick={modal.onOpen}>
-          Fotos hinzufügen
-        </Button>
-      </EmptyContent>
     </Empty>
   );
 };
