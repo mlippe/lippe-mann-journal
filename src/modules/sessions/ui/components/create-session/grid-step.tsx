@@ -59,11 +59,11 @@ export const GridStep = ({
         </div>
       </div>
 
-      {/* Historic Yellow Marker Legend */}
+      {/* Selection Legend */}
       <div className='flex items-center justify-between text-xs font-mono text-muted-foreground px-1'>
         <div className='flex items-center gap-2'>
-          <span className='size-2.5 rounded-full bg-amber-400 ring-2 ring-amber-400/30' />
-          <span>Gelber Marker = Initial Gut Pick</span>
+          <span className='size-2 rounded-full bg-foreground' />
+          <span>Ausgewählte Frames für das Story-Pacing</span>
         </div>
         <span className='tabular-nums font-medium text-foreground'>
           {selectedCount} von {photos.length} ausgewählt
@@ -83,7 +83,7 @@ export const GridStep = ({
               className={cn(
                 'group relative aspect-[3/2] w-full overflow-hidden rounded-xs bg-muted border transition-all duration-200 select-none cursor-pointer',
                 isSelected
-                  ? 'border-amber-400 ring-2 ring-amber-400 ring-offset-2 ring-offset-background shadow-md'
+                  ? 'border-foreground ring-2 ring-foreground ring-offset-2 ring-offset-background shadow-md'
                   : 'border-border/80 hover:border-foreground/40',
               )}
               onClick={() => onTogglePick(photo.id)}
@@ -101,9 +101,9 @@ export const GridStep = ({
               {/* Gradient Scrim */}
               <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none' />
 
-              {/* Top-Right Yellow Marker Badge */}
+              {/* Top-Right Selection Badge */}
               {isSelected ? (
-                <div className='absolute top-1 right-1 z-10 bg-amber-400 text-zinc-950 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-xs shadow-xs'>
+                <div className='absolute top-1 right-1 z-10 bg-foreground text-background font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-xs shadow-xs'>
                   ✓ {pickIndex !== null ? pickIndex + 1 : ''}
                 </div>
               ) : null}
@@ -134,13 +134,13 @@ export const GridStep = ({
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span className='tabular-nums'>
-            <strong className='text-amber-400'>{selectedCount}</strong> Frames ausgewählt
+            <strong className='text-zinc-100'>{selectedCount}</strong> Frames ausgewählt
           </span>
           <Button
             size='sm'
             onClick={onProceed}
             disabled={selectedCount === 0}
-            className='bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold rounded-full px-4 h-8 text-xs cursor-pointer'
+            className='bg-white text-zinc-950 hover:bg-zinc-200 font-semibold rounded-full px-4 h-8 text-xs cursor-pointer'
           >
             <span>Story-Pacing</span>
             <IconArrowRight className='size-3.5 ml-1' />

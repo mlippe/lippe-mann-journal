@@ -51,19 +51,19 @@ export const ContactSheetDrawer = ({
               </DialogTitle>
             </div>
 
-            {/* Historic Contact Sheet Marker Legend */}
+            {/* Contact Sheet Marker Outline Legend */}
             <div className='flex items-center gap-3 text-[11px] font-mono text-zinc-400'>
               <span className='inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-amber-400' />
-                <span>Initial Gut Pick</span>
+                <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
+                <span>Initial Cut</span>
               </span>
               <span className='inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-red-500' />
+                <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
                 <span>Revisited Cut</span>
               </span>
               <span className='hidden sm:inline-flex items-center gap-1.5'>
-                <span className='size-2 rounded-xs bg-red-500 ring-1 ring-amber-400' />
-                <span>Both</span>
+                <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
+                <span>Beide</span>
               </span>
             </div>
           </div>
@@ -89,11 +89,11 @@ export const ContactSheetDrawer = ({
                   className={cn(
                     'group relative aspect-[3/2] w-full overflow-hidden rounded-xs bg-zinc-900 border transition-all duration-200 cursor-pointer text-left',
                     isBoth
-                      ? 'border-red-500 ring-2 ring-red-500 ring-offset-1 ring-offset-zinc-950'
+                      ? 'border-amber-400/80 ring-1 ring-red-500/90'
                       : isRevisited
-                        ? 'border-red-500/80 ring-2 ring-red-500/80 ring-offset-1 ring-offset-zinc-950'
+                        ? 'border-red-500/70 ring-1 ring-red-500/70'
                         : isInitial
-                          ? 'border-amber-400/80 ring-2 ring-amber-400/80 ring-offset-1 ring-offset-zinc-950'
+                          ? 'border-amber-400/70 ring-1 ring-amber-400/70'
                           : 'border-zinc-800/80 hover:border-zinc-600',
                   )}
                 >
@@ -110,18 +110,17 @@ export const ContactSheetDrawer = ({
                   {/* Dark Vignette Overlay for readability */}
                   <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none' />
 
-                  {/* Top-Right Historic Marker Badge */}
+                  {/* Top-Right Neutral Indicator Badge */}
                   {isBoth ? (
-                    <div className='absolute top-1 right-1 z-10 flex items-center gap-1 bg-red-600 text-white font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-xs shadow-xs'>
-                      <span className='size-1.5 rounded-full bg-amber-300' />
-                      <span>BOTH</span>
+                    <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
+                      BOTH
                     </div>
                   ) : isRevisited ? (
-                    <div className='absolute top-1 right-1 z-10 bg-red-600 text-white font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-xs shadow-xs'>
+                    <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
                       REV
                     </div>
                   ) : isInitial ? (
-                    <div className='absolute top-1 right-1 z-10 bg-amber-400 text-zinc-950 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-xs shadow-xs'>
+                    <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
                       1ST
                     </div>
                   ) : null}

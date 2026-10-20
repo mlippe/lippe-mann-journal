@@ -180,7 +180,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       {/* Header */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/70 pb-6'>
         <div>
-          <div className='flex items-center gap-2 text-xs font-mono text-red-500 uppercase tracking-widest font-semibold mb-1'>
+          <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest font-semibold mb-1'>
             <IconRotateClockwise className='size-4' />
             <span>Session Revisit Studio</span>
           </div>
@@ -205,16 +205,16 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       {/* Marker Legend */}
       <div className='flex flex-wrap items-center gap-4 text-xs font-mono p-3 rounded-xl bg-card border border-border/70 text-muted-foreground'>
         <div className='flex items-center gap-2'>
-          <span className='size-2.5 rounded-full bg-amber-400 ring-2 ring-amber-400/40' />
-          <span>Gelb = Initial Gut Pick (damals)</span>
+          <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
+          <span>Initial Gut Pick (damals)</span>
         </div>
         <div className='flex items-center gap-2'>
-          <span className='size-2.5 rounded-full bg-red-500 ring-2 ring-red-500/40' />
-          <span>Rot = Revisited Pick (heute)</span>
+          <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
+          <span>Revisited Pick (heute)</span>
         </div>
         <div className='flex items-center gap-2'>
-          <span className='size-2.5 rounded-full bg-red-500 ring-2 ring-amber-400' />
-          <span>Doppel-Marker = In beiden bestätigt</span>
+          <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
+          <span>In beiden bestätigt</span>
         </div>
       </div>
 
@@ -225,7 +225,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             1. Contact Sheet durchsuchen & Auswählen
           </h2>
           <span className='text-xs font-mono text-muted-foreground'>
-            <strong className='text-red-500'>{revisitedPicks.length}</strong> Frames für Revisited ausgewählt
+            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Revisited ausgewählt
           </span>
         </div>
 
@@ -244,11 +244,11 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                 className={cn(
                   'group relative aspect-[3/2] w-full overflow-hidden rounded-xs bg-muted border select-none cursor-pointer transition-all duration-200',
                   isBoth
-                    ? 'ring-2 ring-red-500 border-amber-400 ring-offset-2 ring-offset-background shadow-md'
+                    ? 'border-amber-400/80 ring-1 ring-red-500/90'
                     : isRevisited
-                      ? 'ring-2 ring-red-500 border-red-500 ring-offset-2 ring-offset-background shadow-md'
+                      ? 'border-red-500/70 ring-1 ring-red-500/70'
                       : isInitial
-                        ? 'border-amber-400 ring-2 ring-amber-400/50'
+                        ? 'border-amber-400/70 ring-1 ring-amber-400/70'
                         : 'border-border/80 hover:border-foreground/40',
                 )}
               >
@@ -262,18 +262,18 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
 
                 <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none' />
 
-                {/* Marker Badges */}
-                <div className='absolute top-1 right-1 z-10 flex items-center gap-0.5 font-mono text-[9px] font-bold'>
+                {/* Neutral Badges */}
+                <div className='absolute top-1 right-1 z-10 flex items-center gap-0.5 font-mono text-[9px] font-medium'>
                   {isBoth ? (
-                    <span className='bg-red-500 text-white border border-amber-400 px-1.5 py-0.5 rounded-xs shadow-xs'>
+                    <span className='bg-black/80 text-white border border-white/10 px-1.5 py-0.5 rounded-xs shadow-xs'>
                       Rev #{revPick!.revisitedOrder + 1} · Both
                     </span>
                   ) : isRevisited ? (
-                    <span className='bg-red-500 text-white px-1.5 py-0.5 rounded-xs shadow-xs'>
+                    <span className='bg-black/80 text-white border border-white/10 px-1.5 py-0.5 rounded-xs shadow-xs'>
                       Rev #{revPick!.revisitedOrder + 1}
                     </span>
                   ) : isInitial ? (
-                    <span className='bg-amber-400 text-zinc-950 px-1 py-0.5 rounded-xs shadow-xs'>
+                    <span className='bg-black/80 text-zinc-300 border border-white/10 px-1 py-0.5 rounded-xs shadow-xs'>
                       1st
                     </span>
                   ) : null}
@@ -333,14 +333,14 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                   className={cn(
                     'flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border bg-card transition-all',
                     isHero
-                      ? 'border-red-500/80 ring-1 ring-red-500/30 bg-red-500/[0.02]'
+                      ? 'border-foreground/50 ring-1 ring-foreground/20 bg-muted/20'
                       : isPaired
                         ? 'border-primary/60 ring-1 ring-primary/20'
                         : 'border-border/80',
                   )}
                 >
                   <div className='flex items-center gap-3'>
-                    <span className='font-mono font-bold text-xs size-6 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center shrink-0'>
+                    <span className='font-mono font-bold text-xs size-6 rounded-full bg-muted text-foreground flex items-center justify-center shrink-0'>
                       {index + 1}
                     </span>
 
@@ -421,7 +421,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
                         className={cn(
                           'px-2 py-1 rounded-md transition-all flex items-center gap-1 text-[11px]',
                           isHero
-                            ? 'bg-red-500 text-white font-semibold shadow-xs'
+                            ? 'bg-foreground text-background font-semibold shadow-xs'
                             : 'text-muted-foreground hover:text-foreground',
                         )}
                       >
@@ -511,13 +511,13 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span>
-            Revisited Cut: <strong className='text-red-500'>{revisitedPicks.length}</strong> Frames
+            Revisited Cut: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
           </span>
           <Button
             size='sm'
             onClick={handleSave}
             disabled={revisitedPicks.length === 0 || revisitMutation.isPending}
-            className='bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full px-5 h-8 text-xs cursor-pointer'
+            className='bg-white text-zinc-950 hover:bg-zinc-200 font-semibold rounded-full px-5 h-8 text-xs cursor-pointer'
           >
             <IconCheck className='size-3.5 mr-1' />
             <span>Revisited Cut speichern</span>

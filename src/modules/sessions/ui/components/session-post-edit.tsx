@@ -109,10 +109,10 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
       </div>
 
       {/* Revisit Studio Callout Banner */}
-      <div className='rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-500/[0.04] to-amber-500/[0.04] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+      <div className='rounded-2xl border border-border/70 bg-muted/30 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <div className='space-y-1'>
           <div className='flex items-center gap-2 font-semibold text-sm sm:text-base'>
-            <IconRotateClockwise className='size-5 text-red-500' />
+            <IconRotateClockwise className='size-5 text-foreground' />
             <span>
               {hasRevisitedCut
                 ? `Revisited Cut aktiv (${revisitedPicks} Frames)`
@@ -128,7 +128,7 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
 
         <Button
           asChild
-          className='bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl shrink-0'
+          className='bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl shrink-0'
         >
           <Link href={`/dashboard/posts/${post.slug}/revisit`}>
             <IconRotateClockwise className='size-4 mr-1.5' />

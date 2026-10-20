@@ -145,7 +145,7 @@ export const PacingStep = ({
               className={cn(
                 'flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border bg-card transition-all',
                 isHero
-                  ? 'border-amber-500/80 ring-1 ring-amber-500/30 bg-amber-500/[0.02]'
+                  ? 'border-foreground/50 ring-1 ring-foreground/20 bg-muted/20'
                   : isPaired
                     ? 'border-primary/60 ring-1 ring-primary/20'
                     : 'border-border/80',
@@ -228,7 +228,7 @@ export const PacingStep = ({
                     className={cn(
                       'px-2 py-1 rounded-md transition-all flex items-center gap-1 text-[11px]',
                       isHero
-                        ? 'bg-amber-400 text-zinc-950 font-semibold shadow-xs'
+                        ? 'bg-foreground text-background font-semibold shadow-xs'
                         : 'text-muted-foreground hover:text-foreground',
                     )}
                     title='Hero Feature'
@@ -296,7 +296,7 @@ export const PacingStep = ({
           <Button
             size='sm'
             onClick={onProceed}
-            className='bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold rounded-full px-4 h-8 text-xs cursor-pointer'
+            className='bg-white text-zinc-950 hover:bg-zinc-200 font-semibold rounded-full px-4 h-8 text-xs cursor-pointer'
           >
             <span>Dispatch & Veröffentlichen</span>
             <IconArrowRight className='size-3.5 ml-1' />

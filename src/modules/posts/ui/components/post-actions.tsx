@@ -111,7 +111,7 @@ export function PostActions({ post }: PostActionsProps) {
           {post.type === 'SESSION' && (
             <DropdownMenuItem asChild>
               <Link href={`/dashboard/posts/${post.slug}/revisit`}>
-                <IconRotateClockwise className='mr-2 size-4 text-red-500' />
+                <IconRotateClockwise className='mr-2 size-4 text-muted-foreground' />
                 <span>Revisited Cut</span>
               </Link>
             </DropdownMenuItem>
