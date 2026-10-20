@@ -22,7 +22,7 @@ import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@/constants';
 import { Context } from 'node:vm';
 
 // Zod schema for the output of getPostsInCollection
-export const postsInCollectionOutputSchema = z.object({
+const postsInCollectionOutputSchema = z.object({
   items: z.array(postsWithPhotos),
   nextCursor: z.number().optional(),
   total: z.number(),

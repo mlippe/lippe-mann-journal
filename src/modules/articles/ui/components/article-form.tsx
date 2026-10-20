@@ -14,7 +14,7 @@ import { postFormSchema } from '../../schemas';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PostGetOne } from '../../types';
+import { PostGetOne } from '@/modules/posts/types';
 import { generateSlug } from '../../lib/utils';
 import { useEffect } from 'react';
 import FileUploader from '@/modules/s3/ui/components/file-uploader';
@@ -57,7 +57,6 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         await queryClient.invalidateQueries(
           trpc.posts.getPublished.queryOptions({}),
         );
-        await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
         router.refresh();
         router.push('/dashboard/posts?type=ARTICLE');
@@ -83,7 +82,6 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         await queryClient.invalidateQueries(
           trpc.posts.getPublished.queryOptions({}),
         );
-        await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
         form.reset();
         router.refresh();
         router.push('/dashboard/posts?type=ARTICLE');

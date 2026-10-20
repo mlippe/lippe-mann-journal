@@ -26,7 +26,7 @@ import { Image as ImageIcon, Link, Upload } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { getImageInfo } from '@/modules/photos/lib/utils';
 
-export interface ImagePlaceholderOptions {
+interface ImagePlaceholderOptions {
   HTMLAttributes: Record<string, unknown>;
   onDrop: (files: File[], editor: Editor) => void;
   onDropRejected?: (files: File[], editor: Editor) => void;

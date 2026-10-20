@@ -67,7 +67,6 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
         queryClient.invalidateQueries(trpc.posts.getOne.queryOptions({ slug: post.slug })),
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
       toast.success('Session erfolgreich aktualisiert!');

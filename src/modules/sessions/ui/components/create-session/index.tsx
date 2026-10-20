@@ -287,7 +287,6 @@ export const CreateSession = () => {
       await Promise.all([
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
       toast.success('Session erfolgreich veröffentlicht!');

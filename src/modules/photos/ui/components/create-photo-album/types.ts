@@ -4,14 +4,6 @@ import { z } from 'zod';
 // FORM SCHEMAS
 // ============================================================================
 
-export const uploadStepSchema = z.object({
-  urls: z
-    .array(z.string())
-    .min(1, { message: 'Please upload at least one photo before proceeding' }),
-});
-
-export type UploadStepData = z.infer<typeof uploadStepSchema>;
-
 export const albumPhotoSchema = z.object({
   id: z.string(),
   url: z.string(),

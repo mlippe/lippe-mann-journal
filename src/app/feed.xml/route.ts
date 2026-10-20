@@ -28,20 +28,18 @@ function getBaseUrl(): string {
   return 'https://journal.lippe-mann.de';
 }
 
-function getPostHref(post: { type: string; slug?: string | null; id: string }): string {
-  if (post.slug) {
-    if (post.type === 'ARTICLE') return `/article/${post.slug}`;
-    if (post.type === 'PHOTO') return `/photo/${post.slug}`;
-    if (post.type === 'ALBUM') return `/album/${post.slug}`;
-    if (post.type === 'SESSION') return `/session/${post.slug}`;
-  }
-  return `/post/${post.slug || post.id}`;
+function getPostHref(post: { type: string; slug: string }): string {
+  if (post.type === 'ARTICLE') return `/article/${post.slug}`;
+  if (post.type === 'PHOTO') return `/photo/${post.slug}`;
+  if (post.type === 'ALBUM') return `/album/${post.slug}`;
+  if (post.type === 'SESSION') return `/session/${post.slug}`;
+  return `/photo/${post.slug}`;
 }
 
 type FeedPost = {
   id: string;
   title: string;
-  slug: string | null;
+  slug: string;
   visibility: string;
   type: string;
   coverImage?: string | null;

@@ -158,7 +158,6 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         queryClient.invalidateQueries(trpc.posts.getOne.queryOptions({ slug })),
         queryClient.invalidateQueries(trpc.posts.getMany.queryOptions({})),
         queryClient.invalidateQueries(trpc.posts.getPublished.queryOptions({})),
-        queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
       toast.success('Finale Wahl erfolgreich gespeichert!');

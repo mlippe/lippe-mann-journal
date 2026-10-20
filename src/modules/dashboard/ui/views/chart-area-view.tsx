@@ -30,8 +30,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const description = "Monatliche Foto-Aktivität";
-
 const chartConfig = {
   photos: {
     label: "Fotos",

@@ -175,56 +175,6 @@ export const postsRouter = createTRPCRouter({
 
       return post;
     }),
-  getPostById: authedProcedure
-    .input(z.object({ postId: z.string().uuid() }))
-    .output(
-      postsWithPhotos.extend({
-        postsToCollections: z
-          .array(
-            z.object({
-              postId: z.string(),
-              collectionId: z.string(),
-              collection: collectionsSelectSchema,
-            }),
-          )
-          .optional(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const { postId } = input;
-
-      const filters = [eq(posts.id, postId)];
-      if (!ctx.auth) {
-        filters.push(eq(posts.visibility, 'public'));
-      }
-
-      const post = await ctx.db.query.posts.findFirst({
-        where: and(...filters),
-        with: {
-          postsToPhotos: {
-            with: {
-              photo: true,
-            },
-            // @ts-expect-error: unspecified any
-            orderBy: (postsToPhotos, { asc }) => [asc(postsToPhotos.sortOrder)],
-          },
-          postsToCollections: {
-            with: {
-              collection: true,
-            },
-          },
-        },
-      });
-
-      if (!post) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Post not found',
-        });
-      }
-
-      return post;
-    }),
   getMany: protectedProcedure
     .input(
       z.object({
