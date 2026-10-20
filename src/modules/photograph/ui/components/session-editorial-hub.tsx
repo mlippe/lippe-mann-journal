@@ -1,12 +1,11 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { IconLayoutGrid, IconArrowUpRight } from '@tabler/icons-react';
+import { IconLayoutGrid, IconArrowUpRight, IconArrowUp } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Image from 'next/image';
 import { keyToUrl } from '@/modules/s3/lib/key-to-url';
-import { SessionCutSwitcher } from './session-cut-switcher';
 import { type SessionContactPhoto } from './contact-sheet-drawer';
 
 interface SessionEditorialHubProps {
@@ -36,41 +35,53 @@ export const SessionEditorialHub = ({
 }: SessionEditorialHubProps) => {
   const totalFrames = allSessionPhotos.length;
 
+  const handleSwitchAndScroll = (targetCut: 'revisited' | 'initial') => {
+    onCutChange(targetCut);
+    const target = document.getElementById('story-photos');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className={cn('relative z-10', className)}>
       <div className='rounded-2xl border border-border/50 bg-muted/15 overflow-hidden transition-all duration-300'>
-        {/* Upper: Editorial Selection Context, Switcher & Author Rationale */}
+        {/* Upper: Editorial Selection Context, "Du siehst gerade" Statement & Author Rationale */}
         <div className='p-5 sm:p-7 md:p-8 border-b border-border/40 space-y-4'>
-          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
-            <div className='flex items-center gap-2'>
-              <span className='text-[11px] sm:text-xs font-mono uppercase tracking-[0.14em] text-muted-foreground font-medium'>
-                Session-Kuration
-              </span>
-              <span className='text-muted-foreground/40'>·</span>
-              <span className='text-[11px] sm:text-xs font-mono text-muted-foreground'>
-                {totalFrames} Frames gesamt
-              </span>
-            </div>
-
-            {hasRevisitedCut && (
-              <SessionCutSwitcher
-                activeCut={activeCut}
-                onCutChange={onCutChange}
-                hasRevisitedCut={hasRevisitedCut}
-                initialCount={initialCount}
-                revisitedCount={revisitedCount}
-              />
-            )}
+          {/* Header row: Session-Kuration & Frames */}
+          <div className='flex items-center gap-2'>
+            <span className='text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground/80 font-semibold'>
+              Session-Kuration
+            </span>
+            <span className='text-muted-foreground/30'>·</span>
+            <span className='text-[11px] sm:text-xs font-mono text-muted-foreground'>
+              {totalFrames} Frames gesamt
+            </span>
           </div>
 
-          {/* One Clear Sentence explaining the active cut */}
-          <p className='text-sm sm:text-[15px] text-muted-foreground font-sans leading-relaxed'>
-            {hasRevisitedCut && activeCut === 'revisited'
-              ? `Mit zeitlichem Abstand neu kuratierte Serie aus allen ${totalFrames} Frames dieser Session.`
-              : `Die ursprüngliche Auswahl direkt nach dem Shooting – intuitiv getroffen aus allen ${totalFrames} Frames.`}
-          </p>
+          {/* "DU SIEHST GERADE" Indicator & Explanatory Quote */}
+          <div className='space-y-1.5'>
+            <div className='flex items-center gap-2'>
+              <span className='text-[10px] font-mono font-semibold uppercase tracking-[0.18em] text-foreground/90 bg-muted/70 px-2 py-0.5 rounded-xs'>
+                Du siehst gerade
+              </span>
+              {hasRevisitedCut && (
+                <span className='text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider'>
+                  {activeCut === 'revisited' ? 'Finale Wahl' : 'Erstwahl'}
+                </span>
+              )}
+            </div>
 
-          {/* Author's Rationale Note when Neuauswahl is active */}
+            <p className='text-sm sm:text-[15px] text-muted-foreground font-sans leading-relaxed'>
+              {hasRevisitedCut && activeCut === 'revisited'
+                ? `Mit zeitlichem Abstand neu kuratierte Serie aus allen ${totalFrames} Frames dieser Session.`
+                : `Die ursprüngliche Auswahl direkt nach dem Shooting – intuitiv getroffen aus allen ${totalFrames} Frames.`}
+            </p>
+          </div>
+
+          {/* Author's Rationale Note when Finale Wahl is active */}
           {hasRevisitedCut && activeCut === 'revisited' && revisitedNote && (
             <div className='pt-1'>
               <div className='border-l-2 border-foreground/30 pl-3.5 sm:pl-4 py-1 bg-muted/20 rounded-r-md'>
@@ -79,10 +90,35 @@ export const SessionEditorialHub = ({
                 </p>
                 {revisitedAt && (
                   <span className='block text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-muted-foreground/60 mt-1.5'>
-                    Notiz zur Neuauswahl · {format(new Date(revisitedAt), 'MMMM yyyy', { locale: de })}
+                    Notiz zur Finalen Wahl · {format(new Date(revisitedAt), 'MMMM yyyy', { locale: de })}
                   </span>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* CTA Switch Button below reading flow */}
+          {hasRevisitedCut && (
+            <div className='pt-1'>
+              <button
+                type='button'
+                onClick={() =>
+                  handleSwitchAndScroll(
+                    activeCut === 'revisited' ? 'initial' : 'revisited',
+                  )
+                }
+                className='inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-muted/80 hover:bg-muted text-foreground border border-border/70 hover:border-border text-xs font-mono transition-all duration-200 cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95'
+              >
+                <span>
+                  {activeCut === 'revisited'
+                    ? 'Originale Auswahl ansehen'
+                    : 'Finale Wahl ansehen'}
+                </span>
+                <span className='text-[10px] text-muted-foreground font-normal tabular-nums'>
+                  ({activeCut === 'revisited' ? initialCount : revisitedCount})
+                </span>
+                <IconArrowUp className='size-3 text-muted-foreground' />
+              </button>
             </div>
           )}
         </div>

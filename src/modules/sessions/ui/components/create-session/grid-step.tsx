@@ -39,7 +39,7 @@ export const GridStep = ({
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/60 pb-4'>
         <div>
           <h2 className='text-xl sm:text-2xl font-bold tracking-tight'>
-            Leuchttisch · Erstauswahl
+            Leuchttisch · Erstwahl
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground mt-0.5'>
             Wähle deine Favoriten direkt nach dem Shooting (3–7 Frames empfohlen).

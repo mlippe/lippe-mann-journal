@@ -93,8 +93,8 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
             {post.title}
           </h1>
           <p className='text-xs sm:text-sm text-muted-foreground mt-1'>
-            {totalFrames} Frames · {initialPicks} in Erstauswahl
-            {hasRevisitedCut ? ` · ${revisitedPicks} in Neuauswahl` : ''}
+            {totalFrames} Frames · {initialPicks} in Erstwahl
+            {hasRevisitedCut ? ` · ${revisitedPicks} in Finaler Wahl` : ''}
           </p>
         </div>
 
@@ -115,13 +115,13 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
             <IconRotateClockwise className='size-5 text-foreground' />
             <span>
               {hasRevisitedCut
-                ? `Neuauswahl aktiv (${revisitedPicks} Frames)`
+                ? `Finale Wahl aktiv (${revisitedPicks} Frames)`
                 : 'Bereit für den zweiten Blick?'}
             </span>
           </div>
           <p className='text-xs sm:text-sm text-muted-foreground max-w-md'>
             {hasRevisitedCut
-              ? 'Passe deine spätere Neuauswahl oder deine Retrospektiv-Notizen jederzeit an.'
+              ? 'Passe deine spätere Finale Wahl oder deine Retrospektiv-Notizen jederzeit an.'
               : 'Kuriere deine Bilder mit zeitlichem Abstand über den digitalen Leuchttisch neu.'}
           </p>
         </div>
@@ -132,7 +132,7 @@ export const SessionPostEdit = ({ post }: { post: PostGetOne }) => {
         >
           <Link href={`/dashboard/posts/${post.slug}/revisit`}>
             <IconRotateClockwise className='size-4 mr-1.5' />
-            <span>{hasRevisitedCut ? 'Neuauswahl bearbeiten' : 'Neuauswahl anlegen'}</span>
+            <span>{hasRevisitedCut ? 'Finale Wahl bearbeiten' : 'Finale Wahl anlegen'}</span>
           </Link>
         </Button>
       </div>

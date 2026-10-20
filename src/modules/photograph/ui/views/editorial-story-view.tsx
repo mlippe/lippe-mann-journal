@@ -1846,7 +1846,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       </header>
 
       {/* 2. EDITORIAL BUILDING BLOCKS ENGINE (Viewport-Fitted Zero-Crop with Mixed Sticky & Reveal) */}
-      <div className='w-full'>
+      <div id='story-photos' className='w-full scroll-mt-14 md:scroll-mt-8'>
         {storyUnits.map((unit, unitIdx) => {
           if (unit.type === 'pinned-hero-unit') {
             return (

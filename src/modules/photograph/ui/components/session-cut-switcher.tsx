@@ -45,8 +45,8 @@ export const SessionCutSwitcher = ({
         )}
       >
         <span>
-          <span className='hidden sm:inline'>Neuauswahl</span>
-          <span className='sm:hidden'>Neu</span> ({revisitedCount})
+          <span className='hidden sm:inline'>Finale Wahl</span>
+          <span className='sm:hidden'>Final</span> ({revisitedCount})
         </span>
       </button>
 
@@ -63,7 +63,7 @@ export const SessionCutSwitcher = ({
         )}
       >
         <span>
-          <span className='hidden sm:inline'>Erstauswahl</span>
+          <span className='hidden sm:inline'>Erstwahl</span>
           <span className='sm:hidden'>Erst</span> ({initialCount})
         </span>
       </button>

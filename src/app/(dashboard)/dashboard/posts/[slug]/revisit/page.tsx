@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   );
 
   return {
-    title: `Neuauswahl · ${post.title}`,
+    title: `Finale Wahl · ${post.title}`,
   };
 }
 

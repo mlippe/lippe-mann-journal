@@ -138,7 +138,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
 
   const handleSave = async () => {
     if (revisitedPicks.length === 0) {
-      toast.error('Bitte wähle mindestens 1 Bild für die Neuauswahl aus.');
+      toast.error('Bitte wähle mindestens 1 Bild für die Finale Wahl aus.');
       return;
     }
 
@@ -161,7 +161,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         queryClient.invalidateQueries(trpc.blog.getMany.queryOptions()),
       ]);
 
-      toast.success('Neuauswahl erfolgreich gespeichert!');
+      toast.success('Finale Wahl erfolgreich gespeichert!');
       router.push(`/session/${post.slug}`);
     } catch (error) {
       console.error('Revisit error:', error);
@@ -182,7 +182,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
         <div>
           <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest font-semibold mb-1'>
             <IconRotateClockwise className='size-4' />
-            <span>Session-Neuauswahl</span>
+            <span>Session · Finale Wahl</span>
           </div>
           <h1 className='text-2xl sm:text-3xl font-bold tracking-tight'>
             {post.title}
@@ -206,11 +206,11 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='flex flex-wrap items-center gap-4 text-xs font-mono p-3 rounded-xl bg-card border border-border/70 text-muted-foreground'>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-amber-400/80 bg-amber-400/20' />
-          <span>Erstauswahl (damals)</span>
+          <span>Erstwahl (damals)</span>
         </div>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-red-500/80 bg-red-500/20' />
-          <span>Neuauswahl (heute)</span>
+          <span>Finale Wahl (heute)</span>
         </div>
         <div className='flex items-center gap-2'>
           <span className='size-2 rounded-full ring-1 ring-red-500 border border-amber-400 bg-red-500/20' />
@@ -225,7 +225,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             1. Kontaktbogen durchsuchen & auswählen
           </h2>
           <span className='text-xs font-mono text-muted-foreground'>
-            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Neuauswahl ausgewählt
+            <strong className='text-foreground'>{revisitedPicks.length}</strong> Frames für Finale Wahl ausgewählt
           </span>
         </div>
 
@@ -309,7 +309,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       {revisitedPicks.length > 0 && (
         <div className='space-y-4 pt-6 border-t border-border/70'>
           <h2 className='text-base sm:text-lg font-semibold tracking-tight'>
-            2. Reihenfolge der Neuauswahl ({revisitedPicks.length} Frames)
+            2. Reihenfolge der Finalen Wahl ({revisitedPicks.length} Frames)
           </h2>
           <p className='text-xs sm:text-sm text-muted-foreground'>
             Bestimme Reihenfolge und Bildrhythmus für die neu kuratierte Auswahl.
@@ -511,7 +511,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
       <div className='fixed bottom-6 inset-x-0 px-4 flex justify-center z-40 pointer-events-none'>
         <div className='pointer-events-auto flex items-center gap-3 bg-zinc-950 text-zinc-100 border border-zinc-800 rounded-full px-5 py-3 shadow-2xl backdrop-blur-md text-xs sm:text-sm font-mono'>
           <span>
-            Neuauswahl: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
+            Finale Wahl: <strong className='text-zinc-100'>{revisitedPicks.length}</strong> Frames
           </span>
           <Button
             size='sm'
@@ -520,7 +520,7 @@ export const SessionRevisitView = ({ slug }: { slug: string }) => {
             className='bg-white text-zinc-950 hover:bg-zinc-200 font-semibold rounded-full px-5 h-8 text-xs cursor-pointer'
           >
             <IconCheck className='size-3.5 mr-1' />
-            <span>Neuauswahl speichern</span>
+            <span>Finale Wahl speichern</span>
           </Button>
         </div>
       </div>

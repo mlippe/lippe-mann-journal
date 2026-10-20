@@ -55,11 +55,11 @@ export const ContactSheetDrawer = ({
             <div className='flex items-center gap-3 text-[11px] font-mono text-zinc-400'>
               <span className='inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-2 ring-amber-400/80' />
-                <span>Erstauswahl</span>
+                <span>Erstwahl</span>
               </span>
               <span className='inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-2 ring-red-500/80' />
-                <span>Neuauswahl</span>
+                <span>Finale Wahl</span>
               </span>
               <span className='hidden sm:inline-flex items-center gap-1.5'>
                 <span className='size-2 rounded-full ring-2 ring-red-500 border-2 border-amber-400' />
@@ -117,7 +117,7 @@ export const ContactSheetDrawer = ({
                     </div>
                   ) : isRevisited ? (
                     <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
-                      NEU
+                      FINAL
                     </div>
                   ) : isInitial ? (
                     <div className='absolute top-1 right-1 z-10 bg-black/80 text-zinc-300 font-mono text-[9px] font-medium px-1.5 py-0.5 rounded-xs border border-white/10 shadow-xs'>
