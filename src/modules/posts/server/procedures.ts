@@ -309,6 +309,8 @@ export const postsRouter = createTRPCRouter({
           tags: true,
           coverImage: true,
           content: true,
+          revisitedNote: true,
+          revisitedAt: true,
           createdAt: true,
           updatedAt: true,
         },

@@ -197,6 +197,8 @@ export const postsSelectSchema = createSelectSchema(posts);
 export const postsUpdateSchema = createUpdateSchema(posts);
 
 export const postsWithPhotos = createSelectSchema(posts).extend({
+  revisitedNote: z.string().optional().nullable(),
+  revisitedAt: z.date().optional().nullable(),
   postsToPhotos: z
     .array(
       z.object({
