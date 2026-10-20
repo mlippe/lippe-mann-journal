@@ -1537,6 +1537,8 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       } else if (e.key === 'ArrowLeft') {
         handlePrevPhoto();
       } else if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
         closeLightbox();
       }
     },
@@ -2084,8 +2086,9 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       >
         <DialogContent
           showCloseButton={false}
+          overlayClassName='z-[70]! bg-black/90'
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! z-50 text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none! outline-none'
+          className='fixed! inset-0! top-0! left-0! right-0! bottom-0! translate-x-0! translate-y-0! transform-none! w-full! max-w-full! h-[100dvh]! max-h-[100dvh]! bg-transparent border-none p-0! m-0! gap-0! rounded-none! z-[70]! text-white overflow-hidden data-[state=open]:zoom-in-100! data-[state=closed]:zoom-out-100! animate-none! outline-none'
           style={{
             position: 'fixed',
             top: 0,

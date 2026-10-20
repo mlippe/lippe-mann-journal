@@ -85,7 +85,6 @@ export const ContactSheetDrawer = ({
                   type='button'
                   onClick={() => {
                     onSelectPhoto(photo, index);
-                    onOpenChange(false);
                   }}
                   className={cn(
                     'group relative aspect-[3/2] w-full overflow-hidden rounded-xs bg-zinc-900 border transition-all duration-200 cursor-pointer text-left',
