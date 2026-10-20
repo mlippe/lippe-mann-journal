@@ -2275,10 +2275,13 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
               >
                 <div className='flex items-center gap-2 sm:gap-3 min-w-0'>
                   <span className='text-[11px] font-mono tracking-widest uppercase bg-white/10 px-2 py-0.5 rounded-sm shrink-0'>
-                    {isSession && currentLightboxPhoto.frameNumber
-                      ? `FRAME ${String(currentLightboxPhoto.frameNumber).padStart(2, '0')} / ${String(activeLightboxPhotos.length).padStart(2, '0')}`
-                      : `${String(lightboxIndex + 1).padStart(2, '0')} / ${String(activeLightboxPhotos.length).padStart(2, '0')}`}
+                    {String(lightboxIndex + 1).padStart(2, '0')} / {String(activeLightboxPhotos.length).padStart(2, '0')}
                   </span>
+                  {isSession && currentLightboxPhoto.frameNumber && !lightboxPhotosList && (
+                    <span className='text-[10px] sm:text-[11px] font-mono tracking-wider text-white/50 bg-white/5 px-1.5 py-0.5 rounded-sm border border-white/10 shrink-0 hidden xs:inline-block'>
+                      Frame {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
+                    </span>
+                  )}
                 </div>
 
                 {/* Actions & Zoom Toggle */}
@@ -2375,6 +2378,14 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
                         <span className='text-white/30'>·</span>
                         <span className='text-white/80 truncate max-w-[180px] sm:max-w-none'>
                           {currentLightboxPhoto.lensModel}
+                        </span>
+                      </>
+                    )}
+                    {isSession && currentLightboxPhoto.frameNumber && (
+                      <>
+                        <span className='text-white/30'>·</span>
+                        <span className='text-white/80'>
+                          Frame {String(currentLightboxPhoto.frameNumber).padStart(2, '0')}
                         </span>
                       </>
                     )}
