@@ -83,9 +83,7 @@ const AboutPage = () => {
                 Ich fotografiere, was mir im Alltag auffällt: das Licht an einer
                 Hauswand, eine Farbe, die plötzlich zusammenpasst, ein Moment,
                 der ohne Kamera einfach vorbeigegangen wäre. Ich bin dankbar für
-                die kleinen schönen Dinge, und nichts bleibt, wie es ist. Also
-                halte ich sie fest, solange sie da sind, und zeige, wie ich die
-                Welt sehe und wo ich Schönheit finde.
+                die kleinen schönen Dinge, denn nichts bleibt, wie es ist.
               </p>
             </div>
           </div>
