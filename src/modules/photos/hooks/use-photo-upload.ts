@@ -67,7 +67,7 @@ export function usePhotoUpload({
       });
 
       setUploadedImageUrl(publicUrl);
-      toast.success("Photo uploaded successfully!");
+      toast.success("Foto erfolgreich hochgeladen!");
       onUploadSuccess?.(publicUrl, exifData, imageInfo);
     } catch (error) {
       setExif(null);
@@ -76,7 +76,7 @@ export function usePhotoUpload({
 
       console.error("Upload error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to upload photo",
+        error instanceof Error ? error.message : "Fehler beim Hochladen des Fotos",
       );
     } finally {
       setIsUploading(false);

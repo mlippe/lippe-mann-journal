@@ -34,7 +34,7 @@ export const columns: ColumnDef<Collection>[] = [
     cell: ({ row }) => {
       const isFeatured = row.getValue('isFeatured') as boolean;
       return isFeatured ? (
-        <Badge variant='secondary'>Featured</Badge>
+        <Badge variant='secondary'>Hervorgehoben</Badge>
       ) : (
         <Badge variant='outline'>Standard</Badge>
       );
@@ -42,17 +42,17 @@ export const columns: ColumnDef<Collection>[] = [
   },
   {
     accessorKey: 'updatedAt',
-    header: 'Last Updated',
+    header: 'Zuletzt aktualisiert',
     cell: ({ row }) => {
       const date = row.getValue('updatedAt') as Date;
       return (
-        <span className='text-sm text-muted-foreground'>{format(new Date(date), 'MMM d, yyyy')}</span>
+        <span className='text-sm text-muted-foreground'>{format(new Date(date), 'dd.MM.yyyy')}</span>
       );
     },
   },
   {
     id: 'actions',
-    header: () => <span className='sr-only'>Actions</span>,
+    header: () => <span className='sr-only'>Aktionen</span>,
     cell: ({ row }) => (
       <div className='flex justify-end'>
         <CollectionActions collection={row.original} />

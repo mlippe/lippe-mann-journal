@@ -28,7 +28,7 @@ import { usePostsFilters } from '../../hooks/use-posts-filters';
 import { PostCardMobile } from './post-card-mobile';
 
 interface PostsListProps {
-  type?: 'ARTICLE' | 'PHOTO' | 'ALBUM';
+  type?: 'ARTICLE' | 'PHOTO' | 'ALBUM' | 'SESSION';
 }
 
 export const PostsList = ({ type }: PostsListProps) => {
@@ -76,16 +76,32 @@ export const PostsList = ({ type }: PostsListProps) => {
 };
 
 const EmptyStatus = ({ type }: { type?: string }) => {
-  const label = type ? type.toLowerCase() : 'posts';
+  const getGermanLabel = () => {
+    switch (type) {
+      case 'SESSION':
+        return 'Sessions';
+      case 'PHOTO':
+        return 'Fotos';
+      case 'ALBUM':
+        return 'Alben';
+      case 'ARTICLE':
+        return 'Artikel';
+      default:
+        return 'Beiträge';
+    }
+  };
+
+  const label = getGermanLabel();
+
   return (
     <Empty className='border border-dashed'>
       <EmptyHeader>
         <EmptyMedia variant='icon'>
           <IconNotebookOff />
         </EmptyMedia>
-        <EmptyTitle>No {label} found</EmptyTitle>
+        <EmptyTitle>Keine {label} gefunden</EmptyTitle>
         <EmptyDescription>
-          You have no {label}. Create some {label} to get started.
+          Du hast noch keine {label} erstellt. Klicke oben auf eine der Aktionen, um zu beginnen.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent></EmptyContent>
@@ -94,7 +110,7 @@ const EmptyStatus = ({ type }: { type?: string }) => {
 };
 
 export const ErrorStatus = () => {
-  return <div>Something went wrong</div>;
+  return <div>Etwas ist schiefgelaufen</div>;
 };
 
 export const LoadingStatus = () => {

@@ -41,6 +41,8 @@ export const generateMetadata = async ({
       description = `Schau dir dieses Foto "${post.title}" in meinem Journal an.`;
     } else if (post.type === 'ALBUM') {
       description = `Schau dir das Album "${post.title}" in meinem Journal an.`;
+    } else if (post.type === 'SESSION') {
+      description = `Schau dir die Session "${post.title}" in meinem Journal an.`;
     } else {
       description = `Sieh dir "${post.title}" in meinem Journal an.`;
     }
@@ -145,7 +147,8 @@ async function SinglePostSuspense({ postId }: { postId: string }) {
           </div>
         )}
 
-        {postWithPhotos.type === 'ALBUM' &&
+        {(postWithPhotos.type === 'ALBUM' ||
+          postWithPhotos.type === 'SESSION') &&
           postWithPhotos.postsToPhotos.length > 0 && (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
               {postWithPhotos.postsToPhotos.map(({ photo }) => (

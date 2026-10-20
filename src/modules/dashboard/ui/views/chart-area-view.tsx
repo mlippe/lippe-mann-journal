@@ -30,11 +30,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const description = "Monthly photo count chart";
+export const description = "Monatliche Foto-Aktivität";
 
 const chartConfig = {
   photos: {
-    label: "Photos",
+    label: "Fotos",
     color: "var(--primary)",
   },
 } satisfies ChartConfig;
@@ -87,7 +87,7 @@ export function ChartAreaView() {
       item.count > max.count ? item : max,
     );
     return {
-      month: new Date(peak.month + "-01").toLocaleDateString("en-US", {
+      month: new Date(peak.month + "-01").toLocaleDateString("de-DE", {
         month: "long",
         year: "numeric",
       }),
@@ -98,19 +98,18 @@ export function ChartAreaView() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Photo Activity</CardTitle>
+        <CardTitle>Foto-Aktivität</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            {totalPhotos.toLocaleString()} photos taken in the last {years} year
-            {years > 1 ? "s" : ""}
+            {totalPhotos.toLocaleString("de-DE")} Fotos in den letzten {years} {years === 1 ? "Jahr" : "Jahren"}
             {peakMonth && (
               <span className="ml-2 text-muted-foreground">
-                • Peak: {peakMonth.month} ({peakMonth.count} photos)
+                • Höchstwert: {peakMonth.month} ({peakMonth.count} Fotos)
               </span>
             )}
           </span>
           <span className="@[540px]/card:hidden">
-            {totalPhotos.toLocaleString()} photos • Last {years}y
+            {totalPhotos.toLocaleString("de-DE")} Fotos • Letzte {years}J
           </span>
         </CardDescription>
         <CardAction>
@@ -121,27 +120,27 @@ export function ChartAreaView() {
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
           >
-            <ToggleGroupItem value="1y">1 Year</ToggleGroupItem>
-            <ToggleGroupItem value="3y">3 Years</ToggleGroupItem>
-            <ToggleGroupItem value="5y">5 Years</ToggleGroupItem>
+            <ToggleGroupItem value="1y">1 Jahr</ToggleGroupItem>
+            <ToggleGroupItem value="3y">3 Jahre</ToggleGroupItem>
+            <ToggleGroupItem value="5y">5 Jahre</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select a value"
+              aria-label="Zeitraum auswählen"
             >
-              <SelectValue placeholder="3 Years" />
+              <SelectValue placeholder="3 Jahre" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="1y" className="rounded-lg">
-                1 Year
+                1 Jahr
               </SelectItem>
               <SelectItem value="3y" className="rounded-lg">
-                3 Years
+                3 Jahre
               </SelectItem>
               <SelectItem value="5y" className="rounded-lg">
-                5 Years
+                5 Jahre
               </SelectItem>
             </SelectContent>
           </Select>
@@ -176,7 +175,7 @@ export function ChartAreaView() {
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
+                return date.toLocaleDateString("de-DE", {
                   month: "short",
                   year: years > 1 ? "2-digit" : undefined,
                 });
@@ -188,14 +187,14 @@ export function ChartAreaView() {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
+                    return new Date(value).toLocaleDateString("de-DE", {
                       month: "long",
                       year: "numeric",
                     });
                   }}
                   formatter={(value) => [
-                    `${value} photo${value !== 1 ? "s" : ""}`,
-                    "Photos",
+                    `${value} Foto${value !== 1 ? "s" : ""}`,
+                    "Fotos",
                   ]}
                   indicator="dot"
                 />
@@ -218,7 +217,7 @@ export const ChartAreaLoading = () => {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Photo Activity</CardTitle>
+        <CardTitle>Foto-Aktivität</CardTitle>
         <CardDescription>
           <Skeleton className="h-4 w-24" />
         </CardDescription>
@@ -230,27 +229,27 @@ export const ChartAreaLoading = () => {
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
           >
-            <ToggleGroupItem value="1y">1 Year</ToggleGroupItem>
-            <ToggleGroupItem value="3y">3 Years</ToggleGroupItem>
-            <ToggleGroupItem value="5y">5 Years</ToggleGroupItem>
+            <ToggleGroupItem value="1y">1 Jahr</ToggleGroupItem>
+            <ToggleGroupItem value="3y">3 Jahre</ToggleGroupItem>
+            <ToggleGroupItem value="5y">5 Jahre</ToggleGroupItem>
           </ToggleGroup>
           <Select value={"3y"} onValueChange={() => {}}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
-              aria-label="Select a value"
+              aria-label="Zeitraum auswählen"
             >
-              <SelectValue placeholder="3 Years" />
+              <SelectValue placeholder="3 Jahre" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="1y" className="rounded-lg">
-                1 Year
+                1 Jahr
               </SelectItem>
               <SelectItem value="3y" className="rounded-lg">
-                3 Years
+                3 Jahre
               </SelectItem>
               <SelectItem value="5y" className="rounded-lg">
-                5 Years
+                5 Jahre
               </SelectItem>
             </SelectContent>
           </Select>

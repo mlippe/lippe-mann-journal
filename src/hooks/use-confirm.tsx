@@ -46,9 +46,9 @@ export const useConfirm = (
         </DialogHeader>
         <DialogFooter className="flex gap-4">
           <Button onClick={handleCancel} variant="outline">
-            Cancel
+            Abbrechen
           </Button>
-          <Button onClick={handleConfirm}>Confirm</Button>
+          <Button onClick={handleConfirm}>Bestätigen</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

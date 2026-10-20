@@ -11,11 +11,11 @@ import { Button } from '@/components/ui/button';
 export const columns: ColumnDef<PostGetMany[number]>[] = [
   {
     accessorKey: 'title',
-    header: 'Title',
+    header: 'Titel',
   },
   {
     accessorKey: 'visibility',
-    header: 'Visibility',
+    header: 'Sichtbarkeit',
     cell: ({ row }) => {
       return (
         <VisibilityToggle
@@ -27,7 +27,7 @@ export const columns: ColumnDef<PostGetMany[number]>[] = [
   },
   {
     id: 'actions',
-    header: 'Actions',
+    header: 'Aktionen',
     cell: ({ row }) => {
       return (
         <>

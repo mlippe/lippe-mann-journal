@@ -90,7 +90,7 @@ const FileUploader = ({
           ),
         );
 
-        toast.success("File uploaded successfully");
+        toast.success("Datei erfolgreich hochgeladen");
         // new successful upload, clear any previously deleted key marker
         setDeletedKey(null);
         onUploadSuccess?.(publicUrl);
@@ -109,8 +109,8 @@ const FileUploader = ({
         );
 
         toast.error(
-          `Failed to upload ${file.name}: ${
-            error instanceof Error ? error.message : "Unknown error"
+          `Fehler beim Hochladen von ${file.name}: ${
+            error instanceof Error ? error.message : "Unbekannter Fehler"
           }`,
         );
       }
@@ -167,11 +167,11 @@ const FileUploader = ({
       );
 
       if (tooManyFiles) {
-        toast.error("Too many files");
+        toast.error("Zu viele Dateien ausgewählt");
       }
 
       if (fileInvalidType) {
-        toast.error("File type is not supported");
+        toast.error("Dateityp wird nicht unterstützt");
       }
     }
   }, []);
@@ -194,7 +194,7 @@ const FileUploader = ({
       const fileToDelete = files.find((f) => f.key === key);
 
       if (fileToDelete?.uploading) {
-        toast.error("Cannot delete file while uploading");
+        toast.error("Datei kann während des Uploads nicht gelöscht werden");
         return;
       }
 
@@ -217,14 +217,14 @@ const FileUploader = ({
         // remember which key was deleted so we don't keep showing it via `value`
         setDeletedKey(key);
 
-        toast.success("File deleted successfully");
+        toast.success("Datei erfolgreich gelöscht");
       } catch (error) {
         setFiles((prev) =>
           prev.map((f) => (f.key === key ? { ...f, isDeleting: false } : f)),
         );
 
         toast.error(
-          error instanceof Error ? error.message : "Failed to delete file",
+          error instanceof Error ? error.message : "Fehler beim Löschen der Datei",
         );
       }
     },
@@ -262,14 +262,14 @@ const FileUploader = ({
               <div className="absolute inset-0 flex items-center justify-center bg-muted animate-pulse">
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <ImageIcon className="size-5" />
-                  <span className="text-sm">Loading image...</span>
+                  <span className="text-sm">Bild wird geladen...</span>
                 </div>
               </div>
             )}
 
             <img
               src={displayImageUrl}
-              alt="Preview"
+              alt="Vorschau"
               className={cn(
                 "h-full w-full object-cover transition-opacity duration-300",
                 imageLoading ? "opacity-0" : "opacity-100",
@@ -291,7 +291,7 @@ const FileUploader = ({
                     type="button"
                   >
                     <Upload className="mr-1 size-4" />
-                    Change Image
+                    Bild ändern
                   </Button>
                   {(value || currentFile?.key) && (
                     <Button
@@ -305,7 +305,7 @@ const FileUploader = ({
                       type="button"
                     >
                       <XIcon className="mr-1 size-4" />
-                      Remove
+                      Entfernen
                     </Button>
                   )}
                 </div>
@@ -359,15 +359,15 @@ const FileUploader = ({
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Upload Cover Image</h3>
+              <h3 className="text-lg font-semibold">Titelbild hochladen</h3>
               <p className="text-sm text-muted-foreground">
-                Drag and drop an image here, or click to browse
+                Bild hierher ziehen oder klicken zum Auswählen
               </p>
             </div>
 
             <Button variant="outline" size="sm" type="button">
               <ImageIcon className="mr-1 size-4" />
-              Browse Files
+              Dateien durchsuchen
             </Button>
           </div>
         )}
@@ -375,9 +375,9 @@ const FileUploader = ({
 
       {hasError && (
         <Alert variant="destructive" className="mt-2">
-          <AlertTitle>Upload failed</AlertTitle>
+          <AlertTitle>Upload fehlgeschlagen</AlertTitle>
           <AlertDescription>
-            <p>Something went wrong while uploading. Please try again.</p>
+            <p>Beim Hochladen ist ein Fehler aufgetreten. Bitte versuche es erneut.</p>
           </AlertDescription>
         </Alert>
       )}

@@ -78,14 +78,14 @@ const EmptyStatus = () => {
         <EmptyMedia variant='icon'>
           <IconPhotoOff />
         </EmptyMedia>
-        <EmptyTitle>No photos found</EmptyTitle>
+        <EmptyTitle>Keine Fotos gefunden</EmptyTitle>
         <EmptyDescription>
-          You have no photos. Upload some photos to get started.
+          Du hast noch keine Fotos. Lade neue Fotos hoch, um zu beginnen.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Button variant='outline' size='sm' onClick={modal.onOpen}>
-          Add Photos
+          Fotos hinzufügen
         </Button>
       </EmptyContent>
     </Empty>
@@ -102,12 +102,12 @@ export const ErrorStatus = () => {
           <EmptyMedia variant='icon'>
             <IconAlertTriangle />
           </EmptyMedia>
-          <EmptyTitle>Something went wrong</EmptyTitle>
-          <EmptyDescription>Please try again later.</EmptyDescription>
+          <EmptyTitle>Etwas ist schiefgelaufen</EmptyTitle>
+          <EmptyDescription>Bitte versuche es später erneut.</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <Button variant='outline' size='sm' onClick={resetBoundary}>
-            Try again
+            Erneut versuchen
           </Button>
         </EmptyContent>
       </Empty>
@@ -140,10 +140,10 @@ export const LoadingStatus = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='pl-6 w-20'>Image</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Taken At</TableHead>
-              <TableHead className='text-right pr-6'>Actions</TableHead>
+              <TableHead className='pl-6 w-20'>Bild</TableHead>
+              <TableHead>Titel</TableHead>
+              <TableHead>Aufnahmedatum</TableHead>
+              <TableHead className='text-right pr-6'>Aktionen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

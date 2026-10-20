@@ -127,10 +127,10 @@ export function ShutterSpeedSelector({
   };
 
   const displayValue = isCustom
-    ? "Custom"
+    ? "Benutzerdefiniert"
     : value
       ? closestSpeed?.label || formatShutterSpeed(value)
-      : "Select shutter speed";
+      : "Verschlusszeit wählen";
 
   return (
     <div className="space-y-2">
@@ -143,7 +143,7 @@ export function ShutterSpeedSelector({
         onValueChange={handleSelectChange}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select shutter speed">
+          <SelectValue placeholder="Verschlusszeit wählen">
             {displayValue}
           </SelectValue>
         </SelectTrigger>
@@ -153,7 +153,7 @@ export function ShutterSpeedSelector({
               {speed.label}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Custom value...</SelectItem>
+          <SelectItem value="custom">Benutzerdefiniert...</SelectItem>
         </SelectContent>
       </Select>
 
@@ -162,13 +162,13 @@ export function ShutterSpeedSelector({
           <Input
             type="number"
             step="0.0001"
-            placeholder="Enter seconds (e.g., 0.0125)"
+            placeholder="Sekunden eingeben (z. B. 0.0125)"
             value={value ?? ""}
             onChange={handleCustomChange}
             className="flex-1"
           />
           <span className="text-sm text-muted-foreground whitespace-nowrap">
-            seconds
+            Sekunden
           </span>
           <Button
             type="button"
@@ -176,7 +176,7 @@ export function ShutterSpeedSelector({
             size="sm"
             onClick={() => setIsCustom(false)}
           >
-            Cancel
+            Abbrechen
           </Button>
         </div>
       )}

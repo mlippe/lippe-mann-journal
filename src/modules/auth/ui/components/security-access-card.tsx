@@ -41,10 +41,10 @@ const SecurityAccessCard = (props: {
       <div className="space-y-4">
         <div>
           <h2 className="text-xl font-semibold tracking-tight mb-1">
-            Active Sessions
+            Aktive Sitzungen
           </h2>
           <p className="text-sm text-muted-foreground">
-            Manage devices signed into your account
+            Geräte verwalten, die in deinem Konto angemeldet sind
           </p>
         </div>
 
@@ -97,7 +97,7 @@ const SecurityAccessCard = (props: {
                               className="text-xs bg-green-100 text-green-700 border-green-200 px-1.5 py-0.5"
                             >
                               <Dot className="w-2 h-2 mr-0.5 fill-current" />
-                              Current
+                              Aktuell
                             </Badge>
                           )}
                         </div>
@@ -142,8 +142,8 @@ const SecurityAccessCard = (props: {
                           } else {
                             toast.success(
                               isCurrentSession
-                                ? "Signed out successfully"
-                                : "Session terminated successfully",
+                                ? "Erfolgreich abgemeldet"
+                                : "Sitzung erfolgreich beendet",
                             );
                           }
                           router.refresh();
@@ -153,9 +153,9 @@ const SecurityAccessCard = (props: {
                         {isTerminating === session.id ? (
                           <Loader2 size={12} className="animate-spin" />
                         ) : isCurrentSession ? (
-                          "Sign Out"
+                          "Abmelden"
                         ) : (
-                          "Terminate"
+                          "Beenden"
                         )}
                       </Button>
                     </div>

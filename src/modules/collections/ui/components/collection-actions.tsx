@@ -25,14 +25,14 @@ export function CollectionActions({ collection }: CollectionActionsProps) {
   const queryClient = useQueryClient();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    'Collection löschen',
+    'Sammlung löschen',
     `Möchtest du "${collection.name}" wirklich unwiderruflich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
   );
 
   const removeCollection = useMutation(
     trpc.collections.remove.mutationOptions({
       onSuccess: () => {
-        toast.success('Collection erfolgreich gelöscht');
+        toast.success('Sammlung erfolgreich gelöscht');
         queryClient.invalidateQueries(
           trpc.collections.getAllCollections.queryOptions({}),
         );

@@ -40,13 +40,13 @@ export function VisibilityToggle({
             trpc.posts.getMany.queryOptions({}),
           );
           toast.success(
-            `Post is now ${newValue === "public" ? "public" : "private"}`,
+            `Beitrag ist jetzt ${newValue === "public" ? "öffentlich" : "privat"}`,
           );
         },
         onError: (error) => {
           // Revert on error
           setVisibility(newValue === "public" ? "private" : "public");
-          toast.error(error.message || "Failed to update visibility");
+          toast.error(error.message || "Fehler beim Aktualisieren der Sichtbarkeit");
         },
       },
     );
@@ -66,10 +66,10 @@ export function VisibilityToggle({
         checked={visibility === "public"}
         onCheckedChange={handleToggle}
         disabled={updatePost.isPending}
-        aria-label="Toggle visibility"
+        aria-label="Sichtbarkeit umschalten"
       />
       <span className="text-sm text-muted-foreground min-w-[50px]">
-        {visibility === "public" ? "Public" : "Private"}
+        {visibility === "public" ? "Öffentlich" : "Privat"}
       </span>
     </div>
   );

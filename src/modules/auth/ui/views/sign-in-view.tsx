@@ -21,9 +21,9 @@ import { useState } from 'react';
 import { authClient } from '../../lib/auth-client';
 
 const signInSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(1, {
-    message: 'Password is required',
+    message: 'Passwort ist erforderlich',
   }),
 });
 
@@ -72,9 +72,9 @@ export const SignInView = () => {
             >
               <div className='flex flex-col gap-6'>
                 <div className='flex flex-col items-center text-center'>
-                  <h1 className='text-2xl font-bold'>Welcome back</h1>
+                  <h1 className='text-2xl font-bold'>Willkommen zurück</h1>
                   <p className='text-muted-foreground text-balance'>
-                    Sign in to your account
+                    Melde dich bei deinem Konto an
                   </p>
                 </div>
 
@@ -84,10 +84,10 @@ export const SignInView = () => {
                     name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>E-Mail</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder='your.email@example.com'
+                            placeholder='deine.email@beispiel.de'
                             {...field}
                           />
                         </FormControl>
@@ -103,7 +103,7 @@ export const SignInView = () => {
                     name='password'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Passwort</FormLabel>
                         <FormControl>
                           <Input
                             placeholder='* * * * * * * *'
@@ -124,7 +124,7 @@ export const SignInView = () => {
                 )}
                 <Button type='submit' className='w-full' disabled={pending}>
                   {pending && <Spinner />}
-                  Sign In
+                  Anmelden
                 </Button>
               </div>
             </form>

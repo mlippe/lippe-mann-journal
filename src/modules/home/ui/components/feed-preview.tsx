@@ -381,7 +381,9 @@ export const ZinePreviewCard = ({
     ? `/article/${post.slug}`
     : post.type?.toLowerCase() === 'photo'
       ? `/photo/${post.slug}`
-      : `/album/${post.slug}`;
+      : post.type?.toLowerCase() === 'session'
+        ? `/session/${post.slug}`
+        : `/album/${post.slug}`;
 
   return (
     <Link

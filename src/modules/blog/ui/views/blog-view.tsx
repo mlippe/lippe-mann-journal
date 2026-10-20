@@ -31,11 +31,10 @@ export const BlogView = () => {
             <h1 className='text-3xl'>Blog</h1>
             <div className='flex flex-col gap-4 font-light'>
               <p>
-                Welcome to my blog, where I share my thoughts, experiences, and
-                insights on a wide range of topics. Whether you&apos;re a
-                photographer, a traveler, or simply someone who appreciates the
-                beauty of life, my blog is a place to connect with others who
-                share my passion for capturing moments and telling stories.
+                Willkommen in meinem Journal, wo ich Gedanken, Erlebnisse und
+                visuelle Notizen teile. Ob Fotografie, Reisen oder die einfachen
+                Momente des Alltags – hier erzähle ich Geschichten in Bildern und
+                Texten.
               </p>
             </div>
           </div>
@@ -51,7 +50,7 @@ export const BlogView = () => {
           <ContactCard title='GitHub' />
           <ContactCard title='X' />
           <ContactCard
-            title='Contact me'
+            title='Kontakt'
             className='bg-primary hover:bg-primary-hover text-white dark:text-black'
           />
         </div>
@@ -82,11 +81,10 @@ export const BlogViewLoadingStatus = () => {
             <h1 className='text-3xl'>Blog</h1>
             <div className='flex flex-col gap-4 font-light'>
               <p>
-                Welcome to my blog, where I share my thoughts, experiences, and
-                insights on a wide range of topics. Whether you&apos;re a
-                photographer, a traveler, or simply someone who appreciates the
-                beauty of life, my blog is a place to connect with others who
-                share my passion for capturing moments and telling stories.
+                Willkommen in meinem Journal, wo ich Gedanken, Erlebnisse und
+                visuelle Notizen teile. Ob Fotografie, Reisen oder die einfachen
+                Momente des Alltags – hier erzähle ich Geschichten in Bildern und
+                Texten.
               </p>
             </div>
           </div>
@@ -108,7 +106,7 @@ export const BlogViewLoadingStatus = () => {
           <ContactCard title='GitHub' />
           <ContactCard title='X' />
           <ContactCard
-            title='Contact me'
+            title='Kontakt'
             className='bg-primary hover:bg-primary-hover text-white dark:text-black'
           />
         </div>

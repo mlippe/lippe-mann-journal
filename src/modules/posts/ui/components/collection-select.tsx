@@ -54,17 +54,17 @@ export function CollectionSelect({ value, onChange }: CollectionSelectProps) {
           >
             <span className='truncate'>
               {value.length > 0
-                ? `${value.length} collection(s) selected`
-                : 'Select collections...'}
+                ? `${value.length} Sammlung(en) ausgewählt`
+                : 'Sammlungen auswählen...'}
             </span>
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full p-0' align='start'>
           <Command>
-            <CommandInput placeholder='Search collections...' />
+            <CommandInput placeholder='Sammlungen durchsuchen...' />
             <CommandList>
-              <CommandEmpty>No collection found.</CommandEmpty>
+              <CommandEmpty>Keine Sammlung gefunden.</CommandEmpty>
               <CommandGroup>
                 {collections?.map((collection) => (
                   <CommandItem

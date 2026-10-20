@@ -63,9 +63,9 @@ const EmptyStatus = () => {
         <EmptyMedia variant='icon'>
           <IconNotebookOff />
         </EmptyMedia>
-        <EmptyTitle>No articles found</EmptyTitle>
+        <EmptyTitle>Keine Artikel gefunden</EmptyTitle>
         <EmptyDescription>
-          You have no articles. Create some articles to get started.
+          Du hast noch keine Artikel. Erstelle einen Artikel, um loszulegen.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent></EmptyContent>
@@ -74,7 +74,7 @@ const EmptyStatus = () => {
 };
 
 export const ErrorStatus = () => {
-  return <div>Something went wrong</div>;
+  return <div>Etwas ist schiefgelaufen</div>;
 };
 
 export const LoadingStatus = () => {
@@ -84,9 +84,9 @@ export const LoadingStatus = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='pl-6'>Title</TableHead>
-              <TableHead>Visibility</TableHead>
-              <TableHead className='text-right pr-6'>Actions</TableHead>
+              <TableHead className='pl-6'>Titel</TableHead>
+              <TableHead>Sichtbarkeit</TableHead>
+              <TableHead className='text-right pr-6'>Aktionen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

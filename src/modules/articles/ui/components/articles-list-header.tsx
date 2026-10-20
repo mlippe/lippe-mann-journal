@@ -24,9 +24,9 @@ export const ArticlesListHeader = () => {
   return (
     <div className='py-4 px-4 md:px-8 flex flex-col gap-y-8'>
       <div>
-        <h1 className='text-2xl font-bold'>Articles</h1>
+        <h1 className='text-2xl font-bold'>Artikel</h1>
         <p className='text-muted-foreground '>
-          Here&apos;s a list of your articles
+          Hier ist eine Übersicht deiner Artikel
         </p>
       </div>
       <div className='flex items-center justify-between'>
@@ -36,7 +36,7 @@ export const ArticlesListHeader = () => {
             {isAnyFilterModified && (
               <Button onClick={onClearFilters} variant='outline' size='sm'>
                 <XCircle />
-                Clear
+                Filter zurücksetzen
               </Button>
             )}
           </div>
@@ -45,7 +45,7 @@ export const ArticlesListHeader = () => {
         <Button asChild>
           <Link href='/dashboard/new/article'>
             <PlusIcon />
-            New Article
+            Neuer Artikel
           </Link>
         </Button>
       </div>

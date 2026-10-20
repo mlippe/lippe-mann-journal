@@ -20,8 +20,8 @@ export function DeletePostButton({
   const queryClient = useQueryClient();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    'Delete post',
-    `Are you sure you want to delete "${postTitle}"? This action cannot be undone. The post will be permanently deleted.`,
+    'Beitrag löschen',
+    `Möchtest du den Beitrag "${postTitle}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
   );
 
   const deletePost = useMutation(trpc.posts.remove.mutationOptions());
@@ -43,10 +43,10 @@ export function DeletePostButton({
             trpc.posts.getPublished.queryOptions({}),
           );
           await queryClient.invalidateQueries(trpc.blog.getMany.queryOptions());
-          toast.success('Post deleted successfully');
+          toast.success('Beitrag erfolgreich gelöscht');
         },
         onError: (error) => {
-          toast.error(error.message || 'Failed to delete post');
+          toast.error(error.message || 'Fehler beim Löschen des Beitrags');
         },
       },
     );
@@ -63,7 +63,7 @@ export function DeletePostButton({
           handleDelete();
         }}
         className='h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10'
-        title='Delete post'
+        title='Beitrag löschen'
       >
         <Trash2 className='size-4' />
       </Button>

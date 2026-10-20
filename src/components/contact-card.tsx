@@ -16,6 +16,7 @@ const iconMap = {
   X: <PiXLogo size={18} />,
   Xiaohongshu: <SiXiaohongshu size={18} />,
   'Contact me': <MdEmail size={18} />,
+  Kontakt: <MdEmail size={18} />,
 };
 
 export type ContactCardTitle = keyof typeof iconMap;

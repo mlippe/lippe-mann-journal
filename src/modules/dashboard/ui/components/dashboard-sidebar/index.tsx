@@ -23,17 +23,17 @@ const data = {
       icon: 'dashboard',
     },
     {
-      title: 'Photos',
+      title: 'Fotos',
       url: '/dashboard/photos',
       icon: 'photo',
     },
     {
-      title: 'Posts',
+      title: 'Beiträge',
       url: '/dashboard/posts',
       icon: 'post',
     },
     {
-      title: 'Collections',
+      title: 'Sammlungen',
       url: '/dashboard/collections',
       icon: 'post',
     },
@@ -43,22 +43,22 @@ const data = {
       icon: 'checklist',
     },
     {
-      title: 'Profile',
+      title: 'Profil',
       url: '/dashboard/profile',
       icon: 'user',
     },
   ],
   navSecondary: [
     {
-      title: 'Settings',
+      title: 'Einstellungen',
       url: '#',
     },
     {
-      title: 'Get Help',
+      title: 'Hilfe',
       url: '#',
     },
     {
-      title: 'Search',
+      title: 'Suche',
       url: '#',
     },
   ],

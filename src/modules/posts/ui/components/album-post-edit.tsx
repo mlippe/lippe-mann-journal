@@ -417,7 +417,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
         ),
       );
 
-      toast.success('Album updated successfully');
+      toast.success('Album erfolgreich aktualisiert');
       await Promise.all([
         queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: post.slug }),
@@ -428,7 +428,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       router.refresh();
       router.push('/dashboard/posts?type=ALBUM');
     } catch (error) {
-      toast.error(`Failed to update album: ${(error as Error).message}`);
+      toast.error(`Fehler beim Aktualisieren des Albums: ${(error as Error).message}`);
     }
   }
 
@@ -446,7 +446,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Album Settings</CardTitle>
+            <CardTitle>Albumeinstellungen</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
             <FormField
@@ -454,7 +454,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
               name='postTitle'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Album Title</FormLabel>
+                  <FormLabel>Albumtitel</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -487,7 +487,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
               name='collectionIds'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Collections</FormLabel>
+                  <FormLabel>Sammlungen</FormLabel>
                   <FormControl>
                     <CollectionSelect
                       value={field.value || []}
@@ -501,11 +501,11 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
 
             <div className='flex items-center justify-between rounded-lg border p-4'>
               <div className='space-y-0.5'>
-                <FormLabel>Visibility</FormLabel>
+                <FormLabel>Sichtbarkeit</FormLabel>
                 <div className='text-sm text-muted-foreground'>
                   {form.watch('postVisibility') === 'public'
-                    ? 'Public'
-                    : 'Private'}
+                    ? 'Öffentlich'
+                    : 'Privat'}
                 </div>
               </div>
               <FormField
@@ -542,7 +542,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
 
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h3 className='text-xl font-semibold'>Photos</h3>
+            <h3 className='text-xl font-semibold'>Fotos</h3>
           </div>
 
           <Card>
@@ -570,7 +570,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
             >
               {index === 0 && (
                 <div className='absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md uppercase font-bold z-10'>
-                  Cover Photo
+                  Titelbild
                 </div>
               )}
               {form.watch(`photos.${index}.isHighlight`) && (
@@ -740,7 +740,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                           <FormControl>
                             <Input
                               {...inputField}
-                              placeholder='Photo title'
+                              placeholder='Fototitel'
                               className='font-semibold text-lg border-transparent hover:border-input focus:border-input px-1'
                             />
                           </FormControl>
@@ -770,7 +770,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                           )
                         }
                       >
-                        {expandedIndex === index ? 'Hide EXIF' : 'Edit EXIF'}
+                        {expandedIndex === index ? 'EXIF ausblenden' : 'EXIF bearbeiten'}
                       </Button>
                     </div>
                   </div>
@@ -783,12 +783,12 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.make`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Camera Make</FormLabel>
+                          <FormLabel>Kamera-Hersteller</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               value={field.value || ''}
-                              placeholder='e.g., Canon'
+                              placeholder='z. B. Canon'
                             />
                           </FormControl>
                         </FormItem>
@@ -799,12 +799,12 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.model`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Camera Model</FormLabel>
+                          <FormLabel>Kameramodell</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               value={field.value || ''}
-                              placeholder='e.g., EOS R5'
+                              placeholder='z. B. EOS R5'
                             />
                           </FormControl>
                         </FormItem>
@@ -815,12 +815,12 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.lensModel`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Lens Model</FormLabel>
+                          <FormLabel>Objektiv</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               value={field.value || ''}
-                              placeholder='e.g., RF 24-70mm'
+                              placeholder='z. B. RF 24-70mm'
                             />
                           </FormControl>
                         </FormItem>
@@ -831,7 +831,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.focalLength`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Focal Length (mm)</FormLabel>
+                          <FormLabel>Brennweite (mm)</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
@@ -854,7 +854,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.fNumber`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Aperture</FormLabel>
+                          <FormLabel>Blende</FormLabel>
                           <FormControl>
                             <ApertureSelector
                               value={field.value ?? undefined}
@@ -869,7 +869,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.exposureTime`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Shutter Speed</FormLabel>
+                          <FormLabel>Verschlusszeit</FormLabel>
                           <FormControl>
                             <ShutterSpeedSelector
                               value={field.value ?? undefined}
@@ -899,7 +899,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.exposureCompensation`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Exposure Comp.</FormLabel>
+                          <FormLabel>Belichtungskorrektur</FormLabel>
                           <FormControl>
                             <ExposureCompensationSelector
                               value={field.value ?? undefined}
@@ -914,7 +914,7 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                       name={`photos.${index}.dateTimeOriginal`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date Taken</FormLabel>
+                          <FormLabel>Aufnahmedatum</FormLabel>
                           <FormControl>
                             <Input
                               type='datetime-local'
@@ -928,7 +928,6 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
                           </FormControl>
                         </FormItem>
                       )}
-
                     />
                   </div>
                 )}
@@ -939,10 +938,10 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
 
         <div className='flex justify-end gap-4'>
           <Button type='button' variant='ghost' onClick={() => router.back()}>
-            Cancel
+            Abbrechen
           </Button>
           <Button type='submit' disabled={isPending}>
-            {isPending ? 'Updating Album...' : 'Update Album'}
+            {isPending ? 'Wird gespeichert...' : 'Album aktualisieren'}
           </Button>
         </div>
       </form>

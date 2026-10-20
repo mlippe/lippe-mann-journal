@@ -8,7 +8,7 @@ export const ArticlesSearchFilter = () => {
   return (
     <div className='relative'>
       <Input
-        placeholder='Filter by title'
+        placeholder='Nach Titel filtern...'
         value={filters.search}
         className='h-9 w-50 pl-7'
         onChange={(e) => setFilters({ search: e.target.value })}

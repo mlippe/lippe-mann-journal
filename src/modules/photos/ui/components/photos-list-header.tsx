@@ -31,9 +31,9 @@ export const PhotosListHeader = () => {
     <>
       <div className="py-4 px-4 md:px-8 flex flex-col gap-y-8">
         <div>
-          <h1 className="text-2xl font-bold">Photos</h1>
+          <h1 className="text-2xl font-bold">Fotos</h1>
           <p className="text-muted-foreground ">
-            Here&apos;s a list of your photos
+            Hier ist eine Übersicht deiner Fotos
           </p>
         </div>
 
@@ -47,12 +47,12 @@ export const PhotosListHeader = () => {
                     {filters.orderBy === "desc" ? (
                       <>
                         <ArrowDownIcon className="h-4 w-4" />
-                        Newest First
+                        Neueste zuerst
                       </>
                     ) : (
                       <>
                         <ArrowUpIcon className="h-4 w-4" />
-                        Oldest First
+                        Älteste zuerst
                       </>
                     )}
                   </Button>
@@ -62,27 +62,27 @@ export const PhotosListHeader = () => {
                     onClick={() => setFilters({ orderBy: "desc" })}
                   >
                     <ArrowDownIcon className="mr-2 h-4 w-4" />
-                    Newest First
+                    Neueste zuerst
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setFilters({ orderBy: "asc" })}
                   >
                     <ArrowUpIcon className="mr-2 h-4 w-4" />
-                    Oldest First
+                    Älteste zuerst
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               {isAnyFilterModified && (
                 <Button onClick={onClearFilters} variant="outline" size="sm">
                   <XCircle />
-                  Clear
+                  Filter zurücksetzen
                 </Button>
               )}
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           <Button variant="default" onClick={modal.onOpen}>
-            Add Photo
+            Foto hinzufügen
           </Button>
         </div>
       </div>

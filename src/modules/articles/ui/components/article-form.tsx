@@ -50,7 +50,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
   const createArticle = useMutation(
     trpc.posts.create.mutationOptions({
       onSuccess: async () => {
-        toast.success('Article created successfully');
+        toast.success('Artikel erfolgreich erstellt');
         await queryClient.invalidateQueries(
           trpc.posts.getMany.queryOptions({}),
         );
@@ -63,7 +63,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         router.push('/dashboard/posts?type=ARTICLE');
       },
       onError: (e) => {
-        toast.error('Failed to create article', {
+        toast.error('Fehler beim Erstellen des Artikels', {
           description: e.message,
         });
       },
@@ -73,7 +73,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
   const updateArticle = useMutation(
     trpc.posts.update.mutationOptions({
       onSuccess: async (data) => {
-        toast.success('Article updated successfully');
+        toast.success('Artikel erfolgreich aktualisiert');
         await queryClient.invalidateQueries(
           trpc.posts.getOne.queryOptions({ slug: data.slug }),
         );
@@ -89,7 +89,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
         router.push('/dashboard/posts?type=ARTICLE');
       },
       onError: (e) => {
-        toast.error('Failed to update article', {
+        toast.error('Fehler beim Aktualisieren des Artikels', {
           description: e.message,
         });
       },
@@ -162,7 +162,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                   <FormItem>
                     <FormControl>
                       <Input
-                        placeholder='Article Title'
+                        placeholder='Artikeltitel'
                         className='text-xl lg:text-2xl font-bold border-none px-0 focus-visible:ring-0 placeholder:opacity-30 h-auto py-2 bg-transparent shadow-none'
                         {...field}
                       />
@@ -178,7 +178,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                 render={({ field }) => (
                   <FormItem className='flex items-center gap-2 text-muted-foreground text-sm'>
                     <span className='whitespace-nowrap opacity-50 font-medium uppercase tracking-wider text-[10px]'>
-                      URL Slug:
+                      URL-Slug:
                     </span>
                     <FormControl>
                       <input
@@ -200,7 +200,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-muted-foreground uppercase tracking-wider text-[10px] font-bold'>
-                    Cover Image
+                    Titelbild
                   </FormLabel>
                   <FormControl>
                     <FileUploader
@@ -240,7 +240,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
             <div className='p-6 rounded-2xl bg-muted/30 border space-y-6'>
               <div className='space-y-4'>
                 <h3 className='text-sm font-bold uppercase tracking-widest opacity-50'>
-                  Publish Settings
+                  Veröffentlichungseinstellungen
                 </h3>
 
                 <FormField
@@ -248,19 +248,19 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                   name='visibility'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-xs'>Visibility</FormLabel>
+                      <FormLabel className='text-xs'>Sichtbarkeit</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger className='bg-background'>
-                            <SelectValue placeholder='Select visibility' />
+                            <SelectValue placeholder='Sichtbarkeit wählen' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='public'>Public</SelectItem>
-                          <SelectItem value='private'>Private</SelectItem>
+                          <SelectItem value='public'>Öffentlich</SelectItem>
+                          <SelectItem value='private'>Privat</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -273,7 +273,7 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                   name='collectionIds'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-xs'>Collections</FormLabel>
+                      <FormLabel className='text-xs'>Sammlungen</FormLabel>
                       <FormControl>
                         <CollectionSelect
                           value={field.value || []}
@@ -308,13 +308,13 @@ export const ArticleForm = ({ post }: ArticleFormProps) => {
                 className='w-full h-12 text-base font-bold rounded-xl'
                 disabled={isPending}
               >
-                {post ? 'Update Article' : 'Publish Article'}
+                {post ? 'Artikel aktualisieren' : 'Artikel veröffentlichen'}
               </Button>
             </div>
 
             {post && (
               <div className='px-6 py-4 text-[10px] text-muted-foreground uppercase tracking-widest flex justify-between border rounded-2xl border-dashed'>
-                <span>Created: {format(post.createdAt, 'MMM d, yyyy')}</span>
+                <span>Erstellt am: {format(post.createdAt, 'dd.MM.yyyy')}</span>
               </div>
             )}
           </aside>

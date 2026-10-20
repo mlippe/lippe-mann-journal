@@ -44,7 +44,9 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
     ? `/article/${post.slug}`
     : post.type === 'PHOTO'
       ? `/photo/${post.slug}`
-      : `/album/${post.slug}`;
+      : post.type === 'SESSION'
+        ? `/session/${post.slug}`
+        : `/album/${post.slug}`;
 
   const interactionParams = {
     postId: post.id,
@@ -104,7 +106,21 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
     lastTap.current = now;
   };
 
-  const photos = post.postsToPhotos || [];
+  const allPhotos = post.postsToPhotos || [];
+  const photos = useMemo(() => {
+    if (post.type === 'SESSION') {
+      const rev = allPhotos
+        .filter((p) => p.isRevisitedPick)
+        .sort((a, b) => (a.revisitedOrder ?? 0) - (b.revisitedOrder ?? 0));
+      if (rev.length > 0) return rev;
+      const init = allPhotos
+        .filter((p) => p.isInitialPick)
+        .sort((a, b) => (a.initialOrder ?? 0) - (b.initialOrder ?? 0));
+      if (init.length > 0) return init;
+      return allPhotos.slice(0, 5);
+    }
+    return allPhotos;
+  }, [post.type, allPhotos]);
   const highlightEntry = photos.find((p) => p.isHighlight);
   const coverIndex = post.coverIndex ?? 0;
   const coverPhoto = highlightEntry?.photo || photos[coverIndex]?.photo || photos[0]?.photo;
@@ -211,9 +227,11 @@ export const ZineFeedItem = ({ post, priority = false }: ZineFeedItemProps) => {
           <span className={isArticle ? 'text-foreground font-semibold' : ''}>
             {isArticle
               ? 'Artikel'
-              : hasMultiplePhotos
-                ? `Serie (${photos.length} Fotos)`
-                : 'Einzelaufnahme'}
+              : post.type === 'SESSION'
+                ? `Session (${allPhotos.length} Frames · ${photos.length} im Edit)`
+                : hasMultiplePhotos
+                  ? `Serie (${photos.length} Fotos)`
+                  : 'Einzelaufnahme'}
           </span>
           {isArticle && (
             <>

@@ -19,7 +19,7 @@ export const PhotoUploadModal = ({
   return (
     <>
       <ResponsiveModal
-        title="Upload a photo"
+        title="Foto hochladen"
         open={isUploading || open}
         onOpenChange={onOpenChange}
         className="h-[80vh] w-[80vw] max-w-none"

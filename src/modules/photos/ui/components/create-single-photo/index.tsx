@@ -52,7 +52,7 @@ const CreateSinglePhoto = () => {
           ),
         ]);
 
-        toast.success('Photo uploaded successfully!');
+        toast.success('Foto erfolgreich hochgeladen!');
         router.refresh();
         router.push('/dashboard/posts?type=PHOTO');
         setIsSubmitting(false);

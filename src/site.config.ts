@@ -56,7 +56,7 @@ export const siteConfig = {
       href: 'https://www.xiaohongshu.com/user/profile/66c84ba2000000001b01b3f1',
     },
     {
-      title: 'Contact me',
+      title: 'Kontakt',
       href: 'mailto:lianshiliang93@gmail.com',
       /** If true, this link gets the primary button style */
       primary: true,

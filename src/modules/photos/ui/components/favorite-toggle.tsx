@@ -39,13 +39,13 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
             trpc.photos.getMany.queryOptions({}),
           );
           toast.success(
-            newValue ? 'Added to favorites' : 'Removed from favorites',
+            newValue ? 'Zu Favoriten hinzugefügt' : 'Aus Favoriten entfernt',
           );
         },
         onError: (error) => {
           // Revert on error
           setIsFavorite(!newValue);
-          toast.error(error.message || 'Failed to update favorite status');
+          toast.error(error.message || 'Fehler beim Aktualisieren des Favoritenstatus');
         },
       },
     );
@@ -61,7 +61,7 @@ export function FavoriteToggle({ photoId, initialValue }: FavoriteToggleProps) {
         'h-8 w-8 transition-colors',
         isFavorite && 'text-red-500 hover:text-red-600',
       )}
-      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      title={isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
     >
       <Heart
         className={cn('size-6 transition-all', isFavorite && 'fill-current')}

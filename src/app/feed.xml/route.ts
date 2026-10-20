@@ -33,6 +33,7 @@ function getPostHref(post: { type: string; slug?: string | null; id: string }): 
     if (post.type === 'ARTICLE') return `/article/${post.slug}`;
     if (post.type === 'PHOTO') return `/photo/${post.slug}`;
     if (post.type === 'ALBUM') return `/album/${post.slug}`;
+    if (post.type === 'SESSION') return `/session/${post.slug}`;
   }
   return `/post/${post.slug || post.id}`;
 }

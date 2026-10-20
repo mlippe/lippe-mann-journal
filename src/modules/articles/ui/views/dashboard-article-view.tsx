@@ -15,8 +15,8 @@ export const DashboardPostView = ({ slug }: { slug: string }) => {
   const { data } = useSuspenseQuery(trpc.posts.getOne.queryOptions({ slug }));
 
   const [ConfirmationDialog, confirm] = useConfirm(
-    'Delete post',
-    'Are you sure you want to delete this post?',
+    'Beitrag löschen',
+    'Möchtest du diesen Beitrag wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
   );
 
   // const deleteFileMutation = useMutation(

@@ -40,13 +40,13 @@ export const ScreensaverSettingsModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='sm:max-w-125 bg-gray-900/95 border-gray-800 backdrop-blur-sm'>
         <DialogHeader>
-          <DialogTitle className='text-white'>Screensaver Settings</DialogTitle>
+          <DialogTitle className='text-white'>Bildschirmschoner-Einstellungen</DialogTitle>
         </DialogHeader>
 
         <div className='space-y-6 py-4'>
           <div>
             <div className='flex items-center justify-between mb-3'>
-              <label className='text-white text-base font-medium'>Rows:</label>
+              <label className='text-white text-base font-medium'>Zeilen:</label>
               <span className='text-white text-base'>{tempRows}</span>
             </div>
             <input
@@ -67,7 +67,7 @@ export const ScreensaverSettingsModal = ({
 
           <div>
             <div className='flex items-center justify-between mb-3'>
-              <label className='text-white text-base font-medium'>Delay:</label>
+              <label className='text-white text-base font-medium'>Verzögerung:</label>
               <span className='text-white text-base'>
                 {(tempFlipInterval / 1000).toFixed(1)}s
               </span>
@@ -99,7 +99,7 @@ export const ScreensaverSettingsModal = ({
             onClick={handleCancel}
             className='flex-1 bg-gray-700/80 border-gray-600 text-white hover:bg-gray-700 hover:text-white'
           >
-            Cancel
+            Abbrechen
           </Button>
           <Button
             onClick={handleApply}

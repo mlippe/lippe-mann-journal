@@ -90,7 +90,7 @@ export function NavUser({ user }: Props) {
               <Link href="/dashboard/profile">
                 <DropdownMenuItem>
                   <IconUserCircle />
-                  Profile
+                  Profil
                 </DropdownMenuItem>
               </Link>
             </DropdownMenuGroup>
@@ -98,12 +98,12 @@ export function NavUser({ user }: Props) {
             <DropdownMenuItem asChild>
               <Link href="/">
                 <IconHomeShare />
-                Exit Dashboard
+                Dashboard verlassen
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
-              Log out
+              Abmelden
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

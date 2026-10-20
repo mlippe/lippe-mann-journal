@@ -4,7 +4,7 @@ import Link from 'next/link';
 import BlurImage from '@/components/blur-image';
 import { createPreview, formatRelativeCustom } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard } from 'swiper/modules';
 import 'swiper/css';
@@ -16,6 +16,7 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconArrowUpRight,
+  IconCamera,
   IconHeartFilled,
   IconLibraryPhoto,
   IconPhoto,
@@ -41,6 +42,11 @@ const POST_TYPE_INFO = {
     displayString: 'Album',
     actionString: 'Album ansehen',
   },
+  SESSION: {
+    icon: IconCamera,
+    displayString: 'Session',
+    actionString: 'Session ansehen',
+  },
   ARTICLE: {
     icon: IconTextSize,
     displayString: 'Artikel',
@@ -65,7 +71,9 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
     ? `/article/${post.slug}`
     : post.type === 'PHOTO'
       ? `/photo/${post.slug}`
-      : `/album/${post.slug}`;
+      : post.type === 'SESSION'
+        ? `/session/${post.slug}`
+        : `/album/${post.slug}`;
 
   const isPriority = index < 3;
 
@@ -109,7 +117,7 @@ export const PostCard = ({ post, className, index = 0 }: PostCardProps) => {
         </Badge>
 
         {/* Type Badge */}
-        {(post.type === 'ALBUM' || post.type === 'ARTICLE') && (
+        {(post.type === 'ALBUM' || post.type === 'SESSION' || post.type === 'ARTICLE') && (
           <Badge
             variant='secondary'
             className={clsx(
@@ -300,7 +308,23 @@ const MediaContent = ({
     lastTap.current = now;
   };
 
-  const photos = post.postsToPhotos || [];
+  const allPhotos = post.postsToPhotos || [];
+  // For sessions, prioritize the curated cut in the feed card carousel so we don't render 36 slides!
+  const photos = useMemo(() => {
+    if (post.type === 'SESSION') {
+      const rev = allPhotos
+        .filter((p) => p.isRevisitedPick)
+        .sort((a, b) => (a.revisitedOrder ?? 0) - (b.revisitedOrder ?? 0));
+      if (rev.length > 0) return rev;
+      const init = allPhotos
+        .filter((p) => p.isInitialPick)
+        .sort((a, b) => (a.initialOrder ?? 0) - (b.initialOrder ?? 0));
+      if (init.length > 0) return init;
+      return allPhotos.slice(0, 5);
+    }
+    return allPhotos;
+  }, [post.type, allPhotos]);
+
   const firstPhoto = photos.at(0)?.photo;
 
   // Use the server-provided coverIndex if available, otherwise use 0
@@ -317,7 +341,7 @@ const MediaContent = ({
   const paginationId = `swiper-pagination-${uniqueId}`;
 
   useEffect(() => {
-    if (post.type !== 'ALBUM' || photos.length <= 1) return;
+    if ((post.type !== 'ALBUM' && post.type !== 'SESSION') || photos.length <= 1) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -379,7 +403,7 @@ const MediaContent = ({
     );
   }
 
-  const isAlbum = post.type === 'ALBUM' && photos.length > 1;
+  const isAlbum = (post.type === 'ALBUM' || post.type === 'SESSION') && photos.length > 1;
   const isSamePhoto = firstPhoto?.id === coverPhoto.id;
 
   if (isAlbum) {
