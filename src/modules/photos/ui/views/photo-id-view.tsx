@@ -25,6 +25,8 @@ import { ShutterSpeedSelector } from '../components/shutter-speed-selector';
 import { ISOSelector } from '../components/iso-selector';
 import { ExposureCompensationSelector } from '../components/exposure-compensation-selector';
 import { formatExifDate } from '../../lib/utils';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
+import { IconExternalLink } from '@tabler/icons-react';
 
 interface PhotoIdViewProps {
   id: string;
@@ -371,17 +373,50 @@ export const PhotoIdView = ({ id }: PhotoIdViewProps) => {
             </Form>
           </div>
 
-          {/* Photo + Map on the right */}
-          <div className='space-y-4'>
-            <div className='flex items-center justify-center bg-gray-50 dark:bg-muted rounded-xl p-6'>
-              <FramedPhoto
-                src={data.url}
-                alt={data.title}
-                blurhash={data.blurData}
-                width={data.width}
-                height={data.height}
-                className='max-h-[50vh]'
-              />
+          {/* Photo preview on the right */}
+          <div className='space-y-4 lg:sticky lg:top-6'>
+            <div className='rounded-xl border bg-card p-4 sm:p-5 shadow-sm space-y-4'>
+              <div className='flex items-center justify-between pb-2 border-b border-border/60'>
+                <span className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Foto-Vorschau
+                </span>
+                {data.width && data.height && (
+                  <span className='text-xs text-muted-foreground font-mono'>
+                    {data.width} × {data.height} px
+                  </span>
+                )}
+              </div>
+
+              <div className='flex items-center justify-center rounded-lg bg-muted/30 p-3 sm:p-5 border border-border/40'>
+                <FramedPhoto
+                  src={data.url}
+                  alt={data.title || 'Foto'}
+                  blurhash={data.blurData}
+                  width={data.width}
+                  height={data.height}
+                  aspectRatio={data.aspectRatio}
+                />
+              </div>
+
+              <div className='flex items-center justify-between pt-1 text-xs text-muted-foreground'>
+                {data.aspectRatio && (
+                  <span>
+                    Seitenverhältnis:{' '}
+                    <span className='font-mono text-foreground font-medium'>
+                      {Number(data.aspectRatio).toFixed(2)}
+                    </span>
+                  </span>
+                )}
+                <a
+                  href={keyToUrl(data.url)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='inline-flex items-center gap-1.5 text-xs font-medium text-foreground hover:text-primary transition-colors ml-auto'
+                >
+                  <IconExternalLink className='size-3.5' />
+                  Original ansehen
+                </a>
+              </div>
             </div>
           </div>
         </div>

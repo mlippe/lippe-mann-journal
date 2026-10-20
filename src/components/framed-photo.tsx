@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import BlurImage from "./blur-image";
-import { keyToUrl } from "@/modules/s3/lib/key-to-url";
+import { cn } from '@/lib/utils';
+import BlurImage from './blur-image';
+import { keyToUrl } from '@/modules/s3/lib/key-to-url';
 
 interface FramedPhotoProps {
   src: string;
@@ -10,43 +10,50 @@ interface FramedPhotoProps {
   blurhash: string;
   width?: number;
   height?: number;
+  aspectRatio?: number;
   className?: string;
 }
 
 export function FramedPhoto({
   src,
-  alt = "Framed photo",
+  alt = 'Foto',
   blurhash,
   width,
   height,
+  aspectRatio,
   className,
 }: FramedPhotoProps) {
+  const resolvedAspectRatio =
+    aspectRatio ||
+    (typeof width === 'number' && typeof height === 'number' && height > 0
+      ? width / height
+      : undefined);
+
   return (
-    <div className="relative inline-block shadow-[10px_10px_8px_rgba(0,0,0,0.65)]">
-      <div className="relative box-border border-10 border-neutral-700 bg-neutral-700">
-        <div
-          className={cn(
-            "relative bg-white p-4",
-            "shadow-[inset_0_0_18px_rgba(0,0,0,0.16)]",
-            "before:pointer-events-none before:absolute before:content-['']",
-            "before:inset-x-0 before:top-0 before:h-3 before:bg-linear-to-b before:from-black/25 before:via-black/25 before:to-transparent",
-            "after:pointer-events-none after:absolute after:content-['']",
-            "after:inset-y-0 after:left-0 after:w-3 after:bg-linear-to-r after:from-black/25 after:via-black/25 after:to-transparent",
-          )}
-        >
-          <BlurImage
-            src={keyToUrl(src)}
-            alt={alt}
-            blurhash={blurhash}
-            className={cn(
-              "block w-full h-auto max-h-[60vh] object-cover border border-neutral-200",
-              className,
-            )}
-            width={width}
-            height={height}
-          />
-        </div>
-      </div>
+    <div
+      className={cn(
+        'group relative mx-auto w-full max-h-[60vh] overflow-hidden rounded-lg border border-border/70 bg-card shadow-sm transition-all duration-300 hover:shadow-md',
+        !resolvedAspectRatio && 'aspect-4/3',
+        className,
+      )}
+      style={
+        resolvedAspectRatio
+          ? {
+              aspectRatio: `${resolvedAspectRatio}`,
+            }
+          : undefined
+      }
+    >
+      <BlurImage
+        src={keyToUrl(src)}
+        alt={alt}
+        blurhash={blurhash}
+        fill
+        aspectRatio={resolvedAspectRatio}
+        className='object-contain'
+        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw'
+        priority
+      />
     </div>
   );
 }
