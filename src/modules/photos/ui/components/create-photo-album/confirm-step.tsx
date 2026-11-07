@@ -278,6 +278,17 @@ const ConfirmStep = ({
             shouldTouch: true,
             shouldValidate: true,
           });
+        } else if (prevPhoto && index > 1) {
+          form.setValue(`photos.${index - 1}.layoutPosition`, 'right', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index - 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         }
       }
 
@@ -298,6 +309,12 @@ const ConfirmStep = ({
         } else if (!isSwappingPrev && updated[index + 1]) {
           updated[index + 1] = {
             ...updated[index + 1],
+            layoutPosition: 'right',
+            isHighlight: false,
+          };
+        } else if (!isSwappingPrev && !updated[index + 1] && index > 1 && updated[index - 1]) {
+          updated[index - 1] = {
+            ...updated[index - 1],
             layoutPosition: 'right',
             isHighlight: false,
           };
@@ -342,6 +359,17 @@ const ConfirmStep = ({
             shouldTouch: true,
             shouldValidate: true,
           });
+        } else if (prevPhoto && index > 1) {
+          form.setValue(`photos.${index - 1}.layoutPosition`, 'left', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index - 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         }
       }
 
@@ -362,6 +390,12 @@ const ConfirmStep = ({
         } else if (!isSwappingPrev && updated[index + 1]) {
           updated[index + 1] = {
             ...updated[index + 1],
+            layoutPosition: 'left',
+            isHighlight: false,
+          };
+        } else if (!isSwappingPrev && !updated[index + 1] && index > 1 && updated[index - 1]) {
+          updated[index - 1] = {
+            ...updated[index - 1],
             layoutPosition: 'left',
             isHighlight: false,
           };

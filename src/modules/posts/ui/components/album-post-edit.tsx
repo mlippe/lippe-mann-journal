@@ -293,6 +293,18 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
             shouldTouch: true,
             shouldValidate: true,
           });
+        } else if (prevPhoto && index > 1) {
+          // If at the end of the album, pair backwards with previous photo
+          form.setValue(`photos.${index - 1}.layoutPosition`, 'right', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index - 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         }
       }
     } else if (position === 'right') {
@@ -330,6 +342,18 @@ export const AlbumPostEdit = ({ post }: { post: PostGetOne }) => {
             shouldValidate: true,
           });
           form.setValue(`photos.${index + 1}.isHighlight`, false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+        } else if (prevPhoto && index > 1) {
+          // If at the end of the album, pair backwards with previous photo
+          form.setValue(`photos.${index - 1}.layoutPosition`, 'left', {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
+          form.setValue(`photos.${index - 1}.isHighlight`, false, {
             shouldDirty: true,
             shouldTouch: true,
             shouldValidate: true,

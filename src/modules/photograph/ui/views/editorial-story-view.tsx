@@ -67,7 +67,12 @@ type StoryPhoto = Photo & {
 type EditorialBlock =
   | { type: 'hero'; photo: StoryPhoto; index: number }
   | { type: 'highlight'; photo: StoryPhoto; index: number }
-  | { type: 'diptych'; photos: [StoryPhoto, StoryPhoto]; startIndex: number }
+  | {
+      type: 'diptych';
+      photos: [StoryPhoto, StoryPhoto];
+      startIndex: number;
+      isManual?: boolean;
+    }
   | { type: 'landscape'; photo: StoryPhoto; index: number }
   | { type: 'solo'; photo: StoryPhoto; index: number };
 
@@ -259,13 +264,19 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
         return allSessionPhotos.slice(0, 5);
       }
 
-      return post.postsToPhotos.map((ptp) => ({
-        ...ptp.photo,
-        isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
-        layoutPosition:
-          ((ptp as { layoutPosition?: 'left' | 'right' | 'solo' | null })
-            .layoutPosition as 'left' | 'right' | 'solo') || 'solo',
-      }));
+      return [...post.postsToPhotos]
+        .sort(
+          (a, b) =>
+            ((a as { sortOrder?: number }).sortOrder ?? 0) -
+            ((b as { sortOrder?: number }).sortOrder ?? 0),
+        )
+        .map((ptp) => ({
+          ...ptp.photo,
+          isHighlight: Boolean((ptp as { isHighlight?: boolean }).isHighlight),
+          layoutPosition:
+            ((ptp as { layoutPosition?: 'left' | 'right' | 'solo' | null })
+              .layoutPosition as 'left' | 'right' | 'solo') || 'solo',
+        }));
     }
     if (post.coverImage) {
       return [
@@ -427,6 +438,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             type: 'diptych',
             photos: [current, next],
             startIndex: realIndex,
+            isManual: true,
           });
         } else {
           // current is right: place next on the left, current on the right
@@ -434,6 +446,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             type: 'diptych',
             photos: [next, current],
             startIndex: realIndex,
+            isManual: true,
           });
         }
         lastWasPair = true;
@@ -473,6 +486,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
             type: 'diptych',
             photos: [current, next],
             startIndex: realIndex,
+            isManual: false,
           });
           lastWasPair = true;
           solosSinceLastPair = 0;
@@ -1075,11 +1089,16 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       photoB.aspectRatio ||
       (photoB.width && photoB.height ? photoB.width / photoB.height : 1);
 
-    const bSeed = getBlockSeed(postSeed, block.startIndex);
-    const bothVertical = ratioA < 1.25 && ratioB < 1.25;
-    const isMobileSideBySide = bothVertical
-      ? bSeed % 3 !== 0 // ~66% of vertical pairs sit side-by-side on mobile
-      : bSeed % 4 === 0; // ~25% of other pairs sit side-by-side on mobile
+    const isManualPair =
+      Boolean(block.isManual) ||
+      photoA.layoutPosition === 'left' ||
+      photoA.layoutPosition === 'right' ||
+      photoB.layoutPosition === 'left' ||
+      photoB.layoutPosition === 'right';
+
+    // Explicit manual pairs configured in the editor should always display side-by-side on mobile.
+    // Automatic cadence pairs stack vertically on mobile instead of being randomized.
+    const isMobileSideBySide = isManualPair;
 
     const indexA = photos.findIndex((p) => p.id === photoA.id);
     const indexB = photos.findIndex((p) => p.id === photoB.id);
