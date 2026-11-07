@@ -19,12 +19,12 @@ interface EditorialOpticalIndicatorProps {
 /**
  * EditorialOpticalIndicator (Scroll Progress)
  *
- * A super subtle, modern UI scroll progress line anchored to the left edge of the screen:
- * - 2px wide on mobile devices, 4px wide on desktop.
- * - Gentle progress fill from top to bottom matching scroll depth through the editorial story.
- * - Precision modern UI front marker at the leading edge showing continuous progress.
- * - Understated idle dimming to stay completely non-intrusive during reading.
- * - Interactive click-to-scrub on desktop while preserving native edge-swipe gestures on mobile.
+ * An ultra-subtle, minimal scroll progress line anchored to the left edge of the screen:
+ * - 1px wide on mobile devices, 2px wide on desktop.
+ * - Tiny 1px horizontal hairline leading marker protruding at the progress tip.
+ * - Darker, subdued color tones for minimal distraction.
+ * - Understated idle dimming during reading.
+ * - Interactive click-to-scrub zone on desktop while preserving native edge-swipe gestures on mobile.
  */
 export function EditorialOpticalIndicator({
   containerRef,
@@ -123,48 +123,40 @@ export function EditorialOpticalIndicator({
     <aside
       aria-label='Story-Fortschritt'
       className={cn(
-        'fixed left-0 top-0 bottom-0 h-screen z-40 select-none',
-        'transition-opacity duration-300 pointer-events-none',
+        'fixed left-0 top-0 bottom-0 h-screen z-40 select-none pointer-events-none',
+        'transition-opacity duration-300',
         isVisible
           ? isScrolling
-            ? 'opacity-90'
-            : 'opacity-30 md:opacity-40 hover:opacity-100'
+            ? 'opacity-55 md:opacity-45'
+            : 'opacity-20 md:opacity-15 hover:opacity-55'
           : 'opacity-0',
       )}
     >
       {/* Interactive desktop scrub zone (wider hit target, pointer-events enabled) */}
       <div
         onClick={handleDesktopScrub}
-        className='hidden md:block absolute left-0 top-0 bottom-0 w-4 h-full cursor-pointer pointer-events-auto group'
+        className='hidden md:block absolute left-0 top-0 bottom-0 w-3 h-full cursor-pointer pointer-events-auto'
         title={`Fortschritt: ${Math.round(scrollProgress * 100)}%`}
       />
 
-      {/* Subtle track line along left edge */}
-      <div className='relative h-full w-[2px] md:w-[4px] bg-foreground/[0.06] dark:bg-white/[0.08]'>
-        {/* Active progress fill line */}
+      {/* Ultra-subtle track line along left edge (1px mobile, 2px desktop) */}
+      <div className='relative h-full w-[1px] md:w-[2px] bg-foreground/[0.04] dark:bg-white/[0.05]'>
+        {/* Active progress fill line with darker, muted tone */}
         <div
-          className='w-full bg-foreground/45 dark:bg-foreground/55 transition-[height] duration-75 ease-out rounded-b-[1px]'
+          className='w-full bg-foreground/30 dark:bg-foreground/35 transition-[height] duration-75 ease-out'
           style={{
             height: `${Math.min(100, Math.max(0, scrollProgress * 100))}%`,
           }}
         />
 
-        {/* Tiny modern UI front marker at the progress tip */}
+        {/* Tiny horizontal line leading marker at progress tip */}
         <div
-          className='absolute left-0 -translate-y-1/2 transition-[top] duration-75 ease-out pointer-events-none flex items-center'
+          className='absolute left-0 -translate-y-1/2 transition-[top] duration-75 ease-out pointer-events-none'
           style={{
             top: `${Math.min(100, Math.max(0, scrollProgress * 100))}%`,
           }}
         >
-          <div
-            className={cn(
-              'rounded-r-xs bg-foreground shadow-xs',
-              'transition-transform duration-200',
-              // Dimensions: 2px track -> 5px marker on mobile; 4px track -> 8px marker on desktop
-              'w-[5px] h-[13px] md:w-[8px] md:h-[18px]',
-              isScrolling && 'scale-y-110',
-            )}
-          />
+          <span className='block h-[1px] w-2 md:w-3 bg-foreground/50 dark:bg-white/45' />
         </div>
       </div>
     </aside>
