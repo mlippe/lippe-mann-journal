@@ -1792,6 +1792,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       <EditorialOpticalIndicator
         containerRef={articleRef}
         photos={photos}
+        fadeDelayMs={250}
       />
 
       {/* 1. TOP BREADCRUMB & UTILITY HEADER */}

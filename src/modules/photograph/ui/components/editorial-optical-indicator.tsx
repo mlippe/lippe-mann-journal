@@ -14,6 +14,7 @@ export interface OpticalIndicatorPhoto {
 interface EditorialOpticalIndicatorProps {
   containerRef?: React.RefObject<HTMLElement | null>;
   photos?: OpticalIndicatorPhoto[];
+  fadeDelayMs?: number;
 }
 
 /**
@@ -28,6 +29,7 @@ interface EditorialOpticalIndicatorProps {
  */
 export function EditorialOpticalIndicator({
   containerRef,
+  fadeDelayMs = 250,
 }: EditorialOpticalIndicatorProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -76,14 +78,18 @@ export function EditorialOpticalIndicator({
       }
       scrollTimeoutRef.current = setTimeout(() => {
         setIsScrolling(false);
-      }, 1500);
+      }, fadeDelayMs);
     });
-  }, [calculateProgress]);
+  }, [calculateProgress, fadeDelayMs]);
 
   useEffect(() => {
+    const handleResize = () => {
+      calculateProgress();
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
-    handleScroll();
+    window.addEventListener('resize', handleResize, { passive: true });
+    calculateProgress();
 
     return () => {
       if (rafId.current !== null) {
@@ -93,9 +99,9 @@ export function EditorialOpticalIndicator({
         clearTimeout(scrollTimeoutRef.current);
       }
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [handleScroll]);
+  }, [handleScroll, calculateProgress]);
 
   const handleDesktopScrub = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -124,11 +130,11 @@ export function EditorialOpticalIndicator({
       aria-label='Story-Fortschritt'
       className={cn(
         'fixed left-0 top-0 bottom-0 h-screen z-40 select-none pointer-events-none',
-        'transition-opacity duration-300',
+        'transition-opacity duration-300 ease-out',
         isVisible
           ? isScrolling
-            ? 'opacity-55 md:opacity-45'
-            : 'opacity-20 md:opacity-15 hover:opacity-55'
+            ? 'opacity-65 md:opacity-55'
+            : 'opacity-20 md:opacity-15 hover:opacity-65'
           : 'opacity-0',
       )}
     >
