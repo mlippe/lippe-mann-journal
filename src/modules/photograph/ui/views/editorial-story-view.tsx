@@ -1788,7 +1788,7 @@ export const EditorialStoryView = ({ post }: EditorialStoryViewProps) => {
       ref={articleRef}
       className='w-full max-w-6xl mx-auto py-6 sm:py-8 md:py-12'
     >
-      {/* Precision Optical Scroll & Frame Indicator (Swiss Design) */}
+      {/* Precision Scroll Progress Line & Front Marker */}
       <EditorialOpticalIndicator
         containerRef={articleRef}
         photos={photos}
